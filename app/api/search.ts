@@ -1,39 +1,50 @@
-import { Client } from "pg";
 import type { Route } from "../+types/root";
-import knex from "knex";
+import knex, { type Knex } from "knex";
+import type { Tea } from "~t/types";
+import type { DB } from "~t/database";
 
-function getPgClient(): Client {
-	return new Client({});
-}
-
-function knexConnection() {
+export function knexConnection() {
 	return knex({
 		client: "pg",
-		debug: true,
 		connection: {
 			host: "localhost",
 			user: "admin",
 			password: "admin",
 			database: "teatea",
-			port: 2345,
-		},
+			port: 2345
+		}
 	});
 }
 
-export async function loader(args: Route.LoaderArgs) {
-	const connection = knexConnection();
+export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
+	const cnx = knexConnection();
 
-	// const client = getPgClient();
-	// await client.connect();
-
-	const qb = connection
-		.select("tea.*", "cultivar.name as cultivar_name")
+	const qb = cnx
+		.select(
+			// Tea
+			"tea.id as t_id",
+			"tea.name as t_name",
+			"tea.origin_id as t_origin_id",
+			"tea.type_id as t_type_id",
+			"tea.cultivar_id as t_cultivar_id",
+			// Cultivar
+			"c.id as c_id",
+			"c.name as c_name",
+			// Tea type
+			"tt.id as tt_id",
+			"tt.name as tt_name",
+			"tt.path as tt_path",
+			// Origin
+			"o.id as o_id",
+			"o.name as o_name",
+			"o.path as o_path"
+		)
 		.from("tea")
-		.leftJoin("cultivar", "tea.cultivar_id", "cultivar.id")
+		.leftJoin("cultivar as c", "tea.cultivar_id", "c.id")
+		.leftJoin("tea_type as tt", "tea.type_id", "tt.id")
+		.leftJoin("origin as o", "tea.origin_id", "o.id")
 		.orderBy("tea.id");
 
-	let joinsClauses = [];
-	const whereClauses = [];
 	const searchTypes = new URL(args.request.url).searchParams.getAll("type[]").map((id) => parseInt(id));
 	const searchOrigins = new URL(args.request.url).searchParams.getAll("origin[]").map((id) => parseInt(id));
 
@@ -47,55 +58,98 @@ export async function loader(args: Route.LoaderArgs) {
 		qb.andWhereRaw(`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${searchOrigins.join(",")}))`);
 	}
 
-	const rawTeas = await qb.limit(100);
+	const results = await qb.limit(100);
 
-	if (0 === rawTeas.length) {
+	if (0 === results.length) {
 		return [];
 	}
 
-	const originsId = rawTeas.reduce((ids, tea) => (ids.includes(tea.origin_id) ? ids : [...ids, tea.origin_id]), []);
-	const typesId = rawTeas.reduce((ids, tea) => (ids.includes(tea.type_id) ? ids : [...ids, tea.type_id]), []);
+	const originsPaths: string[] = results.reduce(
+		(paths, r) => (!!r.tt_path || paths.includes(r.tt_path) ? paths : [...paths, r.tt_path]),
+		[]
+	);
 
-	const originResults = await connection
-		.select("origin.id", connection.raw("array_agg(tmp.name ORDER BY tmp.path) as names"))
-		.from("origin")
-		.leftJoin("origin as tmp", "tmp.path", "@>", "origin.path")
-		.whereIn("origin.id", originsId)
-		.groupBy("origin.id");
+	const typesPaths: string[] = results.reduce(
+		(paths, r) => (!!r.o_path || paths.includes(r.o_path) ? paths : [...paths, r.o_path]),
+		[]
+	);
 
-	const typeResults = await connection
-		.select("tea_type.id", connection.raw("array_agg(tmp.name ORDER BY tmp.path) as names"))
-		.from("tea_type")
-		.leftJoin("tea_type as tmp", "tmp.path", "@>", "tea_type.path")
-		.whereIn("tea_type.id", typesId)
-		.groupBy("tea_type.id");
+	const types = await fetchTypes(cnx, extractPaths(results, "tt_path"));
+	const origins = await fetchOrigins(cnx, extractPaths(results, "o_path"));
 
-	const origins = originResults.reduce((store, item) => ({ ...store, [item.id]: item }), {});
-	const types = typeResults.reduce((store, item) => ({ ...store, [item.id]: item }), {});
+	await cnx.destroy();
 
-	const teas = rawTeas.map((tea) => {
-		const origin = origins[tea.origin_id]?.names ?? [];
-		const type = types[tea.type_id]?.names ?? [];
+	return results.map((row): Tea => {
+		const origin = origins[row.o_path];
 
 		return {
-			...tea,
-			origin: origin
-				? {
-						country: origin[1],
-						region: origin[2],
-						locality: origin[3],
-					}
-				: null,
-			type: {
-				category: type[0],
-				family: type[1],
-				type: type[2],
-				subType: type[3],
-			},
+			id: row.t_id,
+			name: row.t_name ?? undefined,
+			type: { id: row.tt_id, name: row.tt_name, path: row.tt_path },
+			parentTypes: findLTreeParents(types, row.tt_path),
+			cultivar: row.c_id ? { id: row.c_id, name: row.c_name } : undefined,
+			origin: origin ?? undefined,
+			parentOrigins: origin ? findLTreeParents(origins, origin.path) : undefined
 		};
 	});
+}
 
-	await connection.destroy();
+function extractPaths(list: object[], key: string): string[] {
+	return list.reduce<string[]>((paths, item) => {
+		if (false === Object.hasOwn(item, key)) {
+			return paths;
+		}
 
-	return teas;
+		// @ts-ignore
+		const path = typeof item[key] === "string" ? item[key] : undefined;
+
+		if (!path || paths.includes(path)) {
+			return paths;
+		}
+
+		return [...paths, path];
+	}, []);
+}
+
+async function fetchTypes(cnx: Knex, paths: string[]): Promise<{ [key: string]: DB.TeaType }> {
+	if (0 === paths.length) {
+		return {};
+	}
+
+	// .select("origin.id", connection.raw("array_agg(tmp.name ORDER BY tmp.path) as names"))
+	const results: DB.TeaType[] = await cnx
+		.select("*")
+		.from("tea_type")
+		.where("tea_type.path", "@>", cnx.raw(makeLTreeArray(paths)));
+
+	return Object.fromEntries(results.map((row) => [row.path, row]));
+}
+
+async function fetchOrigins(cnx: Knex, paths: string[]): Promise<{ [key: string]: DB.Origin }> {
+	if (0 === paths.length) {
+		return {};
+	}
+
+	// .select("origin.id", connection.raw("array_agg(tmp.name ORDER BY tmp.path) as names"))
+	const results: DB.Origin[] = await cnx
+		.select("*")
+		.from("origin")
+		.where("origin.path", "@>", cnx.raw(makeLTreeArray(paths)));
+	return Object.fromEntries(results.map((row) => [row.path, row]));
+}
+
+function makeLTreeArray(paths: string[]): string {
+	const items = paths.map((path) => `'${path}'::ltree`);
+	return `(ARRAY[${items.join(",")}])`;
+}
+
+function findLTreeParents<T>(list: { [key: string]: T }, path: string): T[] {
+	const paths = [];
+
+	path.split(".").slice(0, -1).reduce((p, n) => {
+		paths.push([...p, n].join("."));
+		return [...p, n];
+	}, []);
+
+	return paths.map((k) => list[k]).filter((v) => !!v);
 }

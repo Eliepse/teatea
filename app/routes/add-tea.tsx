@@ -251,12 +251,12 @@ function CultivarsInput(props: {
 			<option value="">Unknown</option>
 
 			{Object.values(props.values).map((country) => (
-				<Fragment key={country.name}>
+				<Fragment key={country.id}>
 					<option className="text-base-content/40" disabled>
 						{country.name}
 					</option>
 					{country.cultivars.map((cultivar) => (
-						<option value={cultivar.id}>&emsp;{cultivar.name}</option>
+						<option key={cultivar.id} value={cultivar.id}>&emsp;{cultivar.name}</option>
 					))}
 				</Fragment>
 			))}

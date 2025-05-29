@@ -60,7 +60,7 @@ export function MultilevelSelect(props: { types: Node[]; value: Node[]; onChange
 				</button>
 			)}
 
-			<div className="py-2 bg-white text-sm uppercase text-base-content/40 static top-0">
+			<div className="py-2 bg-white text-sm uppercase text-base-content/40 sticky top-0 z-10">
 				{navPath.map((node, i) => (
 					<Fragment key={node.id}>
 						{0 !== i && <> &middot; </>}

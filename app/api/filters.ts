@@ -1,5 +1,6 @@
 import { Client } from "pg";
 import type { Route } from "../+types/root";
+import { knexConnection } from "~/api/search";
 
 type DBOrigin = {
 	id: number;
@@ -17,14 +18,14 @@ function getPgClient(): Client {
 }
 
 function pathToTree(list: any[]): { [key: string]: { children?: any[] } } {
-	return list.reduce((store, item) => {
-		const parentPath = item.path.split(".").slice(0, -1).join(".");
-		const parent = Object.hasOwn(store, parentPath) ? store[parentPath] : null;
+	const itemsByPath = Object.fromEntries(list.map(item => [item.path, item]));
 
-		store[item.path] = item;
+	const treeEntries = Object.entries(itemsByPath).map(([path, item]) => {
+		const parentPath = path.substring(0, path.lastIndexOf("."));
+		const parent = Object.hasOwn(itemsByPath, parentPath) ? itemsByPath[parentPath] : null;
 
 		if (!parent) {
-			return store;
+			return [path, item];
 		}
 
 		if (!parent.children) {
@@ -32,25 +33,22 @@ function pathToTree(list: any[]): { [key: string]: { children?: any[] } } {
 		}
 
 		parent.children.push(item);
-		return store;
-	}, {});
+		return [path, undefined];
+	});
+
+	return Object.fromEntries(treeEntries.filter(([,v]) => undefined !== v));
 }
 
 export async function loader(args: Route.LoaderArgs) {
-	const client = getPgClient();
-	await client.connect();
+	const cnx = knexConnection();
 
-	const originResults = await client.query<DBOrigin>(`SELECT id, name, path FROM origin ORDER BY path`);
-	const typeResults = await client.query(`SELECT id, name, path FROM tea_type ORDER BY path`);
+	const origins = await cnx.select("origin.*").from("origin").orderBy("path");
+	const types = await cnx.select("tea_type.*").from("tea_type").orderBy("order", "path");
 
-	const types = Object.entries(pathToTree(typeResults.rows))
-		.filter(([path]) => false === path.includes("."))
-		.map(([_, item]) => item);
-
-	await client.end();
+	await cnx.destroy();
 
 	return {
-		origins: pathToTree(originResults.rows)["Top"].children,
-		types: types,
+		origins: Object.values(pathToTree(origins)),
+		types: pathToTree(types),
 	};
 }

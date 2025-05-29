@@ -6,23 +6,8 @@ import { type ChangeEvent, Fragment, useState } from "react";
 import { OriginFilter, type OriginFilterValue } from "~/components/search/OriginFilter";
 import { useQuery } from "@tanstack/react-query";
 import { loader as filtersLoader } from "~/api/filters";
-
-type Tea = {
-	id: number;
-	type_id: number;
-	origin_id: number | null;
-	cultivar_id: number | null;
-	type: { category: string; family?: string; type?: string; subType?: string };
-	cultivar_name: string | null;
-	origin: { country?: string; region?: string; locality?: string } | null;
-	harvest: { year?: number; month?: number; season?: string } | null;
-	blend: boolean;
-	altitude: number | null;
-	name: string | null;
-	roast_level: null;
-	scented: boolean | null;
-	smoked: number | null;
-};
+import { ResultItem } from "~/components/search/tea-search/resultItem";
+import type { Tea } from "~t/types";
 
 export function meta({}: Route.MetaArgs) {
 	return [{ title: "Teatea" }];
@@ -71,7 +56,7 @@ export default function Home(props: Route.ComponentProps) {
 
 				<div className="">
 					<TypeFilterListAll
-						types={props.loaderData.types[1].children}
+						types={props.loaderData.types.Tea?.children ?? []}
 						value={typeFilter}
 						onChange={setTypeFilter}
 					/>
@@ -84,39 +69,8 @@ export default function Home(props: Route.ComponentProps) {
 					All teas ({data?.length})
 				</li>
 
-				{data?.map((tea, i) => <TeaItem key={i} tea={tea} />)}
+				{data?.map((tea, i) => <ResultItem key={i} tea={tea} onClick={console.debug} />)}
 			</ul>
 		</div>
-	);
-}
-
-function TeaItem(props: { tea: Tea }) {
-	const tea = props.tea;
-	const hasName = !!tea.name;
-	const isTea = "Tea" === tea.type.category;
-	const type = [isTea ? null : tea.type.category, tea.type.family, tea.type.type, tea.type.subType].filter((v) => v);
-
-	return (
-		<li className="list-row">
-			<div className="list-col-grow">
-				<div className="text-xs text-base-content/60">
-					{type.slice(0, hasName ? undefined : -1).map((name, i) => (
-						<Fragment key={name}>
-							{i !== 0 && <> &middot; </>}
-							{name}
-						</Fragment>
-					))}
-				</div>
-				<span className="font-semibold">{hasName ? tea.name : type.slice(-1)[0]}</span>
-			</div>
-			<div className="text-right text-xs">
-				{!!tea.origin && [tea.origin.region, tea.origin.country].filter((v) => v).join(", ")}
-				{!!tea.cultivar_name && (
-					<div className="text-base-content/50">
-						{tea.cultivar_name} <Leaf className="size-3 text-green-400 inline" />
-					</div>
-				)}
-			</div>
-		</li>
 	);
 }
