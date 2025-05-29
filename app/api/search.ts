@@ -18,8 +18,9 @@ export function knexConnection() {
 
 export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 	const cnx = knexConnection();
+	const requestUrl = new URL(args.request.url);
 
-	const qb = cnx
+	const teasQuery = cnx
 		.select(
 			// Tea
 			"tea.id as t_id",
@@ -45,20 +46,32 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 		.leftJoin("origin as o", "tea.origin_id", "o.id")
 		.orderBy("tea.id");
 
-	const searchTypes = new URL(args.request.url).searchParams.getAll("type[]").map((id) => parseInt(id));
-	const searchOrigins = new URL(args.request.url).searchParams.getAll("origin[]").map((id) => parseInt(id));
+	const searchTypes = requestUrl.searchParams.getAll("type[]").map((id) => parseInt(id));
+	const searchOrigins = requestUrl.searchParams.getAll("origin[]").map((id) => parseInt(id));
 
 	if (0 < searchTypes.length) {
-		qb.innerJoin("tea_type as TFilter", "tea.type_id", "TFilter.id");
-		qb.andWhereRaw(`"TFilter".path <@ ANY (SELECT path FROM tea_type t WHERE t.id IN (${searchTypes.join(",")}))`);
+		teasQuery.innerJoin("tea_type as TFilter", "tea.type_id", "TFilter.id");
+		teasQuery.andWhereRaw(`"TFilter".path <@ ANY (SELECT path FROM tea_type t WHERE t.id IN (${searchTypes.join(",")}))`);
 	}
 
 	if (0 < searchOrigins.length) {
-		qb.innerJoin("origin as OFilter", "tea.origin_id", "OFilter.id");
-		qb.andWhereRaw(`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${searchOrigins.join(",")}))`);
+		teasQuery.innerJoin("origin as OFilter", "tea.origin_id", "OFilter.id");
+		teasQuery.andWhereRaw(`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${searchOrigins.join(",")}))`);
 	}
-
-	const results = await qb.limit(100);
+	
+	const textSearch = requestUrl.searchParams.get("q") || null;
+	if(textSearch) {
+		teasQuery.andWhere((qb) => {
+			const quotedSearch = textSearch.replaceAll(/[_%\\]/g, "\\$&");
+			qb.orWhereRaw("tea.name ILIKE ?", [`%${quotedSearch}%`])
+			.orWhereRaw("c.name ILIKE ?", [`%${quotedSearch}%`])
+			.orWhereRaw("tt.name ILIKE ?", [`%${quotedSearch}%`])
+		});
+	}
+	
+	console.debug(teasQuery.toString())
+	
+	const results = await teasQuery.limit(100);
 
 	if (0 === results.length) {
 		return [];
@@ -144,9 +157,9 @@ function makeLTreeArray(paths: string[]): string {
 }
 
 function findLTreeParents<T>(list: { [key: string]: T }, path: string): T[] {
-	const paths = [];
+	const paths: string[] = [];
 
-	path.split(".").slice(0, -1).reduce((p, n) => {
+	path.split(".").slice(0, -1).reduce<string[]>((p, n) => {
 		paths.push([...p, n].join("."));
 		return [...p, n];
 	}, []);
