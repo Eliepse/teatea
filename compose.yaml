@@ -3,7 +3,7 @@ name: teatea
 services:
   db:
     image: postgres:17-alpine
-    restart: unless-stopped
+    restart: on-failure
     shm_size: 128mb
     environment:
       POSTGRES_DB: teatea
