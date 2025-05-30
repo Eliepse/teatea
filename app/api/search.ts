@@ -11,8 +11,8 @@ export function knexConnection() {
 			user: "admin",
 			password: "admin",
 			database: "teatea",
-			port: 2345
-		}
+			port: 2345,
+		},
 	});
 }
 
@@ -38,7 +38,7 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 			// Origin
 			"o.id as o_id",
 			"o.name as o_name",
-			"o.path as o_path"
+			"o.path as o_path",
 		)
 		.from("tea")
 		.leftJoin("cultivar as c", "tea.cultivar_id", "c.id")
@@ -51,25 +51,29 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 
 	if (0 < searchTypes.length) {
 		teasQuery.innerJoin("tea_type as TFilter", "tea.type_id", "TFilter.id");
-		teasQuery.andWhereRaw(`"TFilter".path <@ ANY (SELECT path FROM tea_type t WHERE t.id IN (${searchTypes.join(",")}))`);
+		teasQuery.andWhereRaw(
+			`"TFilter".path <@ ANY (SELECT path FROM tea_type t WHERE t.id IN (${searchTypes.join(",")}))`,
+		);
 	}
 
 	if (0 < searchOrigins.length) {
 		teasQuery.innerJoin("origin as OFilter", "tea.origin_id", "OFilter.id");
-		teasQuery.andWhereRaw(`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${searchOrigins.join(",")}))`);
+		teasQuery.andWhereRaw(
+			`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${searchOrigins.join(",")}))`,
+		);
 	}
-	
+
 	const textSearch = requestUrl.searchParams.get("q") || null;
 
-	if(!!textSearch) {
+	if (!!textSearch) {
 		teasQuery.andWhere((qb) => {
 			const quotedSearch = textSearch.replaceAll(/[_%\\]/g, "\\$&");
 			qb.orWhereRaw("tea.name ILIKE ?", [`%${quotedSearch}%`])
-			.orWhereRaw("c.name ILIKE ?", [`%${quotedSearch}%`])
-			.orWhereRaw("tt.name ILIKE ?", [`%${quotedSearch}%`])
+				.orWhereRaw("c.name ILIKE ?", [`%${quotedSearch}%`])
+				.orWhereRaw("tt.name ILIKE ?", [`%${quotedSearch}%`]);
 		});
 	}
-	
+
 	const results = await teasQuery.limit(100);
 
 	if (0 === results.length) {
@@ -78,12 +82,12 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 
 	const originsPaths: string[] = results.reduce(
 		(paths, r) => (!!r.tt_path || paths.includes(r.tt_path) ? paths : [...paths, r.tt_path]),
-		[]
+		[],
 	);
 
 	const typesPaths: string[] = results.reduce(
 		(paths, r) => (!!r.o_path || paths.includes(r.o_path) ? paths : [...paths, r.o_path]),
-		[]
+		[],
 	);
 
 	const types = await fetchTypes(cnx, extractPaths(results, "tt_path"));
@@ -101,7 +105,7 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 			parentTypes: findLTreeParents(types, row.tt_path),
 			cultivar: row.c_id ? { id: row.c_id, name: row.c_name } : undefined,
 			origin: origin ?? undefined,
-			parentOrigins: origin ? findLTreeParents(origins, origin.path) : undefined
+			parentOrigins: origin ? findLTreeParents(origins, origin.path) : undefined,
 		};
 	});
 }
@@ -158,10 +162,12 @@ function makeLTreeArray(paths: string[]): string {
 function findLTreeParents<T>(list: { [key: string]: T }, path: string): T[] {
 	const paths: string[] = [];
 
-	path.split(".").slice(0, -1).reduce<string[]>((p, n) => {
-		paths.push([...p, n].join("."));
-		return [...p, n];
-	}, []);
+	path.split(".")
+		.slice(0, -1)
+		.reduce<string[]>((p, n) => {
+			paths.push([...p, n].join("."));
+			return [...p, n];
+		}, []);
 
 	return paths.map((k) => list[k]).filter((v) => !!v);
 }

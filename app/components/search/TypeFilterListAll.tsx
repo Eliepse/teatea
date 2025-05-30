@@ -5,7 +5,12 @@ import { MultilevelSelect } from "~/components/search/MultilevelSelect";
 type Type = { id: number; path: string; name: string; children?: Type[] };
 export type TypeFilterValue = Type[];
 
-export function TypeFilterListAll(props: { types: Type[]; value: Type[]; onChange: (value: Type[]) => void }) {
+export function TypeFilterListAll(props: {
+	types: Type[];
+	value: Type[];
+	onChange: (value: Type[]) => void;
+	disabled?: boolean;
+}) {
 	const [open, setOpen] = useState(false);
 
 	function onCloseClick(e: MouseEvent) {
@@ -21,7 +26,7 @@ export function TypeFilterListAll(props: { types: Type[]; value: Type[]; onChang
 
 	return (
 		<>
-			<button className="btn mr-2" onClick={() => setOpen(true)}>
+			<button className="btn mr-2" onClick={() => setOpen(true)} disabled={props.disabled}>
 				Type
 				{0 < props.value.length && <span className="badge badge-sm badge-secondary">{props.value.length}</span>}
 			</button>
