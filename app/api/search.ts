@@ -60,7 +60,8 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 	}
 	
 	const textSearch = requestUrl.searchParams.get("q") || null;
-	if(textSearch) {
+
+	if(!!textSearch) {
 		teasQuery.andWhere((qb) => {
 			const quotedSearch = textSearch.replaceAll(/[_%\\]/g, "\\$&");
 			qb.orWhereRaw("tea.name ILIKE ?", [`%${quotedSearch}%`])
@@ -68,8 +69,6 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 			.orWhereRaw("tt.name ILIKE ?", [`%${quotedSearch}%`])
 		});
 	}
-	
-	console.debug(teasQuery.toString())
 	
 	const results = await teasQuery.limit(100);
 

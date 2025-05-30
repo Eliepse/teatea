@@ -2,7 +2,7 @@ import type { Route } from "./+types/home";
 import MagnifierIcon from "~/components/icons/magnifier";
 import Leaf from "~/components/icons/leaf";
 import { TypeFilterListAll, type TypeFilterValue } from "~/components/search/TypeFilterListAll";
-import { type ChangeEvent, Fragment, useState } from "react";
+import { type ChangeEvent, Fragment, useEffect, useState } from "react";
 import { OriginFilter, type OriginFilterValue } from "~/components/search/OriginFilter";
 import { useQuery } from "@tanstack/react-query";
 import { loader as filtersLoader } from "~/api/filters";
@@ -17,27 +17,40 @@ export async function loader(args: Route.LoaderArgs) {
 	return await filtersLoader(args);
 }
 
+async function searchTeas(
+	params: { types?: number[]; origins?: number[]; text?: string },
+	signal?: AbortSignal,
+): Promise<Tea[]> {
+	const sp = new URLSearchParams();
+	params.types?.forEach((id) => sp.append("type[]", id.toString()));
+	params.origins?.forEach((id) => sp.append("origin[]", id.toString()));
+
+	if (params.text) {
+		sp.append("q", params.text);
+	}
+
+	const response = await fetch(`/api/search?${sp.toString()}`, { signal });
+	return await response.json();
+}
+
 export default function Home(props: Route.ComponentProps) {
-	const [search, setSearch] = useState<string | null>(null);
+	const [search, setSearch] = useState<string | undefined>(undefined);
 	const [typeFilter, setTypeFilter] = useState<TypeFilterValue>([]);
 	const [originFilter, setOriginFilter] = useState<OriginFilterValue>([]);
 
 	const { data, isLoading } = useQuery({
 		queryFn: async (query): Promise<Tea[]> => {
-			const sp = new URLSearchParams();
-			query.queryKey[1]?.types?.forEach((id) => sp.append("type[]", id));
-			query.queryKey[1]?.origins?.forEach((id) => sp.append("origin[]", id));
-			const response = await fetch(`/api/search?${sp.toString()}`);
-			return await response.json();
+			return await searchTeas(
+				{
+					types: query.queryKey[1]?.types ?? undefined,
+					origins: query.queryKey[1]?.origins ?? undefined,
+					text: query.queryKey[1]?.search ?? undefined,
+				},
+				query.signal,
+			);
 		},
-		queryKey: ["search", { types: typeFilter.map((t) => t.id), origins: originFilter.map((t) => t.id) }],
+		queryKey: ["search", { types: typeFilter.map((t) => t.id), origins: originFilter.map((t) => t.id), search }],
 	});
-
-	function onSearchChange(e: ChangeEvent<HTMLInputElement>) {
-		e.stopPropagation();
-		const value = e.currentTarget.value.trim().toLowerCase();
-		setSearch(value || null);
-	}
 
 	return (
 		<div className="flex flex-col h-screen">
@@ -45,7 +58,8 @@ export default function Home(props: Route.ComponentProps) {
 				<div className="flex mb-2">
 					<label className="input mr-2 flex-1">
 						<MagnifierIcon className="h-[1em] opacity-50" />
-						<input type="search" className="grow" placeholder="Search" onChange={onSearchChange} />
+						<SearchInput onChange={setSearch} />
+						{/* <input type="search" className="grow" placeholder="Search" onChange={onSearchChange} /> */}
 					</label>
 
 					{/*<button className="btn">*/}
@@ -73,4 +87,21 @@ export default function Home(props: Route.ComponentProps) {
 			</ul>
 		</div>
 	);
+}
+
+function SearchInput(props: { initialValue?: string; onChange: (value: string | undefined) => void; delay?: number }) {
+	const [value, setValue] = useState<string | undefined>(props.initialValue);
+
+	function handleChange(e: ChangeEvent<HTMLInputElement>) {
+		e.stopPropagation();
+		const value = e.currentTarget.value.trim().toLowerCase();
+		setValue(value || undefined);
+	}
+
+	useEffect(() => {
+		const to = setTimeout(() => props.onChange(value), props.delay ?? 500);
+		return () => clearTimeout(to);
+	}, [value]);
+
+	return <input type="search" className="grow" placeholder="Search" onChange={handleChange} />;
 }
