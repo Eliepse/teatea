@@ -2,6 +2,8 @@ import type { Route } from "../+types/root";
 import knex, { type Knex } from "knex";
 import type { Tea } from "~t/types";
 import type { DB } from "~t/database";
+import { format } from "path";
+import { unique } from "~/utils/array";
 
 export function knexConnection() {
 	return knex({
@@ -18,7 +20,44 @@ export function knexConnection() {
 
 export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 	const cnx = knexConnection();
+
 	const requestUrl = new URL(args.request.url);
+	let searchTypes = requestUrl.searchParams.getAll("type[]").map((id) => parseInt(id));
+	let searchOrigins = requestUrl.searchParams.getAll("origin[]").map((id) => parseInt(id));
+	const textSearch = requestUrl.searchParams.get("q") || null;
+
+	const filterIds = {
+		teas: [] as number[],
+		cultivars: [] as number[],
+		types: [] as number[],
+		origins: [] as number[],
+	};
+
+	if (textSearch) {
+		const quotedSearch = textSearch.replaceAll(/[_%\\]/g, "\\$&");
+
+		const textSearchResults = await cnx.raw(
+			`
+				SELECT T.id as id, 'teas' as type FROM tea T
+				WHERE T.name @@ :search OR T.name ILIKE :searchLike
+			UNION ALL
+				SELECT C.id as id, 'cultivars' as type FROM cultivar C
+				WHERE C.name @@ :search OR C.name ILIKE :searchLike
+			UNION ALL
+				SELECT DISTINCT TT.id as id, 'types' as type FROM tea_type TT
+				WHERE TT.name @@ :search OR TT.name ILIKE :searchLike
+			UNION ALL
+				SELECT DISTINCT O.id as id, 'origins' as type FROM origin O
+				WHERE O.name @@ :search OR O.name ILIKE :searchLike
+			LIMIT 1000
+			`,
+			{ search: textSearch, searchLike: `%${quotedSearch}%` },
+		);
+
+		textSearchResults.rows.forEach((row: { id: number; type: "teas" | "cultivars" | "types" | "origins" }) => {
+			filterIds[row.type].push(row.id);
+		});
+	}
 
 	const teasQuery = cnx
 		.select(
@@ -46,49 +85,43 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 		.leftJoin("origin as o", "tea.origin_id", "o.id")
 		.orderBy("tea.id");
 
-	const searchTypes = requestUrl.searchParams.getAll("type[]").map((id) => parseInt(id));
-	const searchOrigins = requestUrl.searchParams.getAll("origin[]").map((id) => parseInt(id));
+	if (0 !== searchTypes.length || 0 !== filterIds.types.length) {
+		const typesIds = unique([...searchTypes, ...filterIds.types]);
 
-	if (0 < searchTypes.length) {
 		teasQuery.innerJoin("tea_type as TFilter", "tea.type_id", "TFilter.id");
 		teasQuery.andWhereRaw(
-			`"TFilter".path <@ ANY (SELECT path FROM tea_type t WHERE t.id IN (${searchTypes.join(",")}))`,
+			`"TFilter".path <@ ANY (SELECT path FROM tea_type t WHERE t.id IN (${typesIds.join(",")}))`,
 		);
 	}
 
-	if (0 < searchOrigins.length) {
+	if (0 !== searchOrigins.length || 0 !== filterIds.origins.length) {
+		const originIds = unique([...searchOrigins, ...filterIds.origins]);
+
 		teasQuery.innerJoin("origin as OFilter", "tea.origin_id", "OFilter.id");
 		teasQuery.andWhereRaw(
-			`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${searchOrigins.join(",")}))`,
+			`"OFilter".path <@ ANY (SELECT path FROM origin o WHERE o.id IN (${originIds.join(",")}))`,
 		);
 	}
 
-	const textSearch = requestUrl.searchParams.get("q") || null;
-
-	if (!!textSearch) {
+	if (Object.values(filterIds).some((v) => 0 !== v.length)) {
 		teasQuery.andWhere((qb) => {
-			const quotedSearch = textSearch.replaceAll(/[_%\\]/g, "\\$&");
-			qb.orWhereRaw("tea.name ILIKE ?", [`%${quotedSearch}%`])
-				.orWhereRaw("c.name ILIKE ?", [`%${quotedSearch}%`])
-				.orWhereRaw("tt.name ILIKE ?", [`%${quotedSearch}%`]);
+			if (0 !== filterIds.teas.length) {
+				qb.orWhereIn("tea.id", filterIds.teas);
+			}
+
+			if (0 !== filterIds.cultivars.length) {
+				qb.orWhereIn("c.id", filterIds.cultivars);
+			}
 		});
 	}
+
+	console.debug(teasQuery.toString());
 
 	const results = await teasQuery.limit(100);
 
 	if (0 === results.length) {
 		return [];
 	}
-
-	const originsPaths: string[] = results.reduce(
-		(paths, r) => (!!r.tt_path || paths.includes(r.tt_path) ? paths : [...paths, r.tt_path]),
-		[],
-	);
-
-	const typesPaths: string[] = results.reduce(
-		(paths, r) => (!!r.o_path || paths.includes(r.o_path) ? paths : [...paths, r.o_path]),
-		[],
-	);
 
 	const types = await fetchTypes(cnx, extractPaths(results, "tt_path"));
 	const origins = await fetchOrigins(cnx, extractPaths(results, "o_path"));
