@@ -22,7 +22,7 @@ export async function loader() {
 	await client.connect();
 
 	const { rows: types } = await client.query("SELECT * FROM tea_type ORDER BY path");
-	const { rows: origins } = await client.query("SELECT * FROM origin WHERE path != 'Top' ORDER BY path");
+	const { rows: origins } = await client.query("SELECT * FROM origin ORDER BY path");
 	const { rows: cultivars } = await client.query(
 		"SELECT cultivar.*, origin.name as origin FROM cultivar " +
 			"LEFT JOIN origin ON cultivar.origin_id = origin.id " +
@@ -72,7 +72,10 @@ export async function action({ request }: Route.ActionArgs) {
 	const roast = formData.get("roasted") || null;
 
 	const res = await client.query({
-		text: "INSERT INTO tea (type_id, origin_id, cultivar_id, name, harvest, altitude, blend, roast_level) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+		text: `
+            INSERT INTO tea (type_id, origin_id, cultivar_id, name, harvest, altitude, blend, roast_level)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id
+            `,
 		values: [
 			formData.get("type"),
 			formData.get("origin") || null,
@@ -194,8 +197,8 @@ function OriginInput(props: { origins: { name: string; path: string; id: number 
 
 			{props.origins.map((origin) => {
 				const levels = origin.path.split(".");
-				const isCountry = 2 === levels.length;
-				const isLocality = 4 === levels.length;
+				const isCountry = 1 === levels.length;
+				const isLocality = 3 === levels.length;
 
 				return (
 					<option
@@ -204,7 +207,7 @@ function OriginInput(props: { origins: { name: string; path: string; id: number 
 						className={clsx(isCountry && "bg-accent", isLocality && "text-base-content/70")}
 					>
 						{levels
-							.slice(2)
+							.slice(1)
 							.map((i) => " ")
 							.join("")}
 						{origin.name}
@@ -247,7 +250,7 @@ function CultivarsInput(props: {
 	values: { [key: string]: { name: string; cultivars: { id: string; name: string }[] } };
 }) {
 	return (
-		<select className="select" name="type" defaultValue="" required>
+		<select className="select" name="type" defaultValue="">
 			<option value="">Unknown</option>
 
 			{Object.values(props.values).map((country) => (
@@ -256,7 +259,9 @@ function CultivarsInput(props: {
 						{country.name}
 					</option>
 					{country.cultivars.map((cultivar) => (
-						<option key={cultivar.id} value={cultivar.id}>&emsp;{cultivar.name}</option>
+						<option key={cultivar.id} value={cultivar.id}>
+							&emsp;{cultivar.name}
+						</option>
 					))}
 				</Fragment>
 			))}
