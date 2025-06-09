@@ -1,22 +1,9 @@
 import type { Route } from "../+types/root";
-import knex, { type Knex } from "knex";
+import { type Knex } from "knex";
 import type { Tea } from "~t/types";
 import type { DB } from "~t/database";
-import { format } from "path";
 import { unique } from "~/utils/array";
-
-export function knexConnection() {
-	return knex({
-		client: "pg",
-		connection: {
-			host: "localhost",
-			user: "admin",
-			password: "admin",
-			database: "teatea",
-			port: 2345,
-		},
-	});
-}
+import { knexConnection } from "~/utils/db";
 
 export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 	const cnx = knexConnection();

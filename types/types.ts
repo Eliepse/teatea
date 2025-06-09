@@ -1,3 +1,7 @@
+import type { Volume, Weight } from "~/utils/value-objects/units";
+import type { TeawareType } from "./teawareType";
+import type Steep from "~/utils/value-objects/Steep";
+
 interface Entity {
 	id: number;
 }
@@ -34,3 +38,17 @@ export interface LTreeNode {
 	path: string;
 	children?: LTreeNode[];
 }
+
+export type Teaware = Entity & {
+	type: TeawareType;
+	name: string;
+	volume?: Volume;
+};
+
+export type BrewingSession = Entity & {
+	tea: Tea;
+	teaware?: Teaware;
+	teaQuantity?: Weight;
+	steeps: Steep[];
+	createdAt: Date;
+};

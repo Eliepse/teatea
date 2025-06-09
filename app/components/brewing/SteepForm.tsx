@@ -1,5 +1,5 @@
-import { useEffect, useState, type ChangeEvent } from "react";
-import { FormattedDuration } from "../shared/Duration";
+import { useEffect, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import { FormattedDuration } from "../shared/FormattedDuration";
 import { Duration, Temperature, Volume } from "~/utils/value-objects/units";
 import Steep from "~/utils/value-objects/Steep";
 import { clamp } from "~/utils/math";
@@ -57,6 +57,30 @@ export function SteepForm(props: {
 		setDuration(undefined);
 	}
 
+	function stepChangeTemperature(e: KeyboardEvent) {
+		e.stopPropagation();
+
+		if ("ArrowDown" === e.key) {
+			setTemperature((t) => new Temperature(Math.abs(t.deg - 5)));
+		}
+
+		if ("ArrowUp" === e.key) {
+			setTemperature((t) => new Temperature(Math.abs(t.deg + 5)));
+		}
+	}
+
+	function stepChangeWaterVolume(e: KeyboardEvent) {
+		e.stopPropagation();
+
+		if ("ArrowDown" === e.key) {
+			setWater((v) => Volume.fromMl(Math.abs((v?.ml ?? 100) - 10)));
+		}
+
+		if ("ArrowUp" === e.key) {
+			setWater((v) => Volume.fromMl(Math.abs((v?.ml ?? 100) + 10)));
+		}
+	}
+
 	function handleTemperatureInputChange(e: ChangeEvent<HTMLInputElement>) {
 		const cleanValue = e.currentTarget.value.replaceAll(/[^0-9]/g, "");
 		setTemperature(new Temperature(clamp(0, parseInt(cleanValue || "0"), 100)));
@@ -64,7 +88,8 @@ export function SteepForm(props: {
 
 	function handleWaterInputChange(e: ChangeEvent<HTMLInputElement>) {
 		const cleanValue = e.currentTarget.value.replaceAll(/[^0-9]/g, "");
-		setWater(Volume.fromMl(Math.min(0, parseInt(cleanValue || "0"))));
+		const value = parseInt(cleanValue || "0");
+		setWater(!value ? undefined : Volume.fromMl(Math.min(0, value)));
 	}
 
 	return (
@@ -81,6 +106,7 @@ export function SteepForm(props: {
 						<input
 							value={temperature.deg}
 							onChange={handleTemperatureInputChange}
+							onKeyDown={stepChangeTemperature}
 							type="text"
 							pattern="[0-9]{1,2}"
 						/>
@@ -92,7 +118,13 @@ export function SteepForm(props: {
 					<span className="mx-4">{water?.ml || "-"} ml</span>
 				) : (
 					<label className="input max-w-[10rem]">
-						<input value={water?.ml ?? 0} onChange={handleWaterInputChange} type="text" pattern="[0-9]+" />
+						<input
+							value={water?.ml ?? ""}
+							onChange={handleWaterInputChange}
+							onKeyDown={stepChangeWaterVolume}
+							type="text"
+							pattern="[0-9]+"
+						/>
 						<span className="label">ml</span>
 					</label>
 				)}

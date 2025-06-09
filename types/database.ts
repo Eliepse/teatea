@@ -1,3 +1,5 @@
+import type { TeawareType } from "./teawareType";
+
 type ID = number;
 
 interface WithId {
@@ -21,10 +23,23 @@ export namespace DB {
 	export type Origin = WithId & {
 		name: string;
 		path: string;
-	}
+	};
 
 	export type TeaType = WithId & {
 		name: string;
 		path: string;
-	}
+	};
+
+	export type Teaware = WithId & {
+		type: TeawareType;
+		name: string;
+		volume_ml: number | null;
+	};
+
+	export type BrewingSession = WithId & {
+		tea_id: number;
+		teaware_id?: number;
+		tea_quantity?: number;
+		created_at: Date;
+	};
 }

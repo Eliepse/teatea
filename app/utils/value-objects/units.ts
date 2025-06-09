@@ -10,11 +10,19 @@ export class Duration {
 	}
 
 	get seconds(): number {
-		return this._totalSeconds % 3_600;
+		return (this._totalSeconds % 3_600) % 60;
 	}
 
 	get totalSeconds(): number {
 		return this._totalSeconds;
+	}
+
+	get totalMinutes(): number {
+		return this._totalSeconds / 60;
+	}
+
+	get totalHours(): number {
+		return this._totalSeconds / 3_600;
 	}
 
 	static fromSeconds(seconds: number): Duration {
@@ -39,5 +47,17 @@ export class Volume {
 
 	static fromMl(ml: number): Volume {
 		return new Volume(ml / 1_000);
+	}
+}
+
+export class Weight {
+	constructor(public readonly kilograms: number) {}
+
+	get g() {
+		return this.kilograms * 1_000;
+	}
+
+	static fromG(g: number): Weight {
+		return new Weight(g / 1_000);
 	}
 }

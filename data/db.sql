@@ -44,3 +44,26 @@ create table tea (
     --     organic     bool,
     altitude integer
 );
+
+create table teaware (
+    id serial primary key,
+    type text not null,
+    name text not null,
+    volume_ml integer
+);
+
+create table brewing_session (
+    id serial primary key,
+    tea_id integer references tea (id) not null,
+    teaware_id integer references teaware (id),
+    tea_quantity integer,
+    created_at timestamp not null
+);
+
+create table brewing_steep (
+    id serial primary key,
+    brewing_session_id integer references brewing_session (id) not null,
+    duration integer not null,
+    temperature integer not null,
+    volume_ml integer,
+);

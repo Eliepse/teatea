@@ -2,5 +2,6 @@
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"[sql]": {
 		"editor.defaultFormatter": "cweijan.vscode-postgresql-client2"
-	}
+	},
+	"explorer.excludeGitIgnore": true
 }
