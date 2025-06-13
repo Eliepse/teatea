@@ -1,8 +1,5 @@
 .idea
-.DS_Store
-/node_modules/
 
-# React Router
-/.react-router/
-/build/
-.vscode/settings.json
+/.env
+/helm/api-platform/charts/*
+!/helm/api-platform/charts/.gitignore

@@ -1,0 +1,27 @@
+name: teatea
+
+services:
+    api:
+        build:
+            context: api
+            target: frankenphp_dev
+        restart: on-failure
+        shm_size: 128mb
+        env_file: .env
+        ports:
+            - 80
+            - 433
+        depends_on:
+            - db
+        volumes:
+            - "./api/:/app/"
+    db:
+        image: postgres:17-alpine
+        restart: on-failure
+        shm_size: 128mb
+        environment:
+            POSTGRES_DB: teatea
+            POSTGRES_USER: ${DB_USER}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "2345:5432"

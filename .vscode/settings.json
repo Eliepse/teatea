@@ -1,7 +1,20 @@
 {
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"[sql]": {
-		"editor.defaultFormatter": "cweijan.vscode-postgresql-client2"
-	},
-	"explorer.excludeGitIgnore": true
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[sql]": {
+    "editor.defaultFormatter": "cweijan.vscode-postgresql-client2"
+  },
+  "explorer.excludeGitIgnore": false,
+  "symfony-vscode.consolePath": "api/bin/console",
+  "sqltools.connections": [
+    {
+      "previewLimit": 100,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "Teatea",
+      "database": "teatea",
+      "username": "admin",
+      "password": "admin"
+    }
+  ]
 }
