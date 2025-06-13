@@ -1,0 +1,3 @@
+{
+  "symfony-vscode.consolePath": "api/bin/console",
+}

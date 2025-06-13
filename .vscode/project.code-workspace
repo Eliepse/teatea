@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"name": "Root",
+			"path": "../"
+		},
+		{
+			"name": "API",
+			"path": "../api"
+		},
+		{
+			"name": "PWA",
+			"path": "../pwa"
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"api/": true,
+			"pwa/": true
+		}
+	}
+}

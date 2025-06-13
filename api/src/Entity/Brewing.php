@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BrewingRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +30,17 @@ class Brewing
 
     #[ORM\ManyToOne(inversedBy: 'brewings')]
     private ?Teaware $teaware = null;
+
+    /**
+     * @var Collection<int, BrewingSteep>
+     */
+    #[ORM\OneToMany(targetEntity: BrewingSteep::class, mappedBy: 'brewing', orphanRemoval: true)]
+    private Collection $steeps;
+
+    public function __construct()
+    {
+        $this->steeps = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -78,6 +91,36 @@ class Brewing
     public function setTeaware(?Teaware $teaware): static
     {
         $this->teaware = $teaware;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BrewingSteep>
+     */
+    public function getSteeps(): Collection
+    {
+        return $this->steeps;
+    }
+
+    public function addSteep(BrewingSteep $duration): static
+    {
+        if (!$this->steeps->contains($duration)) {
+            $this->steeps->add($duration);
+            $duration->setBrewing($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSteep(BrewingSteep $duration): static
+    {
+        if ($this->steeps->removeElement($duration)) {
+            // set the owning side to null (unless already changed)
+            if ($duration->getBrewing() === $this) {
+                $duration->setBrewing(null);
+            }
+        }
 
         return $this;
     }

@@ -5,6 +5,7 @@ export default [
 	route("/refs", "routes/refs.tsx"),
 	route("/add-tea", "routes/add-tea.tsx"),
 	route("/brew/:id", "routes/brewing/brewing-edit.tsx"),
+	route("/tea/types/new", "routes/tea/create-type.tsx"),
 	route("/api/search", "api/search.ts"),
 	route("/api/filters", "api/filters.ts"),
 	route("/api/teaware", "api/teaware.ts"),

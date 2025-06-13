@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Enum\RoastLevel;
 use App\Enum\TeaFamily;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: TeaRepository::class)]
 #[ApiResource]
@@ -21,7 +22,7 @@ class Tea
 
     #[ORM\ManyToOne(inversedBy: 'teas')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?TeaType $type = null;
+    private TeaType $type;
 
     #[ORM\ManyToOne(inversedBy: 'teas')]
     private ?Cultivar $cultivar = null;
@@ -35,13 +36,25 @@ class Tea
     #[ORM\OneToMany(targetEntity: Brewing::class, mappedBy: 'tea')]
     private Collection $brewings;
 
-    public function __construct(#[ORM\Column]
-    private TeaFamily $family, #[ORM\Column(nullable: true)]
-    private ?string $name = null, #[ORM\Column(nullable: true)]
-    private ?bool $isBlend = null, #[ORM\Column(nullable: true, type: "jsonb")]
-    private ?array $harvest = null, #[ORM\Column(nullable: true)]
-    private ?RoastLevel $roast = null, #[ORM\Column(nullable: true)]
-    private ?int $altitude = null)
+    public function __construct(
+        #[ORM\Column]
+        private TeaFamily $family,
+
+        #[ORM\Column(nullable: true, type: Types::TEXT)]
+        private ?string $name = null,
+
+        #[ORM\Column(nullable: true)]
+        private ?bool $isBlend = null,
+
+        #[ORM\Column(nullable: true, type: "jsonb")]
+        private ?array $harvest = null,
+
+        #[ORM\Column(nullable: true)]
+        private ?RoastLevel $roast = null,
+
+        #[ORM\Column(nullable: true)]
+        private ?int $altitude = null,
+    )
     {
         $this->brewings = new ArrayCollection();
     }
