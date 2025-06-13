@@ -5,7 +5,7 @@ import type { Route } from "./+types/create-type";
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const data = await request.formData();
 
-	const response = await fetch(import.meta.env.PUBLIC_API_URL + "/tea_types", {
+	const response = await fetch(`${import.meta.env.PUBLIC_API_URL}/tea_types`, {
 		method: "POST",
 		headers: { "Content-Type": "application/ld+json", Accept: "application/ld+json" },
 		body: JSON.stringify({

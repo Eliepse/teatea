@@ -5,7 +5,7 @@ services:
             - database
         restart: unless-stopped
         environment:
-            PWA_UPSTREAM: 172.26.0.1:5173
+            PWA_UPSTREAM: 192.168.1.35:5173
             SERVER_NAME: ${SERVER_NAME:-localhost:80}, php:80
             MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
             MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}

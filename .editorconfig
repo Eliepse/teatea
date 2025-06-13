@@ -32,6 +32,7 @@ indent_style = space
 indent_size = 4
 
 [*.{yaml,yml}]
+indent_style = space
 trim_trailing_whitespace = false
 
 [helm/api-platform/**.yaml]
