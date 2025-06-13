@@ -32,7 +32,7 @@ export default function CreateType() {
 
 				<fieldset className="fieldset mb-4">
 					<legend className="fieldset-legend">Name</legend>
-					<input type="text" name="name" className="input w-full" required />
+					<input type="text" name="name" className="input w-full" autoComplete="off" required />
 				</fieldset>
 
 				<button type="submit" disabled={busy} className="btn btn-primary btn-block">

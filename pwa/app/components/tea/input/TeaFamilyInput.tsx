@@ -47,8 +47,8 @@ export function TeaFamilyInput(props: {
 			onChange={handleChange}
 			required={props.required}
 		>
-			<option value="" disabled>
-				Pick a type
+			<option value="" disabled className="text-base-content/60">
+				Pick a family
 			</option>
 			{Object.entries(FAMILIES).map(([key, label]) => (
 				<option key={key} value={key}>
