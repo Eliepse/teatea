@@ -17,6 +17,20 @@
 		"files.exclude": {
 			"api/": true,
 			"pwa/": true
-		}
+		},
+		"intelephense.environment.documentRoot": "api/public/",
+		"symfony-vscode.consolePath": "api/bin/console",
+		"sqltools.connections": [
+			{
+				"previewLimit": 50,
+				"server": "localhost",
+				"port": 5432,
+				"driver": "PostgreSQL",
+				"name": "Teatea",
+				"database": "teatea",
+				"username": "admin",
+				"password": "admin"
+			}
+		]
 	}
 }

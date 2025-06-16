@@ -21,6 +21,7 @@ doctrine:
             macaddr[]: MartinGeorgiev\Doctrine\DBAL\Types\MacaddrArray
             point: MartinGeorgiev\Doctrine\DBAL\Types\Point
             point[]: MartinGeorgiev\Doctrine\DBAL\Types\PointArray
+            ltree: App\Doctrine\DBAL\Types\LTreeType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

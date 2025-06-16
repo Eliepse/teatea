@@ -45,15 +45,18 @@
 
 	# Matches requests for HTML documents, for static files and for Next.js files,
 	# except for known API paths and paths with extensions handled by API Platform
-	@pwa expression `(
-			header({'Accept': '*text/html*'})
-			&& !path(
-				'/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
-				'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml'
+	@pwa expression `
+		!path('/api*') && (
+			(
+				header({'Accept': '*text/html*'})
+				&& !path(
+					'/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
+					'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml'
+				)
 			)
-		)
-		|| path('/types*', '/node_modules*', '/app/*', '/@*', '/favicon.ico', '/manifest.json', '/robots.txt', '/sitemap*')
-		|| query({'_rsc': '*'})`
+			|| path('/types*', '/node_modules*', '/app/*', '/@*', '/favicon.ico', '/manifest.json', '/robots.txt', '/sitemap*')
+			|| query({'_rsc': '*'})
+		)`
 
 	# Comment the following line if you don't want Next.js to catch requests for HTML documents.
 	# In this case, they will be handled by the PHP app.
