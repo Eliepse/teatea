@@ -1,9 +1,9 @@
 @import "tailwindcss";
-@plugin "daisyui";
 
+@plugin "daisyui";
 @plugin "daisyui/theme" {
 	name: "light";
-	default: false;
+	default: true;
 	prefersdark: false;
 	color-scheme: "light";
 	--color-base-100: oklch(100% 0 0);
