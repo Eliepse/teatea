@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\Repository\OriginRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,87 +12,62 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: OriginRepository::class)]
-#[ApiResource]
+#[ApiResource(
+	order: ["path" => "ASC"],
+	paginationEnabled: false,
+)]
 class Origin
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private int $id;
+	#[ORM\Id]
+	#[ORM\GeneratedValue]
+	#[ORM\Column]
+	public readonly int $id;
 
-    #[ORM\Column]
-    private string $path;
+	#[ORM\Column(type: "ltree")]
+	#[ApiProperty(genId: false)]
+	public LTreePath $path;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private string $name;
+	#[ORM\Column(type: Types::TEXT)]
+	public string $name;
 
-    /**
-     * @var Collection<int, Tea>
-     */
-    #[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'origin')]
-    private Collection $teas;
+	/**
+	 * @var Collection<int, Tea>
+	 */
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'origin')]
+	private Collection $teas;
 
-    public function __construct()
-    {
-        $this->teas = new ArrayCollection();
-    }
+	public function __construct()
+	{
+		$this->teas = new ArrayCollection();
+	}
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+	/**
+	 * @return Collection<int, Tea>
+	 */
+	public function getTeas(): Collection
+	{
+		return $this->teas;
+	}
 
-    public function getPath(): ?string
-    {
-        return $this->path;
-    }
+	public function addTea(Tea $tea): static
+	{
+		if (!$this->teas->contains($tea)) {
+			$this->teas->add($tea);
+			$tea->setOrigin($this);
+		}
 
-    public function setPath(string $path): static
-    {
-        $this->path = $path;
+		return $this;
+	}
 
-        return $this;
-    }
+	public function removeTea(Tea $tea): static
+	{
+		if ($this->teas->removeElement($tea)) {
+			// set the owning side to null (unless already changed)
+			if ($tea->getOrigin() === $this) {
+				$tea->setOrigin(null);
+			}
+		}
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Tea>
-     */
-    public function getTeas(): Collection
-    {
-        return $this->teas;
-    }
-
-    public function addTea(Tea $tea): static
-    {
-        if (!$this->teas->contains($tea)) {
-            $this->teas->add($tea);
-            $tea->setOrigin($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTea(Tea $tea): static
-    {
-        if ($this->teas->removeElement($tea)) {
-            // set the owning side to null (unless already changed)
-            if ($tea->getOrigin() === $this) {
-                $tea->setOrigin(null);
-            }
-        }
-
-        return $this;
-    }
+		return $this;
+	}
 }

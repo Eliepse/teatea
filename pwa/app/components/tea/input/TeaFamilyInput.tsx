@@ -1,16 +1,8 @@
 import clsx from "clsx";
 import type { ChangeEvent } from "react";
+import { teaFamilies, type TeaFamily } from "~t/types";
 
-const FAMILIES = {
-	white: "White",
-	yellow: "Yellow",
-	green: "Green",
-	wulong: "Wulong",
-	black: "Black",
-	fermented: "Fermented",
-} as const;
-
-type Value = keyof typeof FAMILIES;
+type Value = TeaFamily;
 
 export function TeaFamilyInput(props: {
 	name?: string;
@@ -30,7 +22,7 @@ export function TeaFamilyInput(props: {
 
 		const value = e.currentTarget.value;
 
-		if (false === Object.keys(FAMILIES).includes(value)) {
+		if (false === Object.hasOwn(teaFamilies, value)) {
 			props.onChange(null);
 			return;
 		}
@@ -50,7 +42,7 @@ export function TeaFamilyInput(props: {
 			<option value="" disabled className="text-base-content/60">
 				Pick a family
 			</option>
-			{Object.entries(FAMILIES).map(([key, label]) => (
+			{Object.entries(teaFamilies).map(([key, label]) => (
 				<option key={key} value={key}>
 					{label}
 				</option>
