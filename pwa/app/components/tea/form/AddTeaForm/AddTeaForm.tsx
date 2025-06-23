@@ -9,11 +9,11 @@ import { fetchApi } from "~/utils/api";
 import { Confirmation } from "~/components/tea/form/AddTeaForm/Confirmation";
 import { useMutation } from "@tanstack/react-query";
 import { wait } from "~/utils/time";
+import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
 
 type Step = "type" | "origin" | "other" | "confirmation";
 
 const CONTEXT = createContext({
-	step: "type" as Step,
 	goTo: (_step: Step) => warnNotImplemented(),
 	close: (): void => warnNotImplemented(),
 	back: (): void => warnNotImplemented(),
@@ -21,7 +21,7 @@ const CONTEXT = createContext({
 	updateForm: (_updater: (previous: FormValue) => FormValue) => warnNotImplemented(),
 	patchForm: (_part: Partial<FormValue>) => warnNotImplemented(),
 	submit: async (): Promise<unknown> => throwNotImplemented(),
-	submitting: false,
+	submitting: false
 });
 
 type FormValue = {
@@ -55,34 +55,33 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 
 export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 	const [formValue, setFormValue] = useState<FormValue>({});
-	const [navigationStack, setNavigationStack] = useState<Step[]>(["type"]);
+	const navStack = useNavigationStack<{ key: Step }>({ key: "type" });
 	const mutation = useMutation({
 		mutationFn: submitNewTea,
 		onSuccess: (data: { id: number }) => {
 			console.debug(data);
-			setNavigationStack(stack => [...stack, "confirmation"]);
+			navStack.goTo({ key: "confirmation" });
 		}
 	});
 
 	const close = useCallback(() => {
 		setFormValue({});
-		setNavigationStack(["type"]);
+		navStack.reset();
 		mutation.reset();
 		props.onClose();
-	}, [props.onClose]);
+	}, [props.onClose, navStack.reset]);
 
 	const contextValue = useMemo(
 		() => ({
-			step: navigationStack.slice(-1)[0],
-			goTo: (step: Step) => setNavigationStack(stack => [...stack, step]),
+			goTo: (step: Step) => navStack.goTo({ key: step }),
 			close,
 			back() {
-				if (1 >= navigationStack.length) {
+				if (1 >= navStack.stack.length) {
 					close();
 					return;
 				}
 
-				setNavigationStack(stack => stack.slice(0, -1));
+				navStack.back();
 			},
 			formValue,
 			updateForm: (updater: (previous: FormValue) => FormValue) => setFormValue(updater),
@@ -96,18 +95,18 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 				// Submit to the API
 				mutation.mutate(formValue);
 			},
-			submitting: "pending" === mutation.status,
+			submitting: "pending" === mutation.status
 		}),
-		[close, navigationStack, formValue, mutation.status]
+		[close, formValue, mutation.status, navStack]
 	);
 
 	return (
 		<CONTEXT.Provider value={contextValue}>
 			<Paged open={props.open}>
-				{"type" === contextValue.step && <SelectType />}
-				{"origin" === contextValue.step && <SelectOrigin />}
-				{"other" === contextValue.step && <OtherTeaInfo />}
-				{"confirmation" === contextValue.step &&
+				{navStack.isFrame("type") && <SelectType />}
+				{navStack.isFrame("origin") && <SelectOrigin />}
+				{navStack.isFrame("other") && <OtherTeaInfo />}
+				{navStack.isFrame("confirmation") &&
 					<Confirmation
 						state={mutation.status}
 						onBack={contextValue.close}

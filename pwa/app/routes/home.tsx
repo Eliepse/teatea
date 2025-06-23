@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { BrewMultiStepForm } from "~/components/brewing/BrewMultiStepForm";
 import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
+import { Link } from "react-router";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -12,6 +13,10 @@ export default function Home() {
 
 	return (
 		<div className="px-4">
+			<button className="btn btn-block mt-6">
+				What did you drink today?
+			</button>
+
 			<button className="btn btn-block mt-6" onClick={() => setBrewForm(true)}>
 				Brew
 			</button>

@@ -7,7 +7,7 @@ export function Paged(props: React.PropsWithChildren<{ open: boolean; className?
 	}
 
 	return createPortal(
-		<div className={clsx("fixed inset-0 z-30 bg-base-100", props.className)}>{props.children}</div>,
+		<div className={clsx("fixed inset-0 z-30 bg-base-100 overflow-y-auto", props.className)}>{props.children}</div>,
 		document.body,
 	);
 }
