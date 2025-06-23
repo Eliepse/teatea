@@ -19,17 +19,8 @@ export function OtherTeaInfo() {
 			action={
 				<div className="flex justify-center">
 					<button className="ml-2 btn btn-primary rounded-full" onClick={context.submit} disabled={context.submitting}>
-						{!context.submitting && (
-							<>
-								Add new tea
-								<Check className="size-4 ml-1" />
-							</>
-						)}
-						{context.submitting && (
-							<>
-								Saving...
-							</>
-						)}
+						{context.submitting ? "Saving..." : "Add new tea"}
+						{!context.submitting && <Check className="size-4 ml-1" />}
 					</button>
 				</div>
 			}
@@ -61,7 +52,7 @@ export function OtherTeaInfo() {
 
 			<fieldset className="fieldset my-4">
 				<legend className="fieldset-legend">Altitude</legend>
-				<input type="text" className="input w-full" pattern="[0-9]+" name="altitude" />
+				<input type="text" className="input w-full" pattern="[ ,.0-9]+" inputMode="numeric" min={0} name="altitude" />
 			</fieldset>
 		</PageLayout>
 	);
