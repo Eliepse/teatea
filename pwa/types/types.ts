@@ -29,9 +29,8 @@ export type Origin = Resource & {
 export type Tea = Resource & {
 	name?: string;
 	type: TeaType;
+	family: TeaFamily,
 	// All the tree of this tea type
-	parentTypes: TeaType[];
-	cultivar?: Cultivar;
 	origin?: Origin;
 	// All the tree of this tea origin
 	parentOrigins?: Origin[];

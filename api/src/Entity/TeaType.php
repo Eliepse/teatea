@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TeaTypeRepository::class)]
 #[ApiResource(paginationEnabled: false)]
@@ -22,6 +23,7 @@ class TeaType
 	#[ORM\Column(enumType: TeaFamily::class)]
 	public TeaFamily $family;
 
+	#[Groups("tea:list")]
 	#[ORM\Column(type: Types::TEXT)]
 	public string $name;
 

@@ -11,11 +11,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TeaRepository::class)]
-#[ApiResource]
+#[ApiResource(normalizationContext: ["groups" => ["tea:list"]], security: "is_granted('ROLE_USER')")]
 class Tea
 {
 	#[ORM\Id]
@@ -23,9 +24,11 @@ class Tea
 	#[ORM\Column]
 	public readonly int $id;
 
+	#[Groups("tea:list")]
 	#[ORM\Column]
 	public TeaFamily $family;
 
+	#[Groups("tea:list")]
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	#[ORM\JoinColumn]
 	public ?TeaType $type = null;
@@ -34,8 +37,12 @@ class Tea
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	public ?Cultivar $cultivar = null;
 
+	#[Groups("tea:list")]
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	public ?Origin $origin = null;
+
+	#[ORM\ManyToOne(inversedBy: 'teas')]
+	public ?User $user = null;
 
 	/**
 	 * @var Collection<int, Brewing>
