@@ -97,7 +97,7 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 			},
 			submitting: "pending" === mutation.status
 		}),
-		[close, formValue, mutation.status, navStack]
+		[close, formValue, mutation.status, navStack],
 	);
 
 	return (

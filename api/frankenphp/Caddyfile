@@ -47,7 +47,7 @@
 	# except for known API paths and paths with extensions handled by API Platform
 	@pwa expression `
 		!path(
-			'/api*', '/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
+			'/api*', '/auth*', '/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
 			'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml'
 		)`
 

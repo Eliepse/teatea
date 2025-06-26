@@ -5,7 +5,7 @@
 **/*.dist
 **/*.cache
 **/._*
-**/.dockerignore
+.dockerignore
 **/.DS_Store
 **/.git/
 **/.gitattributes
@@ -27,6 +27,7 @@ public/bundles/
 tests/
 var/
 vendor/
+config/jwt
 .editorconfig
 .env.*.local
 .env.local

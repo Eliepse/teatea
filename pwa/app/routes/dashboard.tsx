@@ -7,15 +7,15 @@ export function meta() {
 	return [{ title: "Teatea" }];
 }
 
-export default function Home() {
+export default function Dashboard() {
 	const [brewForm, setBrewForm] = useState(false);
 	const [addTeaForm, setAddTeaForm] = useState(false);
 
 	return (
 		<div className="px-4">
-			<button className="btn btn-block mt-6">
-				What did you drink today?
-			</button>
+			<Link to="/sip/new">
+				<button className="btn btn-block mt-6">What are you drinking today?</button>
+			</Link>
 
 			<button className="btn btn-block mt-6" onClick={() => setBrewForm(true)}>
 				Brew

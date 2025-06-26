@@ -8,6 +8,8 @@ FROM dunglas/frankenphp:1-php8.4 AS frankenphp_upstream
 FROM frankenphp_upstream AS frankenphp_base
 
 WORKDIR /app
+VOLUME /data
+VOLUME /config
 
 # persistent / runtime deps
 # hadolint ignore=DL3008
@@ -37,10 +39,10 @@ CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 FROM frankenphp_base AS frankenphp_dev
 
 ENV APP_ENV=dev XDEBUG_MODE=off
-VOLUME /app/var/
+#VOLUME /app/var/
 
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"; \
-	set -eux; install-php-extensions xdebug
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+#	set -eux; install-php-extensions xdebug
 
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
 
