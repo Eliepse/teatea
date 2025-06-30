@@ -1,17 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
 import { PageLayout } from "~/components/shared/paged/PageLayout";
-import { fetchApi } from "~/utils/api";
-import { type Origin, type TeaFamily } from "~t/types";
+import { type Origin } from "~t/types";
 import { useTeaFormContext } from "./AddTeaForm";
 import { Check } from "~/components/icons/Check";
 import { useMemo } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
+import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
 
 export function SelectOrigin() {
 	const { data, isLoading } = useOriginByPath();
 	const context = useTeaFormContext();
+	const navigationStack = useNavigationStack();
 	const { origin: selectedOrigin } = context.formValue;
 	const leavesPaths = useMemo(() => {
 		const paths = Object.keys(data ?? {});
@@ -30,14 +30,16 @@ export function SelectOrigin() {
 		const targetedLevel = isLeaf ? selectedPathLength : selectedPathLength + 1;
 		const path = selectedOrigin ? selectedOrigin.path.nodes.slice(0, isLeaf ? -1 : undefined).join(".") : null;
 
-		return Object.entries(data).filter(([key, origin]) => {
-			// Limit to n+1 level
-			if (targetedLevel !== origin.path.nodes.length) {
-				return false;
-			}
+		return Object.entries(data)
+			.filter(([key, origin]) => {
+				// Limit to n+1 level
+				if (targetedLevel !== origin.path.nodes.length) {
+					return false;
+				}
 
-			return null === path || key.startsWith(path);
-		}).map(([_, o]) => o);
+				return null === path || key.startsWith(path);
+			})
+			.map(([_, o]) => o);
 	}, [data, isLeaf, selectedOrigin?.path]);
 
 	function back() {
@@ -67,13 +69,13 @@ export function SelectOrigin() {
 	}
 
 	function confirm() {
-		context.goTo("other");
+		navigationStack.next({ key: "other" });
 	}
 
 	return (
 		<PageLayout
 			title="Where does it come from?"
-			onBack={context.back}
+			onBack={navigationStack.back}
 			action={
 				<div className="flex justify-center">
 					{selectedOrigin && (
@@ -100,10 +102,13 @@ export function SelectOrigin() {
 					className={clsx("mb-2 btn btn-block h-12", selectedOrigin?.id === origin.id && "btn-primary")}
 				>
 					{origin.name}
-						<Chevron
-							direction="right"
-							className={clsx("size-4 ml-auto", leavesPaths.includes(origin.path.nodes.join(".")) && "invisible")}
-						/>
+					<Chevron
+						direction="right"
+						className={clsx(
+							"size-4 ml-auto",
+							leavesPaths.includes(origin.path.nodes.join(".")) && "invisible",
+						)}
+					/>
 				</button>
 			))}
 		</PageLayout>

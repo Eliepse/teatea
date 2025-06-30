@@ -1,29 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
 import { PageLayout } from "~/components/shared/paged/PageLayout";
-import { fetchApi } from "~/utils/api";
 import { teaFamilies, type TeaFamily, type TeaType } from "~t/types";
 import { useTeaFormContext } from "./AddTeaForm";
 import Chevron from "~/components/icons/chevron";
 import clsx from "clsx";
 import { Check } from "~/components/icons/Check";
 import { useTeaTypes } from "~/utils/api/useTeaTypes";
-
-
+import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
 
 export function SelectType() {
 	const { data, isLoading } = useTeaTypes();
 	const context = useTeaFormContext();
+	const navigationStack = useNavigationStack();
 	const selectedFamily = context.formValue.family;
 	const selectedType = data && selectedFamily ? context.formValue.type : undefined;
 	const children = data && selectedFamily ? data[selectedFamily] : [];
-
-	function back() {
-		if (!selectedFamily && !selectedType) {
-			context.close();
-		}
-
-		clear();
-	}
 
 	function clear() {
 		context.updateForm((form) => ({ ...form, family: undefined, type: undefined }));
@@ -38,17 +28,17 @@ export function SelectType() {
 	}
 
 	function confirm() {
-		context.goTo(context.formValue.origin ? "other" : "origin");
+		navigationStack.next({ key: context.formValue.origin ? "other" : "origin" });
 	}
 
 	return (
 		<PageLayout
 			title="What type of tea is it?"
-			onBack={context.back}
+			onBack={navigationStack.back}
 			action={
 				<div className="flex justify-center">
 					{!!selectedType && (
-						<button className="btn rounded-full mr-auto" onClick={back}>
+						<button className="btn rounded-full mr-auto" onClick={navigationStack.back}>
 							Back
 						</button>
 					)}
