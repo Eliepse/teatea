@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import type { PropsWithChildren, ReactNode } from "react";
+import type { BaseSyntheticEvent, PropsWithChildren, ReactNode } from "react";
 import Arrow from "~/components/icons/arrow";
 
 export function PageLayout(
@@ -11,9 +11,14 @@ export function PageLayout(
 		className?: string;
 	}>,
 ) {
+	function handleBack(e: BaseSyntheticEvent) {
+		e.stopPropagation();
+		props.onBack && props.onBack();
+	}
+
 	return (
 		<div className="">
-			<button className="btn btn-ghost pl-4 mt-2" onClick={props.onBack || undefined} disabled={false === props.onBack}>
+			<button className="btn btn-ghost pl-4 mt-2" onClick={handleBack} disabled={false === props.onBack}>
 				<Arrow direction="left" className="size-4" />
 			</button>
 

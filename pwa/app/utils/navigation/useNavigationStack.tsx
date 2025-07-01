@@ -14,20 +14,35 @@ const StackContext = createContext<ContextType>({
 	reset: () => throwNotImplemented(),
 });
 
-export function NavigationStack<TFrame extends StackFrame>(props: PropsWithChildren<{ defaultFrame: TFrame }>) {
+export function NavigationStack<TFrame extends StackFrame>(
+	props: PropsWithChildren<{
+		defaultFrame: TFrame;
+		onOverBack?: () => void;
+	}>,
+) {
 	const [stack, setStack] = useState<StackFrame[]>([props.defaultFrame]);
 
 	const contextValue = useMemo<ContextType>(
 		() => ({
 			stack,
-			next: (frame: StackFrame) => setStack((st) => [...st, frame]),
-			back: () => setStack((st) => st.slice(0, -1)),
+			next: (frame: StackFrame) => {
+				setStack((st) => [...st, frame]);
+			},
+			back: () =>
+				setStack((st) => {
+					if (1 === st.length) {
+						props.onOverBack && props.onOverBack();
+						return st;
+					}
+
+					return st.slice(0, -1);
+				}),
 			reset: () => setStack([props.defaultFrame]),
 		}),
-		[stack],
+		[stack, props.onOverBack],
 	);
 
-	return <StackContext value={contextValue}>{props.children}</StackContext>;
+	return <StackContext.Provider value={contextValue}>{props.children}</StackContext.Provider>;
 }
 
 export function StackFrame(props: PropsWithChildren<{ frameKey: string }>) {
