@@ -1,19 +1,28 @@
 import { TokenUtils } from "~/auth/hooks/useToken";
 
-export async function fetchApi(url: string, config?: Parameters<typeof fetch>[1]): Promise<Response> {
-	const token = TokenUtils.get();
+type FetchApiConfig = Omit<RequestInit, "body"> & {
+	payload?: string | number | object | null;
+};
 
-	const headers = new Headers({
+export async function fetchApi(url: string, config?: FetchApiConfig): Promise<Response> {
+	const token = TokenUtils.get();
+	const fetchConfigs: RequestInit = {  ...config };
+
+	fetchConfigs.headers = new Headers({
 		"Content-Type": "application/ld+json",
 		Accept: "application/ld+json",
 		...config?.headers,
 	});
 
 	if (null !== token) {
-		headers.set("Authorization", `Bearer ${token}`);
+		fetchConfigs.headers.set("Authorization", `Bearer ${token}`);
 	}
 
-	const response = await fetch(`${import.meta.env.PUBLIC_API_URL}${url}`, { ...config, headers });
+	if (undefined !== config?.payload) {
+		fetchConfigs.body = "string" === typeof config.payload ? config.payload : JSON.stringify(config.payload);
+	}
+
+	const response = await fetch(`${import.meta.env.PUBLIC_API_URL}${url}`, fetchConfigs);
 
 	if (401 === response.status) {
 		TokenUtils.clear();
