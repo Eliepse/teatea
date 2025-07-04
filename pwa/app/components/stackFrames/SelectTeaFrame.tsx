@@ -2,19 +2,15 @@ import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useTeas } from "~/utils/api/useTeas";
 import type { Tea } from "~t/types";
 import clsx from "clsx";
-import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import Arrow from "~/components/icons/arrow";
 import type { BaseSyntheticEvent } from "react";
+import { handleUIEvent } from "~/utils/function";
 
 export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea) => void }) {
-	const navStack = useNavigationStack();
+	 const navStack = useStackNavigator();
 	const teasQuery = useTeas();
 	const items = teasQuery?.data?.member ?? [];
-
-	function handleConfirmEvent(e: BaseSyntheticEvent) {
-		e.stopPropagation();
-		navStack.next({ key: "date" });
-	}
 
 	return (
 		<PageLayout
@@ -23,8 +19,11 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 			action={
 				<div className="flex justify-center">
 					{props.value && (
-						<button className="ml-2 btn btn-primary rounded-full" onClick={handleConfirmEvent}>
-							Next
+						<button
+							className="ml-2 btn btn-primary rounded-full"
+							onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
+						>
+							Confirm
 							<Arrow direction="right" className="size-4 ml-1" />
 						</button>
 					)}

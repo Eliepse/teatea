@@ -4,11 +4,11 @@ import { Check } from "~/components/icons/Check";
 import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
 import { teaFamilies } from "~t/types";
-import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 
 export function OtherTeaInfo() {
 	const context = useTeaFormContext();
-	const navigationStack = useNavigationStack();
+	const navigationStack = useStackNavigator();
 	const origins = useOriginByPath();
 	const values = context.formValue;
 

@@ -3,9 +3,15 @@ import { throwNotImplemented } from "~/utils/function";
 
 interface StackFrame {
 	key: string;
+	data?: unknown;
 }
 
 type ContextType = { stack: StackFrame[]; next: (frame: StackFrame) => void; back: () => void; reset: () => void };
+
+type StackConfig<TFrame> = {
+	defaultFrame: TFrame;
+	onOverBack?: () => void;
+};
 
 const StackContext = createContext<ContextType>({
 	stack: [],
@@ -14,14 +20,35 @@ const StackContext = createContext<ContextType>({
 	reset: () => throwNotImplemented(),
 });
 
-export function NavigationStack<TFrame extends StackFrame>(
-	props: PropsWithChildren<{
-		defaultFrame: TFrame;
-		onOverBack?: () => void;
-	}>,
-) {
-	const [stack, setStack] = useState<StackFrame[]>([props.defaultFrame]);
+export function NavigationStack<TFrame extends StackFrame>(props: PropsWithChildren<StackConfig<TFrame>>) {
+	const { NavigationStack } = useNavigationStack(props);
+	return <NavigationStack>{props.children}</NavigationStack>;
+}
 
+export function StackFrame(props: PropsWithChildren<{ frameKey: string }>) {
+	const navigationStack = useStackNavigator();
+
+	if (navigationStack.current.key !== props.frameKey) {
+		return null;
+	}
+
+	return props.children;
+}
+
+export function useStackNavigator() {
+	const stackContext = useContext(StackContext);
+	const current = stackContext.stack.slice(-1)[0] ?? undefined;
+	return { current, ...stackContext };
+}
+
+/**
+ * Allow creating a Navigation stack with a context accessible
+ * directly, not only on children nodes.
+ * You can use the <NavigationStack> component directly if you
+ * don't need to control the stack outside of children.
+ */
+export function useNavigationStack(config: StackConfig<StackFrame>) {
+	const [stack, setStack] = useState<StackFrame[]>([config.defaultFrame]);
 	const contextValue = useMemo<ContextType>(
 		() => ({
 			stack,
@@ -31,32 +58,21 @@ export function NavigationStack<TFrame extends StackFrame>(
 			back: () =>
 				setStack((st) => {
 					if (1 === st.length) {
-						props.onOverBack && props.onOverBack();
+						config.onOverBack && config.onOverBack();
 						return st;
 					}
 
 					return st.slice(0, -1);
 				}),
-			reset: () => setStack([props.defaultFrame]),
+			reset: () => setStack([config.defaultFrame]),
 		}),
-		[stack, props.onOverBack],
+		[stack, config.onOverBack],
 	);
 
-	return <StackContext.Provider value={contextValue}>{props.children}</StackContext.Provider>;
-}
-
-export function StackFrame(props: PropsWithChildren<{ frameKey: string }>) {
-	const navigationStack = useNavigationStack();
-
-	if (navigationStack.current.key !== props.frameKey) {
-		return null;
-	}
-
-	return props.children;
-}
-
-export function useNavigationStack() {
-	const stackContext = useContext(StackContext);
-	const current = stackContext.stack.slice(-1)[0] ?? undefined;
-	return { current, ...stackContext };
+	return {
+		NavigationStack: (props: PropsWithChildren) => (
+			<StackContext.Provider value={contextValue}>{props.children}</StackContext.Provider>
+		),
+		...contextValue,
+	};
 }

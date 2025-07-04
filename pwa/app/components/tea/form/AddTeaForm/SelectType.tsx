@@ -5,12 +5,12 @@ import Chevron from "~/components/icons/chevron";
 import clsx from "clsx";
 import { Check } from "~/components/icons/Check";
 import { useTeaTypes } from "~/utils/api/useTeaTypes";
-import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 
 export function SelectType() {
 	const { data, isLoading } = useTeaTypes();
 	const context = useTeaFormContext();
-	const navigationStack = useNavigationStack();
+	const navigationStack = useStackNavigator();
 	const selectedFamily = context.formValue.family;
 	const selectedType = data && selectedFamily ? context.formValue.type : undefined;
 	const children = data && selectedFamily ? data[selectedFamily] : [];

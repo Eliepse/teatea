@@ -6,12 +6,12 @@ import { useMemo } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
-import { useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 
 export function SelectOrigin() {
 	const { data, isLoading } = useOriginByPath();
 	const context = useTeaFormContext();
-	const navigationStack = useNavigationStack();
+	const navigationStack = useStackNavigator();
 	const { origin: selectedOrigin } = context.formValue;
 	const leavesPaths = useMemo(() => {
 		const paths = Object.keys(data ?? {});

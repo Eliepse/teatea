@@ -9,7 +9,7 @@ import { fetchApi } from "~/utils/api";
 import { Confirmation } from "~/components/tea/form/AddTeaForm/Confirmation";
 import { useMutation } from "@tanstack/react-query";
 import { wait } from "~/utils/time";
-import { NavigationStack, StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { NavigationStack, StackFrame, useStackNavigator } from "~/utils/navigation/useNavigationStack";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -50,7 +50,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 
 export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 	const [formValue, setFormValue] = useState<FormValue>({});
-	const navStack = useNavigationStack();
+	const navStack = useStackNavigator();
 	const mutation = useMutation({
 		mutationFn: submitNewTea,
 		onSuccess: (data: { id: number }) => {
