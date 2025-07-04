@@ -13,7 +13,7 @@ export default function Arrow(props: { direction: "up" | "right" | "down" | "lef
 			viewBox="0 0 24 24"
 			strokeWidth="1.5"
 			stroke="currentColor"
-			className={props.className}
+			className={props.className ?? "size-4"}
 		>
 			<path strokeLinecap="round" strokeLinejoin="round" d={path[props.direction]} />
 		</svg>

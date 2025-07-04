@@ -72,9 +72,16 @@ class Tea
 	#[ORM\Column(nullable: true)]
 	public ?int $altitude = null;
 
+    /**
+     * @var Collection<int, Drink>
+     */
+    #[ORM\OneToMany(targetEntity: Drink::class, mappedBy: 'tea')]
+    private Collection $drinks;
+
 	public function __construct()
 	{
 		$this->brewings = new ArrayCollection();
+        $this->drinks = new ArrayCollection();
 	}
 
 	public function setCultivar(?Cultivar $cultivar): static
@@ -110,4 +117,34 @@ class Tea
 
 		return $this;
 	}
+
+    /**
+     * @return Collection<int, Drink>
+     */
+    public function getDrinks(): Collection
+    {
+        return $this->drinks;
+    }
+
+    public function addDrink(Drink $drink): static
+    {
+        if (!$this->drinks->contains($drink)) {
+            $this->drinks->add($drink);
+            $drink->setTea($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDrink(Drink $drink): static
+    {
+        if ($this->drinks->removeElement($drink)) {
+            // set the owning side to null (unless already changed)
+            if ($drink->getTea() === $this) {
+                $drink->setTea(null);
+            }
+        }
+
+        return $this;
+    }
 }

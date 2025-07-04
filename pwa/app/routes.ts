@@ -7,7 +7,7 @@ export default [
 		route("/brew/:id", "routes/brewing/brewing-edit.tsx"),
 		route("/tea/new", "routes/add-tea.tsx"),
 		route("/tea/types/new", "routes/tea/create-type.tsx"),
-		route("/sip/new", "routes/brewing/add-sip.tsx"),
+		route("/drink/new", "routes/brewing/add-drink.tsx"),
 	]),
 	route("/login", "routes/auth/login-page.tsx"),
 ] satisfies RouteConfig;
