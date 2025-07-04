@@ -1,7 +1,8 @@
-import { AuthProvider, useAuth } from "~/auth/hooks/useAuth";
+import { AuthProvider } from "~/auth/hooks/useAuth";
 import { Outlet, redirect, useNavigate } from "react-router";
 import { isLoggedIn } from "~/auth/auth";
 import { useEffect } from "react";
+import { useToken } from "~/auth/hooks/useToken";
 
 export async function clientLoader() {
 	if (false === isLoggedIn()) {
@@ -11,7 +12,7 @@ export async function clientLoader() {
 
 export default function ProtectedLayout() {
 	const navigate = useNavigate();
-	const { token } = useAuth();
+	const [token] = useToken();
 
 	useEffect(() => {
 		if (null !== token) {
