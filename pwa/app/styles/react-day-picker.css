@@ -1,0 +1,14 @@
+.react-day-picker.full.rdp-root {
+	display: block;
+	border: none;
+	font-size: 1rem;
+}
+
+.react-day-picker.full .rdp-months {
+	max-width: none;
+}
+
+.react-day-picker.full .rdp-month_grid,
+.react-day-picker.full .rdp-month {
+	width: 100%;
+}
