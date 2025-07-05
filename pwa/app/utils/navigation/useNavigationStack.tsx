@@ -1,4 +1,4 @@
-import { createContext, type PropsWithChildren, useContext, useMemo, useState } from "react";
+import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
 import { throwNotImplemented } from "~/utils/function";
 
 interface StackFrame {
@@ -68,6 +68,18 @@ export function useNavigationStack(config: StackConfig<StackFrame>) {
 		}),
 		[stack, config.onOverBack],
 	);
+
+	useEffect(() => {
+		if (!import.meta.env.DEV) {
+			return;
+		}
+
+		function forceFrame(key: StackFrame["key"]) {
+			setStack((st) => [...st, { key }]);
+		}
+
+		console.debug({ defaultKey: config.defaultFrame.key, stackCtl: forceFrame });
+	}, []);
 
 	return {
 		NavigationStack: (props: PropsWithChildren) => (

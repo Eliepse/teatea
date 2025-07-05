@@ -4,11 +4,10 @@ import type { Tea } from "~t/types";
 import clsx from "clsx";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import Arrow from "~/components/icons/arrow";
-import type { BaseSyntheticEvent } from "react";
 import { handleUIEvent } from "~/utils/function";
 
 export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea) => void }) {
-	 const navStack = useStackNavigator();
+	const navStack = useStackNavigator();
 	const teasQuery = useTeas();
 	const items = teasQuery?.data?.member ?? [];
 
@@ -30,15 +29,31 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 				</div>
 			}
 		>
-			{items.map((item) => (
-				<TeaItem
-					key={item["@id"]}
-					name={item["@id"] + " - " + (item.name || item.type?.name || item.family)}
-					onSelect={() => props.onSelect(item)}
-					selected={props.value?.["@id"] === item["@id"]}
-					className="mb-2"
-				/>
-			))}
+			{teasQuery.isLoading && (
+				<>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+					<div className="skeleton h-10 mb-2 block"></div>
+				</>
+			)}
+
+			{teasQuery.isError && <div className="text-error">Something went wrong...</div>}
+
+			{teasQuery.isSuccess &&
+				items.map((item) => (
+					<TeaItem
+						key={item["@id"]}
+						name={item["@id"] + " - " + (item.name || item.type?.name || item.family)}
+						onSelect={() => props.onSelect(item)}
+						selected={props.value?.["@id"] === item["@id"]}
+						className="mb-2"
+					/>
+				))}
 		</PageLayout>
 	);
 }

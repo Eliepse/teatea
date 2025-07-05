@@ -9,6 +9,7 @@ export function PageLayout(
 		action?: ReactNode;
 		withoutPadding?: boolean;
 		className?: string;
+		bodyClassName?: string;
 	}>,
 ) {
 	function handleBack(e: BaseSyntheticEvent) {
@@ -27,7 +28,9 @@ export function PageLayout(
 				<h2 className="px-4 pb-4 mt-2 text-lg text-base-content">{props.title}</h2>
 			</div>
 
-			<div className={clsx(!props.withoutPadding && "p-4", "flex-1 overflow-y-auto")}>{props.children}</div>
+			<div className={clsx(!props.withoutPadding && "p-4", "flex-1 overflow-y-auto", props.bodyClassName)}>
+				{props.children}
+			</div>
 
 			{props.action && <div className="fixed bottom-4 inset-x-4">{props.action}</div>}
 		</div>

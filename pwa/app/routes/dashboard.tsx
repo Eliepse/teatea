@@ -13,7 +13,7 @@ export default function Dashboard() {
 
 	return (
 		<div className="px-4">
-			<Link to="/sip/new">
+			<Link to="/drink/new">
 				<button className="btn btn-block mt-6">What are you drinking today?</button>
 			</Link>
 

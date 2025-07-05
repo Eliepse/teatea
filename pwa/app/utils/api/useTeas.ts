@@ -23,7 +23,6 @@ export function useTeas(params?: Params) {
 	return useQuery({
 		queryFn: async () => searchTeas(queryParams),
 		queryKey: ["teas", queryParams],
-		initialData: {member: []},
 		placeholderData: keepPreviousData
 	});
 }
