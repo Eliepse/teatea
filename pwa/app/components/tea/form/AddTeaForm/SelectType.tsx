@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { Check } from "~/components/icons/Check";
 import { useTeaTypes } from "~/utils/api/useTeaTypes";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
+import { handleUIEvent } from "~/utils/function";
 
 export function SelectType() {
 	const { data, isLoading } = useTeaTypes();
@@ -38,13 +39,13 @@ export function SelectType() {
 			action={
 				<div className="flex justify-center">
 					{!!selectedType || (0 !== children.length) && (
-						<button className="btn rounded-full mr-auto" onClick={clear}>
+						<button className="btn rounded-full mr-auto" onClick={handleUIEvent(clear)}>
 							Back
 						</button>
 					)}
 
 					{!!selectedFamily && (
-						<button className="ml-2 btn btn-primary rounded-full" onClick={confirm}>
+						<button className="ml-2 btn btn-primary rounded-full" onClick={handleUIEvent(confirm)}>
 							{selectedType?.name || teaFamilies[selectedFamily]}
 							<Check className="size-4 ml-1" />
 						</button>
@@ -59,7 +60,7 @@ export function SelectType() {
 				Object.entries(teaFamilies).map(([key, label]) => (
 					<button
 						key={key}
-						onClick={() => changeFamily(key as TeaFamily)}
+						onClick={handleUIEvent(() => changeFamily(key as TeaFamily))}
 						className={clsx("mb-2 btn btn-block h-12", selectedFamily === key && "btn-primary")}
 					>
 						{label}{" "}
@@ -73,7 +74,7 @@ export function SelectType() {
 			{children.map((type) => (
 				<button
 					key={type.id}
-					onClick={() => changeType(type)}
+					onClick={handleUIEvent(() => changeType(type))}
 					className={clsx("mb-2 btn btn-block h-12", selectedType?.id === type.id && "btn-primary")}
 				>
 					{type.name}

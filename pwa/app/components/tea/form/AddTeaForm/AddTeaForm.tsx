@@ -32,7 +32,6 @@ export function useTeaFormContext() {
 }
 
 async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" | "origin">>) {
-	console.debug(data);
 	const response = await fetchApi("/teas", {
 		method: "POST",
 		payload: {
