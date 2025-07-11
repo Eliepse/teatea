@@ -48,7 +48,12 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 				items.map((item) => (
 					<TeaItem
 						key={item["@id"]}
-						name={item["@id"] + " - " + (item.name || item.type?.name || item.family)}
+						title={item.displayName}
+						family={item.family + " tea"}
+						type={item.type?.name}
+						country={item.originPath?.country?.name}
+						region={item.originPath?.region?.name}
+						locality={item.originPath?.locality?.name}
 						onSelect={() => props.onSelect(item)}
 						selected={props.value?.["@id"] === item["@id"]}
 						className="mb-2"
@@ -58,13 +63,35 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 	);
 }
 
-function TeaItem(props: { name: string; onSelect: () => void; selected?: boolean; className?: string }) {
+function TeaItem(props: {
+	title: string;
+	onSelect: () => void;
+	selected?: boolean;
+	className?: string;
+	country?: string | null;
+	region?: string | null;
+	locality?: string | null;
+	family: string;
+	type?: string;
+}) {
+	const countryOnly = !props.locality && !props.region;
+
 	return (
-		<button
-			className={clsx("btn btn-block", props.selected && "btn-primary", props.className)}
+		<article
+			className={clsx("bg-base-100 px-4 py-3 flex", props.selected && "bg-base-300", props.className)}
 			onClick={props.onSelect}
 		>
-			{props.name}
-		</button>
+			<div className="flex-1">{props.title}</div>
+			<div className="text-xs text-right">
+				{<div>{props.type ?? props.family}</div>}
+				{countryOnly ? (
+					props.country
+				) : (
+					<>
+						{[props.locality, props.region].filter((s) => s).join(", ")} ({props.country})
+					</>
+				)}
+			</div>
+		</article>
 	);
 }

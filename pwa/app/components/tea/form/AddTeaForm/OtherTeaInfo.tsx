@@ -5,12 +5,24 @@ import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
 import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
+import { type ChangeEvent, useState } from "react";
 
 export function OtherTeaInfo() {
 	const context = useTeaFormContext();
 	const navigationStack = useStackNavigator();
 	const origins = useOriginByPath();
 	const values = context.formValue;
+	const [name, setName] = useState<string>("");
+
+	function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
+		const name = e.currentTarget.value;
+		setName(name);
+	}
+
+	function handleSubmit() {
+		context.patchForm({ name })
+		void context.submit()
+	}
 
 	return (
 		<PageLayout
@@ -20,7 +32,7 @@ export function OtherTeaInfo() {
 				<div className="flex justify-center">
 					<button
 						className="ml-2 btn btn-primary rounded-full"
-						onClick={context.submit}
+						onClick={handleSubmit}
 						disabled={context.submitting}
 					>
 						{context.submitting ? "Saving..." : "Add new tea"}
@@ -37,12 +49,15 @@ export function OtherTeaInfo() {
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
 
-			<button className="my-4 btn btn-block text-left h-16" onClick={() => navigationStack.next({ key: "origin" })}>
+			<button
+				className="my-4 btn btn-block text-left h-16"
+				onClick={() => navigationStack.next({ key: "origin" })}
+			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Origin</div>
 					<div>
 						{!values.origin && "Not set"}
-						{values.origin && origins.data && origins.data[values.origin.path.nodes.join(".")]?.name}
+						{values.origin && origins.data && origins.data[values.origin.path.join(".")]?.name}
 					</div>
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
@@ -50,7 +65,13 @@ export function OtherTeaInfo() {
 
 			<fieldset className="fieldset my-4">
 				<legend className="fieldset-legend">Name</legend>
-				<input type="text" className="input w-full" name="name" />
+				<input
+					type="text"
+					className="input w-full"
+					name="name"
+					defaultValue={name}
+					onChange={handleNameChange}
+				/>
 				<p className="label">Your tea might have the same name of it's type</p>
 			</fieldset>
 

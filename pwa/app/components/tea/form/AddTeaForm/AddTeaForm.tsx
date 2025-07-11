@@ -32,15 +32,16 @@ export function useTeaFormContext() {
 }
 
 async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" | "origin">>) {
+	console.debug(data);
 	const response = await fetchApi("/teas", {
 		method: "POST",
-		body: JSON.stringify({
+		payload: {
 			family: data.family,
 			origin: data.origin["@id"],
 			type: data.type ? data.type["@id"] : null,
 			name: data.name,
 			altitude: data.altitude,
-		}),
+		},
 	});
 
 	await wait(1000);
@@ -86,8 +87,8 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 
 	return (
 		<CONTEXT.Provider value={contextValue}>
-			<NavigationStack defaultFrame={{ key: "type" }}>
-				<Paged open={props.open}>
+			<Paged open={props.open}>
+				<NavigationStack defaultFrame={{ key: "type" }} onOverBack={close}>
 					<StackFrame frameKey="type">
 						<SelectType />
 					</StackFrame>
@@ -105,8 +106,8 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 							error={mutation.error?.message}
 						/>
 					</StackFrame>
-				</Paged>
-			</NavigationStack>
+				</NavigationStack>
+			</Paged>
 		</CONTEXT.Provider>
 	);
 }

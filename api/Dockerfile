@@ -41,8 +41,8 @@ FROM frankenphp_base AS frankenphp_dev
 ENV APP_ENV=dev XDEBUG_MODE=off
 #VOLUME /app/var/
 
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-#	set -eux; install-php-extensions xdebug
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"; \
+	set -eux; install-php-extensions xdebug
 
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
 

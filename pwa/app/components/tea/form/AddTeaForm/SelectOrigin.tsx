@@ -20,20 +20,20 @@ export function SelectOrigin() {
 			return 1 === paths.filter((path) => path.startsWith(key)).length;
 		});
 	}, [data]);
-	const isLeaf = selectedOrigin ? leavesPaths.includes(selectedOrigin.path.nodes.join(".")) : true;
+	const isLeaf = selectedOrigin ? leavesPaths.includes(selectedOrigin.path.join(".")) : true;
 	const originList = useMemo(() => {
 		if (!data) {
 			return [];
 		}
 
-		const selectedPathLength = selectedOrigin?.path?.nodes?.length ?? 1;
+		const selectedPathLength = selectedOrigin?.path?.length ?? 1;
 		const targetedLevel = isLeaf ? selectedPathLength : selectedPathLength + 1;
-		const path = selectedOrigin ? selectedOrigin.path.nodes.slice(0, isLeaf ? -1 : undefined).join(".") : null;
+		const path = selectedOrigin ? selectedOrigin.path.slice(0, isLeaf ? -1 : undefined).join(".") : null;
 
 		return Object.entries(data)
 			.filter(([key, origin]) => {
 				// Limit to n+1 level
-				if (targetedLevel !== origin.path.nodes.length) {
+				if (targetedLevel !== origin.path.length) {
 					return false;
 				}
 
@@ -47,7 +47,7 @@ export function SelectOrigin() {
 			return;
 		}
 
-		const parentPath = selectedOrigin.path.nodes.slice(0, -1).join(".");
+		const parentPath = selectedOrigin.path.slice(0, -1).join(".");
 		const parent = data[parentPath];
 
 		if (0 === parentPath.length) {
@@ -106,7 +106,7 @@ export function SelectOrigin() {
 						direction="right"
 						className={clsx(
 							"size-4 ml-auto",
-							leavesPaths.includes(origin.path.nodes.join(".")) && "invisible",
+							leavesPaths.includes(origin.path.join(".")) && "invisible",
 						)}
 					/>
 				</button>

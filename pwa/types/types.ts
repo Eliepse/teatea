@@ -4,13 +4,11 @@ import type Steep from "~/utils/value-objects/Steep";
 
 interface Resource {
 	id: number;
-	"@id": string,
-	"@type": string,
+	"@id": string;
+	"@type": string;
 }
 
-type LTreePath = {
-	nodes: string[];
-}
+type LTreePath = string[];
 
 export type TeaType = Resource & {
 	name: string;
@@ -27,13 +25,11 @@ export type Origin = Resource & {
 };
 
 export type Tea = Resource & {
-	name?: string;
-	type: TeaType;
-	family: TeaFamily,
-	// All the tree of this tea type
+	family: TeaFamily;
+	type?: TeaType;
 	origin?: Origin;
-	// All the tree of this tea origin
-	parentOrigins?: Origin[];
+	originPath?: { country: Origin; region: Origin | null; locality: Origin | null };
+	displayName: string;
 };
 
 export type TeaTypeTreeNode = TeaType & LTreeNode;

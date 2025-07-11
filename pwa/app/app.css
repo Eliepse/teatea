@@ -2,30 +2,32 @@
 @import "./styles/react-day-picker.css";
 
 @plugin "daisyui";
+
+/*noinspection CssUnknownProperty*/
 @plugin "daisyui/theme" {
-	name: "Sable";
+	name: Sable;
 	default: true;
 	prefersdark: false;
-	color-scheme: "light";
+	color-scheme: light;
 	--color-base-100: oklch(100% 0 0);
-	--color-base-200: #fcf6f0;
-	--color-base-300: #f8e3d6;
-	--color-base-content: #2a4641;
+	--color-base-200: #e4fef9;
+	--color-base-300: #f8ced1;
+	--color-base-content: #2b2626;
 	--color-primary: #fa9c41;
 	--color-primary-content: #682208;
 	--color-secondary: #ded1a9;
 	--color-secondary-content: #69664e;
 	--color-accent: #91f2e8;
-	--color-accent-content: #2b4742;
+	--color-accent-content: #2b2626;
 	--color-neutral: #1b252d;
 	--color-neutral-content: oklch(100% 0 0);
-	--color-info: oklch(74% 0.16 232.661);
-	--color-info-content: oklch(29% 0.066 243.157);
+	--color-info: #cca9e1;
+	--color-info-content: #2b2626;
 	--color-success: oklch(76% 0.177 163.223);
 	--color-success-content: oklch(37% 0.077 168.94);
 	--color-warning: oklch(82% 0.189 84.429);
 	--color-warning-content: oklch(41% 0.112 45.904);
-	--color-error: #da4f24;
+	--color-error: #ee2b2c;
 	--color-error-content: #f8e3d6;
 	--radius-selector: 0rem;
 	--radius-field: 0rem;

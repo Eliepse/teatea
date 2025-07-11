@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: OriginRepository::class)]
 #[ApiResource(
@@ -33,6 +34,7 @@ class Origin
 	/**
 	 * @var Collection<int, Tea>
 	 */
+	#[Ignore]
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'origin')]
 	private Collection $teas;
 
@@ -44,6 +46,7 @@ class Origin
 	/**
 	 * @return Collection<int, Tea>
 	 */
+	#[Ignore]
 	public function getTeas(): Collection
 	{
 		return $this->teas;
@@ -53,7 +56,6 @@ class Origin
 	{
 		if (!$this->teas->contains($tea)) {
 			$this->teas->add($tea);
-			$tea->setOrigin($this);
 		}
 
 		return $this;
@@ -69,5 +71,10 @@ class Origin
 		}
 
 		return $this;
+	}
+
+	public function getPath(): array
+	{
+		return $this->path->getNodes();
 	}
 }

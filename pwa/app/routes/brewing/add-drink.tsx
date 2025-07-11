@@ -59,36 +59,38 @@ export default function LogDrinkPage() {
 	);
 
 	return (
-		<NewSipContext.Provider value={contextValue}>
-			<NavigationStack>
-				<StackFrame frameKey="form">
-					<NewDrinkFormFrame />
-				</StackFrame>
-				<StackFrame frameKey="date">
-					<SelectDateFrame
-						mode="single"
-						selected={contextValue.formData.drankAt}
-						onSelect={(v) => contextValue.updateForm({ drankAt: v })}
-						disabled={{ after: new Date() }}
-						showOutsideDays
-						endMonth={new Date()}
-						required
-					/>
-				</StackFrame>
-				<StackFrame frameKey="tea">
-					<SelectTeaFrame onSelect={(tea) => contextValue.updateForm({ tea })} value={formData.tea} />
-				</StackFrame>
-				<StackFrame frameKey="done">
-					<div className="h-screen flex flex-col justify-center items-center bg-[#f8e3d6]">
-						<div className="max-w-xs relative z-10">
-							<div className="text-2xl font-semibold text-center my-12 text-[#2a4641] ">Your drink has been registered</div>
-							<button className="mx-auto flex btn btn-wide btn-primary mb-4">Add a tasting note</button>
-							<button className="mx-auto flex btn btn-wide btn-secondary" onClick={handleUIEvent(() => navigate(-1))}>Close</button>
+		<div className="bg-base-200 min-h-screen">
+			<NewSipContext.Provider value={contextValue}>
+				<NavigationStack>
+					<StackFrame frameKey="form">
+						<NewDrinkFormFrame />
+					</StackFrame>
+					<StackFrame frameKey="date">
+						<SelectDateFrame
+							mode="single"
+							selected={contextValue.formData.drankAt}
+							onSelect={(v) => contextValue.updateForm({ drankAt: v })}
+							disabled={{ after: new Date() }}
+							showOutsideDays
+							endMonth={new Date()}
+							required
+						/>
+					</StackFrame>
+					<StackFrame frameKey="tea">
+						<SelectTeaFrame onSelect={(tea) => contextValue.updateForm({ tea })} value={formData.tea} />
+					</StackFrame>
+					<StackFrame frameKey="done">
+						<div className="h-screen flex flex-col justify-center items-center bg-[#f8e3d6]">
+							<div className="max-w-xs relative z-10">
+								<div className="text-2xl font-semibold text-center my-12 text-[#2a4641] ">Your drink has been registered</div>
+								<button className="mx-auto flex btn btn-wide btn-primary mb-4">Add a tasting note</button>
+								<button className="mx-auto flex btn btn-wide btn-secondary" onClick={handleUIEvent(() => navigate(-1))}>Close</button>
+							</div>
+							<img src="/img/leaf.gif" alt="" className="fixed bottom-0 right-0 z-0 translate-x-32 translate-y-[45%] rotate-30" />
 						</div>
-						<img src="/img/leaf.gif" alt="" className="fixed bottom-0 right-0 z-0 translate-x-32 translate-y-[45%] rotate-30" />
-					</div>
-				</StackFrame>
-			</NavigationStack>
-		</NewSipContext.Provider>
+					</StackFrame>
+				</NavigationStack>
+			</NewSipContext.Provider>
+		</div>
 	);
 }

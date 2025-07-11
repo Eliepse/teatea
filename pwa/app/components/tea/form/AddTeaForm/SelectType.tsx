@@ -37,8 +37,8 @@ export function SelectType() {
 			onBack={navigationStack.back}
 			action={
 				<div className="flex justify-center">
-					{!!selectedType && (
-						<button className="btn rounded-full mr-auto" onClick={navigationStack.back}>
+					{!!selectedType || (0 !== children.length) && (
+						<button className="btn rounded-full mr-auto" onClick={clear}>
 							Back
 						</button>
 					)}

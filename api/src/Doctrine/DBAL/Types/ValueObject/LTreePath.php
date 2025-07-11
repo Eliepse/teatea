@@ -3,13 +3,12 @@
 namespace App\Doctrine\DBAL\Types\ValueObject;
 
 use RuntimeException;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 final readonly class LTreePath implements \Stringable
 {
-	/**
-	 * @param string[] $nodes
-	 */
 	public function __construct(
+		/** @var string[] */
 		private array $nodes,
 	) {
 		$this->validate($nodes);
@@ -17,7 +16,7 @@ final readonly class LTreePath implements \Stringable
 
 	public function __toString(): string
 	{
-		return join(".", $this->nodes);
+		return $this->getPath();
 	}
 
 	public static function fromString(string $pathString): self
@@ -40,5 +39,21 @@ final readonly class LTreePath implements \Stringable
 	public function getNodes(): array
 	{
 		return $this->nodes;
+	}
+
+	#[Ignore]
+	public function getPath()
+	{
+		return join(".", $this->nodes);
+	}
+
+	#[Ignore]
+	public function getParentPath(): ?string
+	{
+		if (1 === count($this->nodes)) {
+			return null;
+		}
+
+		return join(".", array_slice($this->nodes, 0, -1));
 	}
 }

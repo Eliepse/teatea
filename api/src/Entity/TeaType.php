@@ -23,7 +23,6 @@ class TeaType
 	#[ORM\Column(enumType: TeaFamily::class)]
 	public TeaFamily $family;
 
-	#[Groups("tea:list")]
 	#[ORM\Column(type: Types::TEXT)]
 	public string $name;
 

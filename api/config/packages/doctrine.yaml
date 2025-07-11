@@ -40,6 +40,10 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        
+        dql:
+            numeric_functions:
+                ltree: App\Doctrine\ORM\Functions\LTreeOperatorFunction
 
 when@test:
     doctrine:
