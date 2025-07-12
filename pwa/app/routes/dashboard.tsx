@@ -2,6 +2,7 @@ import { useState } from "react";
 import { BrewMultiStepForm } from "~/components/brewing/BrewMultiStepForm";
 import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
 import { Link } from "react-router";
+import { ActivityGraph } from "~/components/activity/ActivityGraph";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -13,6 +14,8 @@ export default function Dashboard() {
 
 	return (
 		<div className="px-4">
+			<ActivityGraph className="mt-4" />
+
 			<Link to="/drink/new">
 				<button className="btn btn-block mt-6">What are you drinking today?</button>
 			</Link>
