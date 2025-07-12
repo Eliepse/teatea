@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use App\Entity\User;
 use App\State\DrinkProcessor;
 use App\State\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;

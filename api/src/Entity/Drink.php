@@ -18,6 +18,10 @@ class Drink
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly Tea $tea,
 
+		#[ORM\ManyToOne(inversedBy: "drinks")]
+		#[ORM\JoinColumn(nullable: false)]
+		public readonly User $drinker,
+
 		#[ORM\Column]
 		public readonly ?\DateTimeImmutable $drankAt = null,
 	) {

@@ -57,6 +57,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Tea::class)]
     private Collection $collectedTeas;
 
+	/**
+	 * @var Collection<int, Drink>
+	 */
+	#[ORM\OneToMany(targetEntity: Drink::class, mappedBy: 'tea')]
+	private Collection $drinks;
+
 	public function __construct()
 	{
 		$this->collectedTeas = new ArrayCollection();
