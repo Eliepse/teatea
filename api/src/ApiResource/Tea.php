@@ -6,10 +6,12 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use App\Controller\UserCollectTeaController;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
 use App\Entity\TeaType;
 use App\Enum\TeaFamily;
+use App\State\CollectTeaProcessor;
 use App\State\TeaProcessor;
 use App\State\TeaProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -18,6 +20,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Get(provider: TeaProvider::class)]
 #[GetCollection(paginationEnabled: false, provider: TeaProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["tea:create"]], processor: TeaProcessor::class)]
+//#[Post(uriTemplate: "/teas/{id}/collect", input: \stdClass::class, output: \stdClass::class, write: false, processor: CollectTeaProcessor::class)]
 class Tea
 {
 	#[ApiProperty(identifier: true)]

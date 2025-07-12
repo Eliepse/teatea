@@ -25,9 +25,7 @@ readonly class TeaProcessor implements ProcessorInterface
 	 */
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
 	{
-		if (false === is_a($data, Tea::class)) {
-			throw new \RuntimeException("Expected a App\Resource\Tea");
-		}
+		assert($data instanceof Tea);
 
 		$tea = new \App\Entity\Tea(createdAt: $data->addedAt);
 		$tea->family = $data->family;
@@ -38,14 +36,13 @@ readonly class TeaProcessor implements ProcessorInterface
 		$this->em->persist($tea);
 		$this->em->flush();
 
-		$resource = new Tea(
-			family: $tea->family,
-			id: $tea->id,
-			type: $tea->type,
-			origin: $tea->origin,
-			name: $tea->name,
-			addedAt: $tea->createdAt,
-		);
+		$resource = new Tea();
+		$resource->id = $tea->id;
+		$resource->family = $tea->family;
+		$resource->type = $tea->type;
+		$resource->origin = $tea->origin;
+		$resource->name = $tea->name;
+		$resource->addedAt = $tea->createdAt;
 
 		if (null !== $tea->origin) {
 			$nodes = $tea->origin->path->getNodes();

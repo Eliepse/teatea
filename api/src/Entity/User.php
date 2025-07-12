@@ -41,18 +41,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[ORM\Column]
 	private ?string $password = null;
 
-	/** @var Collection<int, Tea> */
-	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "user")]
-	public Collection $teas;
-
 	/** @var Collection<int, Brewing> */
 	#[ORM\OneToMany(targetEntity: Brewing::class, mappedBy: "brewings")]
 	public Collection $brewings;
 
+    /**
+     * @var Collection<int, TeaList>
+     */
+    #[ORM\OneToMany(targetEntity: TeaList::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $teaLists;
+
+    /**
+     * @var Collection<int, Tea>
+     */
+    #[ORM\ManyToMany(targetEntity: Tea::class)]
+    private Collection $collectedTeas;
+
 	public function __construct()
 	{
-		$this->teas = new ArrayCollection();
+		$this->collectedTeas = new ArrayCollection();
 		$this->brewings = new ArrayCollection();
+        $this->teaLists = new ArrayCollection();
 	}
 
 	/**
@@ -112,4 +121,49 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 		// If you store any temporary, sensitive data on the user, clear it here
 		// $this->plainPassword = null;
 	}
+
+    /**
+     * @return Collection<int, TeaList>
+     */
+    public function getTeaLists(): Collection
+    {
+        return $this->teaLists;
+    }
+
+    public function addTeaList(TeaList $teaList): static
+    {
+        if (!$this->teaLists->contains($teaList)) {
+            $this->teaLists->add($teaList);
+            $teaList->owner = $this;
+        }
+
+        return $this;
+    }
+
+    public function removeTeaList(TeaList $teaList): static
+    {
+        if ($this->teaLists->removeElement($teaList)) {
+            // set the owning side to null (unless already changed)
+//            if ($teaList->owner === $this) {
+//                $teaList->owner = null;
+//            }
+        }
+
+        return $this;
+    }
+
+    public function addTea(Tea $tea): static
+    {
+        if (!$this->collectedTeas->contains($tea)) {
+            $this->collectedTeas->add($tea);
+        }
+
+        return $this;
+    }
+
+    public function removeTea(Tea $tea): static
+    {
+        $this->collectedTeas->removeElement($tea);
+        return $this;
+    }
 }

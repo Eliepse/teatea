@@ -1,4 +1,5 @@
 import clsx from "clsx";
+import { handleUIEvent } from "~/utils/function";
 
 export function Confirmation(props: {
 	state: "idle" | "pending" | "success" | "error",
@@ -20,11 +21,11 @@ export function Confirmation(props: {
 		)}
 
 		{"success" === props.state && (
-			<button className="btn btn-wide btn-primary mb-4" onClick={props.onOk}>See the tea</button>
+			<button className="btn btn-wide btn-primary mb-4" onClick={handleUIEvent(props.onOk)}>See the tea</button>
 		)}
 
 		{"pending" !== props.state && (
-			<button className="btn btn-wide" onClick={props.onBack}>Close</button>
+			<button className="btn btn-wide" onClick={handleUIEvent(props.onBack)}>Close</button>
 		)}
 	</div>
 }

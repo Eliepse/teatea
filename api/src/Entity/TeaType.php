@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: TeaTypeRepository::class)]
 #[ApiResource(paginationEnabled: false)]
@@ -29,6 +30,7 @@ class TeaType
 	/**
 	 * @var Collection<int, Tea>
 	 */
+	#[Ignore]
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'type')]
 	private Collection $teas;
 

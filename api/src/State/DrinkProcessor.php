@@ -19,9 +19,7 @@ readonly class DrinkProcessor implements ProcessorInterface
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Drink
 	{
-		if (false === ($data instanceof Drink)) {
-			throw new \RuntimeException("Unsupported resource: " . gettype($data));
-		}
+		assert($data instanceof Drink);
 
 		$this->em->persist(
 			$entity = new \App\Entity\Drink(

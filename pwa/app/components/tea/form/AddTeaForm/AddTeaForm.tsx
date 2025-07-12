@@ -101,7 +101,7 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 					<StackFrame frameKey="confirmation">
 						<Confirmation
 							state={mutation.status}
-							onBack={close}
+							onBack={props.onClose}
 							onOk={warnNotImplemented}
 							error={mutation.error?.message}
 						/>
