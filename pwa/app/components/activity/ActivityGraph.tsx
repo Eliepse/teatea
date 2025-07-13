@@ -1,5 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { eachWeekOfInterval, endOfYear, getDayOfYear, getYear, parse, setDay, setYear, startOfYear } from "date-fns";
+import {
+	addDays,
+	eachWeekOfInterval,
+	endOfYear,
+	getDayOfYear,
+	getYear,
+	parse,
+	setDay,
+	setYear,
+	startOfYear
+} from "date-fns";
 import { fetchApi } from "~/utils/api";
 import { useMemo } from "react";
 import clsx from "clsx";
@@ -29,7 +39,7 @@ export function ActivityGraph(props: { year?: number; className?: string }) {
 	const today = new Date();
 	const year = props.year ?? getYear(today);
 	const date = setYear(today, year);
-	const weeks = eachWeekOfInterval({ start: startOfYear(date), end: endOfYear(date) });
+	const weeks = eachWeekOfInterval({ start: startOfYear(date), end: endOfYear(date) }, { weekStartsOn: 1 });
 	const weekDays = [0, 1, 2, 3, 4, 5, 6];
 
 	const { data } = useQuery({
@@ -68,7 +78,7 @@ export function ActivityGraph(props: { year?: number; className?: string }) {
 				{weekDays.map((weekDay) => (
 					<tr key={weekDay}>
 						{weeks.map((week) => {
-							const day = setDay(week, weekDay);
+							const day = addDays(week, weekDay);
 							const isInYear = getYear(day) === year;
 							const total = isInYear ? (dataByDay[getDayOfYear(day)] ?? 0) : 0;
 
