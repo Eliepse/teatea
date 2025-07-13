@@ -10,6 +10,10 @@ interface Resource {
 
 type LTreePath = string[];
 
+export type User = Resource & {
+	username: string;
+}
+
 export type TeaType = Resource & {
 	name: string;
 	path: string;

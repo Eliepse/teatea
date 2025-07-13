@@ -1,11 +1,13 @@
 import { createContext, type PropsWithChildren, useContext, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { useToken } from "~/auth/hooks/useToken";
+import { useUser } from "~/auth/hooks/useUser";
 
 const AuthContext = createContext<{ token: string | null }>({ token: null });
 
 export function AuthProvider(props: PropsWithChildren) {
 	const [token, _, clearToken] = useToken();
+	const userQuery = useUser();
 	const navigate = useNavigate();
 
 	function logout() {
@@ -15,9 +17,10 @@ export function AuthProvider(props: PropsWithChildren) {
 
 	const value = useMemo(
 		() => ({
-			token
+			token,
+			user: userQuery.data,
 		}),
-		[token]
+		[token, userQuery.data],
 	);
 
 	return <AuthContext.Provider value={value}>{props.children}</AuthContext.Provider>;

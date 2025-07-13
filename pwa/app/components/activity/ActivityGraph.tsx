@@ -19,8 +19,9 @@ type ActivityGraph = {
 };
 
 export function ActivityGraph(props: { year?: number; className?: string }) {
-	const year = props.year ?? getYear(new Date());
-	const date = setYear(new Date(), year);
+	const today = new Date();
+	const year = props.year ?? getYear(today);
+	const date = setYear(today, year);
 	const weeks = eachWeekOfInterval({ start: startOfYear(date), end: endOfYear(date) });
 	const weekDays = [0, 1, 2, 3, 4, 5, 6];
 

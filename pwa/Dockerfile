@@ -3,6 +3,11 @@ COPY . /app
 WORKDIR /app
 RUN npm ci
 
+FROM node:22-alpine AS dev
+COPY ./package.json package-lock.json /app/
+WORKDIR /app
+CMD ["npm", "run", "dev"]
+
 FROM node:22-alpine AS production-dependencies-env
 COPY ./package.json package-lock.json /app/
 WORKDIR /app

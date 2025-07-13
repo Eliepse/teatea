@@ -76,6 +76,7 @@ export function SelectOrigin() {
 		<PageLayout
 			title="Where does it come from?"
 			onBack={navigationStack.back}
+			bodyClassName="pb-20"
 			action={
 				<div className="flex justify-center">
 					{selectedOrigin && (

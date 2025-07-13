@@ -31,7 +31,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[Assert\Length(min: 2)]
 	#[Assert\Unique]
 	#[ORM\Column(type: Types::TEXT)]
-	private ?string $username = null;
+	public ?string $username = null;
 
 	/** @var list<string> The user roles */
 	#[ORM\Column]
