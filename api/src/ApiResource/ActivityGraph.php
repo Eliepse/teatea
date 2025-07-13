@@ -15,6 +15,8 @@ class ActivityGraph
 
 	public string $name = "test";
 
+	public int $levels = 1;
+
 	/** @var ActivityGraphDay[] */
 	#[ApiProperty(genId: false)]
 	public array $items;

@@ -50,10 +50,17 @@ readonly class ActivityGraphProvider implements ProviderInterface
 
 		$data = $statsQB->fetchAllAssociative();
 
+		$totals = array_map(fn($row) => $row["total"], $data);
+		$min = min($totals);
+		$max = max($totals);
+		$levelSize = (int) round(($max - $min) / 2);
+		$levels = array_reverse(array_unique([$min, $min + $levelSize, $max]));
+
 		$days = array_map(
 			fn(array $row) => new ActivityGraphDay(
 				$row["total"],
 				\DateTimeImmutable::createFromFormat("Y-m-d", $row["drank_at"]),
+				1 + (array_find_key($levels, fn($level) => $level <= $row["total"]) ?? 0),
 			),
 			$data,
 		);
@@ -61,6 +68,7 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		$graph = new ActivityGraph();
 		$graph->year = $year;
 		$graph->items = $days;
+		$graph->levels = count($levels);
 		return $graph;
 	}
 }

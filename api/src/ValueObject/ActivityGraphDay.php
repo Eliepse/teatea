@@ -2,15 +2,12 @@
 
 namespace App\ValueObject;
 
-use ApiPlatform\Metadata\ApiProperty;
-use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Serializer\Attribute\Ignore;
-
 readonly class ActivityGraphDay
 {
 	public function __construct(
 		public int $total,
 		public \DateTimeImmutable $date,
+		public int $level = 1,
 	) {
 	}
 

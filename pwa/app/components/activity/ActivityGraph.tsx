@@ -18,6 +18,13 @@ type ActivityGraph = {
 	items: ActivityGraphDay[];
 };
 
+const levelClass = {
+	0: "bg-base-200",
+	1: "bg-primary/40",
+	2: "bg-primary/70",
+	3: "bg-primary",
+} as const;
+
 export function ActivityGraph(props: { year?: number; className?: string }) {
 	const today = new Date();
 	const year = props.year ?? getYear(today);
@@ -71,7 +78,7 @@ export function ActivityGraph(props: { year?: number; className?: string }) {
 										className={clsx(
 											"aspect-square",
 											false === isInYear && "opacity-0",
-											isInYear && (0 !== total ? "bg-primary" : "bg-base-200"),
+											isInYear && levelClass[total as keyof typeof levelClass],
 										)}
 									/>
 								</td>
