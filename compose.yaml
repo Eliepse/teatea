@@ -38,7 +38,7 @@ services:
       target: dev
       dockerfile: pwa/Dockerfile
     volumes:
-      - pwa/:app/
+      - ./pwa/:app/
   
   database:
     image: postgres:17-alpine

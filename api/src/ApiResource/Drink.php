@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Entity\User;
+use App\Enum\BrewingTechnic;
 use App\State\DrinkProcessor;
 use App\State\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -21,6 +22,9 @@ class Drink
 
 	#[Groups("drink:create")]
 	public Tea $tea;
+
+	#[Groups("drink:create")]
+	public ?BrewingTechnic $technic = null;
 
 	#[Groups("drink:create")]
 	public ?\DateTimeImmutable $drankAt;

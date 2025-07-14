@@ -1,4 +1,4 @@
-import { NavigationStack, StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { useMemo, useState } from "react";
 import { SelectTeaFrame } from "~/components/stackFrames/SelectTeaFrame";
 import { useNavigate } from "react-router";
@@ -8,6 +8,7 @@ import { type FormData, NewSipContext, type SipContext } from "./add-drink.conte
 import { useMutation } from "@tanstack/react-query";
 import { fetchApi } from "~/utils/api";
 import { handleUIEvent } from "~/utils/function";
+import { SelectTechnicFrame } from "~/components/stackFrames/SelectTechnicFrame";
 
 export default function LogDrinkPage() {
 	const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function LogDrinkPage() {
 				payload: {
 					drankAt: data.drankAt,
 					tea: data.tea?.["@id"],
+					technic: data.technic,
 				},
 			});
 
@@ -79,14 +81,33 @@ export default function LogDrinkPage() {
 					<StackFrame frameKey="tea">
 						<SelectTeaFrame onSelect={(tea) => contextValue.updateForm({ tea })} value={formData.tea} />
 					</StackFrame>
+					<StackFrame frameKey="technic">
+						<SelectTechnicFrame
+							onSelect={(technic) => contextValue.updateForm({ technic })}
+							value={formData.technic}
+						/>
+					</StackFrame>
 					<StackFrame frameKey="done">
 						<div className="h-screen flex flex-col justify-center items-center bg-[#f8e3d6]">
 							<div className="max-w-xs relative z-10">
-								<div className="text-2xl font-semibold text-center my-12 text-[#2a4641] ">Your drink has been registered</div>
-								<button className="mx-auto flex btn btn-wide btn-primary mb-4">Add a tasting note</button>
-								<button className="mx-auto flex btn btn-wide btn-secondary" onClick={handleUIEvent(() => navigate(-1))}>Close</button>
+								<div className="text-2xl font-semibold text-center my-12 text-[#2a4641] ">
+									Your drink has been registered
+								</div>
+								<button className="mx-auto flex btn btn-wide btn-primary mb-4">
+									Add a tasting note
+								</button>
+								<button
+									className="mx-auto flex btn btn-wide btn-secondary"
+									onClick={handleUIEvent(() => navigate(-1))}
+								>
+									Close
+								</button>
 							</div>
-							<img src="/img/leaf.gif" alt="" className="fixed bottom-0 right-0 z-0 translate-x-32 translate-y-[45%] rotate-30" />
+							<img
+								src="/img/leaf.gif"
+								alt=""
+								className="fixed bottom-0 right-0 z-0 translate-x-32 translate-y-[45%] rotate-30"
+							/>
 						</div>
 					</StackFrame>
 				</NavigationStack>

@@ -5,9 +5,9 @@ import { useNewSipContext } from "~/routes/brewing/add-drink.context";
 import { formatDate } from "date-fns";
 import { useNavigate } from "react-router";
 import type { Tea } from "~t/types";
-import Arrow from "~/components/icons/arrow";
 import { useState } from "react";
 import { Check } from "~/components/icons/Check";
+import { BrewingTechnic } from "~/components/shared/BrewingTechnic";
 
 export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 	const navigate = useNavigate();
@@ -41,10 +41,17 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 				</button>
 			</fieldset>
 
-			<fieldset className="fieldset">
+			<fieldset className="fieldset mb-6">
 				<legend className="fieldset-legend">Which tea?</legend>
 				<button className="input w-full" onClick={handleUIEvent(() => navStack.next({ key: "tea" }))}>
 					{formData.tea ? formData.tea["@id"] : "Select a tea..."}
+				</button>
+			</fieldset>
+
+			<fieldset className="fieldset mb-6">
+				<legend className="fieldset-legend">Brewing technic</legend>
+				<button className="input w-full" onClick={handleUIEvent(() => navStack.next({ key: "technic" }))}>
+					{formData.technic ? <BrewingTechnic value={formData.technic} /> : "Select a technic..."}
 				</button>
 			</fieldset>
 		</PageLayout>

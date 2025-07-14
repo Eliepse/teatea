@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\BrewingTechnic;
 use App\Repository\DrinkRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -21,6 +22,9 @@ class Drink
 		#[ORM\ManyToOne(inversedBy: "drinks")]
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly User $drinker,
+
+		#[ORM\Column(nullable: true)]
+		public ?BrewingTechnic $technic = null,
 
 		#[ORM\Column]
 		public readonly ?\DateTimeImmutable $drankAt = null,

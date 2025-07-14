@@ -30,6 +30,7 @@ readonly class DrinkProcessor implements ProcessorInterface
 			$entity = new \App\Entity\Drink(
 				tea: $this->em->getReference(Tea::class, $data->tea->id),
 				drinker: $user,
+				technic: $data->technic,
 				drankAt: $data->drankAt,
 			),
 		);
@@ -38,6 +39,7 @@ readonly class DrinkProcessor implements ProcessorInterface
 		$drink = new Drink();
 		$drink->id = $entity->id;
 		$drink->drankAt = $entity->drankAt;
+		$drink->technic = $entity->technic;
 
 		// No need to fully load the Tea resource as it will only be serialized as IRI
 		$drink->tea = new \App\ApiResource\Tea();
