@@ -4,7 +4,6 @@ WORKDIR /app
 RUN npm ci
 
 FROM node:22-alpine AS dev
-COPY ./package.json package-lock.json /app/
 WORKDIR /app
 CMD ["npm", "run", "dev"]
 

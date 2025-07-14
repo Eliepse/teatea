@@ -5,11 +5,11 @@ services:
       - database
     restart: unless-stopped
     environment:
-      PWA_UPSTREAM: 192.168.1.35:5173
+      PWA_UPSTREAM: pwa:5173
       SERVER_NAME: ${SERVER_NAME:-localhost:80}, php:80
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16}
+      TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,pwa}
       TRUSTED_HOSTS: ${TRUSTED_HOSTS:-^${SERVER_NAME:-example\.com|localhost}|php$$}
       DATABASE_URL: postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin}@database:5432/${POSTGRES_DB:-app}?serverVersion=17&charset=utf8
       MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
@@ -36,9 +36,9 @@ services:
     user: "1000:1000"
     build:
       target: dev
-      dockerfile: pwa/Dockerfile
+      dockerfile: ./pwa/Dockerfile
     volumes:
-      - ./pwa/:app/
+      - ./pwa/:/app
   
   database:
     image: postgres:17-alpine
