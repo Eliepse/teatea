@@ -31,7 +31,6 @@ readonly class TeaProcessor implements ProcessorInterface
 		$tea->family = $data->family;
 		$tea->type = $data->type;
 		$tea->origin = $data->origin;
-		$tea->name = $data->name;
 
 		$this->em->persist($tea);
 		$this->em->flush();
@@ -41,7 +40,6 @@ readonly class TeaProcessor implements ProcessorInterface
 		$resource->family = $tea->family;
 		$resource->type = $tea->type;
 		$resource->origin = $tea->origin;
-		$resource->name = $tea->name;
 		$resource->addedAt = $tea->createdAt;
 
 		if (null !== $tea->origin) {

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { SelectType } from "./SelectType";
 import { Paged } from "~/components/shared/paged/Paged";
 import type { Origin, TeaFamily, TeaType } from "~t/types";
@@ -23,7 +23,6 @@ type FormValue = {
 	family?: TeaFamily;
 	type?: TeaType;
 	origin?: Origin;
-	name?: string;
 	altitude?: number;
 };
 
@@ -38,7 +37,6 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 			family: data.family,
 			origin: data.origin["@id"],
 			type: data.type ? data.type["@id"] : null,
-			name: data.name,
 			altitude: data.altitude,
 		},
 	});

@@ -5,23 +5,15 @@ import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
 import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
-import { type ChangeEvent, useState } from "react";
 
 export function OtherTeaInfo() {
 	const context = useTeaFormContext();
 	const navigationStack = useStackNavigator();
 	const origins = useOriginByPath();
 	const values = context.formValue;
-	const [name, setName] = useState<string>("");
-
-	function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
-		const name = e.currentTarget.value;
-		setName(name);
-	}
 
 	function handleSubmit() {
-		context.patchForm({ name })
-		void context.submit()
+		void context.submit();
 	}
 
 	return (
@@ -62,18 +54,6 @@ export function OtherTeaInfo() {
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
-
-			<fieldset className="fieldset my-4">
-				<legend className="fieldset-legend">Name</legend>
-				<input
-					type="text"
-					className="input w-full"
-					name="name"
-					defaultValue={name}
-					onChange={handleNameChange}
-				/>
-				<p className="label">Your tea might have the same name of it's type</p>
-			</fieldset>
 
 			<fieldset className="fieldset my-4">
 				<legend className="fieldset-legend">Altitude</legend>

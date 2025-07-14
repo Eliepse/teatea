@@ -91,7 +91,6 @@ readonly class TeaProvider implements ProviderInterface
 		$tea->id = $entity->id;
 		$tea->type = $entity->type;
 		$tea->originPath = $originPath;
-		$tea->name = $entity->name;
 		$tea->addedAt = $entity->createdAt;
 
 		return $tea;
