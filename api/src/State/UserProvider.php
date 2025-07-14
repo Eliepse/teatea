@@ -25,7 +25,7 @@ readonly class UserProvider implements ProviderInterface
 		$user = $this->security->getUser();
 		assert($user instanceof User);
 
-		$resource = new \App\ApiResource\User();
+		$resource = new \App\ApiResource\Member();
 		$resource->id = $user->id;
 		$resource->username = $user->username;
 		return $resource;

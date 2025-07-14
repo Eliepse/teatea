@@ -3,7 +3,7 @@ import { fetchApi } from "~/utils/api";
 import { useQuery } from "@tanstack/react-query";
 
 async function fetchSelf(): Promise<User> {
-	return await (await fetchApi("/users/me")).json();
+	return await (await fetchApi("/members/me")).json();
 }
 
 export function useUser() {

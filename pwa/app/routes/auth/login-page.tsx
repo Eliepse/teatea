@@ -25,7 +25,7 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 
 	if (data.token) {
 		LocalStorageUtils.store("token", data.token);
-		throw redirect("/welcome");
+		return redirect("/welcome");
 	}
 
 	return null;
