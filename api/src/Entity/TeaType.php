@@ -9,7 +9,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: TeaTypeRepository::class)]
@@ -33,6 +32,9 @@ class TeaType
 	#[Ignore]
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'type')]
 	private Collection $teas;
+
+	#[ORM\ManyToOne(targetEntity: Origin::class, inversedBy: 'types')]
+	private ?Origin $origin = null;
 
 	public function __construct()
 	{
