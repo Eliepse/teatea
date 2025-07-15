@@ -2,17 +2,14 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Enum\TeaFamily;
 use App\Repository\TeaTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: TeaTypeRepository::class)]
-#[ApiResource(paginationEnabled: false)]
 class TeaType
 {
 	#[ORM\Id]
@@ -29,7 +26,6 @@ class TeaType
 	/**
 	 * @var Collection<int, Tea>
 	 */
-	#[Ignore]
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'type')]
 	private Collection $teas;
 
