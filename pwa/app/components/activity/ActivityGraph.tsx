@@ -1,15 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import {
-	addDays,
-	eachWeekOfInterval,
-	endOfYear,
-	getDayOfYear,
-	getYear,
-	parse,
-	setDay,
-	setYear,
-	startOfYear
-} from "date-fns";
+import { addDays, eachWeekOfInterval, endOfYear, getDayOfYear, getYear, parse, setYear, startOfYear } from "date-fns";
 import { fetchApi } from "~/utils/api";
 import { useMemo } from "react";
 import clsx from "clsx";
@@ -30,8 +20,8 @@ type ActivityGraph = {
 
 const levelClass = {
 	0: "bg-base-200",
-	1: "bg-primary/40",
-	2: "bg-primary/70",
+	1: "bg-primary/30",
+	2: "bg-primary/60",
 	3: "bg-primary",
 } as const;
 
