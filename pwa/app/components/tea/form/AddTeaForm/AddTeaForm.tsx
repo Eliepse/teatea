@@ -49,7 +49,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 	const [formValue, setFormValue] = useState<FormValue>({});
 	const { NavigationStack, ...navStack } = useNavigationStack({
-		defaultFrame: { key: "type" },
+		defaultFrame: { key: "origin" },
 		onOverBack: () => {
 			mutation.reset();
 			navStack.reset();

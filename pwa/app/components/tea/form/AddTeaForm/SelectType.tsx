@@ -29,7 +29,7 @@ export function SelectType() {
 	}
 
 	function confirm() {
-		navigationStack.next({ key: context.formValue.origin ? "other" : "origin" });
+		navigationStack.next({ key: "other" });
 	}
 
 	return (
@@ -38,11 +38,12 @@ export function SelectType() {
 			onBack={navigationStack.back}
 			action={
 				<div className="flex justify-center">
-					{!!selectedType || (0 !== children.length) && (
-						<button className="btn rounded-full mr-auto" onClick={handleUIEvent(clear)}>
-							Back
-						</button>
-					)}
+					{!!selectedType ||
+						(0 !== children.length && (
+							<button className="btn rounded-full mr-auto" onClick={handleUIEvent(clear)}>
+								Back
+							</button>
+						))}
 
 					{!!selectedFamily && (
 						<button className="ml-2 btn btn-primary rounded-full" onClick={handleUIEvent(confirm)}>
