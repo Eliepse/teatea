@@ -25,20 +25,30 @@ readonly class TeaTypeProvider implements ProviderInterface
 
 		$teaQb = $this->em->createQueryBuilder()
 			->select("type")
-			->from(\App\Entity\TeaType::class, "type")
-			->setMaxResults($isCollection ? null : 1);
+			->from(\App\Entity\TeaType::class, "type");
 
-		/** @var array<\App\Entity\TeaType> $typeEntities */
-		$typeEntities = $teaQb->getQuery()->getResult();
+		if ($isCollection) {
+			/** @var \App\Entity\TeaType|null $typeEntities */
+			$typeEntities = $teaQb->setMaxResults(1)->getQuery()->getResult()[0] ?? null;
+			return static::fromEntity($typeEntities);
+		}
 
-		$resources = array_map(function (\App\Entity\TeaType $type) {
-			$resource = new TeaType();
-			$resource->id = $type->getId();
-			$resource->name = $type->name;
-			$resource->family = $type->family;
-			return $resource;
-		}, $typeEntities);
+		return array_map(
+			fn(\App\Entity\TeaType $type) => static::fromEntity($type),
+			$teaQb->getQuery()->getResult(),
+		);
+	}
 
-		return $isCollection ? $resources : ($resources[0] ?? null);
+	public static function fromEntity(?\App\Entity\TeaType $type): ?TeaType
+	{
+		if (null === $type) {
+			return null;
+		}
+
+		$resource = new TeaType();
+		$resource->id = $type->getId();
+		$resource->name = $type->name;
+		$resource->family = $type->family;
+		return $resource;
 	}
 }
