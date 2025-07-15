@@ -21,22 +21,21 @@ readonly class TeaTypeProvider implements ProviderInterface
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaType|array|null
 	{
 		$isCollection = $operation instanceof CollectionOperationInterface;
-		$expr = $this->em->getExpressionBuilder();
 
 		$teaQb = $this->em->createQueryBuilder()
 			->select("type")
 			->from(\App\Entity\TeaType::class, "type");
 
 		if ($isCollection) {
-			/** @var \App\Entity\TeaType|null $typeEntities */
-			$typeEntities = $teaQb->setMaxResults(1)->getQuery()->getResult()[0] ?? null;
-			return static::fromEntity($typeEntities);
+			return array_map(
+				fn(\App\Entity\TeaType $type) => static::fromEntity($type),
+				$teaQb->getQuery()->getResult(),
+			);
 		}
 
-		return array_map(
-			fn(\App\Entity\TeaType $type) => static::fromEntity($type),
-			$teaQb->getQuery()->getResult(),
-		);
+		/** @var \App\Entity\TeaType|null $typeEntities */
+		$typeEntities = $teaQb->setMaxResults(1)->getQuery()->getResult()[0] ?? null;
+		return static::fromEntity($typeEntities);
 	}
 
 	public static function fromEntity(?\App\Entity\TeaType $type): ?TeaType
