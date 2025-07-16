@@ -1,5 +1,6 @@
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { wait } from "~/utils/time";
+import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
 
 type FetchApiConfig = Omit<RequestInit, "body"> & {
 	payload?: string | number | object | null;
@@ -36,6 +37,7 @@ export async function fetchApi(url: string, config?: FetchApiConfig): Promise<Re
 
 	if (401 === response.status) {
 		TokenUtils.clear();
+		throw new UnauthenticatedError(response);
 	}
 
 	const duration = Date.now() - startedAt;
