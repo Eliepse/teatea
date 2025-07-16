@@ -26,7 +26,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 			->select("type")
 			->from(\App\Entity\TeaType::class, "type");
 
-		if (false === empty($originId = $uriVariables["originId"])) {
+		if (false === empty($originId = $uriVariables["originId"] ?? null)) {
 			$teaQb->innerJoin("type.origin", "origin")
 				->andWhere("origin.id = :originId")
 				->setParameter("originId", $originId);
