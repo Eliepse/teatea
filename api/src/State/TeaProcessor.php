@@ -33,7 +33,7 @@ readonly class TeaProcessor implements ProcessorInterface
 		$tea = new \App\Entity\Tea(createdAt: $data->addedAt);
 		$tea->family = $data->family;
 		$tea->type = $this->em->getReference(TeaType::class, $data->type->id);
-		$tea->origin = $data->origin;
+		$tea->origin = $this->em->getReference(Origin::class, $data->origin->id);
 
 		$this->em->persist($tea);
 		$this->em->flush();
@@ -42,7 +42,7 @@ readonly class TeaProcessor implements ProcessorInterface
 		$resource->id = $tea->id;
 		$resource->family = $tea->family;
 		$resource->type = $data->type;
-		$resource->origin = $tea->origin;
+		$resource->origin = OriginProvider::fromEntity($tea->origin);
 		$resource->addedAt = $tea->createdAt;
 
 		if (null !== $tea->origin) {

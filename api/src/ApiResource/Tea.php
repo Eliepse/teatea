@@ -7,7 +7,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\DTO\OriginPath;
-use App\Entity\Origin;
 use App\Enum\TeaFamily;
 use App\State\TeaProcessor;
 use App\State\TeaProvider;
