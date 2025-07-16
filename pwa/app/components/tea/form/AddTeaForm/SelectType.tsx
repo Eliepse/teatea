@@ -9,8 +9,8 @@ import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
 
 export function SelectType() {
-	const { data, isLoading } = useTeaTypes();
 	const context = useTeaFormContext();
+	const { data, isLoading } = useTeaTypes(context.formValue.origin?.id);
 	const navigationStack = useStackNavigator();
 	const selectedFamily = context.formValue.family;
 	const selectedType = data && selectedFamily ? context.formValue.type : undefined;
