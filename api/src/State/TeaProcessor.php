@@ -7,7 +7,9 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\Entity\TeaType;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Exception\ORMException;
 
 readonly class TeaProcessor implements ProcessorInterface
 {
@@ -22,6 +24,7 @@ readonly class TeaProcessor implements ProcessorInterface
 	 * @param array $context
 	 *
 	 * @return mixed
+	 * @throws ORMException
 	 */
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
 	{
@@ -29,7 +32,7 @@ readonly class TeaProcessor implements ProcessorInterface
 
 		$tea = new \App\Entity\Tea(createdAt: $data->addedAt);
 		$tea->family = $data->family;
-		$tea->type = $data->type;
+		$tea->type = $this->em->getReference(TeaType::class, $data->type->id);
 		$tea->origin = $data->origin;
 
 		$this->em->persist($tea);
@@ -38,7 +41,7 @@ readonly class TeaProcessor implements ProcessorInterface
 		$resource = new Tea();
 		$resource->id = $tea->id;
 		$resource->family = $tea->family;
-		$resource->type = $tea->type;
+		$resource->type = $data->type;
 		$resource->origin = $tea->origin;
 		$resource->addedAt = $tea->createdAt;
 
