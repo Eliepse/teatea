@@ -1,26 +1,30 @@
-FROM node:22-alpine AS development-dependencies-env
+FROM node:22-alpine AS base
+WORKDIR /app
+RUN corepack enable pnpm
+
+FROM base AS development-dependencies-env
 COPY . /app
 WORKDIR /app
-RUN npm ci
+RUN pnpm ci
 
-FROM node:22-alpine AS dev
+FROM base AS dev
 WORKDIR /app
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "run", "dev"]
 
-FROM node:22-alpine AS production-dependencies-env
+FROM base AS production-dependencies-env
 COPY ./package.json package-lock.json /app/
 WORKDIR /app
-RUN npm ci --omit=dev
+RUN pnpm ci --omit=dev
 
-FROM node:22-alpine AS build-env
+FROM base AS build-env
 COPY . /app/
 COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 WORKDIR /app
-RUN npm run build
+RUN pnpm run build
 
-FROM node:22-alpine
+FROM base
 COPY ./package.json package-lock.json /app/
 COPY --from=production-dependencies-env /app/node_modules /app/node_modules
 COPY --from=build-env /app/build /app/build
 WORKDIR /app
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "run", "start"]
