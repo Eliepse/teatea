@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
 use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\Repository\OriginRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -13,10 +12,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: OriginRepository::class)]
-#[ApiResource(
-	order: ["path" => "ASC"],
-	paginationEnabled: false,
-)]
 class Origin
 {
 	#[ORM\Id]
@@ -79,10 +74,5 @@ class Origin
 		}
 
 		return $this;
-	}
-
-	public function getPath(): array
-	{
-		return $this->path->getNodes();
 	}
 }
