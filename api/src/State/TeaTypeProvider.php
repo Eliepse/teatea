@@ -33,8 +33,11 @@ readonly class TeaTypeProvider implements ProviderInterface
 			);
 		}
 
+		$teaQb->where("type.id = :id")->setParameter("id", $uriVariables["id"]);
+		$teaQb->setMaxResults(1);
+
 		/** @var \App\Entity\TeaType|null $typeEntities */
-		$typeEntities = $teaQb->setMaxResults(1)->getQuery()->getResult()[0] ?? null;
+		$typeEntities = $teaQb->getQuery()->getResult()[0] ?? null;
 		return static::fromEntity($typeEntities);
 	}
 
