@@ -32,7 +32,7 @@ readonly class TeaProcessor implements ProcessorInterface
 
 		$tea = new \App\Entity\Tea(createdAt: $data->addedAt);
 		$tea->family = $data->family;
-		$tea->type = $this->em->getReference(TeaType::class, $data->type->id);
+		$tea->type = $data->type ? $this->em->getReference(TeaType::class, $data->type->id) : null;
 		$tea->origin = $this->em->getReference(Origin::class, $data->origin->id);
 
 		$this->em->persist($tea);
