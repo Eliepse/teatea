@@ -29,8 +29,14 @@ readonly class TeaProvider implements ProviderInterface
 			->select("tea", "type", "origin")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
-			->leftJoin("tea.origin", "origin")
-			->setMaxResults($isCollection ? null : 1);
+			->leftJoin("tea.origin", "origin");
+
+		if(false === $isCollection) {
+			$teaQb
+				->andWhere("tea.id = :teaId")
+				->setParameter("teaId", $uriVariables["id"])
+				->setMaxResults(1);
+		}
 
 		/** @var array<\App\Entity\Tea> $teaEntities */
 		$teaEntities = $teaQb->getQuery()->getResult();
