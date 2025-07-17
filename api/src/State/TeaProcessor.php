@@ -40,7 +40,7 @@ readonly class TeaProcessor implements ProcessorInterface
 
 		$resource = new Tea();
 		$resource->id = $tea->id;
-		$resource->family = $tea->family;
+		$resource->family = $tea->type?->family ?? $tea->family;
 		$resource->type = $data->type;
 		$resource->origin = OriginProvider::fromEntity($tea->origin);
 		$resource->addedAt = $tea->createdAt;
