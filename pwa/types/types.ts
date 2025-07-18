@@ -71,3 +71,11 @@ export const teaFamilies = {
 } as const;
 
 export type TeaFamily = keyof typeof teaFamilies;
+
+export interface ApiCollection<T> {
+	"@context": string;
+	"@id": string;
+	"@type": "Collection";
+	totalItems: number;
+	member: T[];
+}

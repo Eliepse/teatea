@@ -1,4 +1,4 @@
-import { type Id, type TeaFamily, type TeaType } from "~t/types";
+import { type ApiCollection, type Id, type TeaFamily, type TeaType } from "~t/types";
 import { fetchApi } from "~/utils/api";
 import { useQuery } from "@tanstack/react-query";
 
@@ -7,12 +7,20 @@ type TeaTypesFilters = {
 	family?: TeaFamily;
 };
 
-async function fetchTypesByFamily(args: {
-	queryKey: [string, TeaTypesFilters];
-}): Promise<{ [key in TeaFamily]: TeaType[] }> {
-	const originId = args.queryKey[1] ?? undefined;
+async function fetchTypesByFamily(args: { queryKey: [string, TeaTypesFilters] }): Promise<ApiCollection<TeaType>> {
+	const filters = args.queryKey[1] ?? {};
+	const searchParams = new URLSearchParams();
 
-	return await (await fetchApi(originId ? `/origins/${originId}/tea_types` : "/tea_types")).json();
+	if (filters.origin) {
+		searchParams.append("origin", filters.origin.toFixed(0));
+	}
+
+	if (filters.family) {
+		searchParams.append("family", filters.family);
+	}
+
+	const params = searchParams.size ? `?${searchParams}` : "";
+	return await (await fetchApi(`/tea_types${params}`)).json();
 }
 
 export function useTeaTypes(filters?: TeaTypesFilters) {
