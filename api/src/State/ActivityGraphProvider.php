@@ -53,8 +53,10 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		$totals = array_map(fn($row) => $row["total"], $data);
 		$min = min($totals);
 		$max = max($totals);
-		$levelSize = (int) round(($max - $min) / 2);
-		$levels = array_reverse(array_unique([$min, $min + $levelSize, $max]));
+		$levelSize = (int)round(($max - $min) / 3);
+
+		$levels = array_map(fn($i) => $min + ($i * $levelSize), array_keys(array_fill(0, 3, null)));
+		$levels = array_reverse($levels, true);
 
 		$days = array_map(
 			fn(array $row) => new ActivityGraphDay(

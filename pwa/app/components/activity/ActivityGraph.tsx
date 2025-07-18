@@ -3,11 +3,13 @@ import { addDays, eachWeekOfInterval, endOfYear, getDayOfYear, getYear, parse, s
 import { fetchApi } from "~/utils/api";
 import { useMemo } from "react";
 import clsx from "clsx";
+import { keyBy } from "~/utils/array";
 
 type ActivityGraphDay = {
 	"@type": string;
 	date: Date;
 	total: number;
+	level: keyof typeof levelClass;
 };
 
 type ActivityGraph = {
@@ -20,7 +22,7 @@ type ActivityGraph = {
 
 const levelClass = {
 	0: "bg-base-200",
-	1: "bg-primary/30",
+	1: "bg-primary/40",
 	2: "bg-primary/60",
 	3: "bg-primary",
 } as const;
@@ -48,19 +50,10 @@ export function ActivityGraph(props: { year?: number; className?: string }) {
 		},
 	});
 
-	const dataByDay = useMemo<{ [key: number]: number }>(() => {
-		if (!data?.items) {
-			return {};
-		}
-
-		return data.items.reduce(
-			(map, item) => {
-				map[getDayOfYear(item.date)] = item.total;
-				return map;
-			},
-			{} as { [key: number]: number },
-		);
-	}, [data]);
+	const dataByDay = useMemo(
+		() => (data?.items ? keyBy(data.items, (item) => getDayOfYear(item.date)) : {}),
+		[data?.items],
+	);
 
 	return (
 		<table className={clsx("w-full border-collapse", props.className)}>
@@ -70,7 +63,7 @@ export function ActivityGraph(props: { year?: number; className?: string }) {
 						{weeks.map((week) => {
 							const day = addDays(week, weekDay);
 							const isInYear = getYear(day) === year;
-							const total = isInYear ? (dataByDay[getDayOfYear(day)] ?? 0) : 0;
+							const data = isInYear ? dataByDay[getDayOfYear(day)] : null;
 
 							return (
 								<td key={day.getTime()} className="border border-transparent">
@@ -78,7 +71,7 @@ export function ActivityGraph(props: { year?: number; className?: string }) {
 										className={clsx(
 											"aspect-square",
 											false === isInYear && "opacity-0",
-											isInYear && levelClass[total as keyof typeof levelClass],
+											isInYear && levelClass[data?.level ?? 0],
 										)}
 									/>
 								</td>
