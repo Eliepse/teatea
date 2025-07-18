@@ -2,9 +2,12 @@ import type { Volume, Weight } from "~/utils/value-objects/units";
 import type { TeawareType } from "./teawareType";
 import type Steep from "~/utils/value-objects/Steep";
 
+export type Id = number;
+export type Iri = string;
+
 interface Resource {
-	id: number;
-	"@id": string;
+	id: Id;
+	"@id": Iri;
 	"@type": string;
 }
 
@@ -12,7 +15,7 @@ type LTreePath = string[];
 
 export type User = Resource & {
 	username: string;
-}
+};
 
 export type TeaType = Resource & {
 	name: string;
