@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { BrewMultiStepForm } from "~/components/brewing/BrewMultiStepForm";
 import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
 import { Link } from "react-router";
 import { ActivityGraph } from "~/components/activity/ActivityGraph";
 import { useUser } from "~/auth/hooks/useUser";
+import { AddTeaTypeFlow } from "~/components/tea/AddTeaTypeFlow";
+import { Paged } from "~/components/shared/paged/Paged";
+import { handleUIEvent } from "~/utils/function";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -12,6 +14,7 @@ export function meta() {
 export default function Dashboard() {
 	const [brewForm, setBrewForm] = useState(false);
 	const [addTeaForm, setAddTeaForm] = useState(false);
+	const [typeFlow, setTypeFlow] = useState(false);
 	const userQuery = useUser();
 
 	return (
@@ -25,14 +28,17 @@ export default function Dashboard() {
 				<button className="btn btn-block mt-6">What are you drinking today?</button>
 			</Link>
 
-			<Link to="/tea/types/new">
-				<button className="btn btn-block mt-6">Add a tea type</button>
-			</Link>
+			<button className="btn btn-block mt-6" onClick={handleUIEvent(() => setTypeFlow(true))}>
+				Add a tea type
+			</button>
 
 			<button className="btn btn-block mt-6" onClick={() => setAddTeaForm(true)}>
 				Add tea
 			</button>
 
+			<Paged open={typeFlow}>
+				<AddTeaTypeFlow />
+			</Paged>
 			<AddTeaForm open={addTeaForm} onClose={() => setAddTeaForm(false)} />
 		</div>
 	);

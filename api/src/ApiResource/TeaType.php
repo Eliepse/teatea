@@ -5,9 +5,9 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use App\Entity\Origin;
 use App\Enum\TeaFamily;
 use App\State\TeaTypeProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Get(provider: TeaTypeProvider::class)]
 #[GetCollection(provider: TeaTypeProvider::class)]
@@ -18,6 +18,7 @@ class TeaType
 
 	public TeaFamily $family;
 
+	#[Groups("tea:create")]
 	public string $name;
 
 	public ?Origin $origin = null;

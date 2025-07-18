@@ -69,7 +69,7 @@ export function SelectOrigin() {
 	}
 
 	function confirm() {
-		navigationStack.next({ key: "type" });
+		navigationStack.next({ key: "family" });
 	}
 
 	return (

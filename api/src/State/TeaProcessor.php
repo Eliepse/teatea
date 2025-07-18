@@ -5,9 +5,9 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
+use App\ApiResource\TeaType;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
-use App\Entity\TeaType;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 
@@ -30,10 +30,24 @@ readonly class TeaProcessor implements ProcessorInterface
 	{
 		assert($data instanceof Tea);
 
+		// Todo: check if the tea's origin is equal or child of the type's origin (if type already exist)
+		$origin = $this->em->getReference(Origin::class, $data->origin->id);
+
+		if($data->type instanceof TeaType && null === $data->type->id) {
+			$typeEntity = new \App\Entity\TeaType();
+			$typeEntity->family = $data->family;
+			$typeEntity->name = $data->type->name;
+			$typeEntity->origin = $origin;
+			$this->em->persist($typeEntity);
+			$this->em->flush();
+
+			$data->type = TeaTypeProvider::fromEntity($typeEntity);
+		}
+
 		$tea = new \App\Entity\Tea(createdAt: $data->addedAt);
 		$tea->family = $data->family;
-		$tea->type = $data->type ? $this->em->getReference(TeaType::class, $data->type->id) : null;
-		$tea->origin = $this->em->getReference(Origin::class, $data->origin->id);
+		$tea->type = $data->type ? $this->em->getReference(\App\Entity\TeaType::class, $data->type->id) : null;
+		$tea->origin = $origin;
 
 		$this->em->persist($tea);
 		$this->em->flush();

@@ -30,7 +30,7 @@ class TeaType
 	private Collection $teas;
 
 	#[ORM\ManyToOne(targetEntity: Origin::class, inversedBy: 'types')]
-	private ?Origin $origin = null;
+	public ?Origin $origin = null;
 
 	public function __construct()
 	{

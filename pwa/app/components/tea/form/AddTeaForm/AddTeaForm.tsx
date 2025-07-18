@@ -1,15 +1,16 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { SelectType } from "./SelectType";
+import { SelectFamily } from "./SelectFamily";
 import { Paged } from "~/components/shared/paged/Paged";
-import type { Origin, TeaFamily, TeaType } from "~t/types";
+import type { Origin, TeaFamily } from "~t/types";
 import { SelectOrigin } from "./SelectOrigin";
-import { OtherTeaInfo } from "~/components/tea/form/AddTeaForm/OtherTeaInfo";
+import { TeaTypeForm } from "./TeaTypeForm";
 import { throwNotImplemented, warnNotImplemented } from "~/utils/function";
 import { fetchApi } from "~/utils/api";
-import { Confirmation } from "~/components/tea/form/AddTeaForm/Confirmation";
+import { Confirmation } from "./Confirmation";
 import { useMutation } from "@tanstack/react-query";
 import { wait } from "~/utils/time";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
+import { TeaFormConfirmation } from "~/components/tea/form/AddTeaForm/TeaFormConfirmation";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -21,7 +22,7 @@ const CONTEXT = createContext({
 
 type FormValue = {
 	family?: TeaFamily;
-	type?: TeaType;
+	type?: { name: string };
 	origin?: Origin;
 	altitude?: number;
 };
@@ -36,7 +37,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 		payload: {
 			family: data.family,
 			origin: data.origin["@id"],
-			type: data.type ? data.type["@id"] : null,
+			type: data.type,
 			altitude: data.altitude,
 		},
 	});
@@ -87,14 +88,17 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 		<NavigationStack>
 			<CONTEXT.Provider value={contextValue}>
 				<Paged open={props.open}>
-					<StackFrame frameKey="type">
-						<SelectType />
-					</StackFrame>
 					<StackFrame frameKey="origin">
 						<SelectOrigin />
 					</StackFrame>
-					<StackFrame frameKey="other">
-						<OtherTeaInfo />
+					<StackFrame frameKey="family">
+						<SelectFamily />
+					</StackFrame>
+					<StackFrame frameKey="typeName">
+						<TeaTypeForm />
+					</StackFrame>
+					<StackFrame frameKey="recap">
+						<TeaFormConfirmation />
 					</StackFrame>
 					<StackFrame frameKey="confirmation">
 						<Confirmation

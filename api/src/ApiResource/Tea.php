@@ -16,22 +16,21 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Get(provider: TeaProvider::class)]
 #[GetCollection(paginationEnabled: false, provider: TeaProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["tea:create"]], processor: TeaProcessor::class)]
-//#[Post(uriTemplate: "/teas/{id}/collect", input: \stdClass::class, output: \stdClass::class, write: false, processor: CollectTeaProcessor::class)]
 class Tea
 {
 	#[ApiProperty(identifier: true)]
 	public ?int $id;
 
-	#[Groups("tea:create")]
+	#[Groups(["tea:create"])]
 	public TeaFamily $family;
 
-	#[Groups("tea:create")]
+	#[Groups(["tea:create"])]
 	public ?TeaType $type = null;
 
 	#[ApiProperty(genId: false)]
 	public ?OriginPath $originPath = null;
 
-	#[Groups("tea:create")]
+	#[Groups(["tea:create"])]
 	public ?Origin $origin = null;
 
 	public \DateTimeImmutable $addedAt;

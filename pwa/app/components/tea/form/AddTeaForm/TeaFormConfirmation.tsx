@@ -5,8 +5,9 @@ import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
 import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
+import { handleUIEvent } from "~/utils/function";
 
-export function OtherTeaInfo() {
+export function TeaFormConfirmation() {
 	const context = useTeaFormContext();
 	const navigationStack = useStackNavigator();
 	const origins = useOriginByPath();
@@ -18,7 +19,7 @@ export function OtherTeaInfo() {
 
 	return (
 		<PageLayout
-			title="What else do you know about it?"
+			title="Is it all good?"
 			onBack={context.submitting ? false : navigationStack.back}
 			action={
 				<div className="flex justify-center">
@@ -27,13 +28,30 @@ export function OtherTeaInfo() {
 						onClick={handleSubmit}
 						disabled={context.submitting}
 					>
-						{context.submitting ? "Saving..." : "Add new tea"}
+						{context.submitting ? "Saving..." : "Submit the tea"}
 						{!context.submitting && <Check className="size-4 ml-1" />}
 					</button>
 				</div>
 			}
 		>
-			<button className="mb-4 btn btn-block text-left h-16" onClick={() => navigationStack.next({ key: "type" })}>
+			<button
+				className="my-4 btn btn-block text-left h-16"
+				onClick={handleUIEvent(() => navigationStack.next({ key: "origin" }))}
+			>
+				<div>
+					<div className="text-xs text-base-content/60 mb-1">Origin</div>
+					<div>
+						{!values.origin && "Not set"}
+						{values.origin && origins.data && origins.data[values.origin.path.join(".")]?.name}
+					</div>
+				</div>
+				<Chevron direction="right" className="size-4 ml-auto" />
+			</button>
+
+			<button
+				className="mb-4 btn btn-block text-left h-16"
+				onClick={handleUIEvent(() => navigationStack.next({ key: "family" }))}
+			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Type</div>
 					<div>{values.family ? teaFamilies[values.family] : "Not set"}</div>
@@ -46,26 +64,11 @@ export function OtherTeaInfo() {
 				onClick={() => navigationStack.next({ key: "origin" })}
 			>
 				<div>
-					<div className="text-xs text-base-content/60 mb-1">Origin</div>
-					<div>
-						{!values.origin && "Not set"}
-						{values.origin && origins.data && origins.data[values.origin.path.join(".")]?.name}
-					</div>
+					<div className="text-xs text-base-content/60 mb-1">Type</div>
+					<div>{context.formValue.type ? context.formValue.type.name : "Not set"}</div>
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
-
-			<fieldset className="fieldset my-4">
-				<legend className="fieldset-legend">Altitude</legend>
-				<input
-					type="text"
-					className="input w-full"
-					pattern="[ ,.0-9]+"
-					inputMode="numeric"
-					min={0}
-					name="altitude"
-				/>
-			</fieldset>
 		</PageLayout>
 	);
 }
