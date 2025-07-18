@@ -22,7 +22,6 @@ export async function action(args: Route.ActionArgs): Promise<{ id: number }> {
 		.returning("*");
 
 	await cnx.destroy();
-	console.debug(rows);
 	const steep = rows[0];
 	return { id: steep.id };
 }

@@ -34,7 +34,6 @@ export async function loader() {
 
 export async function action({ request }: Route.ActionArgs) {
 	const formData = await request.formData();
-	console.debug(Object.fromEntries(formData.entries()));
 	return null;
 }
 

@@ -102,8 +102,6 @@ export async function loader(args: Route.LoaderArgs): Promise<Tea[]> {
 		});
 	}
 
-	console.debug(teasQuery.toString());
-
 	const results = await teasQuery.limit(100);
 
 	if (0 === results.length) {

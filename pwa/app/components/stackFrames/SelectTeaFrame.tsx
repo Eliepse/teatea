@@ -1,15 +1,26 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useTeas } from "~/utils/api/useTeas";
-import type { Tea } from "~t/types";
+import { type Tea, teaFamilies, type TeaFamily } from "~t/types";
 import clsx from "clsx";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import Arrow from "~/components/icons/arrow";
 import { handleUIEvent } from "~/utils/function";
+import { Fragment, useMemo } from "react";
 
 export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea) => void }) {
 	const navStack = useStackNavigator();
 	const teasQuery = useTeas();
 	const items = teasQuery?.data?.member ?? [];
+
+	const teasByFamily = useMemo(() => {
+		const groups = Object.fromEntries(Object.keys(teaFamilies).map((key) => [key, [] as Tea[]])) as {
+			[key in TeaFamily]: Tea[];
+		};
+		return items.reduce((groups, tea) => {
+			groups[tea.family].push(tea);
+			return groups;
+		}, groups);
+	}, [items]);
 
 	return (
 		<PageLayout
@@ -28,6 +39,7 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 					)}
 				</div>
 			}
+			bodyClassName="pb-20"
 		>
 			{teasQuery.isLoading && (
 				<>
@@ -45,19 +57,24 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 			{teasQuery.isError && <div className="text-error">Something went wrong...</div>}
 
 			{teasQuery.isSuccess &&
-				items.map((item) => (
-					<TeaItem
-						key={item["@id"]}
-						title={item.displayName}
-						family={item.family + " tea"}
-						type={item.type?.name}
-						country={item.originPath?.country?.name}
-						region={item.originPath?.region?.name}
-						locality={item.originPath?.locality?.name}
-						onSelect={() => props.onSelect(item)}
-						selected={props.value?.["@id"] === item["@id"]}
-						className="mb-2"
-					/>
+				Object.entries(teasByFamily).map(([key, teas]) => (
+					<Fragment key={key}>
+						<div className="text-xs uppercase text-base-content/60 mb-2 mt-6">{teaFamilies[key as TeaFamily]}</div>
+						{teas.map((tea) => (
+							<TeaItem
+								key={tea["@id"]}
+								title={tea.displayName}
+								family={tea.family + " tea"}
+								type={tea.type?.name}
+								country={tea.originPath?.country?.name}
+								region={tea.originPath?.region?.name}
+								locality={tea.originPath?.locality?.name}
+								onSelect={() => props.onSelect(tea)}
+								selected={props.value?.["@id"] === tea["@id"]}
+								className="mb-2"
+							/>
+						))}
+					</Fragment>
 				))}
 		</PageLayout>
 	);

@@ -77,8 +77,6 @@ export function useNavigationStack(config: StackConfig<StackFrame>) {
 		function forceFrame(key: StackFrame["key"]) {
 			setStack((st) => [...st, { key }]);
 		}
-
-		console.debug({ defaultKey: config.defaultFrame.key, stackCtl: forceFrame });
 	}, []);
 
 	return {
