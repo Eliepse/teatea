@@ -42,10 +42,6 @@ class Tea
 
 	public function getDisplayName(): string
 	{
-		if (false === empty($this->name)) {
-			return $this->name;
-		}
-
 		if (null !== $this->type) {
 			return $this->type->name;
 		}

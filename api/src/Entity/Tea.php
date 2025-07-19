@@ -13,7 +13,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TeaRepository::class)]
-//#[ApiResource(normalizationContext: ["groups" => ["tea:list"]], security: "is_granted('ROLE_USER')")]
 class Tea
 {
 	#[ORM\Id]
@@ -39,10 +38,6 @@ class Tea
 	 */
 	#[ORM\OneToMany(targetEntity: Brewing::class, mappedBy: 'tea')]
 	public Collection $brewings;
-
-	#[ApiProperty(example: "Savage myst")]
-	#[ORM\Column(type: Types::TEXT, nullable: true)]
-	public ?string $name = null;
 
 	#[ORM\Column(nullable: true)]
 	public ?bool $isBlend = null;
