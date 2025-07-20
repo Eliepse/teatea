@@ -16,7 +16,7 @@ export function SelectFamily() {
 	}
 
 	function confirm() {
-		navigationStack.next({ key: "typeName" });
+		navigationStack.next({ key: "select:type" });
 	}
 
 	return (

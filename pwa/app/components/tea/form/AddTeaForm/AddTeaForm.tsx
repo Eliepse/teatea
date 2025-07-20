@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { wait } from "~/utils/time";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { TeaFormConfirmation } from "~/components/tea/form/AddTeaForm/TeaFormConfirmation";
+import { SelectType } from "~/components/tea/form/AddTeaForm/SelectType";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -94,7 +95,10 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 					<StackFrame frameKey="family">
 						<SelectFamily />
 					</StackFrame>
-					<StackFrame frameKey="typeName">
+					<StackFrame frameKey="select:type">
+						<SelectType />
+					</StackFrame>
+					<StackFrame frameKey="type:new">
 						<TeaTypeForm />
 					</StackFrame>
 					<StackFrame frameKey="recap">

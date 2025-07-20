@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 type TeaTypesFilters = {
 	origin?: Id;
+	originPath?: string;
 	family?: TeaFamily;
 };
 
@@ -13,6 +14,10 @@ async function fetchTypesByFamily(args: { queryKey: [string, TeaTypesFilters] })
 
 	if (filters.origin) {
 		searchParams.append("origin", filters.origin.toFixed(0));
+	}
+
+	if (filters.originPath) {
+		searchParams.append("originPath", filters.originPath);
 	}
 
 	if (filters.family) {

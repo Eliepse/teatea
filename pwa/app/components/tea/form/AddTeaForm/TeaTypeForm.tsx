@@ -5,6 +5,7 @@ import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { type ChangeEvent, useState } from "react";
 import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
+import Arrow from "~/components/icons/arrow";
 
 export function TeaTypeForm() {
 	const context = useTeaFormContext();
@@ -27,13 +28,15 @@ export function TeaTypeForm() {
 			onBack={navigationStack.back}
 			action={
 				<div className="flex justify-center">
-					<button
-						className={clsx("ml-2 btn rounded-full", hasCustomName ? "btn-primary" : "btn-secondary")}
-						onClick={handleUIEvent(handleSubmit)}
-					>
-						{hasCustomName ? "Next" : "Skip"}
-						{hasCustomName && <Check className="size-4 ml-1" />}
-					</button>
+					{hasCustomName && (
+						<button
+							className={clsx("ml-2 btn rounded-full", "btn-primary")}
+							onClick={handleUIEvent(handleSubmit)}
+						>
+							Next
+							{hasCustomName && <Arrow direction="right" className="size-4 ml-1" />}
+						</button>
+					)}
 				</div>
 			}
 		>
