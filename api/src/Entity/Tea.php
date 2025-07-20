@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiProperty;
 use App\Enum\RoastLevel;
 use App\Enum\TeaFamily;
 use App\Repository\TeaRepository;
@@ -58,20 +57,23 @@ class Tea
 	#[ORM\OneToMany(targetEntity: Drink::class, mappedBy: 'tea')]
 	private Collection $drinks;
 
-    /**
-     * @var Collection<int, TeaList>
-     */
-    #[ORM\ManyToMany(targetEntity: TeaList::class, mappedBy: 'teas')]
-    private Collection $lists;
+	/**
+	 * @var Collection<int, TeaList>
+	 */
+	#[ORM\ManyToMany(targetEntity: TeaList::class, mappedBy: 'teas')]
+	private Collection $lists;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    public ?User $createdBy = null;
 
 	public function __construct(
 		#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
 		public readonly \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
-	)
-	{
+	) {
 		$this->brewings = new ArrayCollection();
 		$this->drinks = new ArrayCollection();
-        $this->lists = new ArrayCollection();
+		$this->lists = new ArrayCollection();
 	}
 
 	public function setCultivar(?Cultivar $cultivar): static
@@ -138,30 +140,30 @@ class Tea
 		return $this;
 	}
 
-    /**
-     * @return Collection<int, TeaList>
-     */
-    public function getLists(): Collection
-    {
-        return $this->lists;
-    }
+	/**
+	 * @return Collection<int, TeaList>
+	 */
+	public function getLists(): Collection
+	{
+		return $this->lists;
+	}
 
-    public function addList(TeaList $list): static
-    {
-        if (!$this->lists->contains($list)) {
-            $this->lists->add($list);
-            $list->addTea($this);
-        }
+	public function addList(TeaList $list): static
+	{
+		if (!$this->lists->contains($list)) {
+			$this->lists->add($list);
+			$list->addTea($this);
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 
-    public function removeList(TeaList $list): static
-    {
-        if ($this->lists->removeElement($list)) {
-            $list->removeTea($this);
-        }
+	public function removeList(TeaList $list): static
+	{
+		if ($this->lists->removeElement($list)) {
+			$list->removeTea($this);
+		}
 
-        return $this;
-    }
+		return $this;
+	}
 }

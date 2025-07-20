@@ -8,9 +8,11 @@ use App\ApiResource\Tea;
 use App\ApiResource\TeaType;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\Entity\User;
 use App\Repository\TeaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 readonly class TeaProcessor implements ProcessorInterface
@@ -18,6 +20,7 @@ readonly class TeaProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private TeaRepository $repository,
+		private Security $security,
 	) {
 	}
 
@@ -32,7 +35,10 @@ readonly class TeaProcessor implements ProcessorInterface
 	 */
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
 	{
+		$user = $this->security->getUser();
+
 		assert($data instanceof Tea);
+		assert($user instanceof User);
 
 		// TODO: check if the tea's origin is equal or child of the type's origin (if type already exist)
 		$origin = $this->em->find(Origin::class, $data->origin->id);
@@ -56,6 +62,7 @@ readonly class TeaProcessor implements ProcessorInterface
 		$tea->family = $data->family;
 		$tea->type = null !== $type ? $this->em->getReference(\App\Entity\TeaType::class, $type->id) : null;
 		$tea->origin = $origin;
+		$tea->createdBy = $user;
 
 		if ($tea->family !== $type->family) {
 			throw new BadRequestHttpException("The tea cannot have a different family than the selected type");
