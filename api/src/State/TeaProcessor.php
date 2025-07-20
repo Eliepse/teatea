@@ -8,13 +8,17 @@ use App\ApiResource\Tea;
 use App\ApiResource\TeaType;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\Repository\TeaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 readonly class TeaProcessor implements ProcessorInterface
 {
-	public function __construct(private EntityManagerInterface $em)
-	{
+	public function __construct(
+		private EntityManagerInterface $em,
+		private TeaRepository $repository,
+	) {
 	}
 
 	/**
@@ -30,24 +34,36 @@ readonly class TeaProcessor implements ProcessorInterface
 	{
 		assert($data instanceof Tea);
 
-		// Todo: check if the tea's origin is equal or child of the type's origin (if type already exist)
-		$origin = $this->em->getReference(Origin::class, $data->origin->id);
+		// TODO: check if the tea's origin is equal or child of the type's origin (if type already exist)
+		$origin = $this->em->find(Origin::class, $data->origin->id);
+		$type = $data->type;
 
-		if($data->type instanceof TeaType && null === $data->type->id) {
+		// TODO: if type exists, not AOP and tea.origin != type.orin -> create a new one ?
+
+		if ($type instanceof TeaType && null === $type->id) {
+			// TODO: check if the type doesn't already exists
 			$typeEntity = new \App\Entity\TeaType();
 			$typeEntity->family = $data->family;
-			$typeEntity->name = $data->type->name;
+			$typeEntity->name = trim($data->type->name);
 			$typeEntity->origin = $origin;
 			$this->em->persist($typeEntity);
 			$this->em->flush();
 
-			$data->type = TeaTypeProvider::fromEntity($typeEntity);
+			$type = TeaTypeProvider::fromEntity($typeEntity);
 		}
 
 		$tea = new \App\Entity\Tea(createdAt: $data->addedAt);
 		$tea->family = $data->family;
-		$tea->type = $data->type ? $this->em->getReference(\App\Entity\TeaType::class, $data->type->id) : null;
+		$tea->type = null !== $type ? $this->em->getReference(\App\Entity\TeaType::class, $type->id) : null;
 		$tea->origin = $origin;
+
+		if ($tea->family !== $type->family) {
+			throw new BadRequestHttpException("The tea cannot have a different family than the selected type");
+		}
+
+		if ($this->repository->hasDuplicate($tea->family, $tea->origin->id, $tea->type?->getId())) {
+			throw new BadRequestHttpException("This tea already exists");
+		}
 
 		$this->em->persist($tea);
 		$this->em->flush();
