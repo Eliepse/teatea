@@ -25,7 +25,7 @@ export function SelectType() {
 
 	function confirm() {
 		context.patchForm({ type: selection });
-		navigationStack.next({ key: "family" });
+		navigationStack.next({ key: "recap" });
 	}
 
 	return (
