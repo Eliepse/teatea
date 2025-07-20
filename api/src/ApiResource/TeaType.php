@@ -20,6 +20,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		schema: ['minimum' => 1, 'type' => "integer"],
 		property: "origin",
 	),
+	"originPath" => new QueryParameter(
+		schema: [
+			"type" => "string",
+			"example" => "Japan, China.Yunnan, ...",
+		],
+		property: "origin",
+		description: "Filter by origin path, to get only the given branch",
+
+	)
 ])]
 class TeaType
 {

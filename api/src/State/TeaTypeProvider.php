@@ -37,6 +37,12 @@ readonly class TeaTypeProvider implements ProviderInterface
 				->setParameter("originId", $originFilter);
 		}
 
+		if (false === empty($originPathFilter = $filters["originPath"] ?? null)) {
+			$teaQb->innerJoin("type.origin", "origin")
+				->andWhere("CONTAINS(:originPath, origin.path) = TRUE")
+				->setParameter("originPath", $originPathFilter);
+		}
+
 		if (false === empty($familyFilter = $filters["family"] ?? null)) {
 			$family = TeaFamily::tryFrom($familyFilter);
 			$teaQb->andWhere("type.family = :family")
