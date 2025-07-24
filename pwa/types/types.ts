@@ -31,6 +31,11 @@ export type Origin = Resource & {
 	path: LTreePath;
 };
 
+export type OriginPath = {
+	"@type": "OriginPath";
+	country: Origin;
+} & ({ region: Origin; locality?: Origin } | { region: Origin; locality: Origin });
+
 export type Tea = Resource & {
 	family: TeaFamily;
 	type?: TeaType;
