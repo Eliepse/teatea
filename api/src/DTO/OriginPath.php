@@ -11,6 +11,9 @@ readonly class OriginPath
 		public ?Origin $region = null,
 		public ?Origin $locality = null,
 	) {
+		if (null === $this->region && null !== $this->locality) {
+			throw new \RuntimeException("An OriginPath's locality cannot be set without a region");
+		}
 	}
 
 	public static function fromNodes(array $nodes): ?OriginPath
