@@ -3,6 +3,7 @@ import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
 import { Link } from "react-router";
 import { ActivityGraph } from "~/components/activity/ActivityGraph";
 import { useUser } from "~/auth/hooks/useUser";
+import Arrow from "~/components/icons/arrow";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -19,7 +20,14 @@ export default function Dashboard() {
 			<h1 className="mt-4 text-xl">Hi, {userQuery?.data?.username}!</h1>
 
 			<p className="text-sm text-content/60 mt-6">Your activity this year</p>
-			<ActivityGraph className="mt-2 mb-6" />
+			<ActivityGraph className="my-2" />
+
+			<Link to="/me/drinks">
+				<a className="link block mb-6 text-right">
+					Got to my history
+					<Arrow direction="right" className="inline size-4 ml-2" />
+				</a>
+			</Link>
 
 			<Link to="/drink/new">
 				<button className="btn btn-block mt-6">What are you drinking today?</button>

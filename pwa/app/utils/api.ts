@@ -54,3 +54,19 @@ export async function fetchApi(url: string, config?: FetchApiConfig): Promise<Re
 
 	return response;
 }
+
+export async function patchApi(
+	url: string,
+	payload: object,
+	config?: Omit<FetchApiConfig, "payload" | "method">,
+): Promise<Response> {
+	return fetchApi(url, {
+		...config,
+		method: "PATCH",
+		payload,
+		headers: {
+			...config?.headers,
+			"Content-Type": "application/merge-patch+json",
+		},
+	});
+}

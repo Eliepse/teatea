@@ -44,6 +44,11 @@ export type Tea = Resource & {
 	displayName: string;
 };
 
+export type Drink = Resource<"Drink"> & {
+	tea: Tea;
+	drankAt: Date;
+};
+
 export type TeaTypeTreeNode = TeaType & LTreeNode;
 export type OriginTreeNode = Origin & LTreeNode;
 

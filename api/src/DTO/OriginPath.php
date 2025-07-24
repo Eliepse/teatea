@@ -3,12 +3,16 @@
 namespace App\DTO;
 
 use App\Entity\Origin;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class OriginPath
 {
 	public function __construct(
-		public ?Origin $country,
+		#[Groups(["embedded:tea", "embedded:originPath"])]
+		public Origin $country,
+		#[Groups(["embedded:tea", "embedded:originPath"])]
 		public ?Origin $region = null,
+		#[Groups(["embedded:tea", "embedded:originPath"])]
 		public ?Origin $locality = null,
 	) {
 		if (null === $this->region && null !== $this->locality) {

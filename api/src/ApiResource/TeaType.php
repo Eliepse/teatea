@@ -37,7 +37,7 @@ class TeaType
 
 	public TeaFamily $family;
 
-	#[Groups("tea:create")]
+	#[Groups(["tea:create", "embedded:teaType"])]
 	public string $name;
 
 	public ?Origin $origin = null;

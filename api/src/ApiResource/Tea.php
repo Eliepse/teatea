@@ -21,13 +21,14 @@ class Tea
 	#[ApiProperty(identifier: true)]
 	public ?int $id;
 
-	#[Groups(["tea:create"])]
+	#[Groups(["tea:create", "embedded:tea"])]
 	public TeaFamily $family;
 
-	#[Groups(["tea:create"])]
+	#[Groups(["tea:create", "embedded:tea"])]
 	public ?TeaType $type = null;
 
 	#[ApiProperty(genId: false)]
+	#[Groups(["embedded:tea"])]
 	public ?OriginPath $originPath = null;
 
 	#[Groups(["tea:create"])]
@@ -40,6 +41,7 @@ class Tea
 		$this->addedAt = new \DateTimeImmutable();
 	}
 
+	#[Groups(["embedded:tea"])]
 	public function getDisplayName(): string
 	{
 		if (null !== $this->type) {
