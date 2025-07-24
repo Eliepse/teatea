@@ -1,11 +1,12 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useTeas } from "~/utils/api/useTeas";
-import { type Tea, teaFamilies, type TeaFamily } from "~t/types";
+import { type OriginPath, type Tea, teaFamilies, type TeaFamily } from "~t/types";
 import clsx from "clsx";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import Arrow from "~/components/icons/arrow";
 import { handleUIEvent } from "~/utils/function";
 import { Fragment, useMemo } from "react";
+import { FormatOriginPath } from "../shared/FormatOriginPath";
 
 export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea) => void }) {
 	const navStack = useStackNavigator();
@@ -59,16 +60,16 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 			{teasQuery.isSuccess &&
 				Object.entries(teasByFamily).map(([key, teas]) => (
 					<Fragment key={key}>
-						<div className="text-xs uppercase text-base-content/60 mb-2 mt-6">{teaFamilies[key as TeaFamily]}</div>
+						<div className="text-xs uppercase text-base-content/60 mb-2 mt-6">
+							{teaFamilies[key as TeaFamily]}
+						</div>
 						{teas.map((tea) => (
 							<TeaItem
 								key={tea["@id"]}
 								title={tea.displayName}
 								family={tea.family + " tea"}
 								type={tea.type?.name}
-								country={tea.originPath?.country?.name}
-								region={tea.originPath?.region?.name}
-								locality={tea.originPath?.locality?.name}
+								originPath={tea.originPath}
 								onSelect={() => props.onSelect(tea)}
 								selected={props.value?.["@id"] === tea["@id"]}
 								className="mb-2"
@@ -85,14 +86,10 @@ function TeaItem(props: {
 	onSelect: () => void;
 	selected?: boolean;
 	className?: string;
-	country?: string | null;
-	region?: string | null;
-	locality?: string | null;
+	originPath?: OriginPath;
 	family: string;
 	type?: string;
 }) {
-	const countryOnly = !props.locality && !props.region;
-
 	return (
 		<article
 			className={clsx("bg-base-100 px-4 py-3 flex", props.selected && "bg-base-300", props.className)}
@@ -101,13 +98,7 @@ function TeaItem(props: {
 			<div className="flex-1">{props.title}</div>
 			<div className="text-xs text-right">
 				{<div>{props.type ?? props.family}</div>}
-				{countryOnly ? (
-					props.country
-				) : (
-					<>
-						{[props.locality, props.region].filter((s) => s).join(", ")} ({props.country})
-					</>
-				)}
+				{props.originPath && <FormatOriginPath originPath={props.originPath} />}
 			</div>
 		</article>
 	);

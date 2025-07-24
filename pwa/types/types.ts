@@ -5,10 +5,10 @@ import type Steep from "~/utils/value-objects/Steep";
 export type Id = number;
 export type Iri = string;
 
-interface Resource {
+interface Resource<TType extends string = string> {
 	id: Id;
 	"@id": Iri;
-	"@type": string;
+	"@type": TType;
 }
 
 type LTreePath = string[];
@@ -40,7 +40,7 @@ export type Tea = Resource & {
 	family: TeaFamily;
 	type?: TeaType;
 	origin?: Origin;
-	originPath?: { country: Origin; region: Origin | null; locality: Origin | null };
+	originPath?: OriginPath;
 	displayName: string;
 };
 
