@@ -22,11 +22,9 @@ export default function Dashboard() {
 			<p className="text-sm text-content/60 mt-6">Your activity this year</p>
 			<ActivityGraph className="my-2" />
 
-			<Link to="/me/drinks">
-				<a className="link block mb-6 text-right">
-					Got to my history
-					<Arrow direction="right" className="inline size-4 ml-2" />
-				</a>
+			<Link to="/me/drinks" className="link block mb-6 text-right">
+				Got to my history
+				<Arrow direction="right" className="inline size-4 ml-2" />
 			</Link>
 
 			<Link to="/drink/new">
