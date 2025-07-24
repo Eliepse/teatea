@@ -44,24 +44,31 @@ readonly class TeaProvider implements ProviderInterface
 		$originsQb = $this->em->createQueryBuilder()
 			->select("origin")
 			->from(Origin::class, "origin");
-		//->leftJoin(Origin::class, "origins", Join::WITH, "ltree(origins.path, >, origin.path) = true")
-		//->innerJoin("origin.teas", "teas")
-		//->where($expr->in("teas.id", array_map(fn($e) => $e->id, $teaEntities)));
 
 		/** @var array<string, Origin> $originsMap */
-		$originsMap = array_reduce($originsQb->getQuery()->getResult(), function ($map, Origin $o) {
-			$map[(string)$o->path] = $o;
-			return $map;
-		}, []);
+		$originsMap = self::originsToMap($originsQb->getQuery()->getResult());
 
 		$resources = [];
 
 		foreach ($teaEntities as $teaEntity) {
-			$originNodes = OriginPath::fromNodes($this->getOriginPath($originsMap, $teaEntity->origin));
-			$resources[] = $this->hydrateResource($teaEntity, $originNodes);
+			$originNodes = OriginPath::fromNodes(self::getOriginPath($originsMap, $teaEntity->origin));
+			$resources[] = self::hydrateResource($teaEntity, $originNodes);
 		}
 
 		return $isCollection ? $resources : ($resources[0] ?? null);
+	}
+
+	/**
+	 * @param array<Origin> $origins
+	 *
+	 * @return array<string, Origin>
+	 */
+	public static function originsToMap(array $origins): array
+	{
+		return array_reduce($origins, function ($map, Origin $o) {
+			$map[(string)$o->path] = $o;
+			return $map;
+		}, []);
 	}
 
 	/**
@@ -70,7 +77,7 @@ readonly class TeaProvider implements ProviderInterface
 	 *
 	 * @return array<Origin>
 	 */
-	private function getOriginPath(array $originsMap, ?Origin $leaf): array
+	public static function getOriginPath(array $originsMap, ?Origin $leaf): array
 	{
 		if (null === $leaf) {
 			return [];
@@ -90,7 +97,7 @@ readonly class TeaProvider implements ProviderInterface
 		return $originNodes;
 	}
 
-	private function hydrateResource(\App\Entity\Tea $entity, ?OriginPath $originPath): Tea
+	public static function hydrateResource(\App\Entity\Tea $entity, ?OriginPath $originPath): Tea
 	{
 		$tea = new Tea();
 		$tea->family = $entity->family;
