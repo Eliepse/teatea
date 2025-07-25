@@ -31,11 +31,11 @@ export default function ListDrinks(props: Route.ComponentProps) {
 	return (
 		<div>
 			<header className="p-4">
-				<button className="btn btn-ghost" onClick={handleUIEvent(() => navigate(-1))}>
+				<Link to="/welcome" className="btn btn-ghost -ml-4">
 					<Arrow direction="left" />
-				</button>
+				</Link>
 
-				<h1 className="text-lg mt-4">Drinks</h1>
+				<h1 className="text-lg mt-2">Drinks</h1>
 			</header>
 			<div>
 				<ul className="p-4">
