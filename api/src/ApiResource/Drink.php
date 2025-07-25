@@ -36,7 +36,10 @@ class Drink
 	#[Groups(["drink:create", "drink:read"])]
 	public ?BrewingTechnic $technic = null;
 
-	#[Groups("drink:create")]
+	#[Groups(["drink:create", "drink:edit", "drink:read"])]
+	public ?string $note = null;
+
+	#[Groups(["drink:create", "drink:read"])]
 	public ?\DateTimeImmutable $drankAt;
 
 	public function __construct()

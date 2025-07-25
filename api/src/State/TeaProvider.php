@@ -50,7 +50,7 @@ readonly class TeaProvider implements ProviderInterface
 		$resources = [];
 
 		foreach ($teaEntities as $teaEntity) {
-			$originNodes = OriginPath::fromNodes(self::getOriginPath($originsMap, $teaEntity->origin));
+			$originNodes = self::getOriginPath($originsMap, $teaEntity->origin);
 			$resources[] = self::hydrateResource($teaEntity, $originNodes);
 		}
 
@@ -74,12 +74,12 @@ readonly class TeaProvider implements ProviderInterface
 	 * @param array<int, Origin> $originsMap
 	 * @param Origin|null $leaf
 	 *
-	 * @return array<Origin>
+	 * @return OriginPath|null
 	 */
-	public static function getOriginPath(array $originsMap, ?Origin $leaf): array
+	public static function getOriginPath(array $originsMap, ?Origin $leaf): ?OriginPath
 	{
 		if (null === $leaf) {
-			return [];
+			return null;
 		}
 
 		$originNodes = [];
@@ -93,7 +93,7 @@ readonly class TeaProvider implements ProviderInterface
 
 		$originNodes[] = $leaf;
 
-		return $originNodes;
+		return OriginPath::fromNodes($originNodes);
 	}
 
 	public static function hydrateResource(\App\Entity\Tea $entity, ?OriginPath $originPath): Tea

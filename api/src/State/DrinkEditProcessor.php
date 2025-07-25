@@ -6,29 +6,28 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Drink;
 use App\Entity\Tea;
-use App\Entity\User;
 use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @implements ProcessorInterface<Drink>
  */
-readonly class DrinkProcessor implements ProcessorInterface
+readonly class DrinkEditProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private Security $security,
-	)
-	{
+		private OriginRepository $originRepository,
+	) {
 	}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Drink
 	{
-		$user = $this->security->getUser();
-
 		assert($data instanceof Drink);
-		assert($user instanceof User);
+
+		$entity = $this->em->find(\App\Entity\Drink::class, $data->id);
+		$entity->note = $data->note;
+		$this->em->persist($entity);
+		$this->em->flush();
 
 		$tea = $this->em->createQueryBuilder()
 			->select("tea", "origin")
@@ -38,32 +37,16 @@ readonly class DrinkProcessor implements ProcessorInterface
 			->setMaxResults(1)
 			->getQuery()->getSingleResult();
 
-		if(false === ($tea instanceof Tea)) {
+		if (false === ($tea instanceof Tea)) {
 			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
 		}
 
-		$entity = new \App\Entity\Drink(
-			tea: $tea,
-			drinker: $user,
-			technic: $data->technic,
-			drankAt: $data->drankAt,
+		$origins = $this->originRepository->fetchOriginsFromDrink(
+			fn($qb) => $qb->andWhere("drink.id = :drinkId")->setParameter("drinkId", $entity->id),
 		);
-		$entity->note = trim($data["note"]) ?: null;
+		$originMap = TeaProvider::originsToMap($origins);
+		$teaResource = TeaProvider::hydrateResource($tea, TeaProvider::getOriginPath($originMap, $tea->origin));
 
-		$this->em->persist($entity);
-		$this->em->flush();
-
-
-		$drink = new Drink();
-		$drink->id = $entity->id;
-		$drink->note = $entity->note;
-		$drink->drankAt = $entity->drankAt;
-		$drink->technic = $entity->technic;
-
-		// No need to fully load the Tea resource as it will only be serialized as IRI
-		$drink->tea = new \App\ApiResource\Tea();
-		$drink->tea->id = $entity->tea->id;
-
-		return $drink;
+		return DrinkProvider::hydrate($entity, $teaResource);
 	}
 }

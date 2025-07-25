@@ -57,12 +57,12 @@ export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise
 	return response;
 }
 
-export async function patchApi(
+export async function patchApi<T>(
 	url: string,
 	payload: object,
 	config?: Omit<FetchApiConfig, "payload" | "method">,
-): Promise<Response> {
-	return fetchApi(url, {
+): Promise<TResponse<T>> {
+	return fetchApi<T>(url, {
 		...config,
 		method: "PATCH",
 		payload,

@@ -7,7 +7,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Drink;
 use App\ApiResource\Tea;
-use App\DTO\OriginPath;
 use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -34,7 +33,7 @@ readonly class DrinkProvider implements ProviderInterface
 			$originMap = TeaProvider::originsToMap($this->originRepository->fetchOriginsFromDrink());
 
 			return array_map(function (\App\Entity\Drink $entity) use ($originMap) {
-				$path = OriginPath::fromNodes(TeaProvider::getOriginPath($originMap, $entity->tea->origin));
+				$path = TeaProvider::getOriginPath($originMap, $entity->tea->origin);
 				$tea = TeaProvider::hydrateResource($entity->tea, $path);
 				return self::hydrate($entity, $tea);
 			}, $drinkQb->getQuery()->getResult());
@@ -50,7 +49,7 @@ readonly class DrinkProvider implements ProviderInterface
 			->getQuery()->getSingleResult();
 
 		$originMap = TeaProvider::originsToMap($origins);
-		$path = OriginPath::fromNodes(TeaProvider::getOriginPath($originMap, $entity->tea->origin));
+		$path = TeaProvider::getOriginPath($originMap, $entity->tea->origin);
 		$tea = TeaProvider::hydrateResource($entity->tea, $path);
 
 		return self::hydrate($entity, $tea);
