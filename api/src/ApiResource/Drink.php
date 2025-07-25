@@ -9,7 +9,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Enum\BrewingTechnic;
 use App\State\DrinkEditProcessor;
-use App\State\DrinkProcessor;
+use App\State\DrinkCreateProcessor;
 use App\State\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		"embedded:teaType"
 	]
 ], security: "is_granted('ROLE_USER')", provider: DrinkProvider::class)]
-#[Post(denormalizationContext: ["groups" => ["drink:create"]], processor: DrinkProcessor::class)]
+#[Post(denormalizationContext: ["groups" => ["drink:create"]], processor: DrinkCreateProcessor::class)]
 #[Patch(denormalizationContext: ["groups" => ["drink:edit"]], provider: DrinkProvider::class, processor: DrinkEditProcessor::class)]
 class Drink
 {

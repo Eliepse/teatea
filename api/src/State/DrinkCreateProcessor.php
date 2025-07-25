@@ -14,7 +14,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 /**
  * @implements ProcessorInterface<Drink>
  */
-readonly class DrinkProcessor implements ProcessorInterface
+readonly class DrinkCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -48,7 +48,7 @@ readonly class DrinkProcessor implements ProcessorInterface
 			technic: $data->technic,
 			drankAt: $data->drankAt,
 		);
-		$entity->note = trim($data["note"]) ?: null;
+		$entity->note = trim($data->note ?? "") ?: null;
 
 		$this->em->persist($entity);
 		$this->em->flush();
