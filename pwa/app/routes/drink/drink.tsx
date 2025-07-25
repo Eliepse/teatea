@@ -84,7 +84,7 @@ export default function DrinkPage(props: Route.ComponentProps) {
 					</>
 				)}
 
-				{!drink.note && (
+				{!editableData.note && (
 					<button
 						className="btn btn-block btn-dash mt-2"
 						onClick={handleUIEvent(() => setShowNodeEditor(true))}
