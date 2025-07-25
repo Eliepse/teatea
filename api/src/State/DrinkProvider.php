@@ -8,12 +8,14 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Drink;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
+use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class DrinkProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private OriginRepository $originRepository,
 	) {
 	}
 
@@ -27,32 +29,30 @@ readonly class DrinkProvider implements ProviderInterface
 			->leftJoin("tea.origin", "origin")
 			->orderBy("drink.drankAt", "DESC");
 
-		$originQb = $this->em->createQueryBuilder()
-			->select("origin")
-			->distinct()
-			->from(\App\Entity\Origin::class, "origin")
-			->innerJoin(\App\Entity\Origin::class, "teaOrigin", "WITH", "CONTAINS(origin.path, teaOrigin.path) = TRUE")
-			->innerJoin(\App\Entity\Tea::class, "tea", "WITH", "teaOrigin = tea.origin")
-			->innerJoin(\App\Entity\Drink::class, "drink", "WITH", "tea = drink.tea");
-
 
 		if ($operation instanceof CollectionOperationInterface) {
-			$originMap = TeaProvider::originsToMap($originQb->getQuery()->getResult());
-			return array_map(function (\App\Entity\Drink $entity) use($originMap) {
+			$originMap = TeaProvider::originsToMap($this->originRepository->fetchOriginsFromDrink());
+
+			return array_map(function (\App\Entity\Drink $entity) use ($originMap) {
 				$path = OriginPath::fromNodes(TeaProvider::getOriginPath($originMap, $entity->tea->origin));
 				$tea = TeaProvider::hydrateResource($entity->tea, $path);
 				return self::hydrate($entity, $tea);
 			}, $drinkQb->getQuery()->getResult());
 		}
 
-		$originQb->where("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["id"]);
+		$origins = $this->originRepository->fetchOriginsFromDrink(
+			fn($qb) => $qb->where("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["id"]),
+		);
 
-		$entity = $drinkQb->where("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["id"])
+		$entity = $drinkQb
+			->where("drink.id = :drinkId")
+			->setParameter("drinkId", $uriVariables["id"])
 			->getQuery()->getSingleResult();
 
-		$originMap = TeaProvider::originsToMap($originQb->getQuery()->getResult());
+		$originMap = TeaProvider::originsToMap($origins);
 		$path = OriginPath::fromNodes(TeaProvider::getOriginPath($originMap, $entity->tea->origin));
 		$tea = TeaProvider::hydrateResource($entity->tea, $path);
+
 		return self::hydrate($entity, $tea);
 	}
 

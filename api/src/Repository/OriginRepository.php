@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Drink;
 use App\Entity\Origin;
+use App\Entity\Tea;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,33 +14,28 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class OriginRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, Origin::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, Origin::class);
+	}
 
-    //    /**
-    //     * @return Origin[] Returns an array of Origin objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('o.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+	/**
+	 * @param (callable(QueryBuilder):QueryBuilder)|null $queryModifier
+	 *
+	 * @return array<Origin>
+	 */
+	public function fetchOriginsFromDrink(?callable $queryModifier = null): array
+	{
+		$originQb = $this->createQueryBuilder("origin")
+			->select("origin")->distinct()
+			->innerJoin(Origin::class, "teaOrigin", "WITH", "CONTAINS(origin.path, teaOrigin.path) = TRUE")
+			->innerJoin(Tea::class, "tea", "WITH", "teaOrigin = tea.origin")
+			->innerJoin(Drink::class, "drink", "WITH", "tea = drink.tea");
 
-    //    public function findOneBySomeField($value): ?Origin
-    //    {
-    //        return $this->createQueryBuilder('o')
-    //            ->andWhere('o.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+		if (null === $queryModifier) {
+			return $originQb->getQuery()->getResult();
+		}
+
+		return $queryModifier(clone $originQb)->getQuery()->getResult();
+	}
 }

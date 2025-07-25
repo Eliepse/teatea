@@ -23,7 +23,6 @@ readonly class TeaProvider implements ProviderInterface
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
 		$isCollection = $operation instanceof CollectionOperationInterface;
-		$expr = $this->em->getExpressionBuilder();
 
 		$teaQb = $this->em->createQueryBuilder()
 			->select("tea", "type", "origin")
