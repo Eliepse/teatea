@@ -6,7 +6,9 @@ type FetchApiConfig = Omit<RequestInit, "body"> & {
 	payload?: string | number | object | null;
 };
 
-export async function fetchApi(url: string, config?: FetchApiConfig): Promise<Response> {
+type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> }
+
+export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise<TResponse<T>> {
 	const startedAt = Date.now();
 	const token = TokenUtils.get();
 	const fetchConfigs: RequestInit = { ...config };
@@ -25,7 +27,7 @@ export async function fetchApi(url: string, config?: FetchApiConfig): Promise<Re
 		fetchConfigs.body = "string" === typeof config.payload ? config.payload : JSON.stringify(config.payload);
 	}
 
-	let response;
+	let response: Response|undefined;
 
 	try {
 		response = await fetch(`${import.meta.env.PUBLIC_API_URL}${url}`, fetchConfigs);
