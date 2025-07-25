@@ -6,18 +6,13 @@ import { fetchApi } from "~/utils/api";
 import type { ApiCollection, Drink, OriginPath, TeaType } from "~t/types";
 import { formatDate, formatISO } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
+import { limit } from "~/utils/text";
 
 export async function clientLoader(args: Route.ClientLoaderArgs): Promise<ApiCollection<Drink>> {
-	const response = await fetchApi("/drinks");
+	const response = await fetchApi<ApiCollection<DrinkRaw>>("/drinks");
 	const data = await response.json();
-	const deserializedItems = data.member?.map((drink: Drink) => ({
-		...drink,
-		drankAt: new Date(drink.drankAt),
-	}));
-	return {
-		...data,
-		member: deserializedItems,
-	};
+	return { ...data, member: data.member.map(denormalizeDrink) };
 }
 
 export default function ListDrinks(props: Route.ComponentProps) {
@@ -64,6 +59,7 @@ export default function ListDrinks(props: Route.ComponentProps) {
 													family={drink.tea.family}
 													type={drink.tea.type}
 													path={drink.tea.originPath}
+													note={drink.note}
 												/>
 											</Link>
 										</li>
@@ -78,17 +74,23 @@ export default function ListDrinks(props: Route.ComponentProps) {
 	);
 }
 
-function Item(props: { family: string; type?: TeaType; path?: OriginPath }) {
+function Item(props: { family: string; type?: TeaType; path?: OriginPath; note?: string }) {
 	return (
-		<article className="bg-base-200 px-3 py-2">
-			<div className="flex justify-between text-xs text-base-content/60 mb-1">
-				{/*<span>{undefined === props.type && <>{props.family} tea</>}</span>*/}
-				<span>{props.family} tea</span>
+		<article className="bg-base-200 pt-2 pb-2">
+			<div className="px-3 flex justify-between text-xs text-base-content/60 mb-1">
+				<span>
+					<span className="capitalize">{props.family}</span> tea
+				</span>
 				{props.path && <FormatOriginPath originPath={props.path} />}
 			</div>
-			<div>
+			<div className="px-3 pb-1">
 				<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
 			</div>
+			{!!props.note && (
+				<div className="border-t border-base-300 pt-2 px-3 text-base-content/60 text-sm">
+					{limit(props.note, 96)}
+				</div>
+			)}
 		</article>
 	);
 }
