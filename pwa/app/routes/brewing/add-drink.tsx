@@ -1,7 +1,7 @@
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { useMemo, useState } from "react";
 import { SelectTeaFrame } from "~/components/stackFrames/SelectTeaFrame";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { SelectDateFrame } from "~/components/stackFrames/SelectDateFrame";
 import { NewDrinkFormFrame } from "~/components/stackFrames/NewDrinkFormFrame";
 import { type FormData, NewSipContext, type SipContext } from "./add-drink.context";
@@ -9,6 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { fetchApi } from "~/utils/api";
 import { handleUIEvent } from "~/utils/function";
 import { SelectTechnicFrame } from "~/components/stackFrames/SelectTechnicFrame";
+import type { DrinkRaw } from "~/utils/api/normalization/drink";
 
 export default function LogDrinkPage() {
 	const navigate = useNavigate();
@@ -17,13 +18,13 @@ export default function LogDrinkPage() {
 		defaultFrame: { key: "form" },
 		onOverBack: () => navigate(-1),
 	});
-	const createSipMutation = useMutation({
+	const createMutation = useMutation({
 		mutationFn: async (data: FormData) => {
 			if (!formData.tea || !formData.drankAt) {
 				throw new Error("Invalid payload");
 			}
 
-			const response = await fetchApi("/drinks", {
+			const response = await fetchApi<DrinkRaw>("/drinks", {
 				method: "POST",
 				payload: {
 					drankAt: data.drankAt,
@@ -53,11 +54,11 @@ export default function LogDrinkPage() {
 					return;
 				}
 
-				await createSipMutation.mutateAsync(formData);
+				await createMutation.mutateAsync(formData);
 			},
-			isSubmitting: "pending" === createSipMutation.status,
+			isSubmitting: "pending" === createMutation.status,
 		}),
-		[formData, createSipMutation.status],
+		[formData, createMutation.status],
 	);
 
 	return (
@@ -93,9 +94,16 @@ export default function LogDrinkPage() {
 								<div className="text-2xl font-semibold text-center my-12 text-[#2a4641] ">
 									Your drink has been registered
 								</div>
-								<button className="mx-auto flex btn btn-wide btn-primary mb-4">
-									Add a tasting note
-								</button>
+
+								{createMutation.data && (
+									<Link
+										className="mx-auto flex btn btn-wide btn-primary mb-4"
+										to={`/me/drink/${createMutation.data.id}`}
+									>
+										Add a tasting note
+									</Link>
+								)}
+
 								<button
 									className="mx-auto flex btn btn-wide btn-secondary"
 									onClick={handleUIEvent(() => navigate(-1))}
