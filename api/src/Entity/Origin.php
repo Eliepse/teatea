@@ -13,6 +13,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: OriginRepository::class)]
+#[ORM\Index("path_gist_idx", fields: ["path"])]
 class Origin
 {
 	#[ORM\Id]
@@ -20,7 +21,7 @@ class Origin
 	#[ORM\Column]
 	public readonly int $id;
 
-	#[ORM\Column(type: "ltree")]
+	#[ORM\Column(type: "ltree", unique: true)]
 	#[ApiProperty(genId: false)]
 	public LTreePath $path;
 
