@@ -8,6 +8,7 @@ export default [
 		...prefix("/me", [
 			// route("/teas", "routes/user/teaCollection.tsx"),
 			route("/drinks", "routes/drink/drinks.tsx"),
+			route("/drink/:id", "routes/drink/drink.tsx"),
 		]),
 		route("/brew/:id", "routes/brewing/brewing-edit.tsx"),
 		route("/tea/new", "routes/add-tea.tsx"),

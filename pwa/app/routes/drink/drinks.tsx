@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { handleUIEvent } from "~/utils/function";
 import Arrow from "~/components/icons/arrow";
 import type { Route } from "../../../.react-router/types/app/routes/drink/+types/drinks";
@@ -59,11 +59,13 @@ export default function ListDrinks(props: Route.ComponentProps) {
 								<ul>
 									{drinks.map((drink) => (
 										<li key={drink.id} className="mb-2">
-											<Item
-												family={drink.tea.family}
-												type={drink.tea.type}
-												path={drink.tea.originPath}
-											/>
+											<Link to={`/me/drink/${drink.id}`}>
+												<Item
+													family={drink.tea.family}
+													type={drink.tea.type}
+													path={drink.tea.originPath}
+												/>
+											</Link>
 										</li>
 									))}
 								</ul>
