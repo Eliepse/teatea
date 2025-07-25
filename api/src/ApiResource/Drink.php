@@ -3,13 +3,15 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Enum\BrewingTechnic;
-use App\State\DrinkEditProcessor;
 use App\State\DrinkCreateProcessor;
+use App\State\DrinkDeleteProcessor;
+use App\State\DrinkEditProcessor;
 use App\State\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -23,6 +25,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 ], security: "is_granted('ROLE_USER')", provider: DrinkProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["drink:create"]], processor: DrinkCreateProcessor::class)]
 #[Patch(denormalizationContext: ["groups" => ["drink:edit"]], provider: DrinkProvider::class, processor: DrinkEditProcessor::class)]
+#[Delete(provider: DrinkProvider::class, processor: DrinkDeleteProcessor::class)]
 class Drink
 {
 	#[Groups(["drink:read"])]

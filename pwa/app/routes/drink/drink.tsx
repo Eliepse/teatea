@@ -1,5 +1,5 @@
 import type { Route } from "../../../.react-router/types/app/routes/drink/+types/drink";
-import { fetchApi, patchApi } from "~/utils/api";
+import { deleteApi, fetchApi, patchApi } from "~/utils/api";
 import type { Drink } from "~t/types";
 import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
 import { intlFormat } from "date-fns";
@@ -12,6 +12,8 @@ import { handleUIEvent } from "~/utils/function";
 import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
+import { TrashIcon } from "@heroicons/react/16/solid";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<Drink> {
 	const id = parseInt(props.params.id);
@@ -36,6 +38,10 @@ export default function DrinkPage(props: Route.ComponentProps) {
 		},
 		onSuccess: () => setShowNodeEditor(false),
 	});
+	const deleteMutation = useMutation({
+		mutationFn: async () => await deleteApi(`/drinks/${drink.id}`),
+		onSuccess: () => navigate("/me/drinks"),
+	});
 	const editableData = { ...drink, ...editMutation.data };
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -45,10 +51,29 @@ export default function DrinkPage(props: Route.ComponentProps) {
 	return (
 		<div>
 			<header className="p-4">
-				<Link to="/me/drinks" className="block link mb-8">
-					<Arrow direction="left" className="inline size-4 mr-2" />
-					Drink history
-				</Link>
+				<div className="flex">
+					<Link to="/me/drinks" className="block link mb-8">
+						<Arrow direction="left" className="inline size-4 mr-2" />
+						Drink history
+					</Link>
+
+					<div className="dropdown dropdown-end ml-auto">
+						<div tabIndex={0} role="button" className="m-1">
+							<EllipsisVerticalIcon className="size-5" />
+						</div>
+						<ul
+							tabIndex={0}
+							className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+						>
+							<li className="text-error" onClick={handleUIEvent(() => deleteMutation.mutate())}>
+								<span>
+									<TrashIcon className="size-3 inline mr-1" />
+									Delete
+								</span>
+							</li>
+						</ul>
+					</div>
+				</div>
 
 				<div className="uppercase text-xs text-base-content/60">
 					{intlFormat(drink.drankAt, { dateStyle: "long" })}

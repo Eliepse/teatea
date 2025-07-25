@@ -6,7 +6,7 @@ type FetchApiConfig = Omit<RequestInit, "body"> & {
 	payload?: string | number | object | null;
 };
 
-type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> }
+type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> };
 
 export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise<TResponse<T>> {
 	const startedAt = Date.now();
@@ -27,7 +27,7 @@ export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise
 		fetchConfigs.body = "string" === typeof config.payload ? config.payload : JSON.stringify(config.payload);
 	}
 
-	let response: Response|undefined;
+	let response: Response | undefined;
 
 	try {
 		response = await fetch(`${import.meta.env.PUBLIC_API_URL}${url}`, fetchConfigs);
@@ -71,4 +71,8 @@ export async function patchApi<T>(
 			"Content-Type": "application/merge-patch+json",
 		},
 	});
+}
+
+export async function deleteApi<T>(url: string, config?: Omit<FetchApiConfig, "method">): Promise<TResponse<T>> {
+	return fetchApi<T>(url, { ...config, method: "DELETE" });
 }

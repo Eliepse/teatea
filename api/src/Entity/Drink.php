@@ -13,7 +13,7 @@ class Drink
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
-	public readonly int $id;
+	public ?int $id;
 
 	#[ORM\Column(type: Types::TEXT, nullable: true)]
 	public ?string $note = null;
