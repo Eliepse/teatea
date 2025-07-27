@@ -61,6 +61,7 @@ readonly class DrinkProvider implements ProviderInterface
 		$resource->id = $entity->id;
 		$resource->note = $entity->note;
 		$resource->technic = $entity->technic;
+		$resource->teaQuantity = $entity->teaQuantity?->toGrams();
 		$resource->drankAt = $entity->drankAt;
 		$resource->tea = $tea;
 

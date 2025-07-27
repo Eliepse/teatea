@@ -5,6 +5,7 @@ import type { TechnicType } from "~/components/shared/BrewingTechnic";
 
 export type FormData = {
 	tea?: Tea;
+	teaQuantity?: number;
 	drankAt?: Date;
 	technic?: TechnicType | null;
 };
@@ -12,7 +13,7 @@ export type FormData = {
 export type SipContext = {
 	updateForm: (part: Partial<FormData>) => void;
 	formData: FormData;
-	submit: () => Promise<void>;
+	submit: (patch?: Partial<FormData>) => Promise<void>;
 	isSubmitting: boolean;
 };
 

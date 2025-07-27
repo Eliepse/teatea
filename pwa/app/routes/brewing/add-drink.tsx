@@ -30,6 +30,7 @@ export default function LogDrinkPage() {
 					drankAt: data.drankAt,
 					tea: data.tea?.["@id"],
 					technic: data.technic,
+					teaQuantity: data.teaQuantity,
 				},
 			});
 
@@ -49,12 +50,13 @@ export default function LogDrinkPage() {
 		() => ({
 			updateForm: (part: Partial<FormData>) => setFormData((f) => ({ ...f, ...part })),
 			formData,
-			submit: async () => {
+			submit: async (patch) => {
 				if (!formData.tea || !formData.drankAt) {
 					return;
 				}
 
-				await createMutation.mutateAsync(formData);
+				setFormData({ ...formData, ...patch });
+				await createMutation.mutateAsync({ ...formData, ...patch });
 			},
 			isSubmitting: "pending" === createMutation.status,
 		}),

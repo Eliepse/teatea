@@ -14,6 +14,7 @@ use App\State\DrinkDeleteProcessor;
 use App\State\DrinkEditProcessor;
 use App\State\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(provider: DrinkProvider::class)]
 #[GetCollection(normalizationContext: [
@@ -41,6 +42,13 @@ class Drink
 
 	#[Groups(["drink:create", "drink:edit", "drink:read"])]
 	public ?string $note = null;
+
+	/**
+	 * Tea quantity in grams
+	 */
+	#[Assert\GreaterThan(0)]
+	#[Groups(["drink:create", "drink:edit", "drink:read"])]
+	public ?float $teaQuantity = null;
 
 	#[Groups(["drink:create", "drink:read"])]
 	public ?\DateTimeImmutable $drankAt;

@@ -5,7 +5,7 @@ import { useNewSipContext } from "~/routes/brewing/add-drink.context";
 import { formatDate } from "date-fns";
 import { useNavigate } from "react-router";
 import type { Tea } from "~t/types";
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import { Check } from "~/components/icons/Check";
 import { BrewingTechnic } from "~/components/shared/BrewingTechnic";
 
@@ -14,9 +14,16 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 	const navStack = useStackNavigator();
 	const [submitting, setSubmitting] = useState(false);
 	const { formData, isSubmitting, ...ctx } = useNewSipContext();
+	const [teaWeight, setTeaWeight] = useState<number>(formData.teaQuantity ?? 0);
+
+	function handleTeaWeightChange(e: ChangeEvent<HTMLInputElement>) {
+		e.stopPropagation();
+		const value = Math.max(parseInt(e.currentTarget.value.trim()), 0);
+		setTeaWeight(value);
+	}
 
 	async function submitDrink() {
-		await ctx.submit();
+		await ctx.submit({ teaQuantity: 0 < teaWeight ? teaWeight : undefined });
 		navStack.next({ key: "done" });
 	}
 
@@ -30,7 +37,13 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 					disabled={isSubmitting || !formData.tea || !formData.drankAt}
 					onClick={handleUIEvent(submitDrink)}
 				>
-					{isSubmitting ? "Saving..." : <>Save <Check /></>}
+					{isSubmitting ? (
+						"Saving..."
+					) : (
+						<>
+							Save <Check />
+						</>
+					)}
 				</button>
 			}
 		>
@@ -53,6 +66,14 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 				<button className="input w-full" onClick={handleUIEvent(() => navStack.next({ key: "technic" }))}>
 					{formData.technic ? <BrewingTechnic value={formData.technic} /> : "Select a technic..."}
 				</button>
+			</fieldset>
+
+			<fieldset className="fieldset mb-6">
+				<legend className="fieldset-legend">Tea quantity</legend>
+				<label className="input w-full">
+					<input type="number" min="0" value={teaWeight} onChange={handleTeaWeightChange} />
+					<span className="label">g</span>
+				</label>
 			</fieldset>
 		</PageLayout>
 	);
