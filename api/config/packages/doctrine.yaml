@@ -22,6 +22,8 @@ doctrine:
             point: MartinGeorgiev\Doctrine\DBAL\Types\Point
             point[]: MartinGeorgiev\Doctrine\DBAL\Types\PointArray
             ltree: App\Doctrine\DBAL\Types\LTreeType
+            volume: App\Doctrine\DBAL\Types\VolumeType
+            weight: App\Doctrine\DBAL\Types\WeightType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
