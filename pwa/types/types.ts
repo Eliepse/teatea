@@ -47,6 +47,7 @@ export type Tea = Resource & {
 export type Drink = Resource<"Drink"> & {
 	tea: Tea;
 	note?: string;
+	teaQuantity?: number;
 	drankAt: Date;
 };
 
