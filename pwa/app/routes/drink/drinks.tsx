@@ -60,6 +60,7 @@ export default function ListDrinks(props: Route.ComponentProps) {
 													path={drink.tea.originPath}
 													note={drink.note}
 													grams={drink.teaQuantity}
+													ml={drink.waterMl}
 												/>
 											</Link>
 										</li>
@@ -74,7 +75,14 @@ export default function ListDrinks(props: Route.ComponentProps) {
 	);
 }
 
-function Item(props: { family: string; type?: TeaType; path?: OriginPath; note?: string; grams?: number }) {
+function Item(props: {
+	family: string;
+	type?: TeaType;
+	path?: OriginPath;
+	note?: string;
+	grams?: number;
+	ml?: number;
+}) {
 	return (
 		<article className="bg-base-200 pt-2 pb-2">
 			<div className="px-3 flex justify-between text-xs text-base-content/60 mb-1">
@@ -85,7 +93,9 @@ function Item(props: { family: string; type?: TeaType; path?: OriginPath; note?:
 			</div>
 			<div className="px-3 pb-1 flex">
 				<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
-				<span className="ml-auto">{props.grams ? `${props.grams} g` : null}</span>
+				<span className="ml-auto">
+					{[props.grams ? `${props.grams} g` : null, props.ml ? `${props.ml} ml` : null].filter(v => v).join(" · ")}
+				</span>
 			</div>
 			{!!props.note && (
 				<div className="border-t border-base-300 pt-2 px-3 text-base-content/60 text-sm">

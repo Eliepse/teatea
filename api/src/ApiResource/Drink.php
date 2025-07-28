@@ -50,6 +50,13 @@ class Drink
 	#[Groups(["drink:create", "drink:edit", "drink:read"])]
 	public ?float $teaQuantity = null;
 
+	/**
+	 * Water quantity in ml
+	 */
+	#[Assert\GreaterThan(0)]
+	#[Groups(["drink:create", "drink:edit", "drink:read"])]
+	public ?float $waterMl = null;
+
 	#[Groups(["drink:create", "drink:read"])]
 	public ?\DateTimeImmutable $drankAt;
 

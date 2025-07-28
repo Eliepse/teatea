@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Drink;
 use App\Entity\Tea;
 use App\Repository\OriginRepository;
+use App\ValueObject\Volume;
 use App\ValueObject\Weight;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -26,8 +27,9 @@ readonly class DrinkEditProcessor implements ProcessorInterface
 		assert($data instanceof Drink);
 
 		$entity = $this->em->find(\App\Entity\Drink::class, $data->id);
-		$entity->note = $data->note;
+		$entity->note = trim($data->note ?? "") ?: null;
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
+		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
 		$this->em->persist($entity);
 		$this->em->flush();
 

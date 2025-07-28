@@ -31,6 +31,7 @@ export default function LogDrinkPage() {
 					tea: data.tea?.["@id"],
 					technic: data.technic,
 					teaQuantity: data.teaQuantity,
+					waterMl: data.waterVolume,
 				},
 			});
 

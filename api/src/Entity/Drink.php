@@ -23,6 +23,9 @@ class Drink
 	#[ORM\Column(type: "weight", nullable: true)]
 	public ?Weight $teaQuantity = null;
 
+	#[ORM\Column(type: "volume", nullable: true)]
+	public ?Volume $waterVolume = null;
+
 	public function __construct(
 		#[ORM\ManyToOne(inversedBy: 'drinks')]
 		#[ORM\JoinColumn(nullable: false)]

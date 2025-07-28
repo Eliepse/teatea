@@ -6,6 +6,7 @@ import type { TechnicType } from "~/components/shared/BrewingTechnic";
 export type FormData = {
 	tea?: Tea;
 	teaQuantity?: number;
+	waterVolume?: number;
 	drankAt?: Date;
 	technic?: TechnicType | null;
 };

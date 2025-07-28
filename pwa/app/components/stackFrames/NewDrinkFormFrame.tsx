@@ -15,15 +15,23 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 	const [submitting, setSubmitting] = useState(false);
 	const { formData, isSubmitting, ...ctx } = useNewSipContext();
 	const [teaWeight, setTeaWeight] = useState<number>(formData.teaQuantity ?? 0);
+	const [waterVolume, setWaterVolume] = useState<number>(formData.waterVolume ?? 0);
 
 	function handleTeaWeightChange(e: ChangeEvent<HTMLInputElement>) {
 		e.stopPropagation();
-		const value = Math.max(parseInt(e.currentTarget.value.trim()), 0);
-		setTeaWeight(value);
+		setTeaWeight(Math.max(parseInt(e.currentTarget.value.trim()), 0));
+	}
+
+	function handleWaterVolumeChange(e: ChangeEvent<HTMLInputElement>) {
+		e.stopPropagation();
+		setWaterVolume(Math.max(parseInt(e.currentTarget.value.trim()), 0));
 	}
 
 	async function submitDrink() {
-		await ctx.submit({ teaQuantity: 0 < teaWeight ? teaWeight : undefined });
+		await ctx.submit({
+			teaQuantity: 0 < teaWeight ? teaWeight : undefined,
+			waterVolume: 0 < waterVolume ? waterVolume : undefined,
+		});
 		navStack.next({ key: "done" });
 	}
 
@@ -31,6 +39,7 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 		<PageLayout
 			title="Log a drink"
 			onBack={() => navigate(-1)}
+			bodyClassName="pb-20"
 			action={
 				<button
 					className="flex mx-auto btn btn-primary"
@@ -73,6 +82,14 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 				<label className="input w-full">
 					<input type="number" min="0" value={teaWeight} onChange={handleTeaWeightChange} />
 					<span className="label">g</span>
+				</label>
+			</fieldset>
+
+			<fieldset className="fieldset mb-6">
+				<legend className="fieldset-legend">Water volume</legend>
+				<label className="input w-full">
+					<input type="number" min="0" value={waterVolume} onChange={handleWaterVolumeChange} />
+					<span className="label">ml</span>
 				</label>
 			</fieldset>
 		</PageLayout>
