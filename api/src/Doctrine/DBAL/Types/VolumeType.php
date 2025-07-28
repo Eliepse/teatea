@@ -42,6 +42,6 @@ class VolumeType extends Type
 
 	public function getMappedDatabaseTypes(AbstractPlatform $platform): array
 	{
-		return ["DECIMAL"];
+		return ["DECIMAL", "NUMERIC"];
 	}
 }
