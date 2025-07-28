@@ -7,30 +7,40 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Drink;
 use App\ApiResource\Tea;
+use App\Entity\User;
 use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class DrinkProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepository,
+		private Security $security,
 	) {
 	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
+		$user = $this->security->getUser();
+		assert($user instanceof User);
+
 		$drinkQb = $this->em->createQueryBuilder()
 			->select("drink", "tea", "type", "origin")
 			->from(\App\Entity\Drink::class, "drink")
 			->leftJoin("drink.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
+			->where("drink.drinker = :drinker")->setParameter("drinker", $user)
 			->orderBy("drink.drankAt", "DESC");
 
 
 		if ($operation instanceof CollectionOperationInterface) {
-			$originMap = TeaProvider::originsToMap($this->originRepository->fetchOriginsFromDrink());
+			$origins = $this->originRepository->fetchOriginsFromDrink(
+				fn($qb) => $qb->where("drink.drinker = :drinker")->setParameter("drinker", $user),
+			);
+			$originMap = TeaProvider::originsToMap($origins);
 
 			return array_map(function (\App\Entity\Drink $entity) use ($originMap) {
 				$path = TeaProvider::getOriginPath($originMap, $entity->tea->origin);
