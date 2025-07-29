@@ -54,7 +54,7 @@ readonly class DrinkProvider implements ProviderInterface
 		);
 
 		$entity = $drinkQb
-			->where("drink.id = :drinkId")
+			->andWhere("drink.id = :drinkId")
 			->setParameter("drinkId", $uriVariables["id"])
 			->getQuery()->getSingleResult();
 
