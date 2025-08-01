@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router";
-import Arrow from "~/components/icons/arrow";
 import type { Route } from "../../../.react-router/types/app/routes/drink/+types/drinks";
 import { fetchApi } from "~/utils/api";
 import type { ApiCollection, Drink, OriginPath, TeaType } from "~t/types";
@@ -7,6 +6,8 @@ import { formatDate, formatISO } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
 import { limit } from "~/utils/text";
+import { AuthLayout } from "~/layouts/AuthLayout";
+import { ActivityGraph } from "~/components/activity/ActivityGraph";
 
 export async function clientLoader(args: Route.ClientLoaderArgs): Promise<ApiCollection<Drink>> {
 	const response = await fetchApi<ApiCollection<DrinkRaw>>("/drinks");
@@ -28,50 +29,48 @@ export default function ListDrinks(props: Route.ComponentProps) {
 	);
 
 	return (
-		<div>
-			<header className="p-4">
-				<Link to="/welcome" className="btn btn-ghost -ml-4">
-					<Arrow direction="left" />
-				</Link>
-
+		<AuthLayout className="px-4" activeKey="activity">
+			<header className="py-4">
 				<h1 className="text-lg mt-2">Drinks</h1>
 			</header>
-			<div>
-				<ul className="p-4">
-					{Object.entries(drinksByDay).map(([dateKey, drinks]) => {
-						const date = drinks[0].drankAt;
 
-						return (
-							<li key={dateKey} className="mb-12">
-								<div className="leading-tight mb-4 text-lg">
-									<span className="text-xs uppercase text-base-content/60">
-										{formatDate(date, "yyyy")}
-									</span>
-									<br />
-									<span>{formatDate(date, "d MMMM")}</span>
-								</div>
-								<ul>
-									{drinks.map((drink) => (
-										<li key={drink.id} className="mb-2">
-											<Link to={`/me/drink/${drink.id}`}>
-												<Item
-													family={drink.tea.family}
-													type={drink.tea.type}
-													path={drink.tea.originPath}
-													note={drink.note}
-													grams={drink.teaQuantity}
-													ml={drink.waterMl}
-												/>
-											</Link>
-										</li>
-									))}
-								</ul>
-							</li>
-						);
-					})}
-				</ul>
-			</div>
-		</div>
+			<p className="text-sm text-content/60">Your activity this year</p>
+			<ActivityGraph className="my-2" />
+
+			<ul className="py-4">
+				{Object.entries(drinksByDay).map(([dateKey, drinks]) => {
+					const date = drinks[0].drankAt;
+
+					return (
+						<li key={dateKey} className="mb-12">
+							<div className="leading-tight mb-4 text-lg">
+								<span className="text-xs uppercase text-base-content/60">
+									{formatDate(date, "yyyy")}
+								</span>
+								<br />
+								<span>{formatDate(date, "d MMMM")}</span>
+							</div>
+							<ul>
+								{drinks.map((drink) => (
+									<li key={drink.id} className="mb-2">
+										<Link to={`/me/drink/${drink.id}`}>
+											<Item
+												family={drink.tea.family}
+												type={drink.tea.type}
+												path={drink.tea.originPath}
+												note={drink.note}
+												grams={drink.teaQuantity}
+												ml={drink.waterMl}
+											/>
+										</Link>
+									</li>
+								))}
+							</ul>
+						</li>
+					);
+				})}
+			</ul>
+		</AuthLayout>
 	);
 }
 
@@ -94,7 +93,9 @@ function Item(props: {
 			<div className="px-3 pb-1 flex">
 				<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
 				<span className="ml-auto">
-					{[props.grams ? `${props.grams} g` : null, props.ml ? `${props.ml} ml` : null].filter(v => v).join(" · ")}
+					{[props.grams ? `${props.grams} g` : null, props.ml ? `${props.ml} ml` : null]
+						.filter((v) => v)
+						.join(" · ")}
 				</span>
 			</div>
 			{!!props.note && (
