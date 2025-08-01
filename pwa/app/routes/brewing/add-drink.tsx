@@ -65,7 +65,7 @@ export default function LogDrinkPage() {
 	);
 
 	return (
-		<div className="bg-base-200 min-h-screen">
+		<div className="min-h-screen">
 			<NewSipContext.Provider value={contextValue}>
 				<NavigationStack>
 					<StackFrame frameKey="form">

@@ -5,33 +5,29 @@ import { useNewSipContext } from "~/routes/brewing/add-drink.context";
 import { formatDate } from "date-fns";
 import { useNavigate } from "react-router";
 import type { Tea } from "~t/types";
-import { type ChangeEvent, useState } from "react";
+import { useState } from "react";
 import { Check } from "~/components/icons/Check";
 import { BrewingTechnic } from "~/components/shared/BrewingTechnic";
+import { TeaQuantityInput } from "~/components/shared/inputs/TeaQuantityInput";
+import { WaterVolumeInput } from "~/components/shared/inputs/WaterVolumeInput";
 
 export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 	const navigate = useNavigate();
 	const navStack = useStackNavigator();
 	const [submitting, setSubmitting] = useState(false);
 	const { formData, isSubmitting, ...ctx } = useNewSipContext();
-	const [teaWeight, setTeaWeight] = useState<number>(formData.teaQuantity ?? 0);
-	const [waterVolume, setWaterVolume] = useState<number>(formData.waterVolume ?? 0);
-
-	function handleTeaWeightChange(e: ChangeEvent<HTMLInputElement>) {
-		e.stopPropagation();
-		setTeaWeight(Math.max(parseInt(e.currentTarget.value.trim()), 0));
-	}
-
-	function handleWaterVolumeChange(e: ChangeEvent<HTMLInputElement>) {
-		e.stopPropagation();
-		setWaterVolume(Math.max(parseInt(e.currentTarget.value.trim()), 0));
-	}
+	const [teaWeight, setTeaWeight] = useState(formData.teaQuantity ?? null);
+	const [waterVolume, setWaterVolume] = useState(formData.waterVolume ?? null);
 
 	async function submitDrink() {
+		const tea = teaWeight ?? 0;
+		const water = waterVolume ?? 0;
+
 		await ctx.submit({
-			teaQuantity: 0 < teaWeight ? teaWeight : undefined,
-			waterVolume: 0 < waterVolume ? waterVolume : undefined,
+			teaQuantity: 0 < tea ? tea : undefined,
+			waterVolume: 0 < water ? water : undefined,
 		});
+
 		navStack.next({ key: "done" });
 	}
 
@@ -79,18 +75,12 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 
 			<fieldset className="fieldset mb-6">
 				<legend className="fieldset-legend">Tea quantity</legend>
-				<label className="input w-full">
-					<input type="number" min="0" value={teaWeight} onChange={handleTeaWeightChange} />
-					<span className="label">g</span>
-				</label>
+				<TeaQuantityInput value={teaWeight} onChange={setTeaWeight} />
 			</fieldset>
 
 			<fieldset className="fieldset mb-6">
 				<legend className="fieldset-legend">Water volume</legend>
-				<label className="input w-full">
-					<input type="number" min="0" value={waterVolume} onChange={handleWaterVolumeChange} />
-					<span className="label">ml</span>
-				</label>
+				<WaterVolumeInput value={waterVolume} onChange={setWaterVolume} />
 			</fieldset>
 		</PageLayout>
 	);
