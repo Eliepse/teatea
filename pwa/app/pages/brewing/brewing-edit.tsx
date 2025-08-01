@@ -3,11 +3,10 @@ import type { BrewingSession } from "~t/types";
 import { Duration, Temperature, Volume, Weight } from "~/utils/value-objects/units";
 import { useNavigate } from "react-router";
 import Chevron from "~/components/icons/chevron";
-import type { Route } from "./+types/brewing-edit";
 import { useState } from "react";
 import dayjs from "dayjs";
 import Leaf from "~/components/icons/leaf";
-import { teawareTypes, type TeawareType } from "~t/teawareType";
+import { type TeawareType, teawareTypes } from "~t/teawareType";
 import { Modal } from "~/components/shared/modal/Modal";
 import { SteepForm } from "~/components/brewing/SteepForm";
 import Steep from "~/utils/value-objects/Steep";
@@ -18,7 +17,7 @@ export function meta() {
 	return [{ title: "Teatea - Brew" }];
 }
 
-export async function loader(args: Route.LoaderArgs): Promise<
+export async function loader(args: any): Promise<
 	Omit<BrewingSession, "tea" | "teaware"> & {
 		tea: {
 			id: number;
@@ -137,9 +136,7 @@ async function persistSteep(args: { bs_id: number; duration: number; temperature
 	return { ...data, ...args };
 }
 
-function prepareBrew(
-	data: Route.ComponentProps["loaderData"],
-): Omit<BrewingSession, "tea"> & { tea: Route.ComponentProps["loaderData"]["tea"] } {
+function prepareBrew(data: any): Omit<BrewingSession, "tea"> & { tea: any } {
 	return {
 		...data,
 		teaQuantity: data.teaQuantity ? Weight.fromG(data.teaQuantity) : undefined,
@@ -153,7 +150,7 @@ function prepareBrew(
 	};
 }
 
-function prepareSteeps(steeps: Route.ComponentProps["loaderData"]["steeps"]): Steep[] {
+function prepareSteeps(steeps: any): Steep[] {
 	return (
 		steeps?.map(
 			(steep) =>
@@ -167,7 +164,7 @@ function prepareSteeps(steeps: Route.ComponentProps["loaderData"]["steeps"]): St
 	);
 }
 
-export default function BrewingEdit(props: Route.ComponentProps) {
+export default function BrewingEdit(props: any) {
 	const brew = prepareBrew(props.loaderData);
 	const navigate = useNavigate();
 	const [mode, setMode] = useState<"edit" | "read">("read");

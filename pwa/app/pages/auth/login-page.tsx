@@ -1,5 +1,5 @@
 import { redirect, useFetcher } from "react-router";
-import type { Route } from "../../../.react-router/types/app/routes/auth/+types/login-page";
+import type { Route } from "../../../.react-router/types/app/pages/auth/+types/login-page";
 import { TokenUtils } from "~/auth/hooks/useToken";
 
 export async function clientAction({ request }: Route.ClientActionArgs) {

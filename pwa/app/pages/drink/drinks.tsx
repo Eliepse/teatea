@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import type { Route } from "../../../.react-router/types/app/routes/drink/+types/drinks";
+import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drinks";
 import { fetchApi } from "~/utils/api";
 import type { ApiCollection, Drink, OriginPath, TeaType } from "~t/types";
 import { formatDate, formatISO } from "date-fns";

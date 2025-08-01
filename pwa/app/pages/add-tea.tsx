@@ -1,4 +1,4 @@
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/add-tea";
 import clsx from "clsx";
 import { useFetcher } from "react-router";
 import { Fragment } from "react";
@@ -7,29 +7,6 @@ import { OriginInput } from "~/components/tea/input/OriginInput";
 
 export function meta() {
 	return [{ title: "Teatea - Add" }];
-}
-
-export async function loader() {
-	// const { rows: origins } = await client.query("SELECT * FROM origin ORDER BY path");
-	// const { rows: cultivars } = await client.query(
-	// 	"SELECT cultivar.*, origin.name as origin FROM cultivar " +
-	// 		"LEFT JOIN origin ON cultivar.origin_id = origin.id " +
-	// 		"ORDER BY cultivar.origin_id, cultivar.name",
-	// );
-
-	return {
-		// origins,
-		// cultivars: cultivars.reduce((countries, cultivar) => {
-		// 	if (!countries[cultivar.origin]) {
-		// 		countries[cultivar.origin] = {
-		// 			name: cultivar.origin,
-		// 			cultivars: [],
-		// 		};
-		// 	}
-		// 	countries[cultivar.origin].cultivars.push(cultivar);
-		// 	return countries;
-		// }, {}),
-	};
 }
 
 export async function action({ request }: Route.ActionArgs) {

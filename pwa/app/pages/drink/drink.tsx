@@ -1,4 +1,4 @@
-import type { Route } from "../../../.react-router/types/app/routes/drink/+types/drink";
+import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drink";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
 import type { Drink } from "~t/types";
 import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
