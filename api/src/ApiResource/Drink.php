@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Enum\BrewingTechnic;
@@ -16,16 +17,21 @@ use App\State\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Get(provider: DrinkProvider::class)]
-#[GetCollection(normalizationContext: [
-	"groups" => [
-		"drink:read",
-		"embedded:tea",
-		"embedded:teaType"
-	]
-], security: "is_granted('ROLE_USER')", provider: DrinkProvider::class)]
+#[Get(
+	normalizationContext: ["embedded:brewingStep"],
+	provider: DrinkProvider::class,
+)]
+#[GetCollection(
+	normalizationContext: ["groups" => ["drink:read", "embedded:tea", "embedded:teaType"]],
+	security: "is_granted('ROLE_USER')",
+	provider: DrinkProvider::class,
+)]
 #[Post(denormalizationContext: ["groups" => ["drink:create"]], processor: DrinkCreateProcessor::class)]
-#[Patch(denormalizationContext: ["groups" => ["drink:edit"]], provider: DrinkProvider::class, processor: DrinkEditProcessor::class)]
+#[Patch(
+	denormalizationContext: ["groups" => ["drink:edit"]],
+	provider: DrinkProvider::class,
+	processor: DrinkEditProcessor::class,
+)]
 #[Delete(provider: DrinkProvider::class, processor: DrinkDeleteProcessor::class)]
 class Drink
 {
@@ -56,6 +62,12 @@ class Drink
 	#[Assert\GreaterThan(0)]
 	#[Groups(["drink:create", "drink:edit", "drink:read"])]
 	public ?float $waterMl = null;
+
+	/** @var BrewingStep[] */
+	#[Groups(["drink:edit", "embedded:brewingStep"])]
+	#[ApiProperty(genId: false)]
+	#[Link(toProperty: "drinkId")]
+	public array $brewingSteps = [];
 
 	#[Groups(["drink:create", "drink:read"])]
 	public ?\DateTimeImmutable $drankAt;

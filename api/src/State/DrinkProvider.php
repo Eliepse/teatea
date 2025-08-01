@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\BrewingStep;
 use App\ApiResource\Drink;
 use App\ApiResource\Tea;
 use App\Entity\User;
@@ -74,6 +75,24 @@ readonly class DrinkProvider implements ProviderInterface
 		$resource->teaQuantity = $entity->teaQuantity?->toGrams();
 		$resource->waterMl = $entity->waterVolume?->toMl();
 		$resource->drankAt = $entity->drankAt;
+
+		$brewingSteps = $entity->getBrewingSteps();
+
+		if(0 !== count($brewingSteps)) {
+			$resource->brewingSteps = array_map(
+				function (\App\DTO\BrewingStep $bs, int $i) use ($resource) {
+					$r = new BrewingStep();
+					$r->index = $i;
+					$r->duration = $bs->duration->seconds;
+					$r->temperature = $bs->temperature->degrees;
+					$r->drink = $resource;
+					return $r;
+				},
+				$brewingSteps,
+				range(1, count($brewingSteps)),
+			);
+		}
+
 		$resource->tea = $tea;
 
 		return $resource;
