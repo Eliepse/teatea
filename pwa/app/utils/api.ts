@@ -10,7 +10,7 @@ type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> 
 
 export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise<TResponse<T>> {
 	const startedAt = Date.now();
-	const token = TokenUtils.get();
+	const token = TokenUtils.getRaw();
 	const fetchConfigs: RequestInit = { ...config };
 
 	fetchConfigs.headers = new Headers({

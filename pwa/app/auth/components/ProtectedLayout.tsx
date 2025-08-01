@@ -1,26 +1,21 @@
 import { AuthProvider } from "~/auth/hooks/useAuth";
 import { Outlet, redirect, useNavigate } from "react-router";
-import { isLoggedIn } from "~/auth/auth";
-import { useEffect } from "react";
-import { useToken } from "~/auth/hooks/useToken";
+import { TokenUtils } from "~/auth/hooks/useToken";
 
 export async function clientLoader() {
-	if (false === isLoggedIn()) {
+	if (null === TokenUtils.get()) {
 		throw redirect("/login");
 	}
 }
 
 export default function ProtectedLayout() {
+	const token = TokenUtils.get();
 	const navigate = useNavigate();
-	const [token] = useToken();
 
-	useEffect(() => {
-		if (null !== token) {
-			return;
-		}
-
+	if (null === token) {
 		navigate("/login");
-	}, [token, navigate]);
+		return null;
+	}
 
 	return (
 		<AuthProvider>

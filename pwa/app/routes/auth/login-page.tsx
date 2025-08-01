@@ -1,16 +1,11 @@
-import { redirect, useFetcher, useNavigate } from "react-router";
+import { redirect, useFetcher } from "react-router";
 import type { Route } from "../../../.react-router/types/app/routes/auth/+types/login-page";
-import { wait } from "~/utils/time";
-import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
-import { useAuth } from "~/auth/hooks/useAuth";
-import { isLoggedIn } from "~/auth/auth";
+import { TokenUtils } from "~/auth/hooks/useToken";
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
 	const email = formData.get("email");
 	const password = formData.get("password");
-
-	await wait(500);
 
 	const response = await fetch("/auth", {
 		method: "POST",
@@ -24,15 +19,15 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 	const data = await response.json();
 
 	if (data.token) {
-		LocalStorageUtils.store("token", data.token);
-		return redirect("/welcome");
+		TokenUtils.set(data.token);
+		return data;
 	}
 
 	return null;
 }
 
 export function clientLoader() {
-	if (isLoggedIn()) {
+	if (null !== TokenUtils.get()) {
 		throw redirect("/welcome");
 	}
 }
