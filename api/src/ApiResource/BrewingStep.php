@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 	uriTemplate: "/drinks/{drinkId}/brewing-steps/{id}",
 	uriVariables: [
 		"drinkId" => new Link(fromProperty: "drink", fromClass: Drink::class),
-		"id" => new Link(fromProperty: "index", fromClass: BrewingStep::class),
+		"id" => new Link(fromClass: BrewingStep::class),
 	],
 	provider: BrewingStepProvider::class,
 )]
@@ -32,17 +32,13 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 	uriTemplate: "/drinks/{drinkId}/brewing-steps/{id}",
 	uriVariables: [
 		"drinkId" => new Link(fromProperty: "drink", fromClass: Drink::class),
-		"id" => new Link(fromProperty: "index", fromClass: BrewingStep::class),
+		"id" => new Link(fromClass: BrewingStep::class),
 	],
 	provider: BrewingStepProvider::class,
 	processor: BrewingStepDeleteProcessor::class,
 )]
 class BrewingStep
 {
-	#[GreaterThanOrEqual(1)]
-	#[ApiProperty(readable: false, identifier: true)]
-	public int $index;
-
 	#[ApiProperty(readable: false)]
 	public Drink $drink;
 
@@ -54,8 +50,10 @@ class BrewingStep
 	#[Groups(["embedded:brewingStep"])]
 	public int $duration;
 
-	public function __construct()
-	{
+	public function __construct(
+		#[ApiProperty(readable: false, identifier: true)]
+		public ?int $id = null,
+	) {
 		$this->drink = new Drink();
 	}
 }

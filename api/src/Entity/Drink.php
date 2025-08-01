@@ -53,49 +53,57 @@ class Drink
 
 	/**
 	 * @param BrewingStep $step
-	 * @param int|null $position
 	 *
-	 * @return int Return the position the step has been insterted to
+	 * @return int
 	 */
-	public function addBrewingStep(BrewingStep $step, ?int $position = null): int
+	public function addBrewingStep(BrewingStep $step): int
 	{
-		if (null !== $position && 0 > $position) {
-			throw new \RuntimeException("Cannot insert a brewing step to a zero or negative position");
+		$normalizedStep = ["deg" => $step->temperature->degrees, "sec" => $step->duration->seconds];
+		$lastStep = array_slice($this->brewingSteps ?? [], -1)[0] ?? null;
+
+		// Initiate the array of steps
+		if (null === $lastStep) {
+			$this->brewingSteps = [[...$normalizedStep, "i" => 1]];
+			return 1;
 		}
 
-		$index = min(count($this->brewingSteps ?? []), $position - 1);
+		// Push a new step
+		$i = $lastStep["i"] + 1;
+		$this->brewingSteps[] = [...$normalizedStep, "i" => $i];
 
-		$this->brewingSteps ??= [];
-
-		array_splice(
-			$this->brewingSteps,
-			$index,
-			0,
-			[["deg" => $step->temperature->degrees, "sec" => $step->duration->seconds]],
-		);
-
-		return $index + 1;
+		return $i;
 	}
 
 	/**
-	 * @return array<BrewingStep>
+	 * @return array<int, BrewingStep>
 	 */
-	public function getBrewingSteps(): array
+	public function getBrewingStepsMap(): array
 	{
-		return array_map(
-			fn($step) => new BrewingStep(new Temperature($step["deg"]), new Duration($step["sec"])),
+		return array_reduce(
 			$this->brewingSteps ?? [],
+			function ($map, $step) {
+				$map[$step["i"]] = new BrewingStep(new Temperature($step["deg"]), new Duration($step["sec"]));
+				return $map;
+			},
+			[],
 		);
 	}
 
 	public function removeBrewingStep(int $index): bool
 	{
-		$realIndex = $index - 1;
-		if (false === isset($this->brewingSteps[$realIndex])) {
+		$key = array_find_key($this->brewingSteps, fn($bs) => $index === $bs["i"]);
+
+		if (null === $key) {
 			return false;
 		}
 
-		array_splice($this->brewingSteps, $realIndex, 1);
+		array_splice($this->brewingSteps, $key, 1);
+
+		// Prevent empty array to optimize storage and queries
+		if (0 === count($this->brewingSteps)) {
+			$this->brewingSteps = null;
+		}
+
 		return true;
 	}
 }

@@ -77,20 +77,20 @@ readonly class DrinkProvider implements ProviderInterface
 		$resource->waterMl = $entity->waterVolume?->toMl();
 		$resource->drankAt = $entity->drankAt;
 
-		$brewingSteps = $entity->getBrewingSteps();
+		$brewingSteps = $entity->getBrewingStepsMap();
 
 		if(0 !== count($brewingSteps)) {
 			$resource->brewingSteps = array_map(
 				function (\App\DTO\BrewingStep $bs, int $i) use ($resource) {
 					$r = new BrewingStep();
-					$r->index = $i;
+					$r->id = $i;
 					$r->duration = $bs->duration->seconds;
 					$r->temperature = $bs->temperature->degrees;
 					$r->drink = $resource;
 					return $r;
 				},
 				$brewingSteps,
-				range(1, count($brewingSteps)),
+				array_keys($brewingSteps),
 			);
 		}
 

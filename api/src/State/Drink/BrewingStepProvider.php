@@ -36,14 +36,13 @@ readonly class BrewingStepProvider implements ProviderInterface
 		}
 
 		$id = $uriVariables["id"];
-		$brewingStepDTO = $drink->getBrewingSteps()[$id - 1] ?? null;
+		$brewingStepDTO = $drink->getBrewingStepsMap()[$id] ?? null;
 
 		if (null === $brewingStepDTO) {
 			return null;
 		}
 
-		$resource = new BrewingStep();
-		$resource->index = $id;
+		$resource = new BrewingStep($id);
 		$resource->duration = $brewingStepDTO->duration->seconds;
 		$resource->temperature = $brewingStepDTO->temperature->degrees;
 

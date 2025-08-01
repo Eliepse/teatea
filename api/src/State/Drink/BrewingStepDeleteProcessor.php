@@ -28,7 +28,7 @@ readonly class BrewingStepDeleteProcessor implements ProcessorInterface
 		assert($data instanceof BrewingStep);
 		assert($user instanceof User);
 
-		$drink = $this->em->find(\App\Entity\Drink::class, $data->id);
+		$drink = $this->em->find(\App\Entity\Drink::class, $data->drink->id);
 
 		// Only author can delete
 		assert($drink->drinker->id === $user->id);

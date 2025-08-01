@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\BrewingStep;
 use App\ApiResource\Drink;
 use App\Entity\User;
+use App\Repository\DrinkRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -17,6 +18,7 @@ readonly class BrewingStepCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private DrinkRepository $drinkRepository,
 		private Security $security,
 	) {
 	}
@@ -26,27 +28,35 @@ readonly class BrewingStepCreateProcessor implements ProcessorInterface
 		Operation $operation,
 		array $uriVariables = [],
 		array $context = [],
-	): BrewingStep {
+	): ?BrewingStep {
 		$user = $this->security->getUser();
 
 		assert($data instanceof BrewingStep);
 		assert($user instanceof User);
 
-		$drink = $this->em->find(\App\Entity\Drink::class, $uriVariables["drinkId"]);
+		/** @var \App\Entity\Drink|null $drink */
+		$drink = $this->drinkRepository->createQueryBuilder("drink")
+			->where("drink.drinker = :drinker")->setParameter("drinker", $user)
+			->andWhere("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["drinkId"])
+			->getQuery()->getSingleResult();
 
 		if (null === $drink) {
-			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
+			return null;
 		}
 
-		$data->index = $drink->addBrewingStep(\App\DTO\BrewingStep::fromResource($data), $data->index);
+		$index = $drink->addBrewingStep(\App\DTO\BrewingStep::fromResource($data));
 
 		$this->em->persist($drink);
 		$this->em->flush();
 
-		// Only used to let ApiPlatform generate the uri
-		$data->drink = new Drink();
-		$data->drink->id = $drink->id;
+		$resource = new BrewingStep($index);
+		$resource->temperature = $data->temperature;
+		$resource->duration = $data->duration;
 
-		return $data;
+		// Only used to let ApiPlatform generate the uri
+		$resource->drink = new Drink();
+		$resource->drink->id = $drink->id;
+
+		return $resource;
 	}
 }
