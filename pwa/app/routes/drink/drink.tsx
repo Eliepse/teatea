@@ -14,6 +14,7 @@ import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 import { TrashIcon } from "@heroicons/react/16/solid";
+import { AuthLayout } from "~/layouts/AuthLayout";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<Drink> {
 	const id = parseInt(props.params.id);
@@ -49,8 +50,8 @@ export default function DrinkPage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<div>
-			<header className="p-4">
+		<AuthLayout className="px-4" activeKey="activity">
+			<header className="py-4">
 				<div className="flex">
 					<Link to="/me/drinks" className="block link mb-8">
 						<Arrow direction="left" className="inline size-4 mr-2" />
@@ -93,7 +94,7 @@ export default function DrinkPage(props: Route.ComponentProps) {
 				</div>
 			</header>
 
-			<div className="p-4">
+			<div className="py-4">
 				{!!editableData.note && (
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
@@ -135,6 +136,6 @@ export default function DrinkPage(props: Route.ComponentProps) {
 					</button>
 				</div>
 			</Modal>
-		</div>
+		</AuthLayout>
 	);
 }
