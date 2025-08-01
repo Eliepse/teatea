@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State;
+namespace App\State\Drink;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -10,6 +10,7 @@ use App\ApiResource\Drink;
 use App\ApiResource\Tea;
 use App\Entity\User;
 use App\Repository\OriginRepository;
+use App\State\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 

@@ -8,9 +8,9 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use App\State\BrewingStepCreateProcessor;
-use App\State\BrewingStepDeleteProcessor;
-use App\State\BrewingStepProvider;
+use App\State\Drink\BrewingStepCreateProcessor;
+use App\State\Drink\BrewingStepDeleteProcessor;
+use App\State\Drink\BrewingStepProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 

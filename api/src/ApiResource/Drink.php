@@ -10,10 +10,10 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Enum\BrewingTechnic;
-use App\State\DrinkCreateProcessor;
-use App\State\DrinkDeleteProcessor;
-use App\State\DrinkEditProcessor;
-use App\State\DrinkProvider;
+use App\State\Drink\DrinkCreateProcessor;
+use App\State\Drink\DrinkDeleteProcessor;
+use App\State\Drink\DrinkEditProcessor;
+use App\State\Drink\DrinkProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
