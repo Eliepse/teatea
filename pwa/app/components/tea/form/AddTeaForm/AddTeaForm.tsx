@@ -1,6 +1,5 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { SelectFamily } from "./SelectFamily";
-import { Paged } from "~/components/shared/paged/Paged";
 import type { Origin, TeaFamily } from "~t/types";
 import { SelectOrigin } from "./SelectOrigin";
 import { TeaTypeForm } from "./TeaTypeForm";
@@ -48,7 +47,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 	return await response.json();
 }
 
-export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
+export function AddTeaForm(props: { onClose: () => void }) {
 	const [formValue, setFormValue] = useState<FormValue>({});
 	const { NavigationStack, ...navStack } = useNavigationStack({
 		defaultFrame: { key: "origin" },
@@ -88,31 +87,29 @@ export function AddTeaForm(props: { open: boolean; onClose: () => void }) {
 	return (
 		<NavigationStack>
 			<CONTEXT.Provider value={contextValue}>
-				<Paged open={props.open}>
-					<StackFrame frameKey="origin">
-						<SelectOrigin />
-					</StackFrame>
-					<StackFrame frameKey="family">
-						<SelectFamily />
-					</StackFrame>
-					<StackFrame frameKey="select:type">
-						<SelectType />
-					</StackFrame>
-					<StackFrame frameKey="type:new">
-						<TeaTypeForm />
-					</StackFrame>
-					<StackFrame frameKey="recap">
-						<TeaFormConfirmation />
-					</StackFrame>
-					<StackFrame frameKey="confirmation">
-						<Confirmation
-							state={mutation.status}
-							onBack={props.onClose}
-							onOk={warnNotImplemented}
-							error={mutation.error?.message}
-						/>
-					</StackFrame>
-				</Paged>
+				<StackFrame frameKey="origin">
+					<SelectOrigin />
+				</StackFrame>
+				<StackFrame frameKey="family">
+					<SelectFamily />
+				</StackFrame>
+				<StackFrame frameKey="select:type">
+					<SelectType />
+				</StackFrame>
+				<StackFrame frameKey="type:new">
+					<TeaTypeForm />
+				</StackFrame>
+				<StackFrame frameKey="recap">
+					<TeaFormConfirmation />
+				</StackFrame>
+				<StackFrame frameKey="confirmation">
+					<Confirmation
+						state={mutation.status}
+						onBack={props.onClose}
+						onOk={warnNotImplemented}
+						error={mutation.error?.message}
+					/>
+				</StackFrame>
 			</CONTEXT.Provider>
 		</NavigationStack>
 	);

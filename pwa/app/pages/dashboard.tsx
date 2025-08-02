@@ -24,6 +24,10 @@ export default function Dashboard() {
 				<button className="btn btn-block mt-6">What are you drinking today?</button>
 			</Link>
 
+			<Link to="/tea/new">
+				<button className="btn btn-block mt-6">Add a new tea</button>
+			</Link>
+
 			<button className="btn btn-block mt-6" onClick={() => setAddTeaForm(true)}>
 				Add tea
 			</button>

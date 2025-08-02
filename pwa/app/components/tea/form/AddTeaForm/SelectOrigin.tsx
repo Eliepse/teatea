@@ -1,117 +1,135 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { type Origin } from "~t/types";
 import { useTeaFormContext } from "./AddTeaForm";
-import { Check } from "~/components/icons/Check";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
+import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { handleUIEvent } from "~/utils/function";
+
+function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
+	const parentPathNodes = node.path.slice(0, -1);
+
+	if (0 === parentPathNodes.length) {
+		return undefined;
+	}
+
+	return originMap[parentPathNodes.join(".")] ?? undefined;
+}
 
 export function SelectOrigin() {
 	const { data, isLoading } = useOriginByPath();
 	const context = useTeaFormContext();
 	const navigationStack = useStackNavigator();
-	const { origin: selectedOrigin } = context.formValue;
+	const [selected, setSelected] = useState(context.formValue.origin);
 	const leavesPaths = useMemo(() => {
 		const paths = Object.keys(data ?? {});
-		return paths.filter((key) => {
-			// Doesn't have children if only itself is found
-			return 1 === paths.filter((path) => path.startsWith(key)).length;
-		});
+		return paths.filter((key) => !paths.some((path) => path.startsWith(`${key}.`)));
 	}, [data]);
-	const isLeaf = selectedOrigin ? leavesPaths.includes(selectedOrigin.path.join(".")) : true;
+
+	const isLeaf = selected ? leavesPaths.includes(selected.path.join(".")) : true;
+	const displayedParent = selected ? (isLeaf && data ? getOriginParent(data, selected) : selected) : undefined;
+
 	const originList = useMemo(() => {
-		if (!data) {
-			return [];
-		}
-
-		const selectedPathLength = selectedOrigin?.path?.length ?? 1;
-		const targetedLevel = isLeaf ? selectedPathLength : selectedPathLength + 1;
-		const path = selectedOrigin ? selectedOrigin.path.slice(0, isLeaf ? -1 : undefined).join(".") : null;
-
-		return Object.entries(data)
-			.filter(([key, origin]) => {
-				// Limit to n+1 level
-				if (targetedLevel !== origin.path.length) {
-					return false;
-				}
-
-				return null === path || key.startsWith(path);
-			})
+		const search = displayedParent?.path?.join(".");
+		const level = (displayedParent?.path?.length ?? 0) + 1;
+		return Object.entries(data ?? [])
+			.filter(([k, node]) => node.path.length === level && (undefined === search || k.startsWith(`${search}.`)))
 			.map(([_, o]) => o);
-	}, [data, isLeaf, selectedOrigin?.path]);
+	}, [data, displayedParent]);
 
 	function back() {
-		if (!selectedOrigin || !data) {
+		if (!selected || !data) {
+			navigationStack.back();
 			return;
 		}
 
-		const parentPath = selectedOrigin.path.slice(0, -1).join(".");
+		const parentPath = selected.path.slice(0, -1).join(".");
 		const parent = data[parentPath];
 
 		if (0 === parentPath.length) {
-			context.patchForm({ origin: undefined });
+			setSelected(undefined);
 			return;
 		}
 
 		if (!parent) {
-			context.patchForm({ origin: undefined });
+			setSelected(undefined);
 			console.warn(`Failed to find the parent origin of ${parentPath}`);
 			return;
 		}
 
-		context.patchForm({ origin: parent });
+		setSelected(parent);
 	}
 
 	function changeOrigin(origin: Origin): void {
-		context.patchForm({ origin });
+		setSelected(origin);
 	}
 
 	function confirm() {
+		if (!selected) {
+			console.warn("Can't submit: no origin selected!");
+			return;
+		}
+
+		context.patchForm({ origin: selected });
 		navigationStack.next({ key: "family" });
 	}
 
 	return (
 		<PageLayout
 			title="Where does it come from?"
-			onBack={navigationStack.back}
+			onBack={back}
 			bodyClassName="pb-20"
 			action={
 				<div className="flex justify-center">
-					{selectedOrigin && (
-						<button className="btn rounded-full mr-auto" onClick={back}>
-							Back
-						</button>
-					)}
-
-					{selectedOrigin && (
-						<button className="ml-2 btn btn-primary rounded-full" onClick={confirm}>
-							{selectedOrigin.name}
-							<Check className="size-4 ml-1" />
-						</button>
-					)}
+					<button className="flex-1 btn btn-primary" onClick={confirm} disabled={!selected}>
+						Next
+						<ArrowRightIcon className="size-4" />
+					</button>
 				</div>
 			}
 		>
 			{isLoading && "Loading..."}
 
+			{!isLoading && displayedParent && (
+				<OriginItem
+					label={displayedParent.name}
+					selected={displayedParent === selected}
+					onSelect={() => changeOrigin(displayedParent)}
+				/>
+			)}
+
+			{!isLoading && displayedParent && (
+				<div className="text-xs text-base-content/60 my-4 uppercase">
+					{displayedParent && 1 === displayedParent.path.length && "Regions"}
+					{displayedParent && 2 === displayedParent.path.length && "Localities"}
+				</div>
+			)}
+
 			{originList.map((origin) => (
-				<button
+				<OriginItem
 					key={origin.id}
-					onClick={() => changeOrigin(origin)}
-					className={clsx("mb-2 btn btn-block h-12", selectedOrigin?.id === origin.id && "btn-primary")}
-				>
-					{origin.name}
-					<Chevron
-						direction="right"
-						className={clsx(
-							"size-4 ml-auto",
-							leavesPaths.includes(origin.path.join(".")) && "invisible",
-						)}
-					/>
-				</button>
+					label={origin.name}
+					selected={selected?.id === origin.id}
+					hasChildren={!leavesPaths.includes(origin.path.join("."))}
+					onSelect={() => changeOrigin(origin)}
+				/>
 			))}
 		</PageLayout>
+	);
+}
+
+function OriginItem(props: { label: string; selected: boolean; hasChildren?: boolean; onSelect: () => void }) {
+	return (
+		<button
+			onClick={handleUIEvent(props.onSelect)}
+			className={clsx("mb-2 btn btn-block h-14", props.selected && "btn-primary")}
+		>
+			<span className="mr-auto">{props.label}</span>
+			{props.selected && <CheckIcon className="size-4" />}
+			{props.hasChildren && <Chevron direction="right" className="size-4" />}
+		</button>
 	);
 }
