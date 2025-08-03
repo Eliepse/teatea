@@ -92,7 +92,7 @@ function TeaItem(props: {
 }) {
 	return (
 		<article
-			className={clsx("bg-base-100 px-4 py-3 flex", props.selected && "bg-base-300", props.className)}
+			className={clsx("bg-base-200 px-4 py-3 flex", props.selected && "bg-base-300", props.className)}
 			onClick={props.onSelect}
 		>
 			<div className="flex-1">{props.title}</div>

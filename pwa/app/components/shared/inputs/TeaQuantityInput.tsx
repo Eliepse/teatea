@@ -34,6 +34,7 @@ export function TeaQuantityInput(props: { value: number | null; onChange: (value
 		<div className="join">
 			{PREDEFINED_VALUES.map((val) => (
 				<input
+					key={val}
 					className={clsx("join-item btn flex-1", val === props.value && "btn-primary")}
 					type="radio"
 					name="predefined"

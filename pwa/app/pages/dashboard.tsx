@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
 import { Link } from "react-router";
-import { ActivityGraph } from "~/components/activity/ActivityGraph";
 import { useUser } from "~/auth/hooks/useUser";
-import Arrow from "~/components/icons/arrow";
 import { AuthLayout } from "~/layouts/AuthLayout";
+import { Paged } from "~/components/shared/paged/Paged";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -32,7 +31,9 @@ export default function Dashboard() {
 				Add tea
 			</button>
 
-			<AddTeaForm open={addTeaForm} onClose={() => setAddTeaForm(false)} />
+			<Paged open={addTeaForm}>
+				<AddTeaForm onClose={() => setAddTeaForm(false)} />
+			</Paged>
 		</AuthLayout>
 	);
 }
