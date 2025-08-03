@@ -78,4 +78,19 @@ class Origin
 
 		return $this;
 	}
+
+	public function isCountry(): bool
+	{
+		return 1 === count($this->path->getNodes());
+	}
+
+	public function isRegion(): bool
+	{
+		return 2 === count($this->path->getNodes());
+	}
+
+	public function isLocality(): bool
+	{
+		return 3 === count($this->path->getNodes());
+	}
 }

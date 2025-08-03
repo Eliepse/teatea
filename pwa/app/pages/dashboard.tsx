@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
 import { Link } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { Paged } from "~/components/shared/paged/Paged";
+import { CreateTeaTypeFlow } from "~/components/tea_type/create/CreateTeaTypeFlow";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -11,7 +11,7 @@ export function meta() {
 
 export default function Dashboard() {
 	const [brewForm, setBrewForm] = useState(false);
-	const [addTeaForm, setAddTeaForm] = useState(false);
+	const [teaTypeFlow, setTeaTypeFlow] = useState(false);
 	const [typeFlow, setTypeFlow] = useState(false);
 	const userQuery = useUser();
 
@@ -27,12 +27,12 @@ export default function Dashboard() {
 				<button className="btn btn-block mt-6">Add a new tea</button>
 			</Link>
 
-			<button className="btn btn-block mt-6" onClick={() => setAddTeaForm(true)}>
-				Add tea
+			<button className="btn btn-block mt-6" onClick={() => setTeaTypeFlow(true)}>
+				Add type of tea
 			</button>
 
-			<Paged open={addTeaForm}>
-				<AddTeaForm onClose={() => setAddTeaForm(false)} />
+			<Paged open={teaTypeFlow}>
+				<CreateTeaTypeFlow onClose={() => setTeaTypeFlow(false)} />
 			</Paged>
 		</AuthLayout>
 	);

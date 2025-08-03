@@ -10,6 +10,7 @@ use App\DTO\OriginPath;
 use App\Entity\Origin;
 use App\Entity\User;
 use App\Repository\TeaRepository;
+use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -51,7 +52,20 @@ readonly class TeaProcessor implements ProcessorInterface
 			$typeEntity = new \App\Entity\TeaType();
 			$typeEntity->family = $data->family;
 			$typeEntity->name = trim($data->type->name);
-			$typeEntity->origin = $origin;
+
+			// Only define a precise origin
+			if ($type->isProtectedOrigin || 1 === count($origin->path->getNodes())) {
+				$typeEntity->origin = $origin;
+			} else {
+				$country = $this->em
+					->createQuery("SELECT O FROM App\Entity\Origin O WHERE O.path = :path")
+					->setParameter("path", $origin->path->getNodes()[0])
+					->getResult();
+
+				assert($country instanceof Origin);
+				$typeEntity->origin = $country;
+			}
+
 			$this->em->persist($typeEntity);
 			$this->em->flush();
 

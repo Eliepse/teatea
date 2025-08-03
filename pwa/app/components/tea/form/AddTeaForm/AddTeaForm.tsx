@@ -1,8 +1,7 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { SelectFamily } from "./SelectFamily";
+import { SelectFamily } from "../../../tea_type/create/SelectFamily";
 import type { Origin, TeaFamily } from "~t/types";
-import { SelectOrigin } from "./SelectOrigin";
-import { TeaTypeForm } from "./TeaTypeForm";
+import { SelectOrigin } from "../../../tea_type/create/SelectOrigin";
 import { throwNotImplemented, warnNotImplemented } from "~/utils/function";
 import { fetchApi } from "~/utils/api";
 import { Confirmation } from "./Confirmation";
@@ -25,6 +24,7 @@ type FormValue = {
 	type?: { name: string };
 	origin?: Origin;
 	altitude?: number;
+	appellation?: boolean;
 };
 
 export function useTeaFormContext() {
@@ -39,6 +39,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 			origin: data.origin["@id"],
 			type: data.type,
 			altitude: data.altitude,
+			isAppellation: data.appellation,
 		},
 	});
 
@@ -95,9 +96,6 @@ export function AddTeaForm(props: { onClose: () => void }) {
 				</StackFrame>
 				<StackFrame frameKey="select:type">
 					<SelectType />
-				</StackFrame>
-				<StackFrame frameKey="type:new">
-					<TeaTypeForm />
 				</StackFrame>
 				<StackFrame frameKey="recap">
 					<TeaFormConfirmation />

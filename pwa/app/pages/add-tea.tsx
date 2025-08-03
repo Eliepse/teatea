@@ -1,9 +1,8 @@
-import type { Route } from "./+types/add-tea";
-import clsx from "clsx";
 import { useFetcher } from "react-router";
 import { Fragment } from "react";
 import { TeaTypeInput } from "~/components/tea/input/TeaTypeInput";
 import { OriginInput } from "~/components/tea/input/OriginInput";
+import { Route } from "../../.react-router/types/app/pages/tea/+types/tea-create";
 
 export function meta() {
 	return [{ title: "Teatea - Add" }];

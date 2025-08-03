@@ -5,10 +5,13 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Enum\TeaFamily;
-use App\State\TeaTypeProvider;
+use App\State\TeaType\TeaTypeCreateProcessor;
+use App\State\TeaType\TeaTypeProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(provider: TeaTypeProvider::class)]
 #[GetCollection(paginationEnabled: false, provider: TeaTypeProvider::class, parameters: [
@@ -30,15 +33,21 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 	)
 ])]
+#[Post(security: "is_granted('ROLE_USER')", processor: TeaTypeCreateProcessor::class)]
 class TeaType
 {
-	#[ApiProperty(identifier: true)]
-	public ?int $id = null;
+	#[ApiProperty(writable: false, identifier: true)]
+	public ?int $id;
 
 	public TeaFamily $family;
 
-	#[Groups(["tea:create", "embedded:teaType"])]
+	#[Assert\NotBlank]
+	#[Groups(["embedded:teaType"])]
 	public string $name;
 
+	#[Assert\NotNull]
 	public ?Origin $origin = null;
+
+	#[ApiProperty(readable: false)]
+	public bool $isProtectedOrigin = false;
 }

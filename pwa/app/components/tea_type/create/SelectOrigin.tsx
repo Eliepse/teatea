@@ -1,6 +1,5 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { type Origin } from "~t/types";
-import { useTeaFormContext } from "./AddTeaForm";
 import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
@@ -8,6 +7,7 @@ import { useOriginByPath } from "~/utils/api/useOrigins";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
+import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
 
 function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
 	const parentPathNodes = node.path.slice(0, -1);
@@ -21,7 +21,7 @@ function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Or
 
 export function SelectOrigin() {
 	const { data, isLoading } = useOriginByPath();
-	const context = useTeaFormContext();
+	const context = useTeaTypeFormContext();
 	const navigationStack = useStackNavigator();
 	const [selected, setSelected] = useState(context.formValue.origin);
 	const leavesPaths = useMemo(() => {
@@ -74,7 +74,7 @@ export function SelectOrigin() {
 		}
 
 		context.patchForm({ origin: selected });
-		navigationStack.next({ key: "family" });
+		navigationStack.next({ key: "pdo:ask" });
 	}
 
 	return (

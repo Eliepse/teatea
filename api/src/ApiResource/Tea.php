@@ -15,7 +15,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[Get(provider: TeaProvider::class)]
 #[GetCollection(paginationEnabled: false, provider: TeaProvider::class)]
-#[Post(denormalizationContext: ["groups" => ["tea:create"]], processor: TeaProcessor::class)]
+#[Post(
+	denormalizationContext: ["groups" => ["tea:create"]],
+	security: "is_granted('ROLE_USER')",
+	processor: TeaProcessor::class,
+)]
 class Tea
 {
 	#[ApiProperty(identifier: true)]

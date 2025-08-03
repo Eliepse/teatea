@@ -1,27 +1,27 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { teaFamilies, type TeaFamily } from "~t/types";
-import { useTeaFormContext } from "./AddTeaForm";
 import clsx from "clsx";
 import { Check } from "~/components/icons/Check";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
+import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
 
 export function SelectFamily() {
-	const context = useTeaFormContext();
+	const context = useTeaTypeFormContext();
 	const navigationStack = useStackNavigator();
 	const selectedFamily = context.formValue.family;
 
 	function changeFamily(family: TeaFamily | undefined): void {
-		context.updateForm((form) => ({ ...form, family }));
+		context.patchForm({ family });
 	}
 
 	function confirm() {
-		navigationStack.next({ key: "select:type" });
+		navigationStack.next({ key: "name:ask" });
 	}
 
 	return (
 		<PageLayout
-			title="Which family?"
+			title="Which family is it part of?"
 			onBack={navigationStack.back}
 			action={
 				<div className="flex justify-center">

@@ -8,6 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
