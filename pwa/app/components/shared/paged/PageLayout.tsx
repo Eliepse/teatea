@@ -32,7 +32,7 @@ export function PageLayout(
 				{props.children}
 			</div>
 
-			{props.action && <div className="fixed bottom-4 inset-x-4">{props.action}</div>}
+			{props.action && <div className="p-4 border-t border-gray-200">{props.action}</div>}
 		</div>
 	);
 }
