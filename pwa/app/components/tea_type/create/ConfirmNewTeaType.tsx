@@ -23,7 +23,7 @@ export function ConfirmNewTeaType() {
 			onBack={context.submitting ? false : navigationStack.back}
 			action={
 				<div className="flex justify-center">
-					<button className="flex-1 btn btn-primary" onClick={handleSubmit} disabled={context.submitting}>
+					<button className="ml-auto btn btn-primary" onClick={handleSubmit} disabled={context.submitting}>
 						{context.submitting ? "Saving..." : "Submit a new type"}
 						{!context.submitting && <Check className="size-4 ml-1" />}
 					</button>
@@ -56,7 +56,7 @@ export function ConfirmNewTeaType() {
 			</button>
 
 			<button
-				className="my-4 btn btn-block text-left h-16"
+				className="btn btn-block text-left h-16"
 				onClick={() => navigationStack.next({ key: "name:ask" })}
 			>
 				<div>

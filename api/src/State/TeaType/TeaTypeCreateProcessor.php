@@ -36,6 +36,8 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$entity->isProtectedOrigin = $data->isProtectedOrigin;
 		$entity->origin = $origin;
 
+		throw new \RuntimeException("I'm not ok with that");
+
 		// Only define a precise origin
 
 		$this->em->persist($entity);

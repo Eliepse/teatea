@@ -29,12 +29,12 @@ export function IsProtectedOrigin() {
 			bodyClassName="flex flex-col justify-end"
 		>
 			<div>
-				<button className="btn btn-block h-14 mb-4" onClick={handleUIEvent(no)}>
+				<button className="btn btn-block h-16 mb-4" onClick={handleUIEvent(no)}>
 					<span>No / I don't know</span>
 					<XMarkIcon className="size-4 ml-auto" />
 				</button>
 
-				<button className="btn btn-block h-14 mb-4" onClick={handleUIEvent(yes)}>
+				<button className="btn btn-block h-16 mb-4" onClick={handleUIEvent(yes)}>
 					<span>Yes</span>
 					<CheckIcon className="size-4 ml-auto" />
 				</button>

@@ -36,10 +36,10 @@ export function AskName() {
 		<PageLayout
 			title="How is it called?"
 			onBack={navigationStack.back}
-			bodyClassName="flex flex-col justify-end pb-20"
+			bodyClassName="flex flex-col justify-center"
 			action={
 				<div className="flex justify-center">
-					<button className="flex-1 btn btn-primary" onClick={confirm} disabled={!isNameValid}>
+					<button className="ml-auto btn btn-primary" onClick={confirm} disabled={!isNameValid}>
 						Next
 						<ArrowRightIcon className="size-4" />
 					</button>

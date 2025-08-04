@@ -84,7 +84,7 @@ export function SelectOrigin() {
 			bodyClassName="pb-20"
 			action={
 				<div className="flex justify-center">
-					<button className="flex-1 btn btn-primary" onClick={confirm} disabled={!selected}>
+					<button className="ml-auto btn btn-primary" onClick={confirm} disabled={!selected}>
 						Next
 						<ArrowRightIcon className="size-4" />
 					</button>
