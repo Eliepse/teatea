@@ -31,7 +31,7 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 				<div className="flex justify-center">
 					{props.value && (
 						<button
-							className="ml-2 btn btn-primary rounded-full"
+							className="ml-auto btn btn-primary"
 							onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
 						>
 							Confirm
@@ -40,7 +40,8 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 					)}
 				</div>
 			}
-			bodyClassName="pb-20"
+			bodyClassName="pb-8"
+			withoutPadding
 		>
 			{teasQuery.isLoading && (
 				<>
@@ -60,21 +61,24 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 			{teasQuery.isSuccess &&
 				Object.entries(teasByFamily).map(([key, teas]) => (
 					<Fragment key={key}>
-						<div className="text-xs uppercase text-base-content/60 mb-2 mt-6">
+						<div className="sticky top-0 bg-white px-4 py-2 text-xs uppercase text-base-content/60 mb-2 mt-6 tracking-wide font-semibold">
 							{teaFamilies[key as TeaFamily]}
 						</div>
-						{teas.map((tea) => (
-							<TeaItem
-								key={tea["@id"]}
-								title={tea.displayName}
-								family={tea.family + " tea"}
-								type={tea.type?.name}
-								originPath={tea.originPath}
-								onSelect={() => props.onSelect(tea)}
-								selected={props.value?.["@id"] === tea["@id"]}
-								className="mb-2"
-							/>
-						))}
+						<ul className="px-4">
+							{teas.map((tea) => (
+								<li key={tea["@id"]}>
+									<TeaItem
+										title={tea.displayName}
+										family={tea.family + " tea"}
+										type={tea.type?.name}
+										originPath={tea.originPath}
+										onSelect={() => props.onSelect(tea)}
+										selected={props.value?.["@id"] === tea["@id"]}
+										className="mb-2"
+									/>
+								</li>
+							))}
+						</ul>
 					</Fragment>
 				))}
 		</PageLayout>
@@ -92,7 +96,7 @@ function TeaItem(props: {
 }) {
 	return (
 		<article
-			className={clsx("bg-base-200 px-4 py-3 flex", props.selected && "bg-base-300", props.className)}
+			className={clsx("bg-base-200 rounded px-4 py-3 flex", props.selected && "bg-primary text-white", props.className)}
 			onClick={props.onSelect}
 		>
 			<div className="flex-1">{props.title}</div>
