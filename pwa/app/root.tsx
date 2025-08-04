@@ -2,6 +2,7 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 import type { Route } from "./+types/root";
 import "./app.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AlertContext } from "~/components/shared/modal/AlertManager";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -21,23 +22,27 @@ const queryClient = new QueryClient();
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
-		<head>
-			<meta charSet="utf-8" />
-			<meta name="viewport" content="width=device-width, initial-scale=1" />
-			<Meta />
-			<Links />
-		</head>
-		<body>
-		<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-		<ScrollRestoration />
-		<Scripts />
-		</body>
+			<head>
+				<meta charSet="utf-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
+				<Meta />
+				<Links />
+			</head>
+			<body>
+				<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+				<ScrollRestoration />
+				<Scripts />
+			</body>
 		</html>
 	);
 }
 
 export default function App() {
-	return <Outlet />;
+	return (
+		<AlertContext>
+			<Outlet />
+		</AlertContext>
+	);
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
