@@ -1,6 +1,6 @@
 import { TokenUtils } from "~/auth/hooks/useToken";
-import { wait } from "~/utils/time";
 import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
+import { ApiError } from "~/api/errors/ApiError";
 
 type FetchApiConfig = Omit<RequestInit, "body"> & {
 	payload?: string | number | object | null;
@@ -42,16 +42,8 @@ export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise
 		throw new UnauthenticatedError(response);
 	}
 
-	const duration = Date.now() - startedAt;
-
-	// Debug: Add a fake delay to make sure requests duration
-	// is greater or equal to PUBLIC_API_FAKE_DELAY env
-	if (true === import.meta.env.DEV && !!import.meta.env.PUBLIC_API_FAKE_DELAY) {
-		const fakeDelayMs = parseInt(import.meta.env.PUBLIC_API_FAKE_DELAY);
-
-		if (fakeDelayMs > duration) {
-			await wait(fakeDelayMs - duration);
-		}
+	if (200 > response.status || 300 <= response.status) {
+		throw await ApiError.fromResponse(response);
 	}
 
 	return response;
