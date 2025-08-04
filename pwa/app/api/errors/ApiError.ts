@@ -14,7 +14,7 @@ export class ApiError extends Error {
 	public readonly error?: ErrorPayload;
 
 	constructor(message: string, error?: ErrorPayload) {
-		super();
+		super(message);
 		this.error = error;
 	}
 

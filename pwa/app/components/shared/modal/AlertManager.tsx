@@ -47,7 +47,7 @@ export function AlertContext(props: PropsWithChildren) {
 					<div className="fixed inset-0 z-50">
 						<div className="absolute z-0 bg-gray-950 inset-0 opacity-70" onClick={onBackdropClick}></div>
 						<div className="absolute inset-0 scroll-auto flex items-center justify-center p-2 pointer-events-none">
-							<div className="pointer-events-auto" onClick={(e) => e.stopPropagation()}>{currentAlert}</div>
+							{currentAlert}
 						</div>
 					</div>,
 					document.body,

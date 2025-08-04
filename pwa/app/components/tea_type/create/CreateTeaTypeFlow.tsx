@@ -9,6 +9,8 @@ import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigation
 import { IsProtectedOrigin } from "~/components/tea_type/create/IsProtectedOrigin";
 import { AskName } from "~/components/tea_type/create/AskName";
 import { ConfirmNewTeaType } from "~/components/tea_type/create/ConfirmNewTeaType";
+import { useAlert } from "~/components/shared/modal/AlertManager";
+import { ApiError } from "~/api/errors/ApiError";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -43,11 +45,28 @@ async function submitNewTeaType(data: Required<FormValue>) {
 }
 
 export function CreateTeaTypeFlow(props: { onClose: () => void }) {
+	const alert = useAlert();
 	const [formValue, setFormValue] = useState<FormValue>({});
 
 	const { NavigationStack, ...navStack } = useNavigationStack({
 		defaultFrame: { key: "origin:select" },
 		onOverBack: close,
+	});
+
+	const mutation = useMutation({
+		mutationFn: submitNewTeaType,
+		onSuccess: () => navStack.next({ key: "confirmation" }),
+		onError: (e) => {
+			if (e instanceof ApiError) {
+				alert({
+					title: "Could not submit the type",
+					body: e instanceof ApiError ? e.message : null,
+				});
+				return;
+			}
+
+			alert({ body: "Could not submit the type" });
+		},
 	});
 
 	function close() {
@@ -56,13 +75,6 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 		setFormValue({});
 		props.onClose();
 	}
-
-	const mutation = useMutation({
-		mutationFn: submitNewTeaType,
-		onSuccess: () => {
-			navStack.next({ key: "confirmation" });
-		},
-	});
 
 	const contextValue = useMemo(
 		() => ({

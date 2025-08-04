@@ -4,7 +4,10 @@ import { handleUIEvent } from "~/utils/function";
 
 export function Alert(props: PropsWithChildren<{ title?: string; onClose: () => void }>) {
 	return (
-		<article className="bg-white text-base-content rounded-lg w-full max-w-md">
+		<article
+			className="bg-white text-base-content rounded-lg w-full max-w-md pointer-events-auto"
+			onClick={(e) => e.stopPropagation()}
+		>
 			<header className="relative px-4 pt-3 pb-2">
 				<h2 className="text-sm text-base-content/70 mr-8">{props.title}</h2>
 				<button className="absolute top-0 right-0 p-3" onClick={handleUIEvent(props.onClose)}>
