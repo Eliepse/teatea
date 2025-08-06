@@ -1,9 +1,18 @@
 import { AuthProvider } from "~/auth/hooks/useAuth";
 import { Outlet, redirect, useNavigate } from "react-router";
 import { TokenUtils } from "~/auth/hooks/useToken";
+import { refreshToken } from "~/auth/requests";
 
 export async function clientLoader() {
-	if (null === TokenUtils.get()) {
+	if (null !== TokenUtils.get()) {
+		return;
+	}
+
+	try {
+		await refreshToken();
+		return;
+	} catch (e) {
+		console.error(e);
 		throw redirect("/login");
 	}
 }

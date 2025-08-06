@@ -1,29 +1,18 @@
 import { redirect, useFetcher } from "react-router";
 import type { Route } from "../../../.react-router/types/app/pages/auth/+types/login-page";
 import { TokenUtils } from "~/auth/hooks/useToken";
+import { login } from "~/auth/requests";
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
 	const email = formData.get("email");
 	const password = formData.get("password");
 
-	const response = await fetch("/auth", {
-		method: "POST",
-		body: JSON.stringify({ email, password }),
-		headers: {
-			"Content-Type": "application/ld+json",
-			Accept: "application/ld+json",
-		},
-	});
-
-	const data = await response.json();
-
-	if (data.token) {
-		TokenUtils.set(data.token);
-		return data;
+	if (typeof email !== "string" || typeof password !== "string") {
+		return false;
 	}
 
-	return null;
+	return !!(await login(email, password));
 }
 
 export function clientLoader() {
