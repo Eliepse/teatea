@@ -1,30 +1,27 @@
-FROM node:22-alpine AS base
+FROM node:24-alpine AS base
 WORKDIR /app
-RUN corepack enable pnpm
+RUN addgroup -S www && adduser -S www -G www && \
+	corepack enable pnpm && \
+    corepack install -g pnpm && \
+    pnpm -v
+CMD ["pnpm", "run", "start"]
 
-FROM base AS development-dependencies-env
-COPY . /app
-WORKDIR /app
-RUN pnpm ci
+
 
 FROM base AS dev
-WORKDIR /app
 CMD ["pnpm", "run", "dev"]
 
-FROM base AS production-dependencies-env
-COPY ./package.json package-lock.json /app/
-WORKDIR /app
-RUN pnpm ci --omit=dev
 
-FROM base AS build-env
-COPY . /app/
-COPY --from=development-dependencies-env /app/node_modules /app/node_modules
-WORKDIR /app
-RUN pnpm run build
 
-FROM base
-COPY ./package.json package-lock.json /app/
-COPY --from=production-dependencies-env /app/node_modules /app/node_modules
-COPY --from=build-env /app/build /app/build
-WORKDIR /app
-CMD ["pnpm", "run", "start"]
+FROM base AS prod-build
+COPY --link ./ ./
+RUN pnpm install --frozen-lockfile; \
+    pnpm run build
+
+
+
+FROM base AS prod
+COPY --link --from=prod-build /app/build ./build
+COPY --link --from=prod-build /app/package.json /app/pnpm-lock.yaml ./
+RUN pnpm install --prod --frozen-lockfile
+USER www

@@ -15,6 +15,7 @@
 		"@react-router/serve": "^7.6.3",
 		"@tanstack/react-query": "^5.81.5",
 		"clsx": "^2.1.1",
+		"daisyui": "^5.0.43",
 		"date-fns": "^4.1.0",
 		"dayjs": "^1.11.13",
 		"isbot": "^5.1.28",
@@ -26,7 +27,8 @@
 		"react-day-picker": "^9.7.0",
 		"react-dom": "^19.1.0",
 		"react-robot": "^1.2.0",
-		"react-router": "^7.6.3"
+		"react-router": "^7.6.3",
+		"tailwindcss": "^4.1.11"
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.30.1",
@@ -36,7 +38,6 @@
 		"@types/pg": "^8.15.4",
 		"@types/react": "^19.1.8",
 		"@types/react-dom": "^19.1.6",
-		"daisyui": "^5.0.43",
 		"eslint": "^9.30.1",
 		"eslint-plugin-react": "^7.37.5",
 		"eslint-plugin-react-hooks": "^5.2.0",
@@ -44,7 +45,6 @@
 		"postcss-import": "^16.1.1",
 		"prettier": "3.5.3",
 		"sass-embedded": "^1.89.2",
-		"tailwindcss": "^4.1.11",
 		"typescript": "^5.8.3",
 		"typescript-eslint": "^8.35.1",
 		"vite": "^6.3.5",
