@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { SelectFamily } from "../family/SelectFamily";
-import type { Origin, TeaFamily } from "~t/types";
+import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { throwNotImplemented, warnNotImplemented } from "~/utils/function";
 import { fetchApi } from "~/utils/api";
@@ -8,7 +8,7 @@ import { Confirmation } from "./create/Confirmation";
 import { useMutation } from "@tanstack/react-query";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation";
-import { SelectType } from "~/components/tea/create/SelectType";
+import { SelectType } from "~/components/tea_type/SelectType";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -19,7 +19,7 @@ const CONTEXT = createContext({
 
 type FormValue = {
 	family?: TeaFamily;
-	type?: { name: string };
+	type?: TeaType;
 	origin?: Origin;
 	altitude?: number;
 	appellation?: boolean;
@@ -30,12 +30,12 @@ export function useTeaFormContext() {
 }
 
 async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" | "origin">>) {
-	const response = await fetchApi("/teas", {
+	const response = await fetchApi<Tea>("/teas", {
 		method: "POST",
 		payload: {
 			family: data.family,
 			origin: data.origin["@id"],
-			type: data.type,
+			type: data.type?.["@id"],
 			altitude: data.altitude,
 			isAppellation: data.appellation,
 		},
@@ -104,7 +104,15 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 					/>
 				</StackFrame>
 				<StackFrame frameKey="select:type">
-					<SelectType />
+					<SelectType
+						onBack={() => navStack.back()}
+						onSelect={(type) => {
+							contextValue.patchForm({ type });
+							navStack.next({ key: "recap" });
+						}}
+						defaultValue={formValue.type}
+						filters={{ family: formValue.family, originPath: formValue.origin?.path?.join(".") }}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="recap">
 					<TeaFormConfirmation />

@@ -17,9 +17,10 @@ export type User = Resource & {
 	username: string;
 };
 
-export type TeaType = Resource & {
+export type TeaType = Resource<"TeaType"> & {
+	family: TeaFamily;
 	name: string;
-	path: string;
+	origin: Iri;
 };
 
 export type Cultivar = Resource & {

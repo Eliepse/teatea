@@ -22,16 +22,14 @@ export function TeaFormConfirmation() {
 			title="Is it all good?"
 			onBack={context.submitting ? false : navigationStack.back}
 			action={
-				<div className="flex justify-center">
-					<button
-						className="ml-2 btn btn-primary rounded-full"
-						onClick={handleSubmit}
-						disabled={context.submitting}
-					>
-						{context.submitting ? "Saving..." : "Submit the tea"}
-						{!context.submitting && <Check className="size-4 ml-1" />}
-					</button>
-				</div>
+				<button
+					className="ml-auto btn btn-primary"
+					onClick={handleSubmit}
+					disabled={context.submitting}
+				>
+					{context.submitting ? "Saving..." : "Submit the tea"}
+					{!context.submitting && <Check className="size-4 ml-1" />}
+				</button>
 			}
 		>
 			<button

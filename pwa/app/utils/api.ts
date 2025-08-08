@@ -66,6 +66,14 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 	return response;
 }
 
+export async function postApi<T>(
+	url: string,
+	payload: string | number | object,
+	config?: Omit<FetchApiConfig, "payload" | "method">,
+): Promise<TResponse<T>> {
+	return fetchApi<T>(url, { ...config, method: "POST", payload });
+}
+
 export async function patchApi<T>(
 	url: string,
 	payload: object,
