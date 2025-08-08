@@ -11,7 +11,7 @@ export default defineConfig([
 	tseslint.configs.recommended,
 	pluginReact.configs.flat.recommended,
 	pluginReactHook.configs["recommended-latest"],
-	{ ignores: ["**/*.json", ".react-router/**/*"] },
+	{ ignores: ["**/*.json", ".react-router/**/*", "build/", ".pnpm-store/", "data/"] },
 	{
 		rules: {
 			"react/react-in-jsx-scope": "off",
