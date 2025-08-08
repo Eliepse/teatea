@@ -1,5 +1,6 @@
 .idea
-
-/.env
 /helm/api-platform/charts/*
 !/helm/api-platform/charts/.gitignore
+.env
+compose.override.yaml
+compose.override.yml
