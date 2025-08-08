@@ -45,7 +45,7 @@ services:
       context: ./pwa
       target: dev
     depends_on:
-      - php
+      - api
     volumes:
       - ./pwa:/app
   
