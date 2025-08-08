@@ -22,7 +22,7 @@ export function SelectType(props: {
 	const typesByLevel = useMemo(() => {
 		const origin = props.filters?.originPath;
 
-		if (undefined === origin || !types || props.filters) {
+		if (undefined === origin || !types) {
 			return { country: [], region: [], locality: [] };
 		}
 
