@@ -84,7 +84,14 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 		<NavigationStack>
 			<CONTEXT.Provider value={contextValue}>
 				<StackFrame frameKey="origin:select">
-					<SelectOrigin />
+					<SelectOrigin
+						onBack={() => navStack.back()}
+						onSelect={(origin) => {
+							contextValue.patchForm({ origin });
+							navStack.next({ key: "family:select" });
+						}}
+						defaultValue={formValue.origin}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="family:select">
 					<SelectFamily />

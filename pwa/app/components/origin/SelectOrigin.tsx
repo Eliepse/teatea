@@ -4,10 +4,8 @@ import { useMemo, useState } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
 import { useOriginByPath } from "~/utils/api/useOrigins";
-import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
-import { useTeaTypeFormContext } from "~/components/tea_type/CreateTeaTypeFlow";
 
 function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
 	const parentPathNodes = node.path.slice(0, -1);
@@ -19,11 +17,9 @@ function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Or
 	return originMap[parentPathNodes.join(".")] ?? undefined;
 }
 
-export function SelectOrigin() {
+export function SelectOrigin(props: { onSelect: (value: Origin) => void; onBack: () => void; defaultValue?: Origin }) {
 	const { data, isLoading } = useOriginByPath();
-	const context = useTeaTypeFormContext();
-	const navigationStack = useStackNavigator();
-	const [selected, setSelected] = useState(context.formValue.origin);
+	const [selected, setSelected] = useState(props.defaultValue);
 	const leavesPaths = useMemo(() => {
 		const paths = Object.keys(data ?? {});
 		return paths.filter((key) => !paths.some((path) => path.startsWith(`${key}.`)));
@@ -42,7 +38,7 @@ export function SelectOrigin() {
 
 	function back() {
 		if (!selected || !data) {
-			navigationStack.back();
+			props.onBack();
 			return;
 		}
 
@@ -73,8 +69,7 @@ export function SelectOrigin() {
 			return;
 		}
 
-		context.patchForm({ origin: selected });
-		navigationStack.next({ key: "pdo:ask" });
+		props.onSelect(selected);
 	}
 
 	return (

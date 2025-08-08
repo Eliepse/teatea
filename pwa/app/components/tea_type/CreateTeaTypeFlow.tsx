@@ -97,7 +97,14 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 		<CONTEXT.Provider value={contextValue}>
 			<NavigationStack>
 				<StackFrame frameKey="origin:select">
-					<SelectOrigin />
+					<SelectOrigin
+						onBack={() => navStack.back()}
+						onSelect={(origin) => {
+							contextValue.patchForm({ origin });
+							navStack.next({ key: "pdo:ask" });
+						}}
+						defaultValue={formValue.origin}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="pdo:ask">
 					<IsProtectedOrigin />
