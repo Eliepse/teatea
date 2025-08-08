@@ -15,6 +15,8 @@ import { nl2br } from "~/utils/content";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
 import { TrashIcon } from "@heroicons/react/16/solid";
 import { AuthLayout } from "~/layouts/AuthLayout";
+import Leaf from "~/components/icons/leaf";
+import WaterDrop from "~/components/icons/WaterDrop";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<Drink> {
 	const id = parseInt(props.params.id);
@@ -91,6 +93,18 @@ export default function DrinkPage(props: Route.ComponentProps) {
 							&middot; <FormatOriginPath originPath={drink.tea.originPath} />
 						</span>
 					)}
+				</div>
+
+				<div className="mt-4 grid grid-cols-2 gap-4">
+					<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+						<Leaf className="size-3 text-base-content/40" />
+						<span>{!!drink.teaQuantity && `${drink.teaQuantity} g`}</span>
+					</div>
+
+					<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+						<WaterDrop className="size-3 text-base-content/40" />
+						<span>{!!drink.waterMl && `${drink.waterMl} ml`}</span>
+					</div>
 				</div>
 			</header>
 
