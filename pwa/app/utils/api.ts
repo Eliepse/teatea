@@ -2,16 +2,24 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
 import { ApiError } from "~/api/errors/ApiError";
 
-type FetchApiConfig = Omit<RequestInit, "body"> & {
-	payload?: string | number | object | null;
-};
+type FetchApiConfig =
+	| (Omit<RequestInit, "body" | "method"> & {
+			method: "POST" | "PUT" | "PATCH" | "DELETE";
+			payload?: string | number | object;
+	  })
+	| {
+			method?: "GET";
+			payload?: Record<string, string>;
+	  };
 
 type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> };
 
-export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise<TResponse<T>> {
+export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promise<TResponse<T>> {
 	const startedAt = Date.now();
 	const token = TokenUtils.getRaw();
 	const fetchConfigs: RequestInit = { ...config };
+	const oUrl = new URL(`${import.meta.env.PUBLIC_API_URL}${path}`, window.location.toString());
+	let searchParams = oUrl.searchParams;
 
 	fetchConfigs.headers = new Headers({
 		"Content-Type": "application/ld+json",
@@ -23,14 +31,21 @@ export async function fetchApi<T>(url: string, config?: FetchApiConfig): Promise
 		fetchConfigs.headers.set("Authorization", `Bearer ${token}`);
 	}
 
-	if (undefined !== config?.payload) {
+	if ((undefined === config?.method || "GET" === config?.method) && undefined !== config?.payload) {
+		searchParams = new URLSearchParams([
+			...Array.from(searchParams.entries()),
+			...Object.entries(config.payload).filter(([_, v]) => !!v),
+		]);
+		fetchConfigs.body = undefined;
+	} else if (undefined !== config?.method && undefined !== config?.payload) {
 		fetchConfigs.body = "string" === typeof config.payload ? config.payload : JSON.stringify(config.payload);
 	}
 
+	const url = new URL(`${oUrl.origin}${oUrl.pathname}?${searchParams}`);
 	let response: Response | undefined;
 
 	try {
-		response = await fetch(`${import.meta.env.PUBLIC_API_URL}${url}`, fetchConfigs);
+		response = await fetch(url, fetchConfigs);
 	} catch (e) {
 		console.warn(`Request to ${url} failed`);
 		console.warn(e);
