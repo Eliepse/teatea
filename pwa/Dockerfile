@@ -9,7 +9,7 @@ CMD ["pnpm", "run", "start"]
 
 
 FROM base AS dev
-CMD ["pnpm", "run", "dev"]
+CMD ["pnpm", "run", "dev", "--port=3000"]
 
 
 
