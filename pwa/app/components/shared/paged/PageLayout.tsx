@@ -32,7 +32,7 @@ export function PageLayout(
 				{props.children}
 			</div>
 
-			{props.action && <div className="p-4 border-t border-gray-200">{props.action}</div>}
+			{props.action && <div className="flex p-4 border-t border-gray-200">{props.action}</div>}
 		</div>
 	);
 }
