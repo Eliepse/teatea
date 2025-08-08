@@ -1,11 +1,16 @@
 services:
-  php:
-    image: ${IMAGES_PREFIX:-}app-php
+  api:
+    build:
+      context: ./api
+      target: dev
     depends_on:
       - database
+    env_file:
+      - .env
+      - api/.env.local
     restart: unless-stopped
     environment:
-      PWA_UPSTREAM: pwa:3000
+      PWA_UPSTREAM: ${PWA_UPSTREAM:-pwa:3000}
       SERVER_NAME: ${SERVER_NAME:-localhost:80}, php:80
       MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
@@ -35,6 +40,7 @@ services:
       
   pwa:
     user: "1000:1000"
+    restart: unless-stopped
     build:
       context: ./pwa
       target: dev

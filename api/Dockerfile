@@ -1,11 +1,5 @@
-#syntax=docker/dockerfile:1
-# Adapted from https://github.com/dunglas/symfony-docker
-# Versions
-FROM dunglas/frankenphp:1-php8.4 AS frankenphp_upstream
-
-
 # Base FrankenPHP image
-FROM frankenphp_upstream AS frankenphp_base
+FROM dunglas/frankenphp:1-php8.4  AS base
 
 WORKDIR /app
 VOLUME /data
@@ -28,34 +22,24 @@ COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-en
 COPY --link frankenphp/Caddyfile /etc/caddy/Caddyfile
 
 ENTRYPOINT ["docker-entrypoint"]
-
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile" ]
 
 
 
-
 # Dev FrankenPHP image
-FROM frankenphp_base AS frankenphp_dev
-
+FROM base AS dev
 ENV APP_ENV=dev XDEBUG_MODE=off PHP_IDE_CONFIG="serverName=localhost"
-#VOLUME /app/var/
-
-RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"; \
-	set -eux; install-php-extensions xdebug
-
+RUN install-php-extensions xdebug
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
-
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
 
 
-
 # Prod FrankenPHP image
-FROM frankenphp_base AS frankenphp_prod
+FROM base AS prod
 
-ENV APP_ENV=prod
-ENV FRANKENPHP_CONFIG="import worker.Caddyfile"
+ENV APP_ENV=prod FRANKENPHP_CONFIG="import worker.Caddyfile"
 
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
@@ -64,12 +48,17 @@ COPY --link frankenphp/worker.Caddyfile /etc/caddy/worker.Caddyfile
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link composer.* symfony.* ./
+
+RUN rm -Rf frankenphp/ var/ && \
+    chown www-data:www-data .
+
+USER www-data
+
 RUN set -eux; \
 	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
 
 # copy sources
-COPY --link . ./
-RUN rm -Rf frankenphp/
+COPY --link --chown=www-data . ./
 
 RUN set -eux; \
 	mkdir -p var/cache var/log; \
