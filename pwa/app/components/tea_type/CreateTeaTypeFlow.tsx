@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { SelectFamily } from "./create/SelectFamily";
+import { SelectFamily } from "../family/SelectFamily";
 import type { Origin, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { handleUIEvent, throwNotImplemented, warnNotImplemented } from "~/utils/function";
@@ -110,7 +110,14 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 					<IsProtectedOrigin />
 				</StackFrame>
 				<StackFrame frameKey="family:select">
-					<SelectFamily />
+					<SelectFamily
+						onBack={() => navStack.back()}
+						onSelect={(family) => {
+							contextValue.patchForm({ family });
+							navStack.next({ key: "name:ask" });
+						}}
+						defaultValue={formValue.family}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="name:ask">
 					<AskName />
