@@ -2,15 +2,17 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
 import { ApiError } from "~/api/errors/ApiError";
 
-type FetchApiConfig =
-	| (Omit<RequestInit, "body" | "method"> & {
-			method: "POST" | "PUT" | "PATCH" | "DELETE";
-			payload?: string | number | object;
-	  })
-	| {
-			method?: "GET";
-			payload?: Record<string, string>;
-	  };
+type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
+	(
+		| {
+				method: "POST" | "PUT" | "PATCH" | "DELETE";
+				payload?: string | number | object;
+		  }
+		| {
+				method?: "GET";
+				payload?: Record<string, string>;
+		  }
+	);
 
 type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> };
 

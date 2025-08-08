@@ -1,4 +1,4 @@
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/refs";
 
 export function meta({}: Route.MetaArgs) {
   return [{ title: "Teatea - Refs" }];
