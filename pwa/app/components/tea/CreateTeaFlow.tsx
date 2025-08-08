@@ -1,19 +1,17 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import { SelectFamily } from "../../../tea_type/create/SelectFamily";
+import { SelectFamily } from "../tea_type/create/SelectFamily";
 import type { Origin, TeaFamily } from "~t/types";
-import { SelectOrigin } from "../../../tea_type/create/SelectOrigin";
+import { SelectOrigin } from "../origin/SelectOrigin";
 import { throwNotImplemented, warnNotImplemented } from "~/utils/function";
 import { fetchApi } from "~/utils/api";
-import { Confirmation } from "./Confirmation";
+import { Confirmation } from "./create/Confirmation";
 import { useMutation } from "@tanstack/react-query";
-import { wait } from "~/utils/time";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
-import { TeaFormConfirmation } from "~/components/tea/form/AddTeaForm/TeaFormConfirmation";
-import { SelectType } from "~/components/tea/form/AddTeaForm/SelectType";
+import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation";
+import { SelectType } from "~/components/tea/create/SelectType";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
-	updateForm: (_updater: (previous: FormValue) => FormValue) => warnNotImplemented(),
 	patchForm: (_part: Partial<FormValue>) => warnNotImplemented(),
 	submit: async (): Promise<unknown> => throwNotImplemented(),
 	submitting: false,
@@ -43,15 +41,13 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 		},
 	});
 
-	await wait(1000);
-
 	return await response.json();
 }
 
-export function AddTeaForm(props: { onClose: () => void }) {
+export function CreateTeaFlow(props: { onClose: () => void }) {
 	const [formValue, setFormValue] = useState<FormValue>({});
 	const { NavigationStack, ...navStack } = useNavigationStack({
-		defaultFrame: { key: "origin" },
+		defaultFrame: { key: "origin:select" },
 		onOverBack: () => {
 			mutation.reset();
 			navStack.reset();
@@ -61,7 +57,7 @@ export function AddTeaForm(props: { onClose: () => void }) {
 	});
 	const mutation = useMutation({
 		mutationFn: submitNewTea,
-		onSuccess: (data: { id: number }) => {
+		onSuccess: () => {
 			navStack.next({ key: "confirmation" });
 		},
 	});
@@ -69,7 +65,6 @@ export function AddTeaForm(props: { onClose: () => void }) {
 	const contextValue = useMemo(
 		() => ({
 			formValue,
-			updateForm: (updater: (previous: FormValue) => FormValue) => setFormValue(updater),
 			patchForm: (part: Partial<FormValue>) => setFormValue((form) => ({ ...form, ...part })),
 			submit: async () => {
 				// Make sure minimum info are filled in
@@ -78,7 +73,7 @@ export function AddTeaForm(props: { onClose: () => void }) {
 				}
 
 				// Submit to the API
-				mutation.mutate(formValue);
+				mutation.mutate(formValue as FormValue & Required<Pick<FormValue, "family" | "origin">>);
 			},
 			submitting: "pending" === mutation.status,
 		}),
@@ -88,10 +83,10 @@ export function AddTeaForm(props: { onClose: () => void }) {
 	return (
 		<NavigationStack>
 			<CONTEXT.Provider value={contextValue}>
-				<StackFrame frameKey="origin">
+				<StackFrame frameKey="origin:select">
 					<SelectOrigin />
 				</StackFrame>
-				<StackFrame frameKey="family">
+				<StackFrame frameKey="family:select">
 					<SelectFamily />
 				</StackFrame>
 				<StackFrame frameKey="select:type">

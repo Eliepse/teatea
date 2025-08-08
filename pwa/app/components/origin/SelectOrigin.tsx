@@ -7,7 +7,7 @@ import { useOriginByPath } from "~/utils/api/useOrigins";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
-import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
+import { useTeaTypeFormContext } from "~/components/tea_type/CreateTeaTypeFlow";
 
 function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
 	const parentPathNodes = node.path.slice(0, -1);

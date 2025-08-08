@@ -5,7 +5,7 @@ import { useOriginByPath } from "~/utils/api/useOrigins";
 import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
-import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
+import { useTeaTypeFormContext } from "~/components/tea_type/CreateTeaTypeFlow";
 
 export function ConfirmNewTeaType() {
 	const context = useTeaTypeFormContext();

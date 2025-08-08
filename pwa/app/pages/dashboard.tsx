@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { Paged } from "~/components/shared/paged/Paged";
-import { CreateTeaTypeFlow } from "~/components/tea_type/create/CreateTeaTypeFlow";
+import { CreateTeaTypeFlow } from "~/components/tea_type/CreateTeaTypeFlow";
 
 export function meta() {
 	return [{ title: "Teatea" }];

@@ -2,7 +2,7 @@ import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
+import { useTeaTypeFormContext } from "~/components/tea_type/CreateTeaTypeFlow";
 
 /**
  * @see https://en.wikipedia.org/wiki/Protected_designation_of_origin

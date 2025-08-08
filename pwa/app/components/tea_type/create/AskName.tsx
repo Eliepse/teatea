@@ -1,7 +1,7 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { type ChangeEvent, useState } from "react";
-import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
+import { useTeaTypeFormContext } from "~/components/tea_type/CreateTeaTypeFlow";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
 /**

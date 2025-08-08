@@ -1,5 +1,7 @@
-import { AddTeaForm } from "~/components/tea/form/AddTeaForm/AddTeaForm";
+import { CreateTeaFlow } from "~/components/tea/CreateTeaFlow";
+import { useNavigate } from "react-router";
 
 export default function TeaCreatePage() {
-	return <AddTeaForm onClose={console.debug} />;
+	const navigate = useNavigate();
+	return <CreateTeaFlow onClose={() => navigate(-1)} />;
 }

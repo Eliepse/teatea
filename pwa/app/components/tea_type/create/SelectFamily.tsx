@@ -3,7 +3,7 @@ import { teaFamilies, type TeaFamily } from "~t/types";
 import clsx from "clsx";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
-import { useTeaTypeFormContext } from "~/components/tea_type/create/CreateTeaTypeFlow";
+import { useTeaTypeFormContext } from "~/components/tea_type/CreateTeaTypeFlow";
 
 export function SelectFamily() {
 	const context = useTeaTypeFormContext();
