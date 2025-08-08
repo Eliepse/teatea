@@ -8,6 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Origin;
 use App\ApiResource\TeaType;
 use App\Enum\TeaFamily;
+use App\State\OriginProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
 
@@ -26,21 +27,24 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$filters = $context["filters"] ?? [];
 		$isCollection = $operation instanceof CollectionOperationInterface;
 
+		$expr = $this->em->getExpressionBuilder();
 		$teaQb = $this->em->createQueryBuilder()
-			->select("type")
-			->from(\App\Entity\TeaType::class, "type");
-
-		if (false === empty($originFilter = $filters["origin"] ?? null)) {
-			$teaQb->innerJoin("type.origin", "origin")
-				->innerJoin(\App\Entity\Origin::class, "sourceOrigin", Join::WITH, "sourceOrigin.id = :originId")
-				->andWhere("CONTAINS(sourceOrigin.path, origin.path) = TRUE")
-				->setParameter("originId", $originFilter);
-		}
+			->select("type", "origin")
+			->from(\App\Entity\TeaType::class, "type")
+			->leftJoin("type.origin", "origin");
 
 		if (false === empty($originPathFilter = $filters["originPath"] ?? null)) {
-			$teaQb->innerJoin("type.origin", "origin")
-				->andWhere("CONTAINS(:originPath, origin.path) = TRUE")
-				->setParameter("originPath", $originPathFilter);
+			// We must get all types with PDO that are included in the given origin
+			// + we must get all other types that are not PDO at the country level
+			$teaQb->innerJoin("type.origin", "originFilter")
+				->andWhere($expr->orX(
+					// Match protected origin types if their origin is a descendants
+					"CONTAINS(:originPath, originFilter.path) = TRUE AND type.isProtectedOrigin = TRUE",
+					// Match all non protected types in the same country
+					"CONTAINS(:countryPath, originFilter.path) = TRUE AND type.isProtectedOrigin = FALSE",
+				))
+				->setParameter("originPath", $originPathFilter)
+				->setParameter("countryPath", array_slice(explode(".", $originPathFilter), 0, 1));
 		}
 
 		if (false === empty($familyFilter = $filters["family"] ?? null)) {
@@ -70,14 +74,13 @@ readonly class TeaTypeProvider implements ProviderInterface
 			return null;
 		}
 
-		$origin = new Origin();
-		$origin->id = $type->origin->id;
-
 		$resource = new TeaType();
 		$resource->id = $type->getId();
 		$resource->name = $type->name;
 		$resource->family = $type->family;
-		$resource->origin = $origin;
+		$resource->origin = OriginProvider::fromEntity($type->origin);
+		$resource->isProtectedOrigin = $type->isProtectedOrigin;
+
 		return $resource;
 	}
 }

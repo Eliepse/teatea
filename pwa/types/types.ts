@@ -20,7 +20,8 @@ export type User = Resource & {
 export type TeaType = Resource<"TeaType"> & {
 	family: TeaFamily;
 	name: string;
-	origin: Iri;
+	origin: Pick<Origin, "@id" | "@type" | "path">;
+	isPDO: boolean;
 };
 
 export type Cultivar = Resource & {
