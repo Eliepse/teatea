@@ -40,8 +40,8 @@ class TeaType
 	public bool $isProtectedOrigin = false;
 
 	#[ORM\ManyToOne(targetEntity: User::class)]
-	#[ORM\JoinColumn("created_by")]
-	public ?User $createdBy = null;
+	#[ORM\JoinColumn("created_by", nullable: false)]
+	public User $createdBy;
 
 	#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => "NOW()"])]
 	public \DateTimeImmutable $createdAt;
