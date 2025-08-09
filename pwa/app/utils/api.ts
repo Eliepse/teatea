@@ -1,6 +1,7 @@
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
 import { ApiError } from "~/api/errors/ApiError";
+import { refreshToken } from "~/auth/requests";
 
 type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
 	(
@@ -18,7 +19,6 @@ type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> 
 
 export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promise<TResponse<T>> {
 	const startedAt = Date.now();
-	const token = TokenUtils.getRaw();
 	const fetchConfigs: RequestInit = { ...config };
 	const oUrl = new URL(`${import.meta.env.PUBLIC_API_URL}${path}`, window.location.toString());
 	let searchParams = oUrl.searchParams;
@@ -28,6 +28,13 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 		Accept: "application/ld+json",
 		...config?.headers,
 	});
+
+	let token = TokenUtils.getRaw();
+
+	if(null === TokenUtils.get()) {
+		await refreshToken();
+		token = TokenUtils.getRaw();
+	}
 
 	if (null !== token) {
 		fetchConfigs.headers.set("Authorization", `Bearer ${token}`);
