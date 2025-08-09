@@ -32,7 +32,7 @@ class Tea
 	public ?TeaType $type = null;
 
 	#[ApiProperty(genId: false)]
-	#[Groups(["embedded:tea"])]
+	#[Groups(["embedded:tea", "embedded:originPath"])]
 	public ?OriginPath $originPath = null;
 
 	#[Groups(["tea:create"])]

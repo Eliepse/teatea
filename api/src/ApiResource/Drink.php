@@ -18,11 +18,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(
-	normalizationContext: ["embedded:brewingStep"],
+	normalizationContext: ["embedded:brewingStep", "embedded:originPath"],
 	provider: DrinkProvider::class,
 )]
 #[GetCollection(
-	normalizationContext: ["groups" => ["drink:read", "embedded:tea", "embedded:teaType"]],
+	normalizationContext: ["groups" => ["drink:read", "embedded:tea", "embedded:teaType", "embedded:originPath"]],
 	security: "is_granted('ROLE_USER')",
 	provider: DrinkProvider::class,
 )]
