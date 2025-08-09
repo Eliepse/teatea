@@ -28,17 +28,14 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 			title="Select a tea"
 			onBack={navStack.back}
 			action={
-				<div className="flex justify-center">
-					{props.value && (
-						<button
-							className="ml-auto btn btn-primary"
-							onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
-						>
-							Confirm
-							<Arrow direction="right" className="size-4 ml-1" />
-						</button>
-					)}
-				</div>
+				<button
+					className="ml-auto btn btn-primary"
+					onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
+					disabled={!props.value}
+				>
+					Confirm
+					<Arrow direction="right" className="size-4 ml-1" />
+				</button>
 			}
 			bodyClassName="pb-8"
 			withoutPadding
@@ -96,7 +93,11 @@ function TeaItem(props: {
 }) {
 	return (
 		<article
-			className={clsx("bg-base-200 rounded px-4 py-3 flex", props.selected && "bg-primary text-white", props.className)}
+			className={clsx(
+				"bg-base-200 rounded px-4 py-3 flex items-center",
+				props.selected && "bg-primary text-white",
+				props.className,
+			)}
 			onClick={props.onSelect}
 		>
 			<div className="flex-1">{props.title}</div>
