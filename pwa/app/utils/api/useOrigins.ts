@@ -1,4 +1,4 @@
-import type { ApiCollection, Origin } from "~t/types";
+import type { ApiCollection, Iri, Origin } from "~t/types";
 import { fetchApi } from "~/utils/api";
 import { type QueryFunctionContext, useQuery } from "@tanstack/react-query";
 
@@ -16,5 +16,19 @@ export function useOriginByPath(filters?: Filters) {
 	return useQuery({
 		queryFn: fetchOriginsKeyByPath,
 		queryKey: ["origins", "keyByPath", filters],
+	});
+}
+
+export function useOrigin(id: Iri | number | null | undefined) {
+	const key = typeof id === "string" ? parseInt(id.split("/").slice(-1)[0]) : id;
+	return useQuery({
+		queryFn: async () => {
+			if (!key) {
+				return null;
+			}
+
+			return await (await fetchApi<Origin>(`/origins/${key}`)).json();
+		},
+		queryKey: ["origins", key],
 	});
 }

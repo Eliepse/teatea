@@ -7,7 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Drink;
 use App\Entity\Tea;
 use App\Repository\OriginRepository;
-use App\State\TeaProvider;
+use App\State\Tea\TeaProvider;
 use App\ValueObject\Volume;
 use App\ValueObject\Weight;
 use Doctrine\ORM\EntityManagerInterface;

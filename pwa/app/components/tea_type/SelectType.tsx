@@ -18,6 +18,8 @@ export function SelectType(props: {
 	const { data: types, isLoading } = useTeaTypes(props.filters);
 	const [selected, setSelected] = useState(props.defaultValue);
 
+	const hasTypes = !isLoading && 0 < (types?.member?.length ?? 0);
+
 	// Group by levels to display same country, same region, same locality
 	const typesByLevel = useMemo(() => {
 		const origin = props.filters?.originPath;
@@ -70,13 +72,15 @@ export function SelectType(props: {
 				<button
 					className={clsx("ml-auto btn", !selected ? "btn-outline" : "btn-primary")}
 					onClick={handleUIEvent(confirm)}
+					disabled={isLoading}
 				>
-					{selected ? "Next" : "I don't find it"}
+					{!hasTypes || selected ? "Next" : "I don't find it"}
 					<Arrow direction="right" className="size-4 ml-1" />
 				</button>
 			}
 		>
 			{isLoading && "Loading..."}
+			{!hasTypes && <p className="py-4 text-center italic text-base-content/60">No types found</p>}
 
 			{!props.filters?.originPath &&
 				types?.member?.map((type) => (
@@ -87,21 +91,6 @@ export function SelectType(props: {
 						selected={selected?.id === type.id}
 					/>
 				))}
-
-			{props.filters?.originPath && 0 < typesByLevel.locality.length && (
-				<div className="mb-8">
-					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same locality</div>
-					{typesByLevel.locality.map((type) => (
-						<TypeItem
-							key={type.id}
-							label={type.name}
-							onClick={() => toggleType(type)}
-							selected={selected?.id === type.id}
-							isPDO={type.isPDO}
-						/>
-					))}
-				</div>
-			)}
 
 			{props.filters?.originPath && 0 < typesByLevel.region.length && (
 				<div className="mb-8">
@@ -122,6 +111,21 @@ export function SelectType(props: {
 				<div className="mb-8">
 					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same country</div>
 					{typesByLevel.country.map((type) => (
+						<TypeItem
+							key={type.id}
+							label={type.name}
+							onClick={() => toggleType(type)}
+							selected={selected?.id === type.id}
+							isPDO={type.isPDO}
+						/>
+					))}
+				</div>
+			)}
+
+			{props.filters?.originPath && 0 < typesByLevel.locality.length && (
+				<div className="mb-8">
+					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same locality</div>
+					{typesByLevel.locality.map((type) => (
 						<TypeItem
 							key={type.id}
 							label={type.name}

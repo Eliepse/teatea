@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Tea;
-use App\Enum\TeaFamily;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -17,16 +16,16 @@ class TeaRepository extends ServiceEntityRepository
 		parent::__construct($registry, Tea::class);
 	}
 
-	public function hasDuplicate(TeaFamily $family, int $originId, ?int $typeId): bool
+	public function hasDuplicate(Tea $tea): bool
 	{
 		$qb = $this->createQueryBuilder("tea")
 			->select("count(tea)")
-			->where("tea.family = :family")->setParameter("family", $family)
-			->andWhere("tea.origin = :origin")->setParameter("origin", $originId)
+			->where("tea.family = :family")->setParameter("family", $tea->family)
+			->andWhere("tea.origin = :origin")->setParameter("origin", $tea->origin)
 			->andWhere("tea.type = :type");
 
-		if (null !== $typeId) {
-			$qb->andWhere("tea.type = :type")->setParameter("type", $typeId);
+		if (null !== $tea->type) {
+			$qb->andWhere("tea.type = :type")->setParameter("type", $tea->type);
 		} else {
 			$qb->andWhere("tea.type IS NULL");
 		}

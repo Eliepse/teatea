@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State;
+namespace App\State\Tea;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;

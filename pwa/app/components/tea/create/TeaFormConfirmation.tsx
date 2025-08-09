@@ -2,45 +2,43 @@ import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useTeaFormContext } from "../../tea/CreateTeaFlow";
 import { Check } from "~/components/icons/Check";
 import Chevron from "~/components/icons/chevron";
-import { useOriginByPath } from "~/utils/api/useOrigins";
 import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
 
-export function TeaFormConfirmation() {
-	const context = useTeaFormContext();
+export function TeaFormConfirmation(props: {
+	values: ReturnType<typeof useTeaFormContext>["formValue"];
+	onConfirm: () => void;
+	onBack: () => void;
+}) {
+	const ctx = useTeaFormContext();
 	const navigationStack = useStackNavigator();
-	const origins = useOriginByPath();
-	const values = context.formValue;
-
-	function handleSubmit() {
-		void context.submit();
-	}
+	const isExistingType = props.values.type && "@id" in props.values.type;
 
 	return (
 		<PageLayout
 			title="Is it all good?"
-			onBack={context.submitting ? false : navigationStack.back}
+			onBack={props.onBack}
 			action={
 				<button
 					className="ml-auto btn btn-primary"
-					onClick={handleSubmit}
-					disabled={context.submitting}
+					onClick={handleUIEvent(props.onConfirm)}
+					disabled={ctx.submitting}
 				>
-					{context.submitting ? "Saving..." : "Submit the tea"}
-					{!context.submitting && <Check className="size-4 ml-1" />}
+					{ctx.submitting ? "Saving..." : "Submit the tea"}
+					<Check className="size-4 ml-1" />
 				</button>
 			}
 		>
 			<button
 				className="my-4 btn btn-block text-left h-16"
-				onClick={handleUIEvent(() => navigationStack.next({ key: "origin" }))}
+				onClick={handleUIEvent(() => navigationStack.next({ key: "origin:select" }))}
 			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Origin</div>
 					<div>
-						{!values.origin && "Not set"}
-						{values.origin && origins.data && origins.data[values.origin.path.join(".")]?.name}
+						{!props.values.origin && "Not set"}
+						{props.values.origin?.name}
 					</div>
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
@@ -48,22 +46,22 @@ export function TeaFormConfirmation() {
 
 			<button
 				className="mb-4 btn btn-block text-left h-16"
-				onClick={handleUIEvent(() => navigationStack.next({ key: "family" }))}
+				onClick={handleUIEvent(() => navigationStack.next({ key: "family:select" }))}
 			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Type</div>
-					<div>{values.family ? teaFamilies[values.family] : "Not set"}</div>
+					<div>{props.values.family ? teaFamilies[props.values.family] : "Not set"}</div>
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
 
 			<button
 				className="my-4 btn btn-block text-left h-16"
-				onClick={() => navigationStack.next({ key: "origin" })}
+				onClick={() => navigationStack.next({ key: isExistingType ? "type:select" : "name:ask" })}
 			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Type</div>
-					<div>{context.formValue.type ? context.formValue.type.name : "Not set"}</div>
+					<div>{props.values.type ? props.values.type.name : "Not set"}</div>
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>

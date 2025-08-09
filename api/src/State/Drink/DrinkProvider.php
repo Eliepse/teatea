@@ -10,7 +10,7 @@ use App\ApiResource\Drink;
 use App\ApiResource\Tea;
 use App\Entity\User;
 use App\Repository\OriginRepository;
-use App\State\TeaProvider;
+use App\State\Tea\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 

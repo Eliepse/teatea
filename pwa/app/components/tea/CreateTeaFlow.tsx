@@ -9,17 +9,17 @@ import { useMutation } from "@tanstack/react-query";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation";
 import { SelectType } from "~/components/tea_type/SelectType";
+import { AskName } from "~/components/tea/create/AskName";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
 	patchForm: (_part: Partial<FormValue>) => warnNotImplemented(),
-	submit: async (): Promise<unknown> => throwNotImplemented(),
 	submitting: false,
 });
 
 type FormValue = {
 	family?: TeaFamily;
-	type?: TeaType;
+	type?: TeaType | { name: string };
 	origin?: Origin;
 	altitude?: number;
 	appellation?: boolean;
@@ -30,12 +30,14 @@ export function useTeaFormContext() {
 }
 
 async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" | "origin">>) {
-	const response = await fetchApi<Tea>("/teas", {
+	const path = data.type && "id" in data.type ? `/tea_types/${data.type.id}/teas` : "/teas";
+
+	const response = await fetchApi<Tea>(path, {
 		method: "POST",
 		payload: {
 			family: data.family,
 			origin: data.origin["@id"],
-			type: data.type?.["@id"],
+			type: !data.type || "id" in data.type ? undefined : data.type,
 			altitude: data.altitude,
 			isAppellation: data.appellation,
 		},
@@ -55,6 +57,7 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 			props.onClose();
 		},
 	});
+
 	const mutation = useMutation({
 		mutationFn: submitNewTea,
 		onSuccess: () => {
@@ -62,19 +65,20 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 		},
 	});
 
+	function submit() {
+		// Make sure minimum info are filled in
+		if (!formValue.origin || !formValue.family) {
+			throw new Error("Incomplete form");
+		}
+
+		// Submit to the API
+		mutation.mutate(formValue as FormValue & Required<Pick<FormValue, "family" | "origin">>);
+	}
+
 	const contextValue = useMemo(
 		() => ({
 			formValue,
 			patchForm: (part: Partial<FormValue>) => setFormValue((form) => ({ ...form, ...part })),
-			submit: async () => {
-				// Make sure minimum info are filled in
-				if (!formValue.origin || !formValue.family) {
-					throw new Error("Incomplete form");
-				}
-
-				// Submit to the API
-				mutation.mutate(formValue as FormValue & Required<Pick<FormValue, "family" | "origin">>);
-			},
 			submitting: "pending" === mutation.status,
 		}),
 		[formValue, mutation.status, navStack],
@@ -107,15 +111,37 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 					<SelectType
 						onBack={() => navStack.back()}
 						onSelect={(type) => {
-							contextValue.patchForm({ type });
-							navStack.next({ key: "recap" });
+							if (undefined === type) {
+								if (formValue.type && "@id" in formValue.type) {
+									contextValue.patchForm({ type: undefined });
+								}
+
+								navStack.next({ key: "name:ask" });
+							} else {
+								contextValue.patchForm({ type });
+								navStack.next({ key: "recap" });
+							}
 						}}
-						defaultValue={formValue.type}
+						defaultValue={formValue.type && "id" in formValue.type ? formValue.type : undefined}
 						filters={{ family: formValue.family, originPath: formValue.origin?.path?.join(".") }}
 					/>
 				</StackFrame>
+				<StackFrame frameKey="name:ask">
+					<AskName
+						onBack={() => navStack.back()}
+						onConfirm={(name) => {
+							contextValue.patchForm({ type: { name } });
+							navStack.next({ key: "recap" });
+						}}
+						defaultValue={formValue.type?.name}
+					/>
+				</StackFrame>
 				<StackFrame frameKey="recap">
-					<TeaFormConfirmation />
+					<TeaFormConfirmation
+						onBack={() => navStack.back()}
+						values={formValue}
+						onConfirm={submit}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="confirmation">
 					<Confirmation

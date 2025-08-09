@@ -35,13 +35,13 @@ class TeaType
 {
 	#[Groups(["read:origin"])]
 	#[ApiProperty(writable: false, identifier: true)]
-	public ?int $id;
+	public ?int $id = null;
 
 	#[Groups(["read:origin"])]
 	public TeaFamily $family;
 
 	#[Assert\NotBlank]
-	#[Groups(["embedded:teaType", "read:origin"])]
+	#[Groups(["embedded:teaType", "read:origin", "tea:create"])]
 	public string $name;
 
 	#[Assert\NotNull]
@@ -49,6 +49,7 @@ class TeaType
 	public ?Origin $origin = null;
 
 	#[ApiProperty]
+	#[Groups(["tea:create"])]
 	public bool $isProtectedOrigin = false;
 
 	#[Groups(["read:origin"])]
