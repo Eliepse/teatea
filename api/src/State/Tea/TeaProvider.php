@@ -8,6 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\State\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -89,10 +90,10 @@ readonly class TeaProvider implements ProviderInterface
 
 		for ($i = 1; $i < count($nodes); $i++) {
 			$path = join(".", array_slice($nodes, 0, $i));
-			$originNodes[] = $originsMap[$path];
+			$originNodes[] = OriginProvider::fromEntity($originsMap[$path]);
 		}
 
-		$originNodes[] = $leaf;
+		$originNodes[] = OriginProvider::fromEntity($leaf);
 
 		return OriginPath::fromNodes($originNodes);
 	}

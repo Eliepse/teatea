@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-use App\Entity\Origin;
+use App\ApiResource\Origin;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 readonly class OriginPath

@@ -19,6 +19,7 @@ class Origin
 	#[ApiProperty(genId: false)]
 	public LTreePath $path;
 
+	#[Groups("embedded:originPath")]
 	public string $name;
 
 	#[Groups(["embedded:origin"])]
