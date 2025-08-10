@@ -31,6 +31,7 @@ export type Cultivar = Resource & {
 export type Origin = Resource & {
 	name: string;
 	path: LTreePath;
+	isPDO: boolean;
 };
 
 export type OriginPath = {

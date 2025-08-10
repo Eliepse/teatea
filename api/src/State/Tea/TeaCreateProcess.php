@@ -22,7 +22,6 @@ readonly class TeaCreateProcess implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private TeaRepository $repository,
 		private Security $security,
 	) {
 	}
@@ -57,7 +56,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		$typeEntity->family = $data->family;
 		$typeEntity->name = trim($data->type->name);
 		$typeEntity->origin = $origin;
-		$typeEntity->isProtectedOrigin = $data->type->isProtectedOrigin;
+		$typeEntity->isProtectedOrigin = $data->type->isPDO;
 		$typeEntity->createdBy = $user;
 		$this->em->persist($typeEntity);
 

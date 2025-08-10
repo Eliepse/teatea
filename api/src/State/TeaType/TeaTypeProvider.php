@@ -79,7 +79,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$resource->name = $type->name;
 		$resource->family = $type->family;
 		$resource->origin = OriginProvider::fromEntity($type->origin);
-		$resource->isProtectedOrigin = $type->isProtectedOrigin;
+		$resource->isPDO = $type->isProtectedOrigin;
 
 		return $resource;
 	}

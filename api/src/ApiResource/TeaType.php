@@ -53,12 +53,6 @@ class TeaType
 	public ?Origin $origin = null;
 
 	#[ApiProperty]
-	#[Groups(["tea:create"])]
-	public bool $isProtectedOrigin = false;
-
-	#[Groups(["read:origin"])]
-	public function getIsPDO(): bool
-	{
-		return $this->isProtectedOrigin;
-	}
+	#[Groups(["read:origin", "tea:create"])]
+	public bool $isPDO = false;
 }

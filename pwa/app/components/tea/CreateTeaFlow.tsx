@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, useState } from "react";
 import { SelectFamily } from "../family/SelectFamily";
 import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
-import { throwNotImplemented, warnNotImplemented } from "~/utils/function";
+import { warnNotImplemented } from "~/utils/function";
 import { fetchApi } from "~/utils/api";
 import { Confirmation } from "./create/Confirmation";
 import { useMutation } from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigation
 import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation";
 import { SelectType } from "~/components/tea_type/SelectType";
 import { AskName } from "~/components/tea/create/AskName";
+import { IsProtectedOrigin } from "~/components/tea_type/create/IsProtectedOrigin";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -19,7 +20,7 @@ const CONTEXT = createContext({
 
 type FormValue = {
 	family?: TeaFamily;
-	type?: TeaType | { name: string };
+	type?: TeaType | { name: string; isPDO: boolean };
 	origin?: Origin;
 	altitude?: number;
 	appellation?: boolean;
@@ -130,18 +131,30 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 					<AskName
 						onBack={() => navStack.back()}
 						onConfirm={(name) => {
-							contextValue.patchForm({ type: { name } });
-							navStack.next({ key: "recap" });
+							setFormValue((st) => ({ ...st, type: { name, isPDO: st.type?.isPDO ?? false } }));
+							navStack.next({ key: "pdo:ask" });
 						}}
 						defaultValue={formValue.type?.name}
 					/>
 				</StackFrame>
-				<StackFrame frameKey="recap">
-					<TeaFormConfirmation
+				<StackFrame frameKey="pdo:ask">
+					<IsProtectedOrigin
 						onBack={() => navStack.back()}
-						values={formValue}
-						onConfirm={submit}
+						onConfirm={(value) => {
+							setFormValue((st) => {
+								if (!st.type) {
+									throw new Error("Type isn't defined!");
+								}
+
+								return { ...st, type: { ...st.type, isPDO: value } };
+							});
+							navStack.next({ key: "recap" });
+						}}
+						defaultValue={formValue.type?.isPDO}
 					/>
+				</StackFrame>
+				<StackFrame frameKey="recap">
+					<TeaFormConfirmation onBack={() => navStack.back()} values={formValue} onConfirm={submit} />
 				</StackFrame>
 				<StackFrame frameKey="confirmation">
 					<Confirmation

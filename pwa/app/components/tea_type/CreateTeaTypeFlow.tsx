@@ -23,7 +23,7 @@ type FormValue = {
 	family?: TeaFamily;
 	name?: string;
 	origin?: Origin;
-	isProtectedOrigin?: boolean;
+	isPDO?: boolean;
 };
 
 export function useTeaTypeFormContext() {
@@ -37,7 +37,7 @@ async function submitNewTeaType(data: Required<FormValue>) {
 			family: data.family,
 			origin: data.origin["@id"],
 			name: data.name,
-			isProtectedOrigin: data.isProtectedOrigin,
+			isPDO: data.isPDO,
 		},
 	});
 
@@ -107,7 +107,14 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 					/>
 				</StackFrame>
 				<StackFrame frameKey="pdo:ask">
-					<IsProtectedOrigin />
+					<IsProtectedOrigin
+						onConfirm={(value) => {
+							contextValue.patchForm({ isPDO: value });
+							navStack.next({ key: "family:select" });
+						}}
+						defaultValue={formValue.isPDO}
+						onBack={navStack.back}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="family:select">
 					<SelectFamily

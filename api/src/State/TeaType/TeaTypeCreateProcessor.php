@@ -33,7 +33,7 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$origin = $this->em->find(Origin::class, $data->origin->id);
 		assert($origin instanceof Origin);
 
-		$entity->isProtectedOrigin = $data->isProtectedOrigin;
+		$entity->isProtectedOrigin = $data->isPDO;
 		$entity->origin = $origin;
 
 		// Only define a precise origin
