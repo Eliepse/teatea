@@ -26,14 +26,6 @@ export default function Dashboard() {
 			<Link to="/tea/new">
 				<button className="btn btn-block mt-6">Add a new tea</button>
 			</Link>
-
-			<button className="btn btn-block mt-6" onClick={() => setTeaTypeFlow(true)}>
-				Add type of tea
-			</button>
-
-			<Paged open={teaTypeFlow}>
-				<CreateTeaTypeFlow onClose={() => setTeaTypeFlow(false)} />
-			</Paged>
 		</AuthLayout>
 	);
 }

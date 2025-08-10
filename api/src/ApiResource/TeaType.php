@@ -13,10 +13,14 @@ use App\State\TeaType\TeaTypeProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Get(normalizationContext: ["groups" => ["read:origin", "embedded:origin"]], provider: TeaTypeProvider::class)]
+#[Get(
+	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
+	security: "is_granted('ROLE_ADMIN')", provider: TeaTypeProvider::class,
+)]
 #[GetCollection(
 	paginationEnabled: false,
 	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
+	security: "is_granted('ROLE_ADMIN')",
 	provider: TeaTypeProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
@@ -30,7 +34,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	]
 )]
-#[Post(security: "is_granted('ROLE_USER')", processor: TeaTypeCreateProcessor::class)]
+#[Post(security: "is_granted('ROLE_ADMIN')", processor: TeaTypeCreateProcessor::class)]
 class TeaType
 {
 	#[Groups(["read:origin"])]

@@ -4,24 +4,30 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import { refreshToken } from "~/auth/requests";
 
 export async function clientLoader() {
-	if (null !== TokenUtils.get()) {
+	let token = TokenUtils.get();
+
+	if(null === token) {
+		try {
+			await refreshToken();
+			token = TokenUtils.get();
+		} catch (e) {
+			console.error(e);
+			throw redirect("/login");
+		}
+	}
+
+	if (null !== token && token.roles.includes("ROLE_ADMIN")) {
 		return;
 	}
 
-	try {
-		await refreshToken();
-		return;
-	} catch (e) {
-		console.error(e);
-		throw redirect("/login");
-	}
+	throw redirect("/login");
 }
 
-export default function ProtectedLayout() {
+export default function AdminGuard() {
 	const token = TokenUtils.get();
 	const navigate = useNavigate();
 
-	if (null === token) {
+	if (null === token || false === token.roles.includes("ROLE_ADMIN")) {
 		navigate("/login");
 		return null;
 	}

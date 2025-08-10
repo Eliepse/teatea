@@ -3,5 +3,5 @@ import { useNavigate } from "react-router";
 
 export default function TeaCreatePage() {
 	const navigate = useNavigate();
-	return <CreateTeaFlow onClose={() => navigate(-1)} />;
+	return <CreateTeaFlow onClose={() => navigate("/welcome")} />;
 }
