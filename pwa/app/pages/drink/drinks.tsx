@@ -8,6 +8,7 @@ import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink
 import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { ActivityGraph } from "~/components/activity/ActivityGraph";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 export async function clientLoader(args: Route.ClientLoaderArgs): Promise<ApiCollection<Drink>> {
 	const response = await fetchApi<ApiCollection<DrinkRaw>>("/drinks");
@@ -70,6 +71,13 @@ export default function ListDrinks(props: Route.ComponentProps) {
 					);
 				})}
 			</ul>
+
+			<Link
+				to="/drink/new"
+				className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 w-12 shadow-md"
+			>
+				<PlusIcon className="size-4" />
+			</Link>
 		</AuthLayout>
 	);
 }

@@ -1,7 +1,7 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
-import { useNewSipContext } from "~/pages/brewing/add-drink.context";
+import { useNewSipContext } from "~/pages/drink/add-drink.context";
 import { formatDate } from "date-fns";
 import { useNavigate } from "react-router";
 import type { Tea } from "~t/types";

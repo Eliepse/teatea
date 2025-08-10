@@ -16,7 +16,7 @@ export default function LogDrinkPage() {
 	const [formData, setFormData] = useState<FormData>({ drankAt: new Date() });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({
 		defaultFrame: { key: "form" },
-		onOverBack: () => navigate(-1),
+		onOverBack: () => navigate("/drinks"),
 	});
 	const createMutation = useMutation({
 		mutationFn: async (data: FormData) => {

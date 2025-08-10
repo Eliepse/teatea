@@ -6,7 +6,7 @@ export default [
 
 	layout("auth/components/AuthenticatedGuard.tsx", [
 		route("/welcome", "pages/dashboard.tsx"),
-		route("/drink/new", "pages/brewing/add-drink.tsx"),
+		route("/drink/new", "pages/drink/add-drink.tsx"),
 		route("/tea/new", "pages/tea/tea-create.tsx"),
 		...prefix("/me", [route("/drinks", "pages/drink/drinks.tsx"), route("/drink/:id", "pages/drink/drink.tsx")]),
 	]),

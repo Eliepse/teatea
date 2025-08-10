@@ -11,18 +11,20 @@ export function AuthLayout(props: PropsWithChildren<{ className?: string; active
 
 	return (
 		<div className={styles.root}>
-			{isNavigating && (
-				<div className="flex items-center justify-center">
-					<div className="flex justify-center text-gray-500">
-						<span className="inline-block animate-pulse">
-							<Leaf className="size-6 rotate-90" />
-						</span>
-						<span className="ml-2">Loading...</span>
+			<div className="relative overflow-hidden">
+				{isNavigating && (
+					<div className="flex items-center justify-center h-full">
+						<div className="flex justify-center text-gray-500">
+							<span className="inline-block animate-pulse">
+								<Leaf className="size-6 rotate-90" />
+							</span>
+							<span className="ml-2">Loading...</span>
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 
-			{false === isNavigating && <div className={clsx(styles.body, props.className)}>{props.children}</div>}
+				{false === isNavigating && <div className={clsx("h-full overflow-auto", props.className)}>{props.children}</div>}
+			</div>
 
 			<nav className="border-t border-gray-200">
 				<ul className="w-full h-full flex px-4">
