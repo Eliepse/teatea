@@ -2,16 +2,15 @@ import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useTeas } from "~/utils/api/useTeas";
 import { type OriginPath, type Tea, teaFamilies, type TeaFamily } from "~t/types";
 import clsx from "clsx";
-import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import Arrow from "~/components/icons/arrow";
 import { handleUIEvent } from "~/utils/function";
-import { Fragment, useMemo } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { FormatOriginPath } from "../shared/FormatOriginPath";
 
-export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea) => void }) {
-	const navStack = useStackNavigator();
+export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultValue?: Tea; onBack: () => void }) {
 	const teasQuery = useTeas();
 	const items = teasQuery?.data?.member ?? [];
+	const [selected, setSelected] = useState(props.defaultValue);
 
 	const teasByFamily = useMemo(() => {
 		const groups = Object.fromEntries(Object.keys(teaFamilies).map((key) => [key, [] as Tea[]])) as {
@@ -23,16 +22,20 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 		}, groups);
 	}, [items]);
 
+	function confirm() {
+		if (!selected) {
+			return;
+		}
+
+		props.onConfirm(selected);
+	}
+
 	return (
 		<PageLayout
 			title="Select a tea"
-			onBack={navStack.back}
+			onBack={props.onBack}
 			action={
-				<button
-					className="ml-auto btn btn-primary"
-					onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
-					disabled={!props.value}
-				>
+				<button className="ml-auto btn btn-primary" onClick={handleUIEvent(confirm)} disabled={!selected}>
 					Confirm
 					<Arrow direction="right" className="size-4 ml-1" />
 				</button>
@@ -69,8 +72,8 @@ export function SelectTeaFrame(props: { value?: Tea | null; onSelect: (tea: Tea)
 										family={tea.family + " tea"}
 										type={tea.type?.name}
 										originPath={tea.originPath}
-										onSelect={() => props.onSelect(tea)}
-										selected={props.value?.["@id"] === tea["@id"]}
+										onSelect={() => setSelected(tea)}
+										selected={selected?.["@id"] === tea["@id"]}
 										className="mb-2"
 									/>
 								</li>

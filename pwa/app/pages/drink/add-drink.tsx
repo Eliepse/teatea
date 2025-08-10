@@ -47,7 +47,7 @@ export default function LogDrinkPage() {
 		stackNavigator.reset();
 	}
 
-	const contextValue = useMemo<SipContext>(
+	const ctx = useMemo<SipContext>(
 		() => ({
 			updateForm: (part: Partial<FormData>) => setFormData((f) => ({ ...f, ...part })),
 			formData,
@@ -66,7 +66,7 @@ export default function LogDrinkPage() {
 
 	return (
 		<div className="min-h-screen">
-			<NewSipContext.Provider value={contextValue}>
+			<NewSipContext.Provider value={ctx}>
 				<NavigationStack>
 					<StackFrame frameKey="form">
 						<NewDrinkFormFrame />
@@ -74,8 +74,8 @@ export default function LogDrinkPage() {
 					<StackFrame frameKey="date">
 						<SelectDateFrame
 							mode="single"
-							selected={contextValue.formData.drankAt}
-							onSelect={(v) => contextValue.updateForm({ drankAt: v })}
+							selected={ctx.formData.drankAt}
+							onSelect={(v) => ctx.updateForm({ drankAt: v })}
 							disabled={{ after: new Date() }}
 							showOutsideDays
 							endMonth={new Date()}
@@ -83,11 +83,18 @@ export default function LogDrinkPage() {
 						/>
 					</StackFrame>
 					<StackFrame frameKey="tea">
-						<SelectTeaFrame onSelect={(tea) => contextValue.updateForm({ tea })} value={formData.tea} />
+						<SelectTeaFrame
+							onBack={stackNavigator.back}
+							onConfirm={(tea) => {
+								ctx.updateForm({ tea });
+								stackNavigator.next({ key: "form" });
+							}}
+							defaultValue={formData.tea}
+						/>
 					</StackFrame>
 					<StackFrame frameKey="technic">
 						<SelectTechnicFrame
-							onSelect={(technic) => contextValue.updateForm({ technic })}
+							onSelect={(technic) => ctx.updateForm({ technic })}
 							value={formData.technic}
 						/>
 					</StackFrame>
