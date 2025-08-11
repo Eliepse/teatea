@@ -25,17 +25,14 @@ export function SelectTechnicFrame(props: {
 			title="Select a technic"
 			onBack={navStack.back}
 			action={
-				<div className="flex justify-center">
-					{props.value && (
-						<button
-							className="ml-2 btn btn-primary rounded-full"
-							onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
-						>
-							Confirm
-							<Arrow direction="right" className="size-4 ml-1" />
-						</button>
-					)}
-				</div>
+				<button
+					className="ml-auto btn btn-primary"
+					onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
+					disabled={!props.value}
+				>
+					Confirm
+					<Arrow direction="right" className="size-4 ml-1" />
+				</button>
 			}
 		>
 			{Object.keys(brewingTechnic).map((key) => (
@@ -54,7 +51,11 @@ export function SelectTechnicFrame(props: {
 function Item(props: { technic: TechnicType; onSelect: () => void; selected?: boolean; className?: string }) {
 	return (
 		<article
-			className={clsx("bg-base-100 px-4 py-3 flex", props.selected && "bg-base-300", props.className)}
+			className={clsx(
+				"bg-base-100 px-4 py-3 flex rounded",
+				props.selected ? "bg-primary text-white" : "bg-base-200",
+				props.className,
+			)}
 			onClick={props.onSelect}
 		>
 			<BrewingTechnic value={props.technic} />
