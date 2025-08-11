@@ -6,12 +6,12 @@ import Arrow from "~/components/icons/arrow";
 import { handleUIEvent } from "~/utils/function";
 import { Fragment, useMemo, useState } from "react";
 import { FormatOriginPath } from "../shared/FormatOriginPath";
+import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 
 export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultValue?: Tea; onBack: () => void }) {
 	const teasQuery = useTeas();
 	const items = teasQuery?.data?.member ?? [];
 	const [selected, setSelected] = useState(props.defaultValue);
-
 	const teasByFamily = useMemo(() => {
 		const groups = Object.fromEntries(Object.keys(teaFamilies).map((key) => [key, [] as Tea[]])) as {
 			[key in TeaFamily]: Tea[];
@@ -81,6 +81,12 @@ export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultVa
 						</ul>
 					</Fragment>
 				))}
+
+			{teasQuery.isSuccess && (
+				<div className="px-4">
+					<CreateTeaButton className="btn-outline btn-block mt-4" />
+				</div>
+			)}
 		</PageLayout>
 	);
 }
