@@ -22,10 +22,6 @@ export default function Dashboard() {
 			<Link to="/drink/new">
 				<button className="btn btn-block mt-6">What are you drinking today?</button>
 			</Link>
-
-			<Link to="/tea/new">
-				<button className="btn btn-block mt-6">Add a new tea</button>
-			</Link>
 		</AuthLayout>
 	);
 }
