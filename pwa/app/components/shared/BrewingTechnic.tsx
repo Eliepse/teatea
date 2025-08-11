@@ -1,6 +1,6 @@
 export const brewingTechnic = {
 	"cold-brew": "Cold brew",
-	gongfu: "GongFu",
+	gongfu: "Gongfu",
 	"western-teapot": "Western teapot",
 	ceremony: "Ceremony",
 } as const;
