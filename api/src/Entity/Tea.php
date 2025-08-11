@@ -32,12 +32,6 @@ class Tea
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	public ?Origin $origin = null;
 
-	/**
-	 * @var Collection<int, Brewing>
-	 */
-	#[ORM\OneToMany(targetEntity: Brewing::class, mappedBy: 'tea')]
-	public Collection $brewings;
-
 	#[ORM\Column(nullable: true)]
 	public ?bool $isBlend = null;
 
@@ -57,12 +51,6 @@ class Tea
 	#[ORM\OneToMany(targetEntity: Drink::class, mappedBy: 'tea')]
 	private Collection $drinks;
 
-	/**
-	 * @var Collection<int, TeaList>
-	 */
-	#[ORM\ManyToMany(targetEntity: TeaList::class, mappedBy: 'teas')]
-	private Collection $lists;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     public ?User $createdBy = null;
@@ -71,9 +59,7 @@ class Tea
 		#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
 		public readonly \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
 	) {
-		$this->brewings = new ArrayCollection();
 		$this->drinks = new ArrayCollection();
-		$this->lists = new ArrayCollection();
 	}
 
 	public function setCultivar(?Cultivar $cultivar): static
@@ -87,28 +73,6 @@ class Tea
 
 		return $this;
 	}
-
-//	public function addBrewing(Brewing $brewing): static
-//	{
-//		if (!$this->brewings->contains($brewing)) {
-//			$this->brewings->add($brewing);
-//			$brewing->setTea($this);
-//		}
-//
-//		return $this;
-//	}
-//
-//	public function removeBrewing(Brewing $brewing): static
-//	{
-//		if ($this->brewings->removeElement($brewing)) {
-//			// set the owning side to null (unless already changed)
-//			if ($brewing->getTea() === $this) {
-//				$brewing->setTea(null);
-//			}
-//		}
-//
-//		return $this;
-//	}
 
 	/**
 	 * @return Collection<int, Drink>
@@ -135,33 +99,6 @@ class Tea
 			if ($drink->getTea() === $this) {
 				$drink->setTea(null);
 			}
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @return Collection<int, TeaList>
-	 */
-	public function getLists(): Collection
-	{
-		return $this->lists;
-	}
-
-	public function addList(TeaList $list): static
-	{
-		if (!$this->lists->contains($list)) {
-			$this->lists->add($list);
-			$list->addTea($this);
-		}
-
-		return $this;
-	}
-
-	public function removeList(TeaList $list): static
-	{
-		if ($this->lists->removeElement($list)) {
-			$list->removeTea($this);
 		}
 
 		return $this;

@@ -27,15 +27,8 @@ class Teaware
     #[ORM\Column(nullable: true)]
     private ?int $volume = null;
 
-    /**
-     * @var Collection<int, Brewing>
-     */
-    #[ORM\OneToMany(targetEntity: Brewing::class, mappedBy: 'teaware')]
-    private Collection $brewings;
-
     public function __construct()
     {
-        $this->brewings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -75,36 +68,6 @@ class Teaware
     public function setVolume(?int $volume): static
     {
         $this->volume = $volume;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Brewing>
-     */
-    public function getBrewings(): Collection
-    {
-        return $this->brewings;
-    }
-
-    public function addBrewing(Brewing $brewing): static
-    {
-        if (!$this->brewings->contains($brewing)) {
-            $this->brewings->add($brewing);
-            $brewing->setTeaware($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBrewing(Brewing $brewing): static
-    {
-        if ($this->brewings->removeElement($brewing)) {
-            // set the owning side to null (unless already changed)
-            if ($brewing->getTeaware() === $this) {
-                $brewing->setTeaware(null);
-            }
-        }
 
         return $this;
     }
