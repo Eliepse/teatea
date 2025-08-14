@@ -50,7 +50,7 @@ COPY --link frankenphp/worker.Caddyfile /etc/caddy/worker.Caddyfile
 COPY --link composer.* symfony.* ./
 
 RUN rm -Rf frankenphp/ var/ && \
-    chown www-data:www-data .
+    chown www-data:www-data -R . /data /config
 
 USER www-data
 
