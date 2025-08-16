@@ -132,6 +132,7 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 						onBack={() => navStack.back()}
 						onConfirm={(name) => {
 							if(undefined === name) {
+								setFormValue((st) => ({ ...st, type: undefined }));
 								navStack.next({ key: "recap" });
 								return;
 							}
