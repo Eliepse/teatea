@@ -38,7 +38,7 @@ export function NewDrinkFormFrame(props: { drankAt?: Date; tea?: Tea }) {
 			bodyClassName="pb-20"
 			action={
 				<button
-					className="flex mx-auto btn btn-primary"
+					className="flex ml-auto btn btn-primary"
 					disabled={isSubmitting || !formData.tea || !formData.drankAt}
 					onClick={handleUIEvent(submitDrink)}
 				>

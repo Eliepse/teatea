@@ -26,7 +26,7 @@ export function SelectDateFrame(props: DayPickerProps) {
 			onBack={navStack.back}
 			action={
 				<button
-					className="btn btn-primary flex mx-auto"
+					className="btn btn-primary flex ml-auto"
 					onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
 					disabled={props.mode && !props.selected}
 				>
