@@ -21,8 +21,7 @@ class TeaRepository extends ServiceEntityRepository
 		$qb = $this->createQueryBuilder("tea")
 			->select("count(tea)")
 			->where("tea.family = :family")->setParameter("family", $tea->family)
-			->andWhere("tea.origin = :origin")->setParameter("origin", $tea->origin)
-			->andWhere("tea.type = :type");
+			->andWhere("tea.origin = :origin")->setParameter("origin", $tea->origin);
 
 		if (null !== $tea->type) {
 			$qb->andWhere("tea.type = :type")->setParameter("type", $tea->type);
