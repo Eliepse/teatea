@@ -6,12 +6,13 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
  * @see https://en.wikipedia.org/wiki/Protected_designation_of_origin
  */
 
-export function AskName(props: { onConfirm: (name: string) => void; defaultValue?: string; onBack: () => void }) {
+export function AskName(props: { onConfirm: (name: string | undefined) => void; defaultValue?: string; onBack: () => void }) {
 	const [name, setName] = useState(props.defaultValue ?? "");
 	const isNameValid = 0 < name.trim().length;
 
 	function confirm() {
 		if (0 === name.trim().length) {
+			props.onConfirm(undefined);
 			return;
 		}
 
@@ -32,8 +33,8 @@ export function AskName(props: { onConfirm: (name: string) => void; defaultValue
 			onBack={props.onBack}
 			bodyClassName="flex flex-col justify-center"
 			action={
-				<button className="ml-auto btn btn-primary" onClick={confirm} disabled={!isNameValid}>
-					Next
+				<button className="ml-auto btn btn-primary" onClick={confirm}>
+					{isNameValid ? "Next" : "I don't know"}
 					<ArrowRightIcon className="size-4" />
 				</button>
 			}

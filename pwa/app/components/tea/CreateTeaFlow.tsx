@@ -131,6 +131,10 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 					<AskName
 						onBack={() => navStack.back()}
 						onConfirm={(name) => {
+							if(undefined === name) {
+								navStack.next({ key: "recap" });
+								return;
+							}
 							setFormValue((st) => ({ ...st, type: { name, isPDO: st.type?.isPDO ?? false } }));
 							navStack.next({ key: "pdo:ask" });
 						}}

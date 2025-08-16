@@ -15,12 +15,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(
 	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
-	security: "is_granted('ROLE_ADMIN')", provider: TeaTypeProvider::class,
+	security: "is_granted('ROLE_USER')", provider: TeaTypeProvider::class,
 )]
 #[GetCollection(
 	paginationEnabled: false,
 	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
-	security: "is_granted('ROLE_ADMIN')",
+	security: "is_granted('ROLE_USER')",
 	provider: TeaTypeProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
