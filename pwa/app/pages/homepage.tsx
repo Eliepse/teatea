@@ -4,7 +4,7 @@ import type { Route } from "../../.react-router/types/app/pages/+types/homepage"
 
 export async function clientLoader() {
 	return {
-		isAuth: null !== TokenUtils.get(),
+		isAuth: null !== TokenUtils.getRefreshToken(),
 	};
 }
 
