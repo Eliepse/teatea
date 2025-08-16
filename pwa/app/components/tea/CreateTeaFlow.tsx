@@ -82,7 +82,7 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 			patchForm: (part: Partial<FormValue>) => setFormValue((form) => ({ ...form, ...part })),
 			submitting: "pending" === mutation.status,
 		}),
-		[formValue, mutation.status, navStack],
+		[formValue, mutation.status],
 	);
 
 	return (
