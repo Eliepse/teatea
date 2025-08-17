@@ -10,17 +10,16 @@ import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 
 export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultValue?: Tea; onBack: () => void }) {
 	const teasQuery = useTeas();
-	const items = teasQuery?.data?.member ?? [];
 	const [selected, setSelected] = useState(props.defaultValue);
 	const teasByFamily = useMemo(() => {
 		const groups = Object.fromEntries(Object.keys(teaFamilies).map((key) => [key, [] as Tea[]])) as {
 			[key in TeaFamily]: Tea[];
 		};
-		return items.reduce((groups, tea) => {
+		return (teasQuery?.data?.member ?? []).reduce((groups, tea) => {
 			groups[tea.family].push(tea);
 			return groups;
 		}, groups);
-	}, [items]);
+	}, [teasQuery?.data?.member]);
 
 	async function onTeaCreated(tea: Tea) {
 		const result = await teasQuery.refetch();
