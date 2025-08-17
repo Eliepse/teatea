@@ -43,7 +43,7 @@ class TeaType
 	#[ORM\JoinColumn("created_by", nullable: false)]
 	public User $createdBy;
 
-	#[ORM\Column(type: Types::DATETIME_IMMUTABLE, options: ["default" => "NOW()"])]
+	#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
 	public \DateTimeImmutable $createdAt;
 
 	public function __construct()

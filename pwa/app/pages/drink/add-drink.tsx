@@ -10,6 +10,7 @@ import { fetchApi } from "~/utils/api";
 import { handleUIEvent } from "~/utils/function";
 import { SelectTechnicFrame } from "~/components/stackFrames/SelectTechnicFrame";
 import type { DrinkRaw } from "~/utils/api/normalization/drink";
+import { formatISO } from "date-fns";
 
 export default function LogDrinkPage() {
 	const navigate = useNavigate();
@@ -27,7 +28,7 @@ export default function LogDrinkPage() {
 			const response = await fetchApi<DrinkRaw>("/drinks", {
 				method: "POST",
 				payload: {
-					drankAt: data.drankAt,
+					drankAt: formatISO(data.drankAt),
 					tea: data.tea?.["@id"],
 					technic: data.technic,
 					teaQuantity: data.teaQuantity,
@@ -61,7 +62,7 @@ export default function LogDrinkPage() {
 			},
 			isSubmitting: "pending" === createMutation.status,
 		}),
-		[formData, createMutation.status],
+		[formData, createMutation],
 	);
 
 	return (

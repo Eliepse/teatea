@@ -46,7 +46,7 @@ class Drink
 		#[ORM\Column(nullable: true)]
 		public ?BrewingTechnic $technic = null,
 
-		#[ORM\Column]
+		#[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
 		public readonly ?DateTimeImmutable $drankAt = null,
 	) {
 	}
