@@ -22,6 +22,11 @@ export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultVa
 		}, groups);
 	}, [items]);
 
+	async function onTeaCreated(tea: Tea) {
+		const result = await teasQuery.refetch();
+		setSelected(result.data?.member?.find(t => t.id === tea.id));
+	}
+
 	function confirm() {
 		if (!selected) {
 			return;
@@ -61,7 +66,8 @@ export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultVa
 			{teasQuery.isSuccess &&
 				Object.entries(teasByFamily).map(([key, teas]) => (
 					<Fragment key={key}>
-						<div className="sticky top-0 bg-white px-4 py-2 text-xs uppercase text-base-content/60 mb-2 mt-6 tracking-wide font-semibold">
+						<div
+							className="sticky top-0 bg-white px-4 py-2 text-xs uppercase text-base-content/60 mb-2 mt-6 tracking-wide font-semibold">
 							{teaFamilies[key as TeaFamily]}
 						</div>
 						<ul className="px-4">
@@ -84,7 +90,7 @@ export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultVa
 
 			{teasQuery.isSuccess && (
 				<div className="px-4">
-					<CreateTeaButton className="btn-outline btn-block mt-4" />
+					<CreateTeaButton className="btn-outline btn-block mt-4" onCreated={onTeaCreated} />
 				</div>
 			)}
 		</PageLayout>
@@ -103,15 +109,15 @@ function TeaItem(props: {
 	return (
 		<article
 			className={clsx(
-				"bg-base-200 rounded px-4 py-3 flex items-center",
+				"bg-base-200 rounded px-4 py-3 h-16 flex items-center",
 				props.selected && "bg-primary text-white",
-				props.className,
+				props.className
 			)}
 			onClick={props.onSelect}
 		>
 			<div className="flex-1">{props.title}</div>
 			<div className="text-xs text-right">
-				{<div>{props.type ?? props.family}</div>}
+				{<div>{props.type ? props.family : ""}</div>}
 				{props.originPath && <FormatOriginPath originPath={props.originPath} />}
 			</div>
 		</article>

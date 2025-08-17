@@ -15,7 +15,7 @@ import { IsProtectedOrigin } from "~/components/tea_type/create/IsProtectedOrigi
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
 	patchForm: (_part: Partial<FormValue>) => warnNotImplemented(),
-	submitting: false,
+	submitting: false
 });
 
 type FormValue = {
@@ -40,30 +40,44 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 			origin: data.origin["@id"],
 			type: !data.type || "id" in data.type ? undefined : data.type,
 			altitude: data.altitude,
-			isAppellation: data.appellation,
-		},
+			isAppellation: data.appellation
+		}
 	});
 
 	return await response.json();
 }
 
-export function CreateTeaFlow(props: { onClose: () => void }) {
+export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect?: (tea: Tea) => void }) {
+	const asSelector = undefined !== props.onSelect;
 	const [formValue, setFormValue] = useState<FormValue>({});
+	const [createdTea, setCreatedTea] = useState<Tea | undefined>();
 	const { NavigationStack, ...navStack } = useNavigationStack({
 		defaultFrame: { key: "origin:select" },
-		onOverBack: () => {
-			mutation.reset();
-			navStack.reset();
-			setFormValue({});
-			props.onClose();
-		},
+		onOverBack: closeFlow
 	});
+
+	function closeFlow() {
+		mutation.reset();
+		navStack.reset();
+		setFormValue({});
+		props.onClose();
+	}
+
+	function selectTea() {
+		if(undefined === props.onSelect || undefined === createdTea) {
+			return;
+		}
+
+		props.onSelect(createdTea);
+		closeFlow();
+	}
 
 	const mutation = useMutation({
 		mutationFn: submitNewTea,
-		onSuccess: () => {
+		onSuccess: (data: Tea) => {
+			setCreatedTea(data);
 			navStack.next({ key: "confirmation" });
-		},
+		}
 	});
 
 	function submit() {
@@ -80,9 +94,9 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 		() => ({
 			formValue,
 			patchForm: (part: Partial<FormValue>) => setFormValue((form) => ({ ...form, ...part })),
-			submitting: "pending" === mutation.status,
+			submitting: "pending" === mutation.status
 		}),
-		[formValue, mutation.status],
+		[formValue, mutation.status]
 	);
 
 	return (
@@ -131,7 +145,7 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 					<AskName
 						onBack={() => navStack.back()}
 						onConfirm={(name) => {
-							if(undefined === name) {
+							if (undefined === name) {
 								setFormValue((st) => ({ ...st, type: undefined }));
 								navStack.next({ key: "recap" });
 								return;
@@ -165,7 +179,8 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 					<Confirmation
 						state={mutation.status}
 						onBack={props.onClose}
-						onOk={warnNotImplemented}
+						onOk={asSelector ? selectTea : undefined}
+						okText={asSelector ? "Select this tea" : undefined}
 						error={mutation.error?.message}
 					/>
 				</StackFrame>

@@ -4,8 +4,9 @@ import { handleUIEvent } from "~/utils/function";
 export function Confirmation(props: {
 	state: "idle" | "pending" | "success" | "error",
 	error?: string,
-	onBack: () => void,
-	onOk: () => void,
+	onBack?: () => void,
+	onOk?: () => void,
+	okText?: string
 }) {
 	return <div className={clsx("h-full flex flex-col justify-center items-center")}>
 		{"pending" === props.state && (
@@ -20,12 +21,14 @@ export function Confirmation(props: {
 			<div className="my-8">New tea added!</div>
 		)}
 
-		{"success" === props.state && (
-			<button className="btn btn-wide btn-primary mb-4" onClick={handleUIEvent(props.onOk)}>See the tea</button>
+		{"success" === props.state && !!props.onOk && (
+			<button className="btn btn-wide mb-4" onClick={handleUIEvent(props.onOk)}>
+				{props.okText ?? "Ok"}
+			</button>
 		)}
 
-		{"pending" !== props.state && (
-			<button className="btn btn-wide" onClick={handleUIEvent(props.onBack)}>Close</button>
+		{"pending" !== props.state && !!props.onBack && (
+			<button className="btn btn-wide" onClick={handleUIEvent(props.onBack)}>Back</button>
 		)}
 	</div>
 }
