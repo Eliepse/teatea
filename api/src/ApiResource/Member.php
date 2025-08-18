@@ -5,9 +5,12 @@ namespace App\ApiResource;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\State\Member\MemberCreateProcessor;
 use App\State\Member\MemberProvider;
 use App\State\UserProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(uriTemplate: "/members/me", security: "is_granted('ROLE_USER')", provider: UserProvider::class)]
 #[Get(security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class)]
@@ -16,15 +19,23 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	security: "is_granted('ROLE_ADMIN')",
 	provider: MemberProvider::class,
 )]
+#[Post(
+	denormalizationContext: ["groups", "member:create"],
+	security: "is_granted('ROLE_ADMIN')",
+	processor: MemberCreateProcessor::class,
+)]
 class Member
 {
 	#[Groups(["role:admin"])]
 	#[ApiProperty(identifier: true)]
 	public ?int $id;
 
-	#[Groups(["role:admin"])]
+	#[Assert\Regex("/^[a-zA-Z0-9_]{2,}$/")]
+	#[Assert\NotBlank]
+	#[Groups(["role:admin", "member:create"])]
 	public string $username;
 
-	#[Groups(["role:admin"])]
+	#[Assert\Email]
+	#[Groups(["role:admin", "member:create"])]
 	public string $email;
 }
