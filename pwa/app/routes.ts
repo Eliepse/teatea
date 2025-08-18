@@ -13,6 +13,9 @@ export default [
 
 	layout("auth/components/AdminGuard.tsx", [
 		route("/refs", "pages/refs.tsx"),
-		...prefix("/admin", [route("/type/new", "pages/type/type-create.tsx")]),
+		...prefix("/admin", [
+			route("/type/new", "pages/type/type-create.tsx"),
+			route("/members", "pages/admin/members.tsx"),
+		]),
 	]),
 ] satisfies RouteConfig;

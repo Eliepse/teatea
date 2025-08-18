@@ -77,6 +77,11 @@ export type BrewingSession = Resource & {
 	createdAt: Date;
 };
 
+export type Member = Resource<"Member"> & {
+	username: string;
+	email: string;
+}
+
 export const teaFamilies = {
 	white: "White tea",
 	yellow: "Yellow tea",
