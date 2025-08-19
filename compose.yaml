@@ -30,6 +30,8 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./api/:/app
+    ports:
+      - "80:80"
       
   pwa:
     user: "1000:1000"
