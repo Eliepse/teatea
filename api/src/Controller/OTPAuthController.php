@@ -92,6 +92,7 @@ readonly class OTPAuthController
 		$jwt = $this->JWTManager->create($token->owner);
 		$refreshToken = $this->refreshTokenGenerator->createForUserWithTtl($token->owner, $this->ttl);
 
+		$this->em->persist($refreshToken);
 		$this->em->remove($token);
 		$this->em->flush();
 
