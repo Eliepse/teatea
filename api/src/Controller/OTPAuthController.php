@@ -62,7 +62,7 @@ readonly class OTPAuthController
 			);
 
 			$this->mailer->send(
-				new Email()->from("teatea@eliepse.fr")->to($email)->subject("Login to your account")->html(
+				new Email()->from("elie.meignan@eliepse.fr")->to($email)->subject("Login to your account")->html(
 					<<<HTML
 						To login, please follow this link:<br/>
 						<a href="$this->baseUrl/login/$token->challenge">$this->baseUrl/login/$token->challenge</a>
