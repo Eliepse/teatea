@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
@@ -10,9 +9,6 @@ export function meta() {
 }
 
 export default function Dashboard() {
-	const [brewForm, setBrewForm] = useState(false);
-	const [teaTypeFlow, setTeaTypeFlow] = useState(false);
-	const [typeFlow, setTypeFlow] = useState(false);
 	const userQuery = useUser();
 
 	return (
@@ -20,8 +16,18 @@ export default function Dashboard() {
 			<h1 className="mt-4 text-xl">Hi, {userQuery?.data?.username}!</h1>
 
 			<Link to="/drink/new">
-				<button className="btn btn-block mt-6">What are you drinking today?</button>
+				<button className="btn btn-block h-12 mt-6">What are you drinking today?</button>
 			</Link>
+
+			<p className="mt-8 text-base-content/60 text-sm">
+				Welcome to your personal tea-journal !
+				<br />
+				This app is currently in a prototyping phase. Don&#39;t hesitate to send me feedbacks for any problem,
+				idea or frustrations you have!
+				<br />
+				<br />
+				Élie
+			</p>
 		</AuthLayout>
 	);
 }
