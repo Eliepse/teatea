@@ -18,32 +18,25 @@ readonly class MemberProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	)
-	{
+	) {
 	}
 
 	public function provide(
 		Operation $operation,
-		array     $uriVariables = [],
-		array     $context = [],
-	): array|null|object
-	{
-		$query = $this->em->createQueryBuilder()
-			->select("user")
-			->from(User::class, "user");
+		array $uriVariables = [],
+		array $context = [],
+	): array|null|object {
+		$query = $this->em->createQueryBuilder()->select("user")->from(User::class, "user");
 
-		if($operation instanceof CollectionOperationInterface) {
+		if ($operation instanceof CollectionOperationInterface) {
 			return array_map(fn($u) => self::hydrate($u), $query->getQuery()->getResult());
 		}
 
-		if(empty($uriVariables["id"] ?? null)) {
+		if (empty($uriVariables["id"] ?? null)) {
 			throw new NotFoundHttpException();
 		}
 
-		$user = $query->where("user.id = :id")
-			->setParameter("id", $uriVariables["id"])
-			->getQuery()
-			->getSingleResult();
+		$user = $query->where("user.id = :id")->setParameter("id", $uriVariables["id"])->getQuery()->getSingleResult();
 
 		return self::hydrate($user);
 	}
@@ -54,6 +47,7 @@ readonly class MemberProvider implements ProviderInterface
 		$resource->id = $user->id;
 		$resource->username = $user->username;
 		$resource->email = $user->email;
+		$resource->roles = $user->getRoles();
 		return $resource;
 	}
 }

@@ -7,23 +7,32 @@ import { Paged } from "~/components/shared/paged/Paged";
 import { useState } from "react";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation } from "@tanstack/react-query";
+import clsx from "clsx";
+
+type User = Member & {
+	roles: string[];
+};
 
 export async function clientLoader() {
-	return await (await fetchApi<ApiCollection<Member>>("/members")).json();
+	return await (await fetchApi<ApiCollection<User>>("/members")).json();
 }
 
 export default function MembersPage(props: Route.ComponentProps) {
 	const [formOpen, setFormOpen] = useState(false);
+
+	function isOnBoard(member: User): boolean {
+		return member.roles.includes("ROLE_USER");
+	}
 
 	return (
 		<PageLayout title="Members">
 			<ul className="">
 				{props.loaderData.member.map((member) => (
 					<li key={member.id} className="mb-4">
-						<article className="bg-base-200 px-3 py-2 rounded">
+						<article className={clsx("bg-base-200 px-3 py-2 rounded", isOnBoard(member) && "border border-gray-400")}>
 							<div>
-								<span className="font-bold">{member.username}</span>
-								<span className="ml-2 text-sm font-mono text-base-content/60">#{member.id}</span>
+								{!!member.username && <span className="font-bold mr-2">{member.username}</span>}
+								<span className="text-sm font-mono text-base-content/60">#{member.id}</span>
 							</div>
 							<div>{member.email}</div>
 						</article>

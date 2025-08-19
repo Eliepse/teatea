@@ -29,7 +29,6 @@ readonly class MemberCreateProcessor implements ProcessorInterface
 		assert($user instanceof User && $user->hasRole("ROLE_ADMIN"));
 
 		$entity = new \App\Entity\User();
-		$entity->username = $data->username;
 		$entity->email = $data->email;
 		$entity->setRoles([]);
 
