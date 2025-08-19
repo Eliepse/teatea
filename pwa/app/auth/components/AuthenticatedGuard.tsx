@@ -4,16 +4,23 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import { refreshToken } from "~/auth/requests";
 
 export async function clientLoader() {
-	if (null !== TokenUtils.get()) {
-		return;
+	if (null === TokenUtils.get()) {
+		try {
+			await refreshToken();
+		} catch (e) {
+			console.error(e);
+			throw redirect("/login");
+		}
 	}
 
-	try {
-		await refreshToken();
-		return;
-	} catch (e) {
-		console.error(e);
+	const token = TokenUtils.get();
+
+	if(!token) {
 		throw redirect("/login");
+	}
+
+	if(false === token.roles.includes("ROLE_USER") || token.roles.includes("ROLE_ONBOARDING")) {
+		throw redirect("/onboarding");
 	}
 }
 

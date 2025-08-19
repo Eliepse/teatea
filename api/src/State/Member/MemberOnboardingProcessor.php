@@ -12,7 +12,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 /**
  * @implements ProcessorInterface<Member>
  */
-readonly class MemberCreateProcessor implements ProcessorInterface
+readonly class MemberOnboardingProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -25,15 +25,14 @@ readonly class MemberCreateProcessor implements ProcessorInterface
 		$user = $this->security->getUser();
 
 		assert($data instanceof Member);
-		assert($user instanceof User && $user->hasRole("ROLE_ADMIN"));
+		assert($user instanceof User && $user->hasRole("ROLE_ONBOARDING"));
+		assert($user->id === $data->id);
 
-		$entity = new \App\Entity\User();
-		$entity->email = $data->email;
-		$entity->setRoles(["ROLE_ONBOARDING"]);
+		$user->username = $data->username;
+		$user->setRoles(["ROLE_USER"]);
 
-		$this->em->persist($entity);
+		$this->em->persist($user);
 		$this->em->flush();
-
 
 		return MemberProvider::hydrate($user);
 	}

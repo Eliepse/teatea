@@ -21,8 +21,8 @@ export async function clientAction({ request }: Route.ClientActionArgs) {
 		method: "POST",
 		body: JSON.stringify({ email }),
 		headers: {
-			"Content-Type": "application/ld+json",
-			Accept: "application/ld+json",
+			"Content-Type": "application/json",
+			Accept: "application/json",
 		},
 	});
 
@@ -87,7 +87,7 @@ export default function LoginPage(args: Route.ComponentProps) {
 
 export function HydrateFallback() {
 	return (
-		<div className="w-screen  h-screen flex items-center justify-center">
+		<div className="w-screen h-screen flex items-center justify-center">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				fill="none"
