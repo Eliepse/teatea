@@ -39,19 +39,19 @@ export default function MembersPage(props: Route.ComponentProps) {
 			</button>
 
 			<Paged open={formOpen}>
-				<CreateMemberForm onDone={() => window.location.reload()} />
+				<CreateMemberForm onDone={() => window.location.reload()} onBack={() => setFormOpen(false)} />
 			</Paged>
 		</PageLayout>
 	);
 }
 
-function CreateMemberForm(props: { onDone: () => void }) {
+function CreateMemberForm(props: { onDone: () => void; onBack: () => void }) {
 	const [form, setForm] = useState<{ email?: string; username?: string }>({});
 	const mutation = useMutation({
 		mutationFn: async (vars: typeof form) => {
 			await postApi("/members", {
 				email: vars.email,
-				username: vars.username,
+				// username: vars.username,
 			});
 		},
 		onSuccess: props.onDone,
@@ -64,7 +64,7 @@ function CreateMemberForm(props: { onDone: () => void }) {
 	return (
 		<PageLayout
 			title="New member"
-			onBack={() => setFormOpen(false)}
+			onBack={props.onBack}
 			action={
 				<button
 					className="btn btn-primary ml-auto"
@@ -77,14 +77,14 @@ function CreateMemberForm(props: { onDone: () => void }) {
 		>
 			{mutation.error && <div className="alert alter-error">{mutation.error.message}</div>}
 
-			<fieldset className="fieldset">
-				<legend className="fieldset-legend">Username</legend>
-				<input
-					type="text"
-					className="input w-full"
-					onChange={(e) => patch({ username: e.currentTarget.value.trim() })}
-				/>
-			</fieldset>
+			{/*<fieldset className="fieldset">*/}
+			{/*	<legend className="fieldset-legend">Username</legend>*/}
+			{/*	<input*/}
+			{/*		type="text"*/}
+			{/*		className="input w-full"*/}
+			{/*		onChange={(e) => patch({ username: e.currentTarget.value.trim() })}*/}
+			{/*	/>*/}
+			{/*</fieldset>*/}
 
 			<fieldset className="fieldset">
 				<legend className="fieldset-legend">Email</legend>

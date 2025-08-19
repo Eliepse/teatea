@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -27,10 +26,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[ORM\Column(type: Types::TEXT)]
 	public string $email;
 
-	#[Assert\NotBlank]
 	#[Assert\Length(min: 2)]
 	#[Assert\Unique]
-	#[ORM\Column(type: Types::TEXT)]
+	#[ORM\Column(type: Types::TEXT, nullable: true)]
 	public ?string $username = null;
 
 	/** @var list<string> The user roles */
@@ -38,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	private array $roles = [];
 
 	/** @var ?string The hashed password */
-	#[ORM\Column]
+	#[ORM\Column(type: Types::TEXT, nullable: true)]
 	private ?string $password = null;
 
 	/**

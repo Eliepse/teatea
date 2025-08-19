@@ -30,7 +30,7 @@ class Member
 	#[ApiProperty(identifier: true)]
 	public ?int $id;
 
-	#[Assert\Regex("/^[a-zA-Z0-9_]{2,}$/")]
+	#[Assert\Regex("/^[a-zA-Z0-9_]{2,16}$/")]
 	#[Assert\NotBlank]
 	#[Groups(["role:admin", "member:create"])]
 	public string $username;

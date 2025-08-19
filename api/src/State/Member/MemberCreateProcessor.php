@@ -16,7 +16,7 @@ readonly class MemberCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private Security               $security,
+		private Security $security,
 	)
 	{
 	}
@@ -31,8 +31,7 @@ readonly class MemberCreateProcessor implements ProcessorInterface
 		$entity = new \App\Entity\User();
 		$entity->username = $data->username;
 		$entity->email = $data->email;
-		$entity->setPassword("");
-		$entity->setRoles(["ROLE_USER"]);
+		$entity->setRoles([]);
 
 		$this->em->persist($entity);
 		$this->em->flush();
