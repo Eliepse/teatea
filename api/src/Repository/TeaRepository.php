@@ -23,7 +23,7 @@ class TeaRepository extends ServiceEntityRepository
 			->where("tea.family = :family")->setParameter("family", $tea->family)
 			->andWhere("tea.origin = :origin")->setParameter("origin", $tea->origin);
 
-		if (null !== $tea->type) {
+		if (null !== $tea->type?->id) {
 			$qb->andWhere("tea.type = :type")->setParameter("type", $tea->type);
 		} else {
 			$qb->andWhere("tea.type IS NULL");
