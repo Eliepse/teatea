@@ -1,52 +1,12 @@
 import { type ChangeEvent, useState } from "react";
 import clsx from "clsx";
+import { PredefinedNumberInput } from "~/components/shared/inputs/PredefinedNumberInput";
 
-const PREDEFINED_VALUES: number[] = [100, 120];
+const PREDEFINED_VALUES = [
+	{ value: 100, label: "100 ml" },
+	{ value: 120, label: "120 ml" },
+] as const;
 
-export function WaterVolumeInput(props: { value: number | null; onChange: (value: number | null) => void }) {
-	const [isCustom, setIsCustom] = useState(null !== props.value && PREDEFINED_VALUES.includes(props.value));
-
-	function handleCustomChange(e: ChangeEvent<HTMLInputElement>) {
-		const value = Math.max(parseInt(e.currentTarget.value.trim()), 0);
-		props.onChange(0 !== value ? value : null);
-	}
-
-	function handlePredefinedChange(predefinedValue: number) {
-		return (e: ChangeEvent<HTMLInputElement>) => {
-			e.stopPropagation();
-
-			if (e.currentTarget.checked) {
-				props.onChange(predefinedValue);
-			}
-		};
-	}
-
-	if (isCustom) {
-		return (
-			<label className="input w-full">
-				<input type="number" min={10} step={10} value={props.value ?? ""} onChange={handleCustomChange} />
-				<span className="label">ml</span>
-			</label>
-		);
-	}
-
-	return (
-		<div className="join">
-			{PREDEFINED_VALUES.map((val) => (
-				<input
-					key={val}
-					className={clsx("join-item btn flex-1", val === props.value && "btn-primary")}
-					type="radio"
-					name="predefined"
-					aria-label={`${val} ml`}
-					onChange={handlePredefinedChange(val)}
-					checked={val === props.value}
-				/>
-			))}
-
-			<button className="join-item btn" onClick={() => setIsCustom(true)}>
-				Custom
-			</button>
-		</div>
-	);
+export function WaterVolumeInput(props: { value: number | undefined; onChange: (value: number | undefined) => void }) {
+	return <PredefinedNumberInput predefined={PREDEFINED_VALUES} suffix="ml" value={props.value} onChange={props.onChange} />;
 }

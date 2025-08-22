@@ -40,7 +40,7 @@ export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultVa
 			onBack={props.onBack}
 			action={
 				<button className="ml-auto btn btn-primary" onClick={handleUIEvent(confirm)} disabled={!selected}>
-					Confirm
+					Select
 					<Arrow direction="right" className="size-4 ml-1" />
 				</button>
 			}

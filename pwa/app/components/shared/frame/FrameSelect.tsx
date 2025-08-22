@@ -1,4 +1,3 @@
-import { BrewingTechnic } from "~/components/shared/BrewingTechnic";
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import Arrow from "~/components/icons/arrow";
 import clsx from "clsx";
@@ -14,6 +13,7 @@ export function FrameSelect<TValue extends Key = Key>(props: {
 	items: Item<TValue>[];
 	onConfirm: (value: TValue | undefined) => void;
 	defaultValue?: TValue | undefined;
+	buttonText?: string;
 	required?: boolean;
 	onBack?: () => void;
 }) {
@@ -38,7 +38,7 @@ export function FrameSelect<TValue extends Key = Key>(props: {
 			onBack={props.onBack}
 			action={
 				<button className="ml-auto btn btn-primary" onClick={handleUIEvent(confirm)} disabled={!isValid}>
-					Confirm
+					{props.buttonText ?? "Confirm"}
 					<Arrow direction="right" className="size-4 ml-1" />
 				</button>
 			}

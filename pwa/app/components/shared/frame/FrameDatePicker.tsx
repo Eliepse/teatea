@@ -1,5 +1,4 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
-import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import {
 	eachDayOfInterval,
 	eachWeekOfInterval,
@@ -13,29 +12,52 @@ import {
 	startOfMonth,
 } from "date-fns";
 import clsx from "clsx";
-import { DayPicker, type DayPickerProps } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 import Arrow from "~/components/icons/arrow";
 import { handleUIEvent } from "~/utils/function";
+import { useState } from "react";
 
-export function SelectDateFrame(props: DayPickerProps) {
-	const navStack = useStackNavigator();
+export function FrameDatePicker(props: {
+	onConfirm: (date: Date) => void;
+	defaultValue?: Date;
+	onBack?: () => void;
+	buttonText?: string;
+}) {
+	const [selectedDay, setSelectedDay] = useState(props.defaultValue);
+
+	function confirm() {
+		if (!selectedDay) {
+			return;
+		}
+
+		props.onConfirm(selectedDay);
+	}
 
 	return (
 		<PageLayout
 			title="Select a date"
-			onBack={navStack.back}
+			onBack={props.onBack}
 			action={
 				<button
 					className="btn btn-primary flex ml-auto"
-					onClick={handleUIEvent(() => navStack.next({ key: "form" }))}
-					disabled={props.mode && !props.selected}
+					onClick={handleUIEvent(confirm)}
+					disabled={!selectedDay}
 				>
-					Confirm <Arrow direction="right" />
+					{props.buttonText ?? "Confirm"} <Arrow direction="right" />
 				</button>
 			}
 			withoutPadding
 		>
-			<DayPicker className="react-day-picker full" {...props} />
+			<DayPicker
+				className="react-day-picker full"
+				mode="single"
+				selected={selectedDay}
+				onSelect={setSelectedDay}
+				disabled={{ after: new Date() }}
+				endMonth={new Date()}
+				showOutsideDays
+				required
+			/>
 		</PageLayout>
 	);
 }
