@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { useToken } from "~/auth/hooks/useToken";
 import { useUser } from "~/auth/hooks/useUser";
 
-const AuthContext = createContext<{ token: string | null }>({ token: null });
+const AuthContext = createContext<{ token: ReturnType<typeof useToken>[0] }>({ token: null });
 
 export function AuthProvider(props: PropsWithChildren) {
 	const [token, _, clearToken] = useToken();

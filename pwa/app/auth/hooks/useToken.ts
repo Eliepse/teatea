@@ -13,7 +13,8 @@ type JWTokenPayload = {
 };
 
 export function useToken() {
-	return useLocalStorage<string>(tokenKey);
+	const tokenLC = useLocalStorage<string>(tokenKey);
+	return [TokenUtils.get(), tokenLC[1], tokenLC[2]] as const;
 }
 
 export const TokenUtils = {
