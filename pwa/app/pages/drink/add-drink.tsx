@@ -11,6 +11,8 @@ import { handleUIEvent } from "~/utils/function";
 import { SelectTechnicFrame } from "~/components/stackFrames/SelectTechnicFrame";
 import type { DrinkRaw } from "~/utils/api/normalization/drink";
 import { formatISO } from "date-fns";
+import { FrameSelect } from "~/components/shared/frame/Select";
+import { brewingTechnic, type TechnicType } from "~/components/shared/BrewingTechnic";
 
 export default function LogDrinkPage() {
 	const navigate = useNavigate();
@@ -42,6 +44,10 @@ export default function LogDrinkPage() {
 			stackNavigator.next({ key: "done", data });
 		},
 	});
+	const technicItems = Object.entries(brewingTechnic).map(([k, l]) => ({ value: k, label: l })) as {
+		value: TechnicType;
+		label: string;
+	}[];
 
 	function reset() {
 		setFormData({});
@@ -94,9 +100,14 @@ export default function LogDrinkPage() {
 						/>
 					</StackFrame>
 					<StackFrame frameKey="technic">
-						<SelectTechnicFrame
-							onSelect={(technic) => ctx.updateForm({ technic })}
-							value={formData.technic}
+						<FrameSelect
+							items={technicItems}
+							defaultValue={formData.technic ?? undefined}
+							onBack={stackNavigator.back}
+							onConfirm={(technic) => {
+								ctx.updateForm({ technic });
+								stackNavigator.next({ key: "form" });
+							}}
 						/>
 					</StackFrame>
 					<StackFrame frameKey="done">
