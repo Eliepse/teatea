@@ -1,0 +1,18 @@
+{
+	"name": "Teatea",
+	"start_url": "/welcome",
+	"display": "standalone",
+	"display-override": "standalone",
+	"icons": [
+		{
+			"src": "icons/leaf_192.png",
+			"type": "image/png",
+			"sizes": "192x192"
+		},
+		{
+			"src": "icons/leaf_512.png",
+			"type": "image/png",
+			"sizes": "512x512"
+		}
+	]
+}

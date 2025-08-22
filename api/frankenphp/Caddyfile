@@ -47,15 +47,16 @@
 	# Disable Topics tracking if not enabled explicitly: https://github.com/jkarlin/topics
 	header ?Permissions-Policy "browsing-topics=()"
 
-	# Matches requests for HTML documents, for static files and for Next.js files,
+	# Matches requests for HTML documents, for static files and for PWA files,
 	# except for known API paths and paths with extensions handled by API Platform
 	@pwa expression `
-		!path(
+		    path('/manifest.json')
+		|| !path(
 			'/api*', '/auth*', '/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
 			'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml'
 		)`
 
-	# Comment the following line if you don't want Next.js to catch requests for HTML documents.
+	# Comment the following line if you don't want PWA to catch requests for HTML documents.
 	# In this case, they will be handled by the PHP app.
 	reverse_proxy @pwa http://{$PWA_UPSTREAM}
 
