@@ -1,5 +1,5 @@
-import { TeaSearchFrame } from "~/components/search/TeaSearchFrame";
+import { TeaSearchEngine } from "~/components/search/TeaSearchEngine";
 
 export default function TeaSearchPage() {
-	return <TeaSearchFrame onSelect={console.debug} />;
+	return <TeaSearchEngine onSelect={console.debug} />;
 }

@@ -7,8 +7,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import type { ApiCollection, OriginPath, Tea } from "~t/types";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 
-export function TeaSearchFrame(props: { onSelect: (tea: Tea) => void; value?: Tea }) {
+export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: Tea; allowCreation?: boolean }) {
 	const [searchText, setSearchText] = useState<string>();
 
 	const teasQuery = useQuery({
@@ -25,9 +26,14 @@ export function TeaSearchFrame(props: { onSelect: (tea: Tea) => void; value?: Te
 		queryKey: ["search", { q: searchText }],
 	});
 
+	async function onTeaCreated(tea: Tea) {
+		void teasQuery.refetch();
+		props.onSelect(tea);
+	}
+
 	return (
-		<div className="h-full">
-			<div className="sticky top-0 py-4 bg-white border-b border-base-300">
+		<div className="h-full flex flex-col">
+			<div className="py-4 bg-white border-b border-base-300 flex-none">
 				<div className="px-4">
 					<SearchInput value={searchText} onChange={setSearchText} />
 				</div>
@@ -45,7 +51,7 @@ export function TeaSearchFrame(props: { onSelect: (tea: Tea) => void; value?: Te
 				{/*</ul>*/}
 			</div>
 
-			<div className="py-4">
+			<div className="py-4 flex-1 overflow-y-auto">
 				{teasQuery.isLoading && undefined === teasQuery.data && (
 					<ul className="px-4">
 						<li className="skeleton h-16 mb-2 block"></li>
@@ -81,6 +87,10 @@ export function TeaSearchFrame(props: { onSelect: (tea: Tea) => void; value?: Te
 								</li>
 							))}
 						</ul>
+
+						{!!props.allowCreation && (
+							<CreateTeaButton className="btn-dash btn-block h-14 mt-8" onCreated={onTeaCreated} />
+						)}
 					</div>
 				)}
 			</div>
