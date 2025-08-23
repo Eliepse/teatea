@@ -199,6 +199,7 @@ doctrine:
                 TO_TIMESTAMP: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\ToTimestamp
             numeric_functions:
                 ltree: App\Doctrine\ORM\Functions\LTreeOperatorFunction
+                similarity: App\Doctrine\ORM\Functions\TrgmSimilarityFunction
 
 when@test:
     doctrine:

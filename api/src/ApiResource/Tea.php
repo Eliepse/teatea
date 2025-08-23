@@ -8,8 +8,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\DTO\OriginPath;
 use App\Enum\TeaFamily;
+use App\State\Tea\TeaCollectionProvider;
 use App\State\Tea\TeaCreateFromTypeProcessor;
 use App\State\Tea\TeaCreateProcess;
 use App\State\Tea\TeaProvider;
@@ -24,7 +26,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[GetCollection(
 	paginationEnabled: false,
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
-	provider: TeaProvider::class,
+	provider: TeaCollectionProvider::class,
+	parameters: [
+//		"origin" => new QueryParameter(description: "Filter by origin"),
+//		"family" => new QueryParameter(description: "Filter by family"),
+//		"type" => new QueryParameter(description: "Filter by type"),
+		"q" => new QueryParameter(description: "Filter by name"),
+	],
 )]
 #[Post(
 	normalizationContext: ["groups" => ["tea:read"]],

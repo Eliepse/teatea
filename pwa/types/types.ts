@@ -80,7 +80,7 @@ export type BrewingSession = Resource & {
 export type Member = Resource<"Member"> & {
 	username: string;
 	email: string;
-}
+};
 
 export const teaFamilies = {
 	white: "White tea",
@@ -100,3 +100,8 @@ export interface ApiCollection<T> {
 	totalItems: number;
 	member: T[];
 }
+
+export type SearchResult = {
+	label: string;
+	score?: number;
+};

@@ -1,7 +1,7 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import clsx from "clsx";
 import styles from "./AuthLayout.module.css";
-import { CalendarDaysIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigation } from "react-router";
 import Leaf from "~/components/icons/leaf";
 
@@ -34,6 +34,15 @@ export function AuthLayout(props: PropsWithChildren<{ className?: string; active
 								icon={<HomeIcon className="size-5" />}
 								label="Home"
 								active={"home" === props.activeKey}
+							/>
+						</Link>
+					</li>
+					<li className="flex-1">
+						<Link to="/tea/search">
+							<NavItem
+								icon={<MagnifyingGlassIcon className="size-5" />}
+								label="Search"
+								active={"search" === props.activeKey}
 							/>
 						</Link>
 					</li>

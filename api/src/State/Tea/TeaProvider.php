@@ -24,20 +24,16 @@ readonly class TeaProvider implements ProviderInterface
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
-		$isCollection = $operation instanceof CollectionOperationInterface;
+		assert(false === ($operation instanceof CollectionOperationInterface), "Collection operation not supported");
 
 		$teaQb = $this->em->createQueryBuilder()
 			->select("tea", "type", "origin")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
-			->leftJoin("tea.origin", "origin");
-
-		if(false === $isCollection) {
-			$teaQb
-				->andWhere("tea.id = :teaId")
-				->setParameter("teaId", $uriVariables["id"])
-				->setMaxResults(1);
-		}
+			->leftJoin("tea.origin", "origin")
+			->andWhere("tea.id = :teaId")
+			->setParameter("teaId", $uriVariables["id"])
+			->setMaxResults(1);
 
 		/** @var array<\App\Entity\Tea> $teaEntities */
 		$teaEntities = $teaQb->getQuery()->getResult();
@@ -56,7 +52,7 @@ readonly class TeaProvider implements ProviderInterface
 			$resources[] = self::hydrateResource($teaEntity, $originNodes);
 		}
 
-		return $isCollection ? $resources : ($resources[0] ?? null);
+		return $resources[0] ?? null;
 	}
 
 	/**

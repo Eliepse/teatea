@@ -11,7 +11,7 @@ type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
 		  }
 		| {
 				method?: "GET";
-				payload?: Record<string, string>;
+				payload?: Record<string, string | undefined>;
 		  }
 	);
 
@@ -41,6 +41,7 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 	}
 
 	if ((undefined === config?.method || "GET" === config?.method) && undefined !== config?.payload) {
+		// @ts-ignore
 		searchParams = new URLSearchParams([
 			...Array.from(searchParams.entries()),
 			...Object.entries(config.payload).filter(([_, v]) => !!v),
@@ -71,6 +72,14 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 	}
 
 	return response;
+}
+
+export async function getApi<T>(
+	url: string,
+	payload: Record<string, string | undefined>,
+	config?: Omit<FetchApiConfig, "payload" | "method">,
+): Promise<TResponse<T>> {
+	return fetchApi<T>(url, { ...config, method: "GET", payload });
 }
 
 export async function postApi<T>(
