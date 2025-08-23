@@ -3,6 +3,7 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
@@ -13,14 +14,14 @@ use App\State\TeaType\TeaTypeProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+#[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
 	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
-	security: "is_granted('ROLE_USER')", provider: TeaTypeProvider::class,
+	provider: TeaTypeProvider::class,
 )]
 #[GetCollection(
 	paginationEnabled: false,
 	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
-	security: "is_granted('ROLE_USER')",
 	provider: TeaTypeProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
@@ -34,7 +35,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	]
 )]
-#[Post(security: "is_granted('ROLE_ADMIN')", processor: TeaTypeCreateProcessor::class)]
+#[Post(processor: TeaTypeCreateProcessor::class)]
 class TeaType
 {
 	#[Groups(["read:origin"])]

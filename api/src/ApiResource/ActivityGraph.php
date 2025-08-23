@@ -3,10 +3,12 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use App\State\ActivityGraphProvider;
 use App\ValueObject\ActivityGraphDay;
 
+#[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(provider: ActivityGraphProvider::class)]
 class ActivityGraph
 {

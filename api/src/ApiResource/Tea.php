@@ -3,6 +3,7 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
@@ -15,6 +16,7 @@ use App\State\Tea\TeaProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 
+#[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
 	provider: TeaProvider::class),
@@ -27,7 +29,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Post(
 	normalizationContext: ["groups" => ["tea:read"]],
 	denormalizationContext: ["groups" => ["tea:create"]],
-	security: "is_granted('ROLE_USER')",
 	processor: TeaCreateProcess::class,
 )]
 #[Post(
@@ -35,7 +36,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	uriVariables: ["typeId" => new Link(toProperty: "type", fromClass: TeaType::class)],
 	normalizationContext: ["groups" => ["tea:read"]],
 	denormalizationContext: ["groups" => ["tea:createFromType"]],
-	security: "is_granted('ROLE_USER')",
 	processor: TeaCreateFromTypeProcessor::class,
 )]
 class Tea

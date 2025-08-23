@@ -14,7 +14,7 @@ use App\State\Drink\BrewingStepProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
-#[ApiResource]
+#[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
 	uriTemplate: "/drinks/{drinkId}/brewing-steps/{id}",
 	uriVariables: [

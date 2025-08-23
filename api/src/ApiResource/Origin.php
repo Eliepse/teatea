@@ -3,12 +3,14 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\State\OriginProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(provider: OriginProvider::class)]
 #[GetCollection(provider: OriginProvider::class)]
 class Origin
