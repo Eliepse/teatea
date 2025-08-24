@@ -200,6 +200,7 @@ doctrine:
             numeric_functions:
                 ltree: App\Doctrine\ORM\Functions\LTreeOperatorFunction
                 similarity: App\Doctrine\ORM\Functions\TrgmSimilarityFunction
+                row_number: App\Doctrine\ORM\Functions\RowNumberFunction
 
 when@test:
     doctrine:
