@@ -23,24 +23,56 @@ readonly class TeaCollectionProvider implements ProviderInterface
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
+
+		// Query parameters
+
 		$params = $operation->getParameters();
-		$searchText = $params->get("q")->getValue();
+
+		$searchTextParam = $params->get("q")->getValue();
+		$hasSearchText = false === ($searchTextParam instanceof ParameterNotFound);
+
+		$sortParam = $params->get("sort")->getValue();
+		if ($sortParam instanceof ParameterNotFound) {
+			$sortParam = "popularity";
+		}
+
+		// Base query
 
 		$teaQb = $this->em->createQueryBuilder()
 			->select("tea", "type", "origin")
 			->from(\App\Entity\Tea::class, "tea")
+			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.type", "type")
-			->leftJoin("tea.origin", "origin");
+			->groupBy("tea.id", "tea.createdBy", "type.id", "origin.id");
 
-		if (false === ($searchText instanceof ParameterNotFound)) {
+		// Search
+
+		if ($hasSearchText) {
 			$teaQb
-				->setParameter("searchText", $searchText)
 				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
-				->addOrderBy("SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))", "DESC");
+				->setParameter("searchText", $searchTextParam);
+		}
+
+		// Sorting
+
+		if ("popularity" === $sortParam) {
+			$teaQb->leftJoin("tea.drinks", "drink", "WITH", ":popularSince <= drink.drankAt")
+				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
+
+			if ($hasSearchText) {
+				$teaQb->orderBy(
+					"ROW_NUMBER(ORDER BY SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC, count(drink.id) DESC)",
+				);
+			} else {
+				$teaQb->orderBy("count(drink.id)", "DESC");
+			}
 		}
 
 		/** @var array<\App\Entity\Tea> $teaEntities */
-		$teaEntities = $teaQb->getQuery()->getResult();
+		$teaEntities = $teaQb
+			->addOrderBy("tea.createdBy", "DESC")
+			->getQuery()
+			->getResult();
 
 		$originsQb = $this->em->createQueryBuilder()
 			->select("origin")

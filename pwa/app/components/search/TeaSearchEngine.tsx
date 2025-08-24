@@ -23,7 +23,7 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 			const response = await getApi<ApiCollection<Tea>>("/teas", params);
 			return await response.json();
 		},
-		queryKey: ["search", { q: searchText }],
+		queryKey: ["search", { q: searchText, sort: "popularity" }],
 	});
 
 	async function onTeaCreated(tea: Tea) {

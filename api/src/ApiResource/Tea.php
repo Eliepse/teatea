@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\DTO\OriginPath;
 use App\Enum\TeaFamily;
 use App\State\Tea\TeaCollectionProvider;
@@ -31,7 +32,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 //		"origin" => new QueryParameter(description: "Filter by origin"),
 //		"family" => new QueryParameter(description: "Filter by family"),
 //		"type" => new QueryParameter(description: "Filter by type"),
-		"q" => new QueryParameter(description: "Filter by name"),
+		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
+		"sort" => new QueryParameter(
+			schema: ["enum" => ["popularity"],],
+			openApi: new OpenApiParameter(name: "enum", in: "query"),
+			description: "Sorting method",
+		),
 	],
 )]
 #[Post(
