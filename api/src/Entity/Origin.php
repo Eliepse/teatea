@@ -22,7 +22,6 @@ class Origin
 	public readonly int $id;
 
 	#[ORM\Column(type: "ltree", unique: true)]
-	#[ApiProperty(genId: false)]
 	public LTreePath $path;
 
 	#[ORM\Column(type: Types::TEXT)]
