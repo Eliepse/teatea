@@ -1,5 +1,10 @@
 import { TeaSearchEngine } from "~/components/search/TeaSearchEngine";
+import { AuthLayout } from "~/layouts/AuthLayout";
 
 export default function TeaSearchPage() {
-	return <TeaSearchEngine onSelect={console.debug} />;
+	return (
+		<AuthLayout activeKey="search">
+			<TeaSearchEngine onSelect={console.debug} />
+		</AuthLayout>
+	);
 }
