@@ -30,11 +30,7 @@ export default function ListDrinks(props: Route.ComponentProps) {
 	);
 
 	return (
-		<AuthLayout className="px-4" activeKey="activity">
-			<header className="py-4">
-				<h1 className="text-lg mt-2">Drinks</h1>
-			</header>
-
+		<AuthLayout className="p-4" activeKey="activity">
 			<p className="text-sm text-content/60">Your activity this year</p>
 			<ActivityGraph className="my-2" />
 
