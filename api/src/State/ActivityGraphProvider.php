@@ -51,6 +51,14 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		$data = $statsQB->fetchAllAssociative();
 
 		$totals = array_map(fn($row) => $row["total"], $data);
+
+		if (0 === count($totals)) {
+			$graph = new ActivityGraph();
+			$graph->year = $year;
+			$graph->items = [];
+			return $graph;
+		}
+
 		$min = min($totals);
 		$max = max($totals);
 		$levelSize = (int)round(($max - $min) / 3);
