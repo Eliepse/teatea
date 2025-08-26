@@ -96,15 +96,19 @@ export default function DrinkPage(props: Route.ComponentProps) {
 				</div>
 
 				<div className="mt-4 grid grid-cols-2 gap-4">
-					<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-						<Leaf className="size-3 text-base-content/40" />
-						<span>{!!drink.teaQuantity && `${drink.teaQuantity} g`}</span>
-					</div>
+					{!!drink.teaQuantity && (
+						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+							<Leaf className="size-3 text-base-content/40" />
+							<span>{`${drink.teaQuantity} g`}</span>
+						</div>
+					)}
 
-					<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-						<WaterDrop className="size-3 text-base-content/40" />
-						<span>{!!drink.waterMl && `${drink.waterMl} ml`}</span>
-					</div>
+					{!!drink.waterMl && (
+						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+							<WaterDrop className="size-3 text-base-content/40" />
+							<span>{`${drink.waterMl} ml`}</span>
+						</div>
+					)}
 				</div>
 			</header>
 
