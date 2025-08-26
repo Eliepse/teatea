@@ -20,12 +20,15 @@ final readonly class TokenManager
 		private string $signingKey,
 		private EntityManagerInterface $em,
 		private TokenRepository $tokenRepository,
-	)
-	{
+	) {
 	}
 
-	public function generateTokenWithSalt(string $type, User $owner, \DateTimeImmutable $expiredAt, string $salt): GeneratedToken
-	{
+	public function generateTokenWithSalt(
+		string $type,
+		User $owner,
+		\DateTimeImmutable $expiredAt,
+		string $salt,
+	): GeneratedToken {
 		$key = $this->generateRandomString(self::KEY_LENGTH);
 		$payload = [$salt, $type, $owner->id, $expiredAt->getTimestamp()];
 		$encodedPayload = base64_encode(serialize($payload));
@@ -46,10 +49,6 @@ final readonly class TokenManager
 
 	/**
 	 * Check the challenge and return the associated token on success.
-	 *
-	 * @param string $challenge
-	 * @param string $type
-	 * @return Token|null
 	 */
 	public function validateChallenge(string $challenge, string $type): ?Token
 	{

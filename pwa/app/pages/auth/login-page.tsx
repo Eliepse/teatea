@@ -3,11 +3,16 @@ import type { Route } from "../../../.react-router/types/app/pages/auth/+types/l
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { handleUIEvent } from "~/utils/function";
 
-type OTPResponse = {
-	token: string;
-	refresh_token: string;
-	refresh_token_expiration: number;
-};
+type OTPResponse =
+	| {
+			token: string;
+			refresh_token: string;
+			refresh_token_expiration: number;
+	  }
+	| {
+			action: { redirect: string };
+			message?: string;
+	  };
 
 export async function clientAction({ request }: Route.ClientActionArgs) {
 	const formData = await request.formData();
@@ -43,14 +48,17 @@ export async function clientLoader(props: Route.ClientLoaderArgs) {
 	const response = await fetch(`/auth/otp/${otpToken}`, { method: "POST", headers: { Accept: "application/json" } });
 	const data = (await response.json()) as Partial<OTPResponse>;
 
-	if (!data.token || !data.refresh_token || !data.refresh_token_expiration) {
-		throw new Error("Invalid auth response");
+	if ("action" in data) {
+		return { message: data.message };
 	}
 
-	TokenUtils.set(data.token);
-	TokenUtils.setRefreshToken(data.refresh_token, new Date(data.refresh_token_expiration * 1_000));
+	if ("token" in data && data.token && data.refresh_token && data.refresh_token_expiration) {
+		TokenUtils.set(data.token);
+		TokenUtils.setRefreshToken(data.refresh_token, new Date(data.refresh_token_expiration * 1_000));
+		throw redirect("/welcome");
+	}
 
-	throw redirect("/welcome");
+	throw new Error("Invalid auth response");
 }
 
 export default function LoginPage(args: Route.ComponentProps) {
@@ -71,6 +79,12 @@ export default function LoginPage(args: Route.ComponentProps) {
 
 	return (
 		<div className="p-6 h-screen flex flex-col justify-center items-center">
+			{!!args.loaderData?.message && (
+				<div role="alert" className="alert alert-error text-white w-full mb-4">
+					{args.loaderData.message}
+				</div>
+			)}
+
 			<fetcher.Form method="POST" className="max-w-xs w-full">
 				<fieldset className="fieldset mb-2">
 					<legend className="fieldset-legend">Email</legend>

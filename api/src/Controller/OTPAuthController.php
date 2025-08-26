@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Token;
 use App\Entity\User;
+use App\Exception\Auth\ExpiredTokenException;
+use App\Exception\Auth\InvalidTokenException;
 use App\Repository\UserRepository;
 use App\Service\TokenManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
@@ -83,10 +84,17 @@ readonly class OTPAuthController
 	#[Route("/auth/otp/{challenge}", requirements: ["challenge" => "[0-9a-zA-Z]{42}"], methods: ["POST"], format: "application/json",)]
 	public function validate(string $challenge): JsonResponse
 	{
-		$token = $this->tokenManager->validateChallenge($challenge, Token::TYPE_OTP);
+		try {
+			$token = $this->tokenManager->validateChallenge($challenge, Token::TYPE_OTP);
+		} catch (InvalidTokenException|ExpiredTokenException $e) {
+			$token = null;
+		}
 
 		if (null === $token) {
-			throw new NotFoundHttpException();
+			return new JsonResponse(
+				["action" => ["redirect" => "/login"], "message" => "Token invalid or expired"],
+				404,
+			);
 		}
 
 		$jwt = $this->JWTManager->create($token->owner);

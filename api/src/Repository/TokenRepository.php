@@ -21,7 +21,7 @@ class TokenRepository extends ServiceEntityRepository
 	{
 		return $this->createQueryBuilder("T")
 			->where("T.tokenKey = :key")->setParameter("key", $key)
-			->getQuery()->getSingleResult();
+			->getQuery()->getOneOrNullResult();
 	}
 
 	public function removeExpiredTokens(): void
