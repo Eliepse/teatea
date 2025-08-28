@@ -4,3 +4,4 @@
 api/.env.local
 compose.override.yaml
 compose.override.yml
+/.env
