@@ -40,8 +40,8 @@ services:
       context: ./pwa
       target: dev
     environment:
-      PUBLIC_POSTHOG_KEY: ${POSTHOG_KEY}
-      PUBLIC_POSTHOG_HOST: ${POSTHOG_HOST}
+      PUBLIC_POSTHOG_KEY: ${POSTHOG_KEY:-}
+      PUBLIC_POSTHOG_HOST: ${POSTHOG_HOST:-}
     depends_on:
       - api
     volumes:
