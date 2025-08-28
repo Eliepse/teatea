@@ -1,18 +1,27 @@
 {
-	"name": "Teatea",
-	"start_url": "/welcome",
-	"display": "standalone",
-	"display-override": "standalone",
-	"icons": [
-		{
-			"src": "icons/leaf_192.png",
-			"type": "image/png",
-			"sizes": "192x192"
-		},
-		{
-			"src": "icons/leaf_512.png",
-			"type": "image/png",
-			"sizes": "512x512"
-		}
-	]
+  "name": "Teatea",
+  "description": "Social and collaborative tea journal",
+  "start_url": "/welcome",
+  "display": "standalone",
+  "display-override": "standalone",
+	"orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/leaf_192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icons/leaf_512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "background_color": "white",
+	"theme_color": "white",
+  "categories": [
+    "productivity",
+    "lifestyle",
+    "social"
+  ]
 }
