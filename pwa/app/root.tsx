@@ -3,6 +3,13 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
+import { StrictMode } from "react";
+import { PostHogProvider } from "posthog-js/react";
+
+const options = {
+	api_host: import.meta.env.PUBLIC_POSTHOG_HOST as string,
+	defaults: "2025-05-24",
+};
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -40,9 +47,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 export default function App() {
 	return (
-		<AlertContext>
-			<Outlet />
-		</AlertContext>
+		<StrictMode>
+			<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
+				<AlertContext>
+					<Outlet />
+				</AlertContext>
+			</PostHogProvider>
+		</StrictMode>
 	);
 }
 
