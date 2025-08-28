@@ -4,4 +4,5 @@
 api/.env.local
 compose.override.yaml
 compose.override.yml
+.pnpm-store
 /.env
