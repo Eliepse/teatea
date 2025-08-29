@@ -29,6 +29,27 @@ export default function ListDrinks(props: Route.ComponentProps) {
 		{} as { [key: string]: Drink[] },
 	);
 
+	if (0 === items.length) {
+		return (
+			<AuthLayout className="p-4 flex items-center" activeKey="activity">
+				<p className="text-base-content/60 text-center">
+					This page shows your recent activity, but you haven't save any tea session yet.{" "}
+					Start your tea journal by {" "}
+					<Link to="/drink/new" className="link link-primary">
+						recording your first session!
+					</Link>
+				</p>
+
+				<Link
+					to="/drink/new"
+					className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 w-12 shadow-md"
+				>
+					<PlusIcon className="size-4" />
+				</Link>
+			</AuthLayout>
+		);
+	}
+
 	return (
 		<AuthLayout className="p-4" activeKey="activity">
 			<p className="text-sm text-content/60">Your activity this year</p>
