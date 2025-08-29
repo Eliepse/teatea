@@ -46,6 +46,7 @@ class TeaType
 	public TeaFamily $family;
 
 	#[Assert\NotBlank]
+	#[Assert\Length(min: 2, max: 16)]
 	#[Groups(["embedded:teaType", "read:origin", "tea:create"])]
 	public string $name;
 

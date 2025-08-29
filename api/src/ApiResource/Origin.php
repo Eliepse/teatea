@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\State\OriginProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(provider: OriginProvider::class)]
@@ -21,6 +22,8 @@ class Origin
 	#[ApiProperty(genId: false)]
 	public LTreePath $path;
 
+	#[Assert\NotBlank]
+	#[Assert\Length(min: 2, max: 24)]
 	#[Groups("embedded:originPath")]
 	public string $name;
 
