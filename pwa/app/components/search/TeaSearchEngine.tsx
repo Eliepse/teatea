@@ -69,15 +69,17 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 
 				{teasQuery.isSuccess && teasQuery.data && (
 					<div className="px-4">
-						<div className="uppercase text-xs text-base-content/60">
-							{teasQuery.data.totalItems} results
+						<div className="uppercase text-xs text-base-content/60 flex justify-between mb-4">
+							<span>{teasQuery.data.totalItems} results</span>
+							<span>Sorted by popularity</span>
 						</div>
-						<ul className="mt-2">
+
+						<ul>
 							{teasQuery.data.member?.map((tea) => (
 								<li key={tea.id}>
 									<TeaItem
 										title={tea.displayName}
-										family={tea.family + " tea"}
+										family={tea.family}
 										type={tea.type?.name}
 										originPath={tea.originPath}
 										onSelect={() => props.onSelect(tea)}
@@ -142,19 +144,55 @@ function TeaItem(props: {
 	family: string;
 	type?: string;
 }) {
+	const familyLabel = props.family[0].toUpperCase() + props.family.substring(1);
+
+	if (!props.type) {
+		const closestOrigin = props.originPath?.locality ?? props.originPath?.region ?? props.originPath?.country;
+
+		return (
+			<article
+				className={clsx(
+					"bg-base-200 rounded px-4 py-2 h-16",
+					props.selected && "bg-primary text-white",
+					props.className,
+				)}
+				onClick={props.onSelect}
+			>
+				<div className="flex justify-between">
+					<span className="text-[.66rem] text-base-content/40 uppercase">{familyLabel}</span>
+					<span className="text-xs text-right text-base-content/60">
+						{props.originPath && (
+							<FormatOriginPath
+								originPath={props.originPath}
+								maxLevel={closestOrigin === props.originPath?.locality ? "region" : "country"}
+							/>
+						)}
+					</span>
+				</div>
+				<div>
+					{familyLabel} tea <span className="text-base-content/60">of {closestOrigin?.name}</span>
+				</div>
+			</article>
+		);
+	}
+
 	return (
 		<article
 			className={clsx(
-				"bg-base-200 rounded px-4 py-3 h-16 flex items-center",
+				"bg-base-200 rounded px-4 py-2 h-16",
 				props.selected && "bg-primary text-white",
 				props.className,
 			)}
 			onClick={props.onSelect}
 		>
-			<div className="flex-1">{props.title}</div>
-			<div className="text-xs text-right">
-				{<div>{props.type ? props.family : ""}</div>}
-				{props.originPath && <FormatOriginPath originPath={props.originPath} />}
+			<div className="flex justify-between">
+				<span className="text-[.66rem] text-base-content/40 uppercase">{familyLabel}</span>
+				<span className="text-xs text-right text-base-content/60">
+					{props.originPath && <FormatOriginPath originPath={props.originPath} />}
+				</span>
+			</div>
+			<div>
+				<div className="">{props.type}</div>
 			</div>
 		</article>
 	);
