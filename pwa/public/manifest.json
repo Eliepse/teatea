@@ -31,6 +31,13 @@
 			"type": "image/png",
 			"form_factor": "narrow",
 			"label": "Page listing member's own recent activity"
+		},
+		{
+			"src": "img/screenshots/search-desktop.png",
+			"sizes": "1559x1081",
+			"type": "image/png",
+			"form_factor": "wide",
+			"label": "Tea search engine"
 		}
 	]
 }
