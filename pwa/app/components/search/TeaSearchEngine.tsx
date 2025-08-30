@@ -159,8 +159,17 @@ function TeaItem(props: {
 				onClick={props.onSelect}
 			>
 				<div className="flex justify-between">
-					<span className="text-[.66rem] text-base-content/40 uppercase">{familyLabel}</span>
-					<span className="text-xs text-right text-base-content/60">
+					<span
+						className={clsx(
+							"text-[.66rem] uppercase",
+							props.selected ? "text-white" : "text-base-content/40",
+						)}
+					>
+						{familyLabel}
+					</span>
+					<span
+						className={clsx("text-xs text-right", props.selected ? "text-white" : "text-base-content/60")}
+					>
 						{props.originPath && (
 							<FormatOriginPath
 								originPath={props.originPath}
@@ -170,7 +179,10 @@ function TeaItem(props: {
 					</span>
 				</div>
 				<div>
-					{familyLabel} tea <span className="text-base-content/60">of {closestOrigin?.name}</span>
+					{familyLabel} tea{" "}
+					<span className={clsx(props.selected ? "text-white" : "text-base-content/60")}>
+						of {closestOrigin?.name}
+					</span>
 				</div>
 			</article>
 		);
@@ -186,8 +198,12 @@ function TeaItem(props: {
 			onClick={props.onSelect}
 		>
 			<div className="flex justify-between">
-				<span className="text-[.66rem] text-base-content/40 uppercase">{familyLabel}</span>
-				<span className="text-xs text-right text-base-content/60">
+				<span
+					className={clsx("text-[.66rem] uppercase", props.selected ? "text-white" : "text-base-content/40")}
+				>
+					{familyLabel}
+				</span>
+				<span className={clsx("text-xs text-right", props.selected ? "text-white" : "text-base-content/60")}>
 					{props.originPath && <FormatOriginPath originPath={props.originPath} />}
 				</span>
 			</div>
