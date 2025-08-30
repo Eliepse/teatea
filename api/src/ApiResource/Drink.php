@@ -48,6 +48,7 @@ class Drink
 	#[Groups(["drink:create", "drink:read"])]
 	public ?BrewingTechnic $technic = null;
 
+	#[Assert\Length(max: 1000)]
 	#[Groups(["drink:create", "drink:edit", "drink:read"])]
 	public ?string $note = null;
 

@@ -35,7 +35,7 @@ class Member
 	#[ApiProperty(identifier: true)]
 	public ?int $id;
 
-	#[Assert\Regex("/^[a-zA-Z0-9_]{2,16}$/")]
+	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
 	#[Groups(["role:admin", "member:onboarding"])]
 	public ?string $username;

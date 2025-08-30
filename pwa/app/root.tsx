@@ -3,6 +3,15 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
+import { StrictMode } from "react";
+import { PostHogProvider } from "posthog-js/react";
+import type { PostHogConfig } from "posthog-js";
+
+const options: Partial<PostHogConfig> = {
+	api_host: import.meta.env.PUBLIC_POSTHOG_HOST as string,
+	defaults: "2025-05-24",
+	debug: import.meta.env.DEV,
+};
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -39,11 +48,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-	return (
+	const children = (
 		<AlertContext>
 			<Outlet />
 		</AlertContext>
 	);
+
+	if (options.api_host && import.meta.env.PUBLIC_POSTHOG_KEY) {
+		return (
+			<StrictMode>
+				<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
+					{children}
+				</PostHogProvider>
+			</StrictMode>
+		);
+	}
+
+	return <StrictMode>{children}</StrictMode>;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
