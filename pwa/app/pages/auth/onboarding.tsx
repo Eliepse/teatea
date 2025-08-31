@@ -50,7 +50,7 @@ export default function OnboardingPage() {
 	return (
 		<NavigationStack>
 			<StackFrame frameKey="welcome">
-				<div className="flex flex-col h-screen p-4">
+				<div className="flex flex-col h-dvh p-4">
 					<div className="flex-1 flex flex-col justify-center">
 						<h2 className="text-3xl text-primary">Welcome to Teatea!</h2>
 						<p className="max-w-xs mt-8 text-lg">
@@ -88,7 +88,7 @@ export default function OnboardingPage() {
 			</StackFrame>
 
 			<StackFrame frameKey="cta:drink">
-				<div className="flex flex-col h-screen p-4">
+				<div className="flex flex-col h-dvh p-4">
 					<div className="flex-1 flex flex-col justify-center items-start">
 						<h2 className="text-xl text-primary">Ready?</h2>
 						<p className="max-w-xs mt-6 text-lg">
@@ -131,7 +131,7 @@ function AskUsername(props: {
 	}
 
 	return (
-		<div className="flex flex-col h-screen p-4">
+		<div className="flex flex-col h-dvh p-4">
 			<div className="flex-1 flex flex-col justify-center">
 				<h2 className="text-xl text-primary">How should people call you here?</h2>
 				<fieldset className="fieldset w-full mt-8">
@@ -179,7 +179,7 @@ function ProposePWA(props: { onNext: () => void }) {
 	}
 
 	return (
-		<div className="flex flex-col h-screen p-4">
+		<div className="flex flex-col h-dvh p-4">
 			<div className="flex-1 flex flex-col justify-center">
 				<h2 className="text-xl text-primary">Quick access</h2>
 				<p className="max-w-xs mt-6 text-lg">

@@ -21,7 +21,7 @@ export function PageLayout(
 	}
 
 	return (
-		<div className={clsx("flex flex-col h-screen", props.className)}>
+		<div className={clsx("flex flex-col h-dvh", props.className)}>
 			<div className="flex-none border-b border-base-300">
 				{!!props.onBack && (
 					<button className="btn btn-ghost pl-4 mt-2" onClick={handleBack}>
