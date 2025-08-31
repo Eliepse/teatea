@@ -32,6 +32,16 @@ services:
       - ./api/:/app
     ports:
       - "80:80"
+    develop:
+      watch:
+        - action: rebuild
+          path: compose.yaml
+        - action: rebuild
+          path: compose.override.yaml
+        - action: rebuild
+          path: .env
+        - action: rebuild
+          path: api/frankenphp
       
   pwa:
     user: "1000:1000"
