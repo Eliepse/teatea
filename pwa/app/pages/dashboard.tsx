@@ -1,9 +1,10 @@
 import { Link } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { Paged } from "~/components/shared/paged/Paged";
-import { CreateTeaTypeFlow } from "~/components/tea_type/CreateTeaTypeFlow";
 import { useToken } from "~/auth/hooks/useToken";
+import { usePWAInstall } from "~/utils/browser/usePWAInstall";
+import { handleUIEvent } from "~/utils/function";
+import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -12,6 +13,7 @@ export function meta() {
 export default function Dashboard() {
 	const [token] = useToken();
 	const userQuery = useUser();
+	const pwaInstall = usePWAInstall();
 
 	return (
 		<AuthLayout className="px-4" activeKey="home">
@@ -31,8 +33,15 @@ export default function Dashboard() {
 				Élie
 			</p>
 
+			{pwaInstall.installable && false === pwaInstall.installed && (
+				<button className="btn btn-outline btn-primary btn-block h-12 mt-8" onClick={handleUIEvent(pwaInstall.prompt)}>
+					Install the web app
+					<ArrowDownCircleIcon className="ml-2 size-5" />
+				</button>
+			)}
+
 			{token?.roles?.includes("ROLE_ADMIN") && (
-				<Link to="/admin" className="btn btn-block h-12 mt-6">
+				<Link to="/admin" className="btn btn-block h-12 mt-40">
 					Admin dashboard
 				</Link>
 			)}
