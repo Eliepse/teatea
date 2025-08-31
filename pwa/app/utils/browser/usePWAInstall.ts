@@ -4,7 +4,9 @@ export let installPrompt: (Event & { prompt: () => Promise<{ outcome: "accepted"
 	undefined;
 
 if (!import.meta.env.SSR) {
+	console.debug("ran")
 	window.addEventListener("beforeinstallprompt", (e) => {
+		console.debug("triggered")
 		e.preventDefault();
 		installPrompt = e as typeof installPrompt;
 	});
@@ -25,20 +27,21 @@ export function usePWAInstall() {
 	const isInPWA = false === ["browser", "unknown"].includes(displayMode);
 	const [isInstalled, setIsInstalled] = useState(import.meta.env.SSR ? true : isInPWA);
 
-	async function prompt() {
+	async function prompt(): Promise<boolean> {
 		if (isInstalled || !installPrompt) {
-			return;
+			return false;
 		}
 
 		const result = await installPrompt.prompt();
 
 		if ("dismissed" === result.outcome) {
-			return;
+			return false;
 		}
 
 		installPrompt = undefined;
 		setIsInstalled(true);
+		return true;
 	}
 
-	return { prompt, installable: !isInstalled && !!installPrompt };
+	return { prompt, installable: !!installPrompt, installed: isInstalled };
 }

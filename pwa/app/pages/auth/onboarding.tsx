@@ -1,15 +1,15 @@
-import { TokenUtils, useToken } from "~/auth/hooks/useToken";
+import { TokenUtils } from "~/auth/hooks/useToken";
 import { redirect, useNavigate } from "react-router";
-import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { useMutation } from "@tanstack/react-query";
 import { type ChangeEvent, useState } from "react";
-import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import { ArrowDownCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { useUser } from "~/auth/hooks/useUser";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { refreshToken } from "~/auth/requests";
 import clsx from "clsx";
 import { patchApi } from "~/utils/api";
+import { usePWAInstall } from "~/utils/browser/usePWAInstall";
 
 export async function clientLoader() {
 	const token = TokenUtils.get();
@@ -26,6 +26,7 @@ export async function clientLoader() {
 export default function OnboardingPage() {
 	const user = useUser();
 	const navigate = useNavigate();
+	const { installable, installed } = usePWAInstall();
 	const { NavigationStack, ...stack } = useNavigationStack({ defaultFrame: { key: "welcome" } });
 
 	const mutation = useMutation({
@@ -62,19 +63,30 @@ export default function OnboardingPage() {
 					</div>
 
 					<div className="flex-none flex items-center">
-						<ProgressDots steps={3} active={1} className="mr-auto" />
+						<ProgressDots steps={installable ? 4 : 3} active={1} className="mr-auto" />
 						<button
 							className="btn btn-primary"
-							onClick={handleUIEvent(() => stack.next({ key: "ask:username" }))}
+							onClick={handleUIEvent(() => stack.next({ key: installable ? "ask:pwa" : "ask:username" }))}
 						>
 							Next <ArrowRightIcon className="size-4" />
 						</button>
 					</div>
 				</div>
 			</StackFrame>
-			<StackFrame frameKey="ask:username">
-				<AskUsername submitting={mutation.isPending} onSubmit={(username) => mutation.mutate(username)} />
+
+			<StackFrame frameKey="ask:pwa">
+				<ProposePWA onNext={() => stack.next({ key: "ask:username" })} />
 			</StackFrame>
+
+			<StackFrame frameKey="ask:username">
+				<AskUsername
+					submitting={mutation.isPending}
+					onSubmit={(username) => mutation.mutate(username)}
+					steps={installable ? 4 : 3}
+					step={installable ? 3 : 2}
+				/>
+			</StackFrame>
+
 			<StackFrame frameKey="cta:drink">
 				<div className="flex flex-col h-screen p-4">
 					<div className="flex-1 flex flex-col justify-center items-start">
@@ -89,7 +101,7 @@ export default function OnboardingPage() {
 					</div>
 
 					<div className="flex-none flex items-center">
-						<ProgressDots steps={3} active={3} className="mr-auto" />
+						<ProgressDots steps={installable ? 4 : 3} active={installable ? 4 : 3} className="mr-auto" />
 						<button className="btn" onClick={handleUIEvent(() => start("/welcome"))}>
 							Skip <ArrowRightIcon className="size-4" />
 						</button>
@@ -100,7 +112,12 @@ export default function OnboardingPage() {
 	);
 }
 
-function AskUsername(props: { submitting: boolean; onSubmit: (username: string) => void }) {
+function AskUsername(props: {
+	submitting: boolean;
+	onSubmit: (username: string) => void;
+	steps: number;
+	step: number;
+}) {
 	const [username, setUsername] = useState<string>();
 
 	function handleUsernameChange(e: ChangeEvent<HTMLInputElement>) {
@@ -133,7 +150,7 @@ function AskUsername(props: { submitting: boolean; onSubmit: (username: string) 
 			</div>
 
 			<div className="flex-none flex items-center">
-				<ProgressDots steps={3} active={2} className="mr-auto" />
+				<ProgressDots steps={props.steps} active={props.step} className="mr-auto" />
 				<button
 					className="btn btn-primary ml-auto"
 					disabled={(username?.length ?? 0) < 2 || props.submitting}
@@ -152,12 +169,45 @@ function AskUsername(props: { submitting: boolean; onSubmit: (username: string) 
 	);
 }
 
+function ProposePWA(props: { onNext: () => void }) {
+	const pwaInstall = usePWAInstall();
+
+	async function install() {
+		if (await pwaInstall.prompt()) {
+			props.onNext();
+		}
+	}
+
+	return (
+		<div className="flex flex-col h-screen p-4">
+			<div className="flex-1 flex flex-col justify-center">
+				<h2 className="text-xl text-primary">Quick access</h2>
+				<p className="max-w-xs mt-6 text-lg">
+					Add your journal to your phone as an app to access it easily anytime!
+				</p>
+
+				<button className="btn btn-primary h-12 mt-8" onClick={handleUIEvent(install)}>
+					Install the web app
+					<ArrowDownCircleIcon className="ml-2 size-4" />
+				</button>
+			</div>
+
+			<div className="flex-none flex items-center">
+				<ProgressDots steps={4} active={2} className="mr-auto" />
+				<button className="btn ml-auto" onClick={handleUIEvent(props.onNext)}>
+					Skip <ArrowRightIcon className="size-4" />
+				</button>
+			</div>
+		</div>
+	);
+}
+
 function ProgressDots(props: { steps: number; active: number; className?: string }) {
 	const dots = [];
 
 	for (let i = 1; i <= props.steps; i++) {
 		const cls = props.active >= i ? "bg-primary" : "bg-gray-100";
-		dots.push(<span className={clsx("inline-block rounded-full h-3 w-3 mr-2", cls)}></span>);
+		dots.push(<span key={i} className={clsx("inline-block rounded-full h-3 w-3 mr-2", cls)}></span>);
 	}
 
 	return <div className={props.className}>{dots}</div>;
