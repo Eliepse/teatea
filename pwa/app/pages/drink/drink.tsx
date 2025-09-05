@@ -82,7 +82,7 @@ export default function DrinkPage(props: Route.ComponentProps) {
 					{intlFormat(drink.drankAt, { dateStyle: "long" })}
 				</div>
 				<div className="text-2xl mt-2">
-					<Link to={`/tea /${drink.tea.id}`}>
+					<Link to={`/tea/${drink.tea.id}`}>
 						{drink.tea.displayName}
 						<ArrowTopRightOnSquareIcon className="size-4 text-base-content/60 inline-block ml-2" />
 					</Link>
