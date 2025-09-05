@@ -45,6 +45,7 @@ export type Tea = Resource & {
 	origin?: Origin;
 	originPath?: OriginPath;
 	displayName: string;
+	addedAt: Date;
 };
 
 export type Drink = Resource<"Drink"> & {

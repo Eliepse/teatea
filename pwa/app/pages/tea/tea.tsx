@@ -1,20 +1,21 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
 import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection, Drink, Tea, TeaStats } from "~t/types";
+import type { ApiPaginatedCollection, Drink, TeaStats } from "~t/types";
 import { useNavigate } from "react-router";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { useQuery } from "@tanstack/react-query";
 import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, intlFormat } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { limit } from "~/utils/text";
 import clsx from "clsx";
+import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
-	const tea = await (await getApi<Tea>(`/teas/${args.params.id}`)).json();
+	const tea = denormalizeTea(await (await getApi<TeaRaw>(`/teas/${args.params.id}`)).json());
 	const stats = await (await getApi<TeaStats>(`/teas/${args.params.id}/stats`)).json();
 	return { tea, stats };
 }
@@ -132,6 +133,9 @@ export default function TeaPage(props: Route.ComponentProps) {
 					</section>
 				)}
 			</main>
+			<footer className="px-4 mt-16 text-xs text-base-content/60">
+				Created at {intlFormat(tea.addedAt, { dateStyle: "long" })}
+			</footer>
 		</div>
 	);
 }

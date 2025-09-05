@@ -71,6 +71,7 @@ class Tea
 	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
 	public ?Origin $origin = null;
 
+	#[Groups(["tea:read"])]
 	public \DateTimeImmutable $addedAt;
 
 	public function __construct()
