@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
-import { TrashIcon } from "@heroicons/react/16/solid";
+import { ArrowTopRightOnSquareIcon, ArrowUpRightIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
@@ -81,7 +81,12 @@ export default function DrinkPage(props: Route.ComponentProps) {
 				<div className="uppercase text-xs text-base-content/60">
 					{intlFormat(drink.drankAt, { dateStyle: "long" })}
 				</div>
-				<div className="text-2xl mt-2">{drink.tea.displayName}</div>
+				<div className="text-2xl mt-2">
+					<Link to={`/tea /${drink.tea.id}`}>
+						{drink.tea.displayName}
+						<ArrowTopRightOnSquareIcon className="size-4 text-base-content/60 inline-block ml-2" />
+					</Link>
+				</div>
 				<div className="text-sm mt-1">
 					<span>
 						<span className="capitalize">{drink.tea.family}</span> tea
