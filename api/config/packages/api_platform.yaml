@@ -1,12 +1,15 @@
 api_platform:
-    title: Hello API Platform
-    version: 1.0.0
-    # Mercure integration, remove if unwanted
-    mercure:
-        include_type: true
+    title: Teatea API
+    version: 0.1.0
+    show_webby: true
     patch_formats:
         json: [ "application/merge-patch+json" ]
-    # Good defaults for REST APIs
+    
+    enable_swagger_ui: false
+    enable_swagger: "%kernel.debug%"
+    enable_docs: "%kernel.debug%"
+    enable_re_doc: "%kernel.debug%"
+    
     defaults:
         stateless: true
         cache_headers:
