@@ -101,6 +101,17 @@ export interface ApiCollection<T> {
 	member: T[];
 }
 
+export interface ApiPaginatedCollection<T> extends ApiCollection<T> {
+	view: {
+		"@id": string;
+		"@type": string;
+		first: string;
+		last: string;
+		previous?: string;
+		next?: string;
+	};
+}
+
 export type SearchResult = {
 	label: string;
 	score?: number;
