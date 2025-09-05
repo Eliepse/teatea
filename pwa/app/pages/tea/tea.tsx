@@ -86,6 +86,14 @@ export default function TeaPage(props: Route.ComponentProps) {
 					</div>
 				)}
 
+				{drinksQuery.isPending && (
+					<div className="px-4 mt-8">
+						<div className="skeleton h-8 mb-2" />
+						<div className="skeleton h-8 mb-2" />
+						<div className="skeleton h-8 mb-2" />
+					</div>
+				)}
+
 				{0 !== (drinksQuery.data?.member?.length ?? 0) && (
 					<section className="px-4 mt-8">
 						<h2 className="text-lg mb-4">How others brewed it?</h2>
