@@ -67,7 +67,7 @@ readonly class DrinkProvider implements ProviderInterface
 		return self::hydrate($entity, $tea);
 	}
 
-	public static function hydrate(\App\Entity\Drink $entity, Tea $tea): Drink
+	public static function hydrate(\App\Entity\Drink $entity, ?Tea $tea = null): Drink
 	{
 		$resource = new Drink();
 		$resource->id = $entity->id;
@@ -94,7 +94,9 @@ readonly class DrinkProvider implements ProviderInterface
 			);
 		}
 
-		$resource->tea = $tea;
+		if($tea) {
+			$resource->tea = $tea;
+		}
 
 		return $resource;
 	}
