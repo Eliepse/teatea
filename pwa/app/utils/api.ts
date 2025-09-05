@@ -18,7 +18,6 @@ type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
 type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> };
 
 export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promise<TResponse<T>> {
-	const startedAt = Date.now();
 	const fetchConfigs: RequestInit = { ...config };
 	const oUrl = new URL(`${import.meta.env.PUBLIC_API_URL}${path}`, window.location.toString());
 	let searchParams = oUrl.searchParams;
@@ -76,7 +75,7 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 
 export async function getApi<T>(
 	url: string,
-	payload: Record<string, string | undefined>,
+	payload?: Record<string, string | undefined>,
 	config?: Omit<FetchApiConfig, "payload" | "method">,
 ): Promise<TResponse<T>> {
 	return fetchApi<T>(url, { ...config, method: "GET", payload });

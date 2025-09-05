@@ -11,6 +11,7 @@ export default [
 		route("/drink/new", "pages/drink/add-drink.tsx"),
 		route("/tea/new", "pages/tea/tea-create.tsx"),
 		route("/tea/search", "pages/tea/search.tsx"),
+		route("/tea/:id", "pages/tea/tea.tsx"),
 		...prefix("/me", [route("/drinks", "pages/drink/drinks.tsx"), route("/drink/:id", "pages/drink/drink.tsx")]),
 	]),
 

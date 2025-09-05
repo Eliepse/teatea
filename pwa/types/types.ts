@@ -105,3 +105,9 @@ export type SearchResult = {
 	label: string;
 	score?: number;
 };
+
+export type TeaStats = Pick<Resource<"TeaStats">, "@type" | "@id"> & {
+	teaId: number;
+	drinksCount: number;
+	drinkersCount: number;
+};
