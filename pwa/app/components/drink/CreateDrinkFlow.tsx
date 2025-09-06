@@ -78,23 +78,23 @@ export function CreateDrinkFlow(props: { onBack: () => void }) {
 				<SelectTeaFrame
 					onConfirm={(tea) => {
 						setForm((st) => ({ ...st, tea }));
-						stackNavigator.next({ key: "technic:select" });
-					}}
-					onBack={stackNavigator.back}
-				/>
-			</StackFrame>
-			<StackFrame frameKey="technic:select">
-				<FrameSelect
-					items={technicItems}
-					defaultValue={form.technic ?? undefined}
-					onBack={stackNavigator.back}
-					buttonText="Next"
-					onConfirm={(technic) => {
-						setForm((st) => ({ ...st, technic }));
 						stackNavigator.next({ key: "parameters:input" });
 					}}
+					onBack={stackNavigator.back}
 				/>
 			</StackFrame>
+			{/*<StackFrame frameKey="technic:select">*/}
+			{/*	<FrameSelect*/}
+			{/*		items={technicItems}*/}
+			{/*		defaultValue={form.technic ?? undefined}*/}
+			{/*		onBack={stackNavigator.back}*/}
+			{/*		buttonText="Next"*/}
+			{/*		onConfirm={(technic) => {*/}
+			{/*			setForm((st) => ({ ...st, technic }));*/}
+			{/*			stackNavigator.next({ key: "parameters:input" });*/}
+			{/*		}}*/}
+			{/*	/>*/}
+			{/*</StackFrame>*/}
 			<StackFrame frameKey="parameters:input">
 				<ParametersInput
 					onBack={stackNavigator.back}
