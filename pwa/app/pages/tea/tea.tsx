@@ -1,7 +1,7 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Drink, TeaStats } from "~t/types";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
@@ -46,7 +46,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 	});
 
 	return (
-		<div>
+		<div className="pb-22">
 			<header className="p-4 bg-base-200">
 				<button className="btn btn-ghost p-0 mb-4" onClick={handleUIEvent(() => navigate(-1))}>
 					<ArrowLeftIcon className="size-4 mr-1" /> Back
@@ -100,7 +100,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<h2 className="text-lg mb-4">How others brewed it?</h2>
 						<ul>
 							{drinksQuery.data?.member?.map((drink) => (
-								<li className="mb-2">
+								<li className="mb-2" key={drink.id}>
 									<article className="px-2 py-2 bg-base-200 rounded">
 										<div className="flex text-xs gap-2 items-center">
 											{!!drink.teaQuantity && (
@@ -133,9 +133,14 @@ export default function TeaPage(props: Route.ComponentProps) {
 					</section>
 				)}
 			</main>
+
 			<footer className="px-4 mt-16 text-xs text-base-content/60">
 				Created at {intlFormat(tea.addedAt, { dateStyle: "long" })}
 			</footer>
+
+			<Link to={`/drink/new?tea=${tea.id}`} className="fixed bottom-4 right-4 btn btn-primary rounded-full h-12">
+				Brew it
+			</Link>
 		</div>
 	);
 }

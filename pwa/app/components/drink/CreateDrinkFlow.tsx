@@ -3,7 +3,6 @@ import type { Tea } from "~t/types";
 import { brewingTechnic, type TechnicType } from "~/components/shared/BrewingTechnic";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { SelectTeaFrame } from "~/components/stackFrames/SelectTeaFrame";
-import { FrameSelect } from "~/components/shared/frame/FrameSelect";
 import { ParametersInput } from "~/components/drink/create/ParametersInput";
 import { FrameDatePicker } from "~/components/shared/frame/FrameDatePicker";
 import { useMutation } from "@tanstack/react-query";
@@ -27,12 +26,12 @@ const technicItems = Object.entries(brewingTechnic).map(([k, l]) => ({ value: k,
 	label: string;
 }[];
 
-export function CreateDrinkFlow(props: { onBack: () => void }) {
+export function CreateDrinkFlow(props: { tea?: Tea; onBack: () => void }) {
 	const navigate = useNavigate();
 	const alert = useAlert();
-	const [form, setForm] = useState<DrinkForm>({ drankAt: new Date() });
+	const [form, setForm] = useState<DrinkForm>({ drankAt: new Date(), tea: props.tea });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({
-		defaultFrame: { key: "tea:select" },
+		defaultFrame: { key: props.tea?.id ? "parameters:input" : "tea:select" },
 		onOverBack: props.onBack,
 	});
 
