@@ -58,7 +58,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$typeEntity->family = $data->family;
 			$typeEntity->name = trim($data->type->name);
 			$typeEntity->origin = $origin;
-			$typeEntity->isProtectedOrigin = $data->type->isPDO;
+			$typeEntity->isProtectedOrigin = $data->type->isPDO ?? false;
 			$typeEntity->createdBy = $user;
 			$this->em->persist($typeEntity);
 

@@ -151,27 +151,27 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 								return;
 							}
 							setFormValue((st) => ({ ...st, type: { name, isPDO: st.type?.isPDO ?? false } }));
-							navStack.next({ key: "pdo:ask" });
+							navStack.next({ key: "recap" });
 						}}
 						defaultValue={formValue.type?.name}
 					/>
 				</StackFrame>
-				<StackFrame frameKey="pdo:ask">
-					<IsProtectedOrigin
-						onBack={() => navStack.back()}
-						onConfirm={(value) => {
-							setFormValue((st) => {
-								if (!st.type) {
-									throw new Error("Type isn't defined!");
-								}
+				{/*<StackFrame frameKey="pdo:ask">*/}
+				{/*	<IsProtectedOrigin*/}
+				{/*		onBack={() => navStack.back()}*/}
+				{/*		onConfirm={(value) => {*/}
+				{/*			setFormValue((st) => {*/}
+				{/*				if (!st.type) {*/}
+				{/*					throw new Error("Type isn't defined!");*/}
+				{/*				}*/}
 
-								return { ...st, type: { ...st.type, isPDO: value } };
-							});
-							navStack.next({ key: "recap" });
-						}}
-						defaultValue={formValue.type?.isPDO}
-					/>
-				</StackFrame>
+				{/*				return { ...st, type: { ...st.type, isPDO: value } };*/}
+				{/*			});*/}
+				{/*			navStack.next({ key: "recap" });*/}
+				{/*		}}*/}
+				{/*		defaultValue={formValue.type?.isPDO}*/}
+				{/*	/>*/}
+				{/*</StackFrame>*/}
 				<StackFrame frameKey="recap">
 					<TeaFormConfirmation onBack={() => navStack.back()} values={formValue} onConfirm={submit} />
 				</StackFrame>

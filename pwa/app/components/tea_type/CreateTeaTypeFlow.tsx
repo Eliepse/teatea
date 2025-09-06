@@ -101,21 +101,21 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 						onBack={() => navStack.back()}
 						onSelect={(origin) => {
 							contextValue.patchForm({ origin });
-							navStack.next({ key: "pdo:ask" });
+							navStack.next({ key: "family:select" });
 						}}
 						defaultValue={formValue.origin}
 					/>
 				</StackFrame>
-				<StackFrame frameKey="pdo:ask">
-					<IsProtectedOrigin
-						onConfirm={(value) => {
-							contextValue.patchForm({ isPDO: value });
-							navStack.next({ key: "family:select" });
-						}}
-						defaultValue={formValue.isPDO}
-						onBack={navStack.back}
-					/>
-				</StackFrame>
+				{/*<StackFrame frameKey="pdo:ask">*/}
+				{/*	<IsProtectedOrigin*/}
+				{/*		onConfirm={(value) => {*/}
+				{/*			contextValue.patchForm({ isPDO: value });*/}
+				{/*			navStack.next({ key: "family:select" });*/}
+				{/*		}}*/}
+				{/*		defaultValue={formValue.isPDO}*/}
+				{/*		onBack={navStack.back}*/}
+				{/*	/>*/}
+				{/*</StackFrame>*/}
 				<StackFrame frameKey="family:select">
 					<SelectFamily
 						onBack={() => navStack.back()}
