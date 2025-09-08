@@ -30,6 +30,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 	normalizationContext: ["groups" => ["drink:read", "embedded:tea", "embedded:teaType", "embedded:originPath"]],
 	security: "is_granted('ROLE_USER')",
 	provider: DrinkProvider::class,
+	parameters: [
+		"cursor" => new QueryParameter(schema: ["type" => "date"], property: 'drankAt'),
+		"limit" => new QueryParameter(
+			schema: ["type" => "integer", "minimum" => 1, "maximum" => 14],
+			property: 'drankAt',
+			description: "Maximum days to return (excluding gaps)",
+			castToNativeType: true,
+		),
+	],
 )]
 #[Post(denormalizationContext: ["groups" => ["drink:create"]], processor: DrinkCreateProcessor::class)]
 #[Patch(

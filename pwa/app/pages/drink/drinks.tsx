@@ -2,23 +2,61 @@ import { Link, useNavigate } from "react-router";
 import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drinks";
 import { fetchApi } from "~/utils/api";
 import type { ApiCollection, Drink, OriginPath, TeaType } from "~t/types";
-import { formatDate, formatISO } from "date-fns";
+import { formatDate, formatISO, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
 import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { ActivityGraph } from "~/components/activity/ActivityGraph";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { handleUIEvent } from "~/utils/function";
 
-export async function clientLoader(args: Route.ClientLoaderArgs): Promise<ApiCollection<Drink>> {
-	const response = await fetchApi<ApiCollection<DrinkRaw>>("/drinks");
+export async function clientLoader(args: Route.ClientLoaderArgs) {
+	return await fetchDrinks();
+}
+
+async function fetchDrinks(cursor?: string) {
+	const queryParams = cursor ? `cursor=${cursor}&limit=14` : "limit=14";
+	const response = await fetchApi<ApiCollection<DrinkRaw>>(`/drinks?${queryParams}`);
 	const data = await response.json();
 	return { ...data, member: data.member.map(denormalizeDrink) };
 }
 
+function getNextCursorFromDrink(drink?: Drink) {
+	return drink ? formatISO(subDays(drink.drankAt, 1), { representation: "date" }) : null;
+}
+
 export default function ListDrinks(props: Route.ComponentProps) {
 	const navigate = useNavigate();
-	const items = props.loaderData.member;
+
+	const [cursor, setCursor] = useState<string>();
+
+	const drinksQuery = useInfiniteQuery({
+		queryFn: async (context) => await fetchDrinks(context.pageParam),
+		queryKey: ["me", "drinks"],
+		enabled: undefined !== cursor,
+		getPreviousPageParam: () => undefined,
+		getNextPageParam: (last, allPages) => {
+			const lastPage = allPages.slice(-1)[0];
+
+			// Page incomplete means last page
+			if (14 > (lastPage?.member?.length ?? 14)) {
+				return undefined;
+			}
+
+			const lastItem = lastPage.member?.slice(-1)[0];
+			return lastItem ? getNextCursorFromDrink(lastItem) : undefined;
+		},
+		initialPageParam: "",
+		initialData: { pages: [props.loaderData], pageParams: [] },
+	});
+
+	const items = drinksQuery.data.pages.reduce((carr, p) => {
+		carr.push(...p.member);
+		return carr;
+	}, [] as Drink[]);
 
 	const drinksByDay = items.reduce(
 		(days, drink) => {
@@ -33,8 +71,8 @@ export default function ListDrinks(props: Route.ComponentProps) {
 		return (
 			<AuthLayout className="p-4 flex items-center" activeKey="activity">
 				<p className="text-base-content/60 text-center">
-					This page shows your recent activity, but you haven't save any tea session yet.{" "}
-					Start your tea journal by {" "}
+					This page shows your recent activity, but you haven't save any tea session yet. Start your tea
+					journal by{" "}
 					<Link to="/drink/new" className="link link-primary">
 						recording your first session!
 					</Link>
@@ -51,11 +89,11 @@ export default function ListDrinks(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="p-4" activeKey="activity">
+		<AuthLayout className="p-4 pb-18" activeKey="activity">
 			<p className="text-sm text-content/60">Your activity this year</p>
 			<ActivityGraph className="my-2" />
 
-			<ul className="py-4">
+			<ul className="mt-4">
 				{Object.entries(drinksByDay).map(([dateKey, drinks]) => {
 					const date = drinks[0].drankAt;
 
@@ -88,6 +126,16 @@ export default function ListDrinks(props: Route.ComponentProps) {
 					);
 				})}
 			</ul>
+
+			{drinksQuery.hasNextPage && (
+				<button
+					className="btn btn-block btn-outline"
+					onClick={handleUIEvent(() => drinksQuery.fetchNextPage())}
+					disabled={drinksQuery.isFetchingNextPage}
+				>
+					Load previous
+				</button>
+			)}
 
 			<Link
 				to="/drink/new"
