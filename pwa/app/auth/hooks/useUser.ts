@@ -5,7 +5,7 @@ import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
 import { useNavigate } from "react-router";
 
 async function fetchSelf(): Promise<User> {
-	return await (await fetchApi("/members/me")).json();
+	return await (await fetchApi<User>("/members/me")).json();
 }
 
 const QUERY_TTL = 15 * 60 * 1000;
