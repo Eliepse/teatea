@@ -4,9 +4,9 @@ export let installPrompt: (Event & { prompt: () => Promise<{ outcome: "accepted"
 	undefined;
 
 if (!import.meta.env.SSR) {
-	console.debug("ran")
+	console.debug("ran");
 	window.addEventListener("beforeinstallprompt", (e) => {
-		console.debug("triggered")
+		console.debug("triggered");
 		e.preventDefault();
 		installPrompt = e as typeof installPrompt;
 	});
@@ -15,6 +15,7 @@ if (!import.meta.env.SSR) {
 function getPWADisplayMode() {
 	if (document.referrer.startsWith("android-app://")) return "twa";
 	if (window.matchMedia("(display-mode: browser)").matches) return "browser";
+	// @ts-ignore
 	if (window.matchMedia("(display-mode: standalone)").matches || navigator.standalone) return "standalone";
 	if (window.matchMedia("(display-mode: minimal-ui)").matches) return "minimal-ui";
 	if (window.matchMedia("(display-mode: fullscreen)").matches) return "fullscreen";
