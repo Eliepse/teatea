@@ -8,14 +8,18 @@ async function fetchSelf(): Promise<User> {
 	return await (await fetchApi("/members/me")).json();
 }
 
+const QUERY_TTL = 15 * 60 * 1000;
+
 export function useUser() {
 	const navigate = useNavigate();
 	const query = useQuery({
 		queryFn: fetchSelf,
 		queryKey: ["user:me"],
+		staleTime: QUERY_TTL,
+		gcTime: QUERY_TTL,
 	});
 
-	if(query.error instanceof UnauthenticatedError) {
+	if (query.error instanceof UnauthenticatedError) {
 		navigate("/login");
 		return query;
 	}
