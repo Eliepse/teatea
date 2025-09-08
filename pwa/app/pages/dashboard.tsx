@@ -29,21 +29,21 @@ export default function Dashboard(props: Route.ComponentProps) {
 
 			{0 < props.loaderData.statsDrinksTotal && (
 				<div className="grid grid-cols-2 gap-4">
-					<Link className="bg-base-200 border border-primary text-primary rounded-md px-4 py-2" to="/me/drinks">
+					<Link className="bg-primary/10 text-primary rounded-md px-4 py-3" to="/me/drinks">
 						<div className="text-4xl font-bold mb-1">{props.loaderData.statsDrinksTotal}</div>
-						<div className="text-xs mb-1 ">tea sessions</div>
-						<div className="flex text-primary/60 items-center text-xs">See all <ArrowRightIcon className="ml-1 size-3" /></div>
+						<div className="text-sm mb-1 ">tea sessions</div>
+						<div className="flex text-primary/60 items-center text-sm">See all <ArrowRightIcon className="ml-1 size-3" /></div>
 					</Link>
 
-					<div className="bg-base-200 border border-primary text-primary rounded-md px-4 py-2">
+					<div className="bg-primary/10 text-primary rounded-md px-4 py-3">
 						<div className="text-4xl font-bold mb-1">{props.loaderData.statsConsumedTeasTotal}</div>
-						<div className="text-xs">teas tasted</div>
+						<div className="text-sm">teas tasted</div>
 						{/*<div className="flex text-white/80 items-center text-xs">See all <ArrowRightIcon className="ml-1 size-3" /></div>*/}
 					</div>
 				</div>
 			)}
 
-			<Link to="/drink/new" className="flex bg-base-200 p-6 h-20 mt-4 items-center justify-between rounded-md text-lg text-primary">
+			<Link to="/drink/new" className="flex bg-primary/10 p-6 h-20 mt-4 items-center justify-between rounded-md text-lg text-primary">
 				Ready for some tea? <CoffeeCup className="size-7 opacity-60" />
 			</Link>
 
