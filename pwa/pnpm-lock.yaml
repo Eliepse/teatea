@@ -32,6 +32,9 @@ dependencies:
   dayjs:
     specifier: ^1.11.13
     version: 1.11.15
+  iconoir-react:
+    specifier: ^7.11.0
+    version: 7.11.0(react@19.1.1)
   isbot:
     specifier: ^5.1.28
     version: 5.1.30
@@ -2858,6 +2861,14 @@ packages:
       setprototypeof: 1.2.0
       statuses: 2.0.1
       toidentifier: 1.0.1
+
+  /iconoir-react@7.11.0(react@19.1.1):
+    resolution: {integrity: sha512-uvTKtnHYwbbTsmQ6HCcliYd50WK0GbjP497RwdISxKzfS01x4cK1Mn/F2mT/t2roSaJQ0I+KnHxMcyvmNMXWsQ==}
+    peerDependencies:
+      react: 18 || 19
+    dependencies:
+      react: 19.1.1
+    dev: false
 
   /iconv-lite@0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
