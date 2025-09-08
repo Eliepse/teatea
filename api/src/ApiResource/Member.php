@@ -11,10 +11,22 @@ use App\State\Member\MemberCreateProcessor;
 use App\State\Member\MemberOnboardingProcessor;
 use App\State\Member\MemberProvider;
 use App\State\UserProvider;
+use App\State\UserStatsProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Get(uriTemplate: "/members/me", security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')", provider: UserProvider::class)]
+#[Get(
+	uriTemplate: "/members/me",
+	normalizationContext: ["groups" => ["member:self"]],
+	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
+	provider: UserProvider::class
+)]
+#[Get(
+	uriTemplate: "/members/me/stats",
+	normalizationContext: ["groups" => ["member:stats"]],
+	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
+	provider: UserStatsProvider::class
+)]
 #[Get(security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class)]
 #[GetCollection(normalizationContext: ["groups" => ["role:admin"]], security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class,)]
 #[Post(
@@ -31,20 +43,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Member
 {
-	#[Groups(["role:admin"])]
+	#[Groups(["role:admin", "member:self", "member:stats"])]
 	#[ApiProperty(identifier: true)]
 	public ?int $id;
 
 	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
-	#[Groups(["role:admin", "member:onboarding"])]
+	#[Groups(["role:admin", "member:onboarding", "member:self"])]
 	public ?string $username;
 
 	#[Assert\Email]
-	#[Groups(["role:admin", "member:create"])]
+	#[Groups(["role:admin", "member:create", "member:self"])]
 	public string $email;
 
 	/** @var string[] */
 	#[Groups(["role:admin"])]
 	public array $roles = [];
+
+	#[Groups(["member:stats"])]
+	public int $statsDrinksTotal = 0;
+
+	#[Groups(["member:stats"])]
+	public int $statsConsumedTeasTotal = 0;
 }

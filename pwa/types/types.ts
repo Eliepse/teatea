@@ -17,6 +17,11 @@ export type User = Resource & {
 	username: string;
 };
 
+export type MemberStats = Resource & {
+	statsDrinksTotal: number;
+	statsConsumedTeasTotal: number;
+};
+
 export type TeaType = Resource<"TeaType"> & {
 	family: TeaFamily;
 	name: string;
