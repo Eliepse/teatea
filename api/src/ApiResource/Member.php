@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[Get(
 	uriTemplate: "/members/me/stats",
-	normalizationContext: ["groups" => ["member:stats"]],
+	normalizationContext: ["groups" => ["member:stats", "embedded:tea", "embedded:originPath"]],
 	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
 	provider: UserStatsProvider::class
 )]
@@ -65,4 +65,8 @@ class Member
 
 	#[Groups(["member:stats"])]
 	public int $statsConsumedTeasTotal = 0;
+
+	/** @var Tea[]  */
+	#[Groups(["member:stats"])]
+	public array $statsTopTeas = [];
 }

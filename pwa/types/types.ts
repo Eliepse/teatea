@@ -20,6 +20,7 @@ export type User = Resource & {
 export type MemberStats = Resource & {
 	statsDrinksTotal: number;
 	statsConsumedTeasTotal: number;
+	statsTopTeas: Tea[];
 };
 
 export type TeaType = Resource<"TeaType"> & {

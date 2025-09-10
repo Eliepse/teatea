@@ -55,7 +55,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class Tea
 {
 	#[ApiProperty(identifier: true)]
-	#[Groups(["tea:read"])]
+	#[Groups(["tea:read", "embedded:tea"])]
 	public ?int $id;
 
 	#[Groups(["tea:create", "tea:read", "embedded:tea"])]
