@@ -57,10 +57,10 @@ readonly class UserStatsProvider implements ProviderInterface
 				FROM App\Entity\Tea tea
 					LEFT JOIN tea.type type
 				WHERE tea.id IN (
-					SELECT stea.id
-					FROM App\Entity\Tea stea
-						INNER JOIN tea.drinks drink WITH drink.drankAt >= :before AND drink.drinker = :user
-					GROUP BY stea.id
+					SELECT searchTea.id
+					FROM App\Entity\Tea searchTea
+						LEFT JOIN searchTea.drinks drink WITH drink.drankAt >= :before AND drink.drinker = :user
+					GROUP BY searchTea.id
 					ORDER BY COUNT(drink) DESC
 				)
 				DQL,
