@@ -10,12 +10,12 @@ import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigation
 import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation";
 import { SelectType } from "~/components/tea_type/SelectType";
 import { AskName } from "~/components/tea/create/AskName";
-import { IsProtectedOrigin } from "~/components/tea_type/create/IsProtectedOrigin";
+import { useAlert } from "~/components/shared/modal/AlertManager";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
 	patchForm: (_part: Partial<FormValue>) => warnNotImplemented(),
-	submitting: false
+	submitting: false,
 });
 
 type FormValue = {
@@ -40,8 +40,8 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 			origin: data.origin["@id"],
 			type: !data.type || "id" in data.type ? undefined : data.type,
 			altitude: data.altitude,
-			isAppellation: data.appellation
-		}
+			isAppellation: data.appellation,
+		},
 	});
 
 	return await response.json();
@@ -51,9 +51,10 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 	const asSelector = undefined !== props.onSelect;
 	const [formValue, setFormValue] = useState<FormValue>({});
 	const [createdTea, setCreatedTea] = useState<Tea | undefined>();
+	const alert = useAlert();
 	const { NavigationStack, ...navStack } = useNavigationStack({
 		defaultFrame: { key: "origin:select" },
-		onOverBack: closeFlow
+		onOverBack: closeFlow,
 	});
 
 	function closeFlow() {
@@ -64,7 +65,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 	}
 
 	function selectTea() {
-		if(undefined === props.onSelect || undefined === createdTea) {
+		if (undefined === props.onSelect || undefined === createdTea) {
 			return;
 		}
 
@@ -77,7 +78,10 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 		onSuccess: (data: Tea) => {
 			setCreatedTea(data);
 			navStack.next({ key: "confirmation" });
-		}
+		},
+		onError: (e) => {
+			alert({ title: "Couldn't add this tea", body: e.message });
+		},
 	});
 
 	function submit() {
@@ -94,9 +98,9 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 		() => ({
 			formValue,
 			patchForm: (part: Partial<FormValue>) => setFormValue((form) => ({ ...form, ...part })),
-			submitting: "pending" === mutation.status
+			submitting: "pending" === mutation.status,
 		}),
-		[formValue, mutation.status]
+		[formValue, mutation.status],
 	);
 
 	return (
