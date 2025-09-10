@@ -5,9 +5,9 @@ import clsx from "clsx";
 import { handleUIEvent } from "~/utils/function";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
-import type { ApiCollection, OriginPath, Tea } from "~t/types";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import type { ApiCollection, Tea } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
+import { TeaShortCard } from "~/components/tea/TeaShortCard";
 
 export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: Tea; allowCreation?: boolean }) {
 	const [searchText, setSearchText] = useState<string>();
@@ -77,12 +77,12 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 						<ul>
 							{teasQuery.data.member?.map((tea) => (
 								<li key={tea.id}>
-									<TeaItem
+									<TeaShortCard
 										title={tea.displayName}
 										family={tea.family}
 										type={tea.type?.name}
 										originPath={tea.originPath}
-										onSelect={() => props.onSelect(tea)}
+										onClick={() => props.onSelect(tea)}
 										selected={props.value?.id === tea.id}
 										className="mb-2"
 									/>
@@ -132,84 +132,5 @@ function SearchInput(props: {
 				</button>
 			)}
 		</div>
-	);
-}
-
-function TeaItem(props: {
-	title: string;
-	onSelect: () => void;
-	selected?: boolean;
-	className?: string;
-	originPath?: OriginPath;
-	family: string;
-	type?: string;
-}) {
-	const familyLabel = props.family[0].toUpperCase() + props.family.substring(1);
-
-	if (!props.type) {
-		const closestOrigin = props.originPath?.locality ?? props.originPath?.region ?? props.originPath?.country;
-
-		return (
-			<article
-				className={clsx(
-					"bg-base-200 rounded px-4 py-2 h-16",
-					props.selected && "bg-primary text-white",
-					props.className,
-				)}
-				onClick={props.onSelect}
-			>
-				<div className="flex justify-between">
-					<span
-						className={clsx(
-							"text-[.66rem] uppercase",
-							props.selected ? "text-white" : "text-base-content/40",
-						)}
-					>
-						{familyLabel}
-					</span>
-					<span
-						className={clsx("text-xs text-right", props.selected ? "text-white" : "text-base-content/60")}
-					>
-						{props.originPath && (
-							<FormatOriginPath
-								originPath={props.originPath}
-								maxLevel={closestOrigin === props.originPath?.locality ? "region" : "country"}
-							/>
-						)}
-					</span>
-				</div>
-				<div>
-					{familyLabel} tea{" "}
-					<span className={clsx(props.selected ? "text-white" : "text-base-content/60")}>
-						of {closestOrigin?.name}
-					</span>
-				</div>
-			</article>
-		);
-	}
-
-	return (
-		<article
-			className={clsx(
-				"bg-base-200 rounded px-4 py-2 h-16",
-				props.selected && "bg-primary text-white",
-				props.className,
-			)}
-			onClick={props.onSelect}
-		>
-			<div className="flex justify-between">
-				<span
-					className={clsx("text-[.66rem] uppercase", props.selected ? "text-white" : "text-base-content/40")}
-				>
-					{familyLabel}
-				</span>
-				<span className={clsx("text-xs text-right", props.selected ? "text-white" : "text-base-content/60")}>
-					{props.originPath && <FormatOriginPath originPath={props.originPath} />}
-				</span>
-			</div>
-			<div>
-				<div className="">{props.type}</div>
-			</div>
-		</article>
 	);
 }
