@@ -1,17 +1,17 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { type TeaType } from "~t/types";
-import { Check } from "~/components/icons/Check";
 import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { useTeaTypes } from "~/utils/api/useTeaTypes";
 import { handleUIEvent } from "~/utils/function";
 import Arrow from "~/components/icons/arrow";
+import { ArrowRightIcon, PlusIcon } from "@heroicons/react/24/outline";
 
 type Filters = Parameters<typeof useTeaTypes>[0];
 
 export function SelectType(props: {
 	onBack: () => void;
-	onSelect: (value?: TeaType) => void;
+	onSelect: (value: TeaType) => void;
 	onCreate?: () => void;
 	onSkip?: () => void;
 	defaultValue?: TeaType;
@@ -58,7 +58,6 @@ export function SelectType(props: {
 
 	function confirm() {
 		if (undefined === selected) {
-			props.onSelect(undefined);
 			return;
 		}
 
@@ -72,17 +71,26 @@ export function SelectType(props: {
 			bodyClassName="pb-4"
 			action={
 				<button
-					className={clsx("ml-auto btn", !selected ? "btn-outline" : "btn-primary")}
+					className="ml-auto btn btn-primary"
 					onClick={handleUIEvent(confirm)}
-					disabled={isLoading}
+					disabled={!selected || isLoading}
 				>
-					{!hasTypes || selected ? "Next" : "I don't find it"}
+					Next
 					<Arrow direction="right" className="size-4 ml-1" />
 				</button>
 			}
 		>
 			{isLoading && "Loading..."}
 			{!hasTypes && <p className="py-4 text-center italic text-base-content/60">No types found</p>}
+
+			{props.onSkip && (
+				<button
+					className="btn btn-block btn-outline btn-secondary justify-between h-12 mb-4"
+					onClick={handleUIEvent(props.onSkip)}
+				>
+					I don't know <ArrowRightIcon className="size-4" />
+				</button>
+			)}
 
 			{!props.filters?.originPath &&
 				types?.member?.map((type) => (
@@ -137,6 +145,15 @@ export function SelectType(props: {
 						/>
 					))}
 				</div>
+			)}
+
+			{props.onCreate && (
+				<button
+					className="btn btn-block btn-dash justify-between h-12 mb-4"
+					onClick={handleUIEvent(props.onCreate)}
+				>
+					Add a new type <PlusIcon className="size-4" />
+				</button>
 			)}
 		</PageLayout>
 	);

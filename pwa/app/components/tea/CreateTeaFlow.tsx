@@ -129,6 +129,17 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 				<StackFrame frameKey="select:type">
 					<SelectType
 						onBack={() => navStack.back()}
+						onSkip={() => {
+							contextValue.patchForm({ type: undefined });
+							navStack.next({ key: "recap" });
+						}}
+						onCreate={() => {
+							if (formValue.type && "@id" in formValue.type) {
+								contextValue.patchForm({ type: undefined });
+							}
+
+							navStack.next({ key: "name:ask" });
+						}}
 						onSelect={(type) => {
 							if (undefined === type) {
 								if (formValue.type && "@id" in formValue.type) {
