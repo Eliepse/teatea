@@ -12,6 +12,8 @@ type Filters = Parameters<typeof useTeaTypes>[0];
 export function SelectType(props: {
 	onBack: () => void;
 	onSelect: (value?: TeaType) => void;
+	onCreate?: () => void;
+	onSkip?: () => void;
 	defaultValue?: TeaType;
 	filters?: Filters;
 }) {
@@ -92,6 +94,21 @@ export function SelectType(props: {
 					/>
 				))}
 
+			{props.filters?.originPath && 0 < typesByLevel.locality.length && (
+				<div className="mb-8">
+					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same locality</div>
+					{typesByLevel.locality.map((type) => (
+						<TypeItem
+							key={type.id}
+							label={type.name}
+							onClick={() => toggleType(type)}
+							selected={selected?.id === type.id}
+							isPDO={type.isPDO}
+						/>
+					))}
+				</div>
+			)}
+
 			{props.filters?.originPath && 0 < typesByLevel.region.length && (
 				<div className="mb-8">
 					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same region</div>
@@ -111,21 +128,6 @@ export function SelectType(props: {
 				<div className="mb-8">
 					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same country</div>
 					{typesByLevel.country.map((type) => (
-						<TypeItem
-							key={type.id}
-							label={type.name}
-							onClick={() => toggleType(type)}
-							selected={selected?.id === type.id}
-							isPDO={type.isPDO}
-						/>
-					))}
-				</div>
-			)}
-
-			{props.filters?.originPath && 0 < typesByLevel.locality.length && (
-				<div className="mb-8">
-					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same locality</div>
-					{typesByLevel.locality.map((type) => (
 						<TypeItem
 							key={type.id}
 							label={type.name}
