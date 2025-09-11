@@ -1,6 +1,15 @@
-import type { OriginPath } from "~t/types";
+import type { OriginPath, TeaFamily } from "~t/types";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import clsx from "clsx";
+
+const TEA_FAMILY_CLS = {
+	yellow: "border-lime-200",
+	white: "border-cyan-200",
+	green: "border-green-300",
+	wulong: "border-indigo-300",
+	black: "border-amber-300",
+	fermented: "border-stone-500",
+} as const;
 
 export function TeaShortCard(props: {
 	title: string;
@@ -8,7 +17,7 @@ export function TeaShortCard(props: {
 	selected?: boolean;
 	className?: string;
 	originPath?: OriginPath;
-	family: string;
+	family: TeaFamily;
 	type?: string;
 }) {
 	const familyLabel = props.family[0].toUpperCase() + props.family.substring(1);
@@ -19,9 +28,10 @@ export function TeaShortCard(props: {
 		return (
 			<article
 				className={clsx(
-					"bg-base-200 rounded px-4 py-2 h-16",
+					"bg-base-200 rounded px-4 py-2 h-16 border-l-2",
 					props.selected && "bg-primary text-white",
 					props.className,
+					TEA_FAMILY_CLS[props.family],
 				)}
 				onClick={props.onClick}
 			>
@@ -58,9 +68,10 @@ export function TeaShortCard(props: {
 	return (
 		<article
 			className={clsx(
-				"bg-base-200 rounded px-4 py-2 h-16",
+				"bg-base-200 rounded px-4 py-2 h-16 border-l-2",
 				props.selected && "bg-primary text-white",
 				props.className,
+				TEA_FAMILY_CLS[props.family],
 			)}
 			onClick={props.onClick}
 		>
