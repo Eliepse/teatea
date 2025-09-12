@@ -13,7 +13,7 @@ import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
-import { ArrowTopRightOnSquareIcon, ArrowUpRightIcon, TrashIcon } from "@heroicons/react/16/solid";
+import { ArrowTopRightOnSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
@@ -129,7 +129,9 @@ export default function DrinkPage(props: Route.ComponentProps) {
 								<PencilSquare className="size-3 inline mr-2" version="micro" /> Edit
 							</button>
 						</h2>
-						<p className="leading-normal">{nl2br(editableData.note)}</p>
+						<p className="leading-normal rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
+							{nl2br(editableData.note)}
+						</p>
 					</>
 				)}
 

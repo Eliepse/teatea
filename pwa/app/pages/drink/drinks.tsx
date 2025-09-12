@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drinks";
 import { fetchApi } from "~/utils/api";
 import type { ApiCollection, Drink, OriginPath, TeaFamily, TeaType } from "~t/types";
@@ -9,17 +9,18 @@ import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { ActivityGraph } from "~/components/activity/ActivityGraph";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 
-export async function clientLoader(args: Route.ClientLoaderArgs) {
+export async function clientLoader(_args: Route.ClientLoaderArgs) {
 	return await fetchDrinks();
 }
 
+const PAGE_SIZE = 14;
+
 async function fetchDrinks(cursor?: string) {
-	const queryParams = cursor ? `cursor=${cursor}&limit=14` : "limit=14";
+	const queryParams = cursor ? `cursor=${cursor}&limit=${PAGE_SIZE}` : `limit=${PAGE_SIZE}`;
 	const response = await fetchApi<ApiCollection<DrinkRaw>>(`/drinks?${queryParams}`);
 	const data = await response.json();
 	return { ...data, member: data.member.map(denormalizeDrink) };
@@ -39,20 +40,15 @@ const TEA_FAMILY_BORDER_CLS = {
 } as const;
 
 export default function ListDrinks(props: Route.ComponentProps) {
-	const navigate = useNavigate();
-
-	const [cursor, setCursor] = useState<string>();
-
 	const drinksQuery = useInfiniteQuery({
 		queryFn: async (context) => await fetchDrinks(context.pageParam),
 		queryKey: ["me", "drinks"],
-		enabled: undefined !== cursor,
 		getPreviousPageParam: () => undefined,
-		getNextPageParam: (last, allPages) => {
+		getNextPageParam: (_last, allPages) => {
 			const lastPage = allPages.slice(-1)[0];
 
-			// Page incomplete means last page
-			if (14 > (lastPage?.member?.length ?? 14)) {
+			// Incomplete page means last page
+			if (PAGE_SIZE > (lastPage?.member?.length ?? PAGE_SIZE)) {
 				return undefined;
 			}
 
@@ -166,11 +162,11 @@ function Item(props: {
 	ml?: number;
 }) {
 	return (
-		<article className={clsx("bg-base-200 rounded h-min-16 pt-2 pb-2 border-l-2", TEA_FAMILY_BORDER_CLS[props.family])}>
-			<div className="px-3 flex justify-between text-xs text-base-content/60 mb-1">
-				<span>
-					<span className="capitalize">{props.family}</span> tea
-				</span>
+		<article
+			className={clsx("bg-base-200 rounded h-min-16 pt-2 pb-1 border-l-2", TEA_FAMILY_BORDER_CLS[props.family])}
+		>
+			<div className="px-3 flex justify-between text-xs text-base-content/60 leading-tight">
+				<span className="uppercase text-base-content/40">{props.family}</span>
 				{props.path && <FormatOriginPath originPath={props.path} />}
 			</div>
 			<div className="px-3 pb-1 flex">
@@ -182,7 +178,7 @@ function Item(props: {
 				</span>
 			</div>
 			{!!props.note && (
-				<div className="border-t border-base-300 pt-2 px-3 text-base-content/60 text-sm">
+				<div className="border-t border-base-300 pt-2 pb-1 px-3 text-base-content/60 text-sm">
 					{limit(props.note, 96)}
 				</div>
 			)}
