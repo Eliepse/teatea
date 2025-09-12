@@ -7,7 +7,7 @@ const TEA_FAMILY_CLS = {
 	white: "border-cyan-200",
 	green: "border-green-300",
 	wulong: "border-indigo-300",
-	black: "border-amber-300",
+	black: "border-orange-300",
 	fermented: "border-stone-500",
 } as const;
 
