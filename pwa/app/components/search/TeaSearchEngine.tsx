@@ -6,8 +6,14 @@ import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
 import { SearchTextInput } from "~/components/search/SearchTextInput";
 
-export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: Tea; allowCreation?: boolean }) {
-	const [searchText, setSearchText] = useState<string>();
+export function TeaSearchEngine(props: {
+	onSelect: (tea: Tea) => void;
+	defaultSearch?: string;
+	value?: Tea;
+	allowCreation?: boolean;
+	onSearch?: (text: string | undefined) => void;
+}) {
+	const [searchText, setSearchText] = useState<string | undefined>(props.defaultSearch);
 
 	const teasQuery = useQuery({
 		queryFn: async ({ queryKey }) => {
@@ -23,6 +29,11 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 		queryKey: ["search", { q: searchText, sort: "popularity" }],
 	});
 
+	function handleSearchUpdate(text?: string) {
+		props.onSearch && props.onSearch(text);
+		setSearchText(text);
+	}
+
 	async function onTeaCreated(tea: Tea) {
 		void teasQuery.refetch();
 		props.onSelect(tea);
@@ -32,7 +43,11 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 		<div className="h-full flex flex-col">
 			<div className="py-4 bg-white border-b border-base-300 flex-none">
 				<div className="px-4">
-					<SearchTextInput onChange={setSearchText} loading={teasQuery.isPending} />
+					<SearchTextInput
+						onChange={handleSearchUpdate}
+						defaultValue={props.defaultSearch}
+						loading={teasQuery.isPending}
+					/>
 				</div>
 				{/*<ul className="overflow-y-auto flex gap-x-2 px-4 mt-4">*/}
 				{/*	<li>*/}
