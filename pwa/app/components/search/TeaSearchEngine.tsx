@@ -35,7 +35,7 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 		<div className="h-full flex flex-col">
 			<div className="py-4 bg-white border-b border-base-300 flex-none">
 				<div className="px-4">
-					<SearchInput onChange={setSearchText} />
+					<SearchInput onChange={setSearchText} loading={teasQuery.isPending} />
 				</div>
 				{/*<ul className="overflow-y-auto flex gap-x-2 px-4 mt-4">*/}
 				{/*	<li>*/}
@@ -105,6 +105,7 @@ function SearchInput(props: {
 	onChange: (value: string | undefined) => void;
 	disabled?: boolean;
 	debounceDelayMs?: number;
+	loading?: boolean;
 }) {
 	const [value, setValue] = useState(props.defaultValue?.trim() ?? "");
 	const isFilled = 0 !== value.trim().length;
@@ -133,6 +134,20 @@ function SearchInput(props: {
 			<MagnifyingGlassIcon className="size-4 text-base-content/40 flex-none" />
 
 			<input placeholder="Search" value={value} onChange={handleInputChange} disabled={props.disabled} />
+
+			{props.loading && (
+				<svg className="h-4 w-4 flex-none text-gray-400 animate-spin" viewBox="0 0 16 16">
+					<circle
+						cx={8}
+						cy={8}
+						r={6}
+						fill="none"
+						stroke="currentcolor"
+						strokeWidth={2}
+						strokeDasharray="27 13"
+					/>
+				</svg>
+			)}
 
 			{isFilled && !props.disabled && (
 				<button className="h-full px-4 flex-none" onClick={handleUIEvent(() => props.onChange(undefined))}>
