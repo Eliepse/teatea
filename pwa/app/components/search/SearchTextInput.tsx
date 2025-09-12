@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useState } from "react";
+import { type ChangeEvent, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
@@ -12,6 +12,7 @@ export function SearchTextInput(props: {
 	loading?: boolean;
 }) {
 	const [value, setValue] = useState(props.defaultValue?.trim() ?? "");
+	const previousValue = useRef(value);
 	const isFilled = 0 !== value.trim().length;
 
 	function clear() {
@@ -26,10 +27,17 @@ export function SearchTextInput(props: {
 
 	// Prevents too many requests (debounce)
 	useEffect(() => {
+		if(previousValue.current === value) {
+			return;
+		}
+
+		previousValue.current = value;
+
 		const timeout = setTimeout(() => {
 			const cleanValue = value.trim();
 			props.onChange(0 === cleanValue.length ? undefined : cleanValue);
 		}, props.debounceDelayMs ?? 350);
+
 		return () => clearTimeout(timeout);
 	}, [props.onChange, props.debounceDelayMs, value]);
 
