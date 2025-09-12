@@ -8,7 +8,10 @@ use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\Entity\Origin;
+use App\Helper\Arr;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @implements ProviderInterface<Tea|null>
@@ -17,6 +20,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -28,51 +32,84 @@ readonly class TeaCollectionProvider implements ProviderInterface
 
 		$params = $operation->getParameters();
 
-		$searchTextParam = $params->get("q")->getValue();
-		$hasSearchText = false === ($searchTextParam instanceof ParameterNotFound);
+		$searchText = $params->get("q")->getValue();
+		$searchText = $searchText instanceof ParameterNotFound ? null : trim($searchText);
+		$searchText = empty($searchText) ? null : $searchText;
 
 		$sortParam = $params->get("sort")->getValue();
 		if ($sortParam instanceof ParameterNotFound) {
 			$sortParam = "popularity";
 		}
 
-		// Base query
+		/*
+		| --------------------------------
+		| Search
+		| --------------------------------
+		*/
 
-		$teaQb = $this->em->createQueryBuilder()
-			->select("tea", "type", "origin")
+		$expr = $this->em->getExpressionBuilder();
+		$searchQb = $this->em->createQueryBuilder()
+			->select("tea.id")
 			->from(\App\Entity\Tea::class, "tea")
-			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.type", "type")
-			->groupBy("tea.id", "tea.createdBy", "type.id", "origin.id");
+			->groupBy("tea.id");
 
-		// Search
-
-		if ($hasSearchText) {
-			$teaQb
-				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
-				->setParameter("searchText", $searchTextParam);
+		if (null !== $searchText) {
+			$searchQb
+				->andWhere(
+					$expr->orX(
+						"0.1 < SIMILARITY(tea.family, UNACCENT(:searchText))",
+						"0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))",
+					),
+				)
+				->setParameter("searchText", $searchText)
+				->addGroupBy("type.name")
+				->orderBy(
+					"ROW_NUMBER(ORDER BY
+						SIMILARITY(tea.family, unaccent(':searchText')) DESC,
+						SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC
+					)",
+				);
 		}
 
 		// Sorting
 
 		if ("popularity" === $sortParam) {
-			$teaQb->leftJoin("tea.drinks", "drink", "WITH", ":popularSince <= drink.drankAt")
+			$searchQb
+				->leftJoin("tea.drinks", "drink", "WITH", ":popularSince <= drink.drankAt")
 				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
 
-			if ($hasSearchText) {
-				$teaQb->orderBy(
-					"ROW_NUMBER(ORDER BY SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC, count(drink.id) DESC)",
-				);
-			} else {
-				$teaQb->orderBy("count(drink.id)", "DESC");
-			}
+			$searchQb->addOrderBy("count(drink.id)", "DESC");
 		}
 
-		/** @var array<\App\Entity\Tea> $teaEntities */
-		$teaEntities = $teaQb
+		$searchResults = $searchQb
 			->addOrderBy("tea.createdBy", "DESC")
 			->getQuery()
 			->getResult();
+
+		if (0 === count($searchResults)) {
+			return [];
+		}
+
+		/*
+		| --------------------------------
+		| Hydrate
+		| --------------------------------
+		*/
+
+		/** @var array<\App\Entity\Tea> $teaEntities */
+		$teaEntities = $this->em->createQueryBuilder()
+			->select("tea", "type", "origin")
+			->from(\App\Entity\Tea::class, "tea")
+			->leftJoin("tea.origin", "origin")
+			->leftJoin("tea.type", "type")
+			->where("tea.id IN (:ids)")
+			->setParameter("ids", Arr::pluck($searchResults, "id"), ArrayParameterType::INTEGER)
+			->getQuery()
+			->getResult();
+
+		/** @var array<integer, \App\Entity\Tea> $teaEntitiesById */
+		$teaEntitiesById = Arr::keyBy($teaEntities, "id");
 
 		$originsQb = $this->em->createQueryBuilder()
 			->select("origin")
@@ -83,9 +120,17 @@ readonly class TeaCollectionProvider implements ProviderInterface
 
 		$resources = [];
 
-		foreach ($teaEntities as $teaEntity) {
-			$originNodes = TeaProvider::getOriginPath($originsMap, $teaEntity->origin);
-			$resources[] = TeaProvider::hydrateResource($teaEntity, $originNodes);
+		// Iterate over search results to keep the right ordering
+		foreach ($searchResults as $searchResult) {
+			$tea = $teaEntitiesById[$searchResult["id"]] ?? null;
+
+			if (null === $tea) {
+				$this->logger->warning("Couldn't hydrate a tea: not found in list", ["teaId" => $searchResult["id"]]);
+				continue;
+			}
+
+			$originNodes = TeaProvider::getOriginPath($originsMap, $tea->origin);
+			$resources[] = TeaProvider::hydrateResource($tea, $originNodes);
 		}
 
 		return $resources;
