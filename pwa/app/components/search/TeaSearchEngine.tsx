@@ -1,13 +1,10 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { XCircleIcon } from "@heroicons/react/20/solid";
-import { type ChangeEvent, useEffect, useState } from "react";
-import clsx from "clsx";
-import { handleUIEvent } from "~/utils/function";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import type { ApiCollection, Tea } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
+import { SearchTextInput } from "~/components/search/SearchTextInput";
 
 export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: Tea; allowCreation?: boolean }) {
 	const [searchText, setSearchText] = useState<string>();
@@ -35,7 +32,7 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 		<div className="h-full flex flex-col">
 			<div className="py-4 bg-white border-b border-base-300 flex-none">
 				<div className="px-4">
-					<SearchInput onChange={setSearchText} loading={teasQuery.isPending} />
+					<SearchTextInput onChange={setSearchText} loading={teasQuery.isPending} />
 				</div>
 				{/*<ul className="overflow-y-auto flex gap-x-2 px-4 mt-4">*/}
 				{/*	<li>*/}
@@ -96,64 +93,6 @@ export function TeaSearchEngine(props: { onSelect: (tea: Tea) => void; value?: T
 					</div>
 				)}
 			</div>
-		</div>
-	);
-}
-
-function SearchInput(props: {
-	defaultValue?: string | undefined;
-	onChange: (value: string | undefined) => void;
-	disabled?: boolean;
-	debounceDelayMs?: number;
-	loading?: boolean;
-}) {
-	const [value, setValue] = useState(props.defaultValue?.trim() ?? "");
-	const isFilled = 0 !== value.trim().length;
-
-	function clear() {
-		setValue("");
-		// Don't wait for debounce
-		props.onChange(undefined);
-	}
-
-	function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-		setValue(e.currentTarget.value);
-	}
-
-	// Prevents too many requests (debounce)
-	useEffect(() => {
-		const timeout = setTimeout(() => {
-			const cleanValue = value.trim();
-			props.onChange(0 === cleanValue.length ? undefined : cleanValue);
-		}, props.debounceDelayMs ?? 350);
-		return () => clearTimeout(timeout);
-	}, [props.onChange, props.debounceDelayMs, value]);
-
-	return (
-		<div className={clsx("input w-full", isFilled && "pr-0")}>
-			<MagnifyingGlassIcon className="size-4 text-base-content/40 flex-none" />
-
-			<input placeholder="Search" value={value} onChange={handleInputChange} disabled={props.disabled} />
-
-			{props.loading && (
-				<svg className="h-4 w-4 flex-none text-gray-400 animate-spin" viewBox="0 0 16 16">
-					<circle
-						cx={8}
-						cy={8}
-						r={6}
-						fill="none"
-						stroke="currentcolor"
-						strokeWidth={2}
-						strokeDasharray="27 13"
-					/>
-				</svg>
-			)}
-
-			{isFilled && !props.disabled && (
-				<button className="h-full px-4 flex-none" onClick={handleUIEvent(() => props.onChange(undefined))}>
-					<XCircleIcon className="size-4 cursor-pointer opacity-60 hover:opacity-100 active:opacity-100" />
-				</button>
-			)}
 		</div>
 	);
 }
