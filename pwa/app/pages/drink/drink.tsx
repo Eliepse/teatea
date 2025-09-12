@@ -103,14 +103,14 @@ export default function DrinkPage(props: Route.ComponentProps) {
 				<div className="mt-4 grid grid-cols-2 gap-4">
 					{!!drink.teaQuantity && (
 						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-							<Leaf className="size-3 text-base-content/40" />
+							<Leaf className="size-3 text-green-300" />
 							<span>{`${drink.teaQuantity} g`}</span>
 						</div>
 					)}
 
 					{!!drink.waterMl && (
 						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-							<WaterDrop className="size-3 text-base-content/40" />
+							<WaterDrop className="size-3 text-blue-300" />
 							<span>{`${drink.waterMl} ml`}</span>
 						</div>
 					)}

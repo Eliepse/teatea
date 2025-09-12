@@ -29,10 +29,19 @@ const TEA_FAMILY_BADGE_CLS = {
 	fermented: "badge-neutral",
 } as const;
 
+const TEA_FAMILY_BORDER_CLS = {
+	yellow: "border-lime-200",
+	white: "border-cyan-200",
+	green: "border-green-300",
+	wulong: "border-indigo-300",
+	black: "border-orange-300",
+	fermented: "border-stone-500",
+} as const;
+
 export default function TeaPage(props: Route.ComponentProps) {
 	const { tea, stats } = props.loaderData;
 	const navigate = useNavigate();
-	const familyLabel = tea.family[0].toUpperCase() + tea.family.substring(1);
+	const familyLabel = (tea.family[0].toUpperCase() + tea.family.substring(1)) + " tea";
 
 	const drinksQuery = useQuery({
 		queryFn: async (): Promise<ApiPaginatedCollection<Drink>> => {
@@ -47,7 +56,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 	return (
 		<div className="pb-22">
-			<header className="p-4 bg-base-200">
+			<header className={clsx("p-4 bg-stone-50 border-t-3", TEA_FAMILY_BORDER_CLS[tea.family])}>
 				<button className="btn btn-ghost p-0 mb-4" onClick={handleUIEvent(() => navigate(-1))}>
 					<ArrowLeftIcon className="size-4 mr-1" /> Back
 				</button>
@@ -77,11 +86,11 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<p>
 							This tea has been brewed{" "}
 							<strong>
-								{stats.drinksCount}&nbsp;{1 < stats.drinksCount ? "times" : "time"}
+								{stats.drinksCount}&nbsp;{1 === stats.drinksCount ? "time" : "times"}
 							</strong>{" "}
 							times by a total of{" "}
 							<strong>
-								{stats.drinkersCount}&nbsp;{1 < stats.drinkersCount ? "members" : "member"}.
+								{stats.drinkersCount}&nbsp;{1 === stats.drinkersCount ? "member" : "members"}.
 							</strong>
 						</p>
 					</div>

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drinks";
 import { fetchApi } from "~/utils/api";
-import type { ApiCollection, Drink, OriginPath, TeaType } from "~t/types";
+import type { ApiCollection, Drink, OriginPath, TeaFamily, TeaType } from "~t/types";
 import { formatDate, formatISO, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
@@ -12,6 +12,7 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { handleUIEvent } from "~/utils/function";
+import clsx from "clsx";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	return await fetchDrinks();
@@ -27,6 +28,15 @@ async function fetchDrinks(cursor?: string) {
 function getNextCursorFromDrink(drink?: Drink) {
 	return drink ? formatISO(subDays(drink.drankAt, 1), { representation: "date" }) : null;
 }
+
+const TEA_FAMILY_BORDER_CLS = {
+	yellow: "border-lime-200",
+	white: "border-cyan-200",
+	green: "border-green-300",
+	wulong: "border-indigo-300",
+	black: "border-orange-300",
+	fermented: "border-stone-500",
+} as const;
 
 export default function ListDrinks(props: Route.ComponentProps) {
 	const navigate = useNavigate();
@@ -148,7 +158,7 @@ export default function ListDrinks(props: Route.ComponentProps) {
 }
 
 function Item(props: {
-	family: string;
+	family: TeaFamily;
 	type?: TeaType;
 	path?: OriginPath;
 	note?: string;
@@ -156,7 +166,7 @@ function Item(props: {
 	ml?: number;
 }) {
 	return (
-		<article className="bg-base-200 pt-2 pb-2">
+		<article className={clsx("bg-base-200 rounded h-min-16 pt-2 pb-2 border-l-2", TEA_FAMILY_BORDER_CLS[props.family])}>
 			<div className="px-3 flex justify-between text-xs text-base-content/60 mb-1">
 				<span>
 					<span className="capitalize">{props.family}</span> tea
