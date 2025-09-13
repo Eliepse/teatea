@@ -19,10 +19,9 @@ readonly class TeaCreateProcess implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private TeaRepository          $teaRepository,
-		private Security               $security,
-	)
-	{
+		private TeaRepository $teaRepository,
+		private Security $security,
+	) {
 	}
 
 	/**
@@ -65,9 +64,10 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$teaEntity->type = $typeEntity;
 		}
 
-		// Check if the tea has already been created
-		if ($this->teaRepository->hasDuplicate($teaEntity)) {
-			throw new BadRequestException("A tea with the same parameters already exists");
+		// Check if the tea has already been created.
+		// No need to check if a new type is created as it certainly new
+		if (null === $data->type && $this->teaRepository->hasDuplicate($teaEntity)) {
+			throw new BadRequestException("A tea with the same parameters already exists", ["data" => $data]);
 		}
 
 		// Create the new tea
