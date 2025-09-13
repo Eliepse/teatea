@@ -80,16 +80,31 @@ export function SelectType(props: {
 				</button>
 			}
 		>
-			{isLoading && "Loading..."}
-			{!hasTypes && <p className="py-4 text-center italic text-base-content/60">No types found</p>}
-
 			{props.onSkip && (
 				<button
 					className="btn btn-block btn-outline btn-secondary justify-between h-12 mb-4"
 					onClick={handleUIEvent(props.onSkip)}
 				>
-					I don't know <ArrowRightIcon className="size-4" />
+					I don't know the type of this tea <ArrowRightIcon className="size-4" />
 				</button>
+			)}
+
+			{props.onCreate && (
+				<button
+					className="btn btn-block btn-dash justify-between h-12 mb-4"
+					onClick={handleUIEvent(props.onCreate)}
+				>
+					Add a new type (not listed) <PlusIcon className="size-4" />
+				</button>
+			)}
+
+			{!hasTypes && <p className="py-4 text-center italic text-base-content/60">No types found</p>}
+			{isLoading && (
+				<div className="mb-8">
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+				</div>
 			)}
 
 			{!props.filters?.originPath &&
@@ -145,15 +160,6 @@ export function SelectType(props: {
 						/>
 					))}
 				</div>
-			)}
-
-			{props.onCreate && (
-				<button
-					className="btn btn-block btn-dash justify-between h-12 mb-4"
-					onClick={handleUIEvent(props.onCreate)}
-				>
-					Add a new type <PlusIcon className="size-4" />
-				</button>
 			)}
 		</PageLayout>
 	);
