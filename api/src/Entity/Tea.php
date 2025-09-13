@@ -46,10 +46,10 @@ class Tea
 	public ?int $altitude = null;
 
 	/**
-	 * @var Collection<int, Drink>
+	 * @var Collection<int, TeaSession>
 	 */
-	#[ORM\OneToMany(targetEntity: Drink::class, mappedBy: 'tea')]
-	private Collection $drinks;
+	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'tea')]
+	private Collection $sessions;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -59,7 +59,7 @@ class Tea
 		#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
 		public readonly \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
 	) {
-		$this->drinks = new ArrayCollection();
+		$this->sessions = new ArrayCollection();
 	}
 
 	public function setCultivar(?Cultivar $cultivar): static
@@ -75,29 +75,29 @@ class Tea
 	}
 
 	/**
-	 * @return Collection<int, Drink>
+	 * @return Collection<int, TeaSession>
 	 */
-	public function getDrinks(): Collection
+	public function getSessions(): Collection
 	{
-		return $this->drinks;
+		return $this->sessions;
 	}
 
-	public function addDrink(Drink $drink): static
+	public function addSession(TeaSession $session): static
 	{
-		if (!$this->drinks->contains($drink)) {
-			$this->drinks->add($drink);
-			$drink->setTea($this);
+		if (!$this->sessions->contains($session)) {
+			$this->sessions->add($session);
+			$session->setTea($this);
 		}
 
 		return $this;
 	}
 
-	public function removeDrink(Drink $drink): static
+	public function removeSession(TeaSession $session): static
 	{
-		if ($this->drinks->removeElement($drink)) {
+		if ($this->sessions->removeElement($session)) {
 			// set the owning side to null (unless already changed)
-			if ($drink->getTea() === $this) {
-				$drink->setTea(null);
+			if ($session->getTea() === $this) {
+				$session->setTea(null);
 			}
 		}
 

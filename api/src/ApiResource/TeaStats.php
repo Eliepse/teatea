@@ -14,7 +14,7 @@ class TeaStats
 	#[ApiProperty(identifier: true)]
 	public int $teaId;
 
-	public int $drinksCount;
+	public int $sessionsCount;
 
-	public int $drinkersCount;
+	public int $authorsCount;
 }

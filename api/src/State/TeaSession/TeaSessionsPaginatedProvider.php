@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-readonly class TeaDrinksPaginatedProvider implements ProviderInterface
+readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -40,31 +40,31 @@ readonly class TeaDrinksPaginatedProvider implements ProviderInterface
 		$offset = $this->pagination->getOffset($operation, $context);
 
 		$expr = $this->em->createQueryBuilder()->expr();
-		$drinkQb = $this->em->createQueryBuilder()
-			->select("drink")
-			->from(\App\Entity\Drink::class, "drink")
-			->where("drink.tea = :tea")->setParameter("tea", $tea)
-			->andWhere("drink.teaQuantity IS NOT NULL")
-			->orderBy("drink.drankAt", "DESC");
+		$sessionQb = $this->em->createQueryBuilder()
+			->select("session")
+			->from(\App\Entity\TeaSession::class, "session")
+			->where("session.tea = :tea")->setParameter("tea", $tea)
+			->andWhere("session.teaQuantity IS NOT NULL")
+			->orderBy("session.drankAt", "DESC");
 
 		if ($isContentful) {
-			$drinkQb->andWhere(
+			$sessionQb->andWhere(
 				$expr->orX(
-					"drink.teaQuantity IS NOT NULL",
-					"drink.waterVolume IS NOT NULL",
-					"drink.note IS NOT NULL",
+					"session.teaQuantity IS NOT NULL",
+					"session.waterVolume IS NOT NULL",
+					"session.note IS NOT NULL",
 				),
 			);
 		}
 
-		$total = (clone $drinkQb)
-			->select("COUNT(drink)")
+		$total = (clone $sessionQb)
+			->select("COUNT(session)")
 			->resetDQLPart("orderBy")
 			->getQuery()
 			->getSingleScalarResult();
 
 		if (0 < $total) {
-			$entities = $drinkQb
+			$entities = $sessionQb
 				->setFirstResult($offset)
 				->setMaxResults($itemsPerPage)
 				->getQuery()->getResult();
@@ -75,7 +75,7 @@ readonly class TeaDrinksPaginatedProvider implements ProviderInterface
 		$items = new \ArrayIterator();
 
 		foreach ($entities as $entity) {
-			$items->append(DrinkProvider::hydrate($entity));
+			$items->append(TeaSessionProvider::hydrate($entity));
 		}
 
 		return new TraversablePaginator($items, $currentPage, $itemsPerPage, $total);

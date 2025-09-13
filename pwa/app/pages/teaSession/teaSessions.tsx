@@ -1,10 +1,10 @@
 import { Link } from "react-router";
-import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drinks";
+import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSessions";
 import { fetchApi } from "~/utils/api";
-import type { ApiCollection, Drink, OriginPath, TeaFamily, TeaType } from "~t/types";
+import type { ApiCollection, TeaSession, OriginPath, TeaFamily, TeaType } from "~t/types";
 import { formatDate, formatISO, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
+import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { ActivityGraph } from "~/components/activity/ActivityGraph";
@@ -14,20 +14,20 @@ import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 
 export async function clientLoader(_args: Route.ClientLoaderArgs) {
-	return await fetchDrinks();
+	return await fetchSessions();
 }
 
 const PAGE_SIZE = 14;
 
-async function fetchDrinks(cursor?: string) {
+async function fetchSessions(cursor?: string) {
 	const queryParams = cursor ? `cursor=${cursor}&limit=${PAGE_SIZE}` : `limit=${PAGE_SIZE}`;
-	const response = await fetchApi<ApiCollection<DrinkRaw>>(`/drinks?${queryParams}`);
+	const response = await fetchApi<ApiCollection<TeaSeassionRaw>>(`/tea_sessions?${queryParams}`);
 	const data = await response.json();
-	return { ...data, member: data.member.map(denormalizeDrink) };
+	return { ...data, member: data.member.map(denormalizeTeaSession) };
 }
 
-function getNextCursorFromDrink(drink?: Drink) {
-	return drink ? formatISO(subDays(drink.drankAt, 1), { representation: "date" }) : null;
+function getNextCursorFromSession(session?: TeaSession) {
+	return session ? formatISO(subDays(session.drankAt, 1), { representation: "date" }) : null;
 }
 
 const TEA_FAMILY_BORDER_CLS = {
@@ -39,10 +39,10 @@ const TEA_FAMILY_BORDER_CLS = {
 	fermented: "border-stone-500",
 } as const;
 
-export default function ListDrinks(props: Route.ComponentProps) {
-	const drinksQuery = useInfiniteQuery({
-		queryFn: async (context) => await fetchDrinks(context.pageParam),
-		queryKey: ["me", "drinks"],
+export default function ListTeaSessions(props: Route.ComponentProps) {
+	const sessionsQuery = useInfiniteQuery({
+		queryFn: async (context) => await fetchSessions(context.pageParam),
+		queryKey: ["me", "sessions"],
 		getPreviousPageParam: () => undefined,
 		getNextPageParam: (_last, allPages) => {
 			const lastPage = allPages.slice(-1)[0];
@@ -53,24 +53,24 @@ export default function ListDrinks(props: Route.ComponentProps) {
 			}
 
 			const lastItem = lastPage.member?.slice(-1)[0];
-			return lastItem ? getNextCursorFromDrink(lastItem) : undefined;
+			return lastItem ? getNextCursorFromSession(lastItem) : undefined;
 		},
 		initialPageParam: "",
 		initialData: { pages: [props.loaderData], pageParams: [] },
 	});
 
-	const items = drinksQuery.data.pages.reduce((carr, p) => {
+	const items = sessionsQuery.data.pages.reduce((carr, p) => {
 		carr.push(...p.member);
 		return carr;
-	}, [] as Drink[]);
+	}, [] as TeaSession[]);
 
-	const drinksByDay = items.reduce(
-		(days, drink) => {
-			const date = formatISO(drink.drankAt, { representation: "date" });
-			days[date] = [...(days[date] ?? []), drink];
+	const sessionsByDay = items.reduce(
+		(days, session) => {
+			const date = formatISO(session.drankAt, { representation: "date" });
+			days[date] = [...(days[date] ?? []), session];
 			return days;
 		},
-		{} as { [key: string]: Drink[] },
+		{} as { [key: string]: TeaSession[] },
 	);
 
 	if (0 === items.length) {
@@ -79,13 +79,13 @@ export default function ListDrinks(props: Route.ComponentProps) {
 				<p className="text-base-content/60 text-center">
 					This page shows your recent activity, but you haven't save any tea session yet. Start your tea
 					journal by{" "}
-					<Link to="/drink/new" className="link link-primary">
+					<Link to="/session/new" className="link link-primary">
 						recording your first session!
 					</Link>
 				</p>
 
 				<Link
-					to="/drink/new"
+					to="/session/new"
 					className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 w-12 shadow-md"
 				>
 					<PlusIcon className="size-4" />
@@ -100,8 +100,8 @@ export default function ListDrinks(props: Route.ComponentProps) {
 			<ActivityGraph className="my-2" />
 
 			<ul className="mt-4">
-				{Object.entries(drinksByDay).map(([dateKey, drinks]) => {
-					const date = drinks[0].drankAt;
+				{Object.entries(sessionsByDay).map(([dateKey, sessions]) => {
+					const date = sessions[0].drankAt;
 
 					return (
 						<li key={dateKey} className="mb-12">
@@ -113,16 +113,16 @@ export default function ListDrinks(props: Route.ComponentProps) {
 								<span>{formatDate(date, "d MMMM")}</span>
 							</div>
 							<ul>
-								{drinks.map((drink) => (
-									<li key={drink.id} className="mb-2">
-										<Link to={`/me/drink/${drink.id}`}>
+								{sessions.map((session) => (
+									<li key={session.id} className="mb-2">
+										<Link to={`/me/sessions/${session.id}`}>
 											<Item
-												family={drink.tea.family}
-												type={drink.tea.type}
-												path={drink.tea.originPath}
-												note={drink.note}
-												grams={drink.teaQuantity}
-												ml={drink.waterMl}
+												family={session.tea.family}
+												type={session.tea.type}
+												path={session.tea.originPath}
+												note={session.note}
+												grams={session.teaQuantity}
+												ml={session.waterMl}
 											/>
 										</Link>
 									</li>
@@ -133,18 +133,18 @@ export default function ListDrinks(props: Route.ComponentProps) {
 				})}
 			</ul>
 
-			{drinksQuery.hasNextPage && (
+			{sessionsQuery.hasNextPage && (
 				<button
 					className="btn btn-block btn-outline"
-					onClick={handleUIEvent(() => drinksQuery.fetchNextPage())}
-					disabled={drinksQuery.isFetchingNextPage}
+					onClick={handleUIEvent(() => sessionsQuery.fetchNextPage())}
+					disabled={sessionsQuery.isFetchingNextPage}
 				>
 					Load previous
 				</button>
 			)}
 
 			<Link
-				to="/drink/new"
+				to="/session/new"
 				className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 w-12 shadow-md"
 			>
 				<PlusIcon className="size-4" />

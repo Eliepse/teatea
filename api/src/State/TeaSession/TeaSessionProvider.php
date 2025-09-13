@@ -1,22 +1,21 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\BrewingStep;
-use App\ApiResource\Drink;
 use App\ApiResource\Tea;
+use App\ApiResource\TeaSession;
 use App\Entity\User;
-use App\Helper\Arr;
 use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
-readonly class DrinkProvider implements ProviderInterface
+readonly class TeaSessionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -37,21 +36,21 @@ readonly class DrinkProvider implements ProviderInterface
 
 		assert(false !== $cursor);
 
-		$drinkQb = $this->em->createQueryBuilder()
-			->select("drink", "tea", "type", "origin")
-			->from(\App\Entity\Drink::class, "drink")
-			->leftJoin("drink.tea", "tea")
+		$sessionQb = $this->em->createQueryBuilder()
+			->select("session", "tea", "type", "origin")
+			->from(\App\Entity\TeaSession::class, "session")
+			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
-			->where("drink.drinker = :drinker")->setParameter("drinker", $user)
-			->orderBy("drink.drankAt", "DESC");
+			->where("session.author = :author")->setParameter("author", $user)
+			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {
-			// Fetch drinks for a fixed amount of days
+			// Fetch sessions for a fixed amount of days
 			$searchQb = $this->em->getConnection()->createQueryBuilder()
 				->select("array_agg(id) AS ids")
-				->from("drink")
-				->where("drinker_id = :drinkerId")->setParameter("drinkerId", $user->id)
+				->from("tea_session")
+				->where("author_id = :authorId")->setParameter("authorId", $user->id)
 				->groupBy("drank_at::date")
 				->orderBy("drank_at::date", "DESC")
 				->setMaxResults($limit);
@@ -60,42 +59,42 @@ readonly class DrinkProvider implements ProviderInterface
 				$searchQb->andWhere("drank_at <= :cursor")->setParameter("cursor", $cursor->format("Y-m-d"));
 			}
 
-			$drinkIds = [];
+			$sessionIds = [];
 
 			foreach ($searchQb->fetchAllAssociative() as $row) {
-				array_push($drinkIds, ...array_map("intval", explode(",", substr($row["ids"], 1, -1))));
+				array_push($sessionIds, ...array_map("intval", explode(",", substr($row["ids"], 1, -1))));
 			}
 
-			$drinkIds = array_unique($drinkIds);
+			$sessionIds = array_unique($sessionIds);
 
-			if(empty($drinkIds)) {
+			if (empty($sessionIds)) {
 				return [];
 			}
 
-			$drinkQb->andWhere("drink.id IN (:drinkIds)")
-				->setParameter("drinkIds", $drinkIds, ArrayParameterType::INTEGER);
+			$sessionQb->andWhere("session.id IN (:sessionIds)")
+				->setParameter("sessionIds", $sessionIds, ArrayParameterType::INTEGER);
 
-			// TODO(elie): optimize to only fetch origins of requested drinks/teas
-			$origins = $this->originRepository->fetchOriginsFromDrink(
-				fn($qb) => $qb->where("drink.drinker = :drinker")->setParameter("drinker", $user),
+			// TODO(elie): optimize to only fetch origins of requested sessions/teas
+			$origins = $this->originRepository->fetchOriginsFromSession(
+				fn($qb) => $qb->where("session.author = :author")->setParameter("author", $user),
 			);
 
 			$originMap = TeaProvider::originsToMap($origins);
 
-			return array_map(function (\App\Entity\Drink $entity) use ($originMap) {
+			return array_map(function (\App\Entity\TeaSession $entity) use ($originMap) {
 				$path = TeaProvider::getOriginPath($originMap, $entity->tea->origin);
 				$tea = TeaProvider::hydrateResource($entity->tea, $path);
 				return self::hydrate($entity, $tea);
-			}, $drinkQb->getQuery()->getResult());
+			}, $sessionQb->getQuery()->getResult());
 		}
 
-		$origins = $this->originRepository->fetchOriginsFromDrink(
-			fn($qb) => $qb->where("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["id"]),
+		$origins = $this->originRepository->fetchOriginsFromSession(
+			fn($qb) => $qb->where("session.id = :sessionId")->setParameter("sessionId", $uriVariables["id"]),
 		);
 
-		$entity = $drinkQb
-			->andWhere("drink.id = :drinkId")
-			->setParameter("drinkId", $uriVariables["id"])
+		$entity = $sessionQb
+			->andWhere("session.id = :sessionId")
+			->setParameter("sessionId", $uriVariables["id"])
 			->getQuery()->getSingleResult();
 
 		$originMap = TeaProvider::originsToMap($origins);
@@ -105,9 +104,9 @@ readonly class DrinkProvider implements ProviderInterface
 		return self::hydrate($entity, $tea);
 	}
 
-	public static function hydrate(\App\Entity\Drink $entity, ?Tea $tea = null): Drink
+	public static function hydrate(\App\Entity\TeaSession $entity, ?Tea $tea = null): TeaSession
 	{
-		$resource = new Drink();
+		$resource = new TeaSession();
 		$resource->id = $entity->id;
 		$resource->note = $entity->note;
 		$resource->technic = $entity->technic;
@@ -124,7 +123,7 @@ readonly class DrinkProvider implements ProviderInterface
 					$r->id = $i;
 					$r->duration = $bs->duration->seconds;
 					$r->temperature = $bs->temperature->degrees;
-					$r->drink = $resource;
+					$r->session = $resource;
 					return $r;
 				},
 				$brewingSteps,

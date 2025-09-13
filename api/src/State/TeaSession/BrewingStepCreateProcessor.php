@@ -1,13 +1,13 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\BrewingStep;
-use App\ApiResource\Drink;
+use App\ApiResource\TeaSession;
 use App\Entity\User;
-use App\Repository\DrinkRepository;
+use App\Repository\TeaSessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -18,7 +18,7 @@ readonly class BrewingStepCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private DrinkRepository $drinkRepository,
+		private TeaSessionRepository $sessionRepository,
 		private Security $security,
 	) {
 	}
@@ -34,19 +34,19 @@ readonly class BrewingStepCreateProcessor implements ProcessorInterface
 		assert($data instanceof BrewingStep);
 		assert($user instanceof User);
 
-		/** @var \App\Entity\Drink|null $drink */
-		$drink = $this->drinkRepository->createQueryBuilder("drink")
-			->where("drink.drinker = :drinker")->setParameter("drinker", $user)
-			->andWhere("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["drinkId"])
+		/** @var \App\Entity\TeaSession|null $session */
+		$session = $this->sessionRepository->createQueryBuilder("session")
+			->where("session.author = :author")->setParameter("author", $user)
+			->andWhere("session.id = :sessionId")->setParameter("sessionId", $uriVariables["sessionId"])
 			->getQuery()->getSingleResult();
 
-		if (null === $drink) {
+		if (null === $session) {
 			return null;
 		}
 
-		$index = $drink->addBrewingStep(\App\DTO\BrewingStep::fromResource($data));
+		$index = $session->addBrewingStep(\App\DTO\BrewingStep::fromResource($data));
 
-		$this->em->persist($drink);
+		$this->em->persist($session);
 		$this->em->flush();
 
 		$resource = new BrewingStep($index);
@@ -54,8 +54,8 @@ readonly class BrewingStepCreateProcessor implements ProcessorInterface
 		$resource->duration = $data->duration;
 
 		// Only used to let ApiPlatform generate the uri
-		$resource->drink = new Drink();
-		$resource->drink->id = $drink->id;
+		$resource->session = new TeaSession();
+		$resource->session->id = $session->id;
 
 		return $resource;
 	}

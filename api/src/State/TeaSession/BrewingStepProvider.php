@@ -1,11 +1,11 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\BrewingStep;
-use App\ApiResource\Drink;
+use App\ApiResource\TeaSession;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -23,20 +23,20 @@ readonly class BrewingStepProvider implements ProviderInterface
 		$user = $this->security->getUser();
 		assert($user instanceof User);
 
-		/** @var \App\Entity\Drink|null $drink */
-		$drink = $this->em->createQueryBuilder()
-			->select("drink")
-			->from(\App\Entity\Drink::class, "drink")
-			->where("drink.drinker = :drinker")->setParameter("drinker", $user)
-			->andWhere("drink.id = :drinkId")->setParameter("drinkId", $uriVariables["drinkId"])
+		/** @var \App\Entity\TeaSession|null $session */
+		$session = $this->em->createQueryBuilder()
+			->select("session")
+			->from(\App\Entity\TeaSession::class, "session")
+			->where("session.author = :author")->setParameter("author", $user)
+			->andWhere("session.id = :sessionId")->setParameter("sessionId", $uriVariables["sessionId"])
 			->getQuery()->getSingleResult();
 
-		if (null === $drink) {
+		if (null === $session) {
 			return null;
 		}
 
 		$id = $uriVariables["id"];
-		$brewingStepDTO = $drink->getBrewingStepsMap()[$id] ?? null;
+		$brewingStepDTO = $session->getBrewingStepsMap()[$id] ?? null;
 
 		if (null === $brewingStepDTO) {
 			return null;
@@ -46,8 +46,8 @@ readonly class BrewingStepProvider implements ProviderInterface
 		$resource->duration = $brewingStepDTO->duration->seconds;
 		$resource->temperature = $brewingStepDTO->temperature->degrees;
 
-		$resource->drink = new Drink();
-		$resource->drink->id = $drink->id;
+		$resource->session = new TeaSession();
+		$resource->session->id = $session->id;
 
 		return $resource;
 	}

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\ApiResource\Drink;
+use App\ApiResource\TeaSession;
 use App\Entity\Tea;
 use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
@@ -13,9 +13,9 @@ use App\ValueObject\Weight;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @implements ProcessorInterface<Drink>
+ * @implements ProcessorInterface<TeaSession>
  */
-readonly class DrinkEditProcessor implements ProcessorInterface
+readonly class TeaSessionEditProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -23,11 +23,11 @@ readonly class DrinkEditProcessor implements ProcessorInterface
 	) {
 	}
 
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Drink
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaSession
 	{
-		assert($data instanceof Drink);
+		assert($data instanceof TeaSession);
 
-		$entity = $this->em->find(\App\Entity\Drink::class, $data->id);
+		$entity = $this->em->find(\App\Entity\TeaSession::class, $data->id);
 		$entity->note = trim($data->note ?? "") ?: null;
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
@@ -46,12 +46,12 @@ readonly class DrinkEditProcessor implements ProcessorInterface
 			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
 		}
 
-		$origins = $this->originRepository->fetchOriginsFromDrink(
-			fn($qb) => $qb->andWhere("drink.id = :drinkId")->setParameter("drinkId", $entity->id),
+		$origins = $this->originRepository->fetchOriginsFromSession(
+			fn($qb) => $qb->andWhere("session.id = :sessionId")->setParameter("sessionId", $entity->id),
 		);
 		$originMap = TeaProvider::originsToMap($origins);
 		$teaResource = TeaProvider::hydrateResource($tea, TeaProvider::getOriginPath($originMap, $tea->origin));
 
-		return DrinkProvider::hydrate($entity, $teaResource);
+		return TeaSessionProvider::hydrate($entity, $teaResource);
 	}
 }

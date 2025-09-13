@@ -1,12 +1,12 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
 import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection, Drink, TeaStats } from "~t/types";
+import type { ApiPaginatedCollection, TeaSession, TeaStats } from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { useQuery } from "@tanstack/react-query";
-import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
+import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { formatDistanceToNow, intlFormat } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
@@ -41,17 +41,17 @@ const TEA_FAMILY_BORDER_CLS = {
 export default function TeaPage(props: Route.ComponentProps) {
 	const { tea, stats } = props.loaderData;
 	const navigate = useNavigate();
-	const familyLabel = (tea.family[0].toUpperCase() + tea.family.substring(1)) + " tea";
+	const familyLabel = tea.family[0].toUpperCase() + tea.family.substring(1) + " tea";
 
-	const drinksQuery = useQuery({
-		queryFn: async (): Promise<ApiPaginatedCollection<Drink>> => {
-			const response = await getApi<ApiPaginatedCollection<DrinkRaw>>(
-				`/teas/${tea.id}/drinks?itemsPerPage=5&contentful=1`,
+	const sessionsQuery = useQuery({
+		queryFn: async (): Promise<ApiPaginatedCollection<TeaSession>> => {
+			const response = await getApi<ApiPaginatedCollection<TeaSeassionRaw>>(
+				`/teas/${tea.id}/sessions?itemsPerPage=5&contentful=1`,
 			);
 			const payload = await response.json();
-			return { ...payload, member: payload.member.map(denormalizeDrink) };
+			return { ...payload, member: payload.member.map(denormalizeTeaSession) };
 		},
-		queryKey: ["page", tea["@id"], "drinks"],
+		queryKey: ["page", tea["@id"], "sessions"],
 	});
 
 	return (
@@ -81,22 +81,22 @@ export default function TeaPage(props: Route.ComponentProps) {
 			</header>
 
 			<main>
-				{0 !== stats.drinkersCount && (
+				{0 !== stats.sessionsCount && (
 					<div className="px-4 mt-4">
 						<p>
 							This tea has been brewed{" "}
 							<strong>
-								{stats.drinksCount}&nbsp;{1 === stats.drinksCount ? "time" : "times"}
+								{stats.sessionsCount}&nbsp;{1 === stats.sessionsCount ? "time" : "times"}
 							</strong>{" "}
 							times by a total of{" "}
 							<strong>
-								{stats.drinkersCount}&nbsp;{1 === stats.drinkersCount ? "member" : "members"}.
+								{stats.authorsCount}&nbsp;{1 === stats.authorsCount ? "member" : "members"}.
 							</strong>
 						</p>
 					</div>
 				)}
 
-				{drinksQuery.isPending && (
+				{sessionsQuery.isPending && (
 					<div className="px-4 mt-8">
 						<div className="skeleton h-8 mb-2" />
 						<div className="skeleton h-8 mb-2" />
@@ -104,35 +104,35 @@ export default function TeaPage(props: Route.ComponentProps) {
 					</div>
 				)}
 
-				{0 !== (drinksQuery.data?.member?.length ?? 0) && (
+				{0 !== (sessionsQuery.data?.member?.length ?? 0) && (
 					<section className="px-4 mt-8">
 						<h2 className="text-lg mb-4">How others brewed it?</h2>
 						<ul>
-							{drinksQuery.data?.member?.map((drink) => (
-								<li className="mb-2" key={drink.id}>
+							{sessionsQuery.data?.member?.map((session) => (
+								<li className="mb-2" key={session.id}>
 									<article className="px-2 py-2 bg-base-200 rounded">
 										<div className="flex text-xs gap-2 items-center">
-											{!!drink.teaQuantity && (
+											{!!session.teaQuantity && (
 												<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
 													<Leaf className="size-3 text-green-300 mr-2" />
-													<span>{`${drink.teaQuantity} g`}</span>
+													<span>{`${session.teaQuantity} g`}</span>
 												</div>
 											)}
 
-											{!!drink.waterMl && (
+											{!!session.waterMl && (
 												<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
 													<WaterDrop className="size-3 text-blue-300 mr-2" />
-													<span>{`${drink.waterMl} ml`}</span>
+													<span>{`${session.waterMl} ml`}</span>
 												</div>
 											)}
 
 											<div className="ml-auto text-sm text-base-content/60">
-												{formatDistanceToNow(drink.drankAt)} ago
+												{formatDistanceToNow(session.drankAt)} ago
 											</div>
 										</div>
-										{!!drink.note && (
+										{!!session.note && (
 											<p className="mt-4 pt-2 italic border-t border-gray-300 text-sm text-base-content/70">
-												{limit(drink.note, 96)}
+												{limit(session.note, 96)}
 											</p>
 										)}
 									</article>
@@ -147,7 +147,10 @@ export default function TeaPage(props: Route.ComponentProps) {
 				Created at {intlFormat(tea.addedAt, { dateStyle: "long" })}
 			</footer>
 
-			<Link to={`/drink/new?tea=${tea.id}`} className="fixed bottom-4 right-4 btn btn-primary rounded-full h-12">
+			<Link
+				to={`/session/new?tea=${tea.id}`}
+				className="fixed bottom-4 right-4 btn btn-primary rounded-full h-12"
+			>
 				Brew it
 			</Link>
 		</div>

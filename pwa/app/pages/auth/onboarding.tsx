@@ -37,7 +37,7 @@ export default function OnboardingPage() {
 			}
 
 			await patchApi(`/members/${user.data.id}/onboarding`, { username });
-			stack.next({ key: "cta:drink" });
+			stack.next({ key: "cta:session" });
 		},
 	});
 
@@ -87,15 +87,15 @@ export default function OnboardingPage() {
 				/>
 			</StackFrame>
 
-			<StackFrame frameKey="cta:drink">
+			<StackFrame frameKey="cta:session">
 				<div className="flex flex-col h-dvh p-4">
 					<div className="flex-1 flex flex-col justify-center items-start">
 						<h2 className="text-xl text-primary">Ready?</h2>
 						<p className="max-w-xs mt-6 text-lg">
-							Start your journey by adding your first tea drink in your journal.
+							Start your journey by adding your first tea session in your journal.
 						</p>
 
-						<button className="btn btn-primary mt-6" onClick={handleUIEvent(() => start("/drink/new"))}>
+						<button className="btn btn-primary mt-6" onClick={handleUIEvent(() => start("/session/new"))}>
 							Add my first tea session <ArrowRightIcon className="size-4" />
 						</button>
 					</div>

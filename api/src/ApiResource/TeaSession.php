@@ -13,23 +13,23 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Enum\BrewingTechnic;
-use App\State\Drink\DrinkCreateProcessor;
-use App\State\Drink\DrinkDeleteProcessor;
-use App\State\Drink\DrinkEditProcessor;
-use App\State\Drink\DrinkProvider;
-use App\State\Drink\TeaDrinksPaginatedProvider;
+use App\State\TeaSession\TeaSessionCreateProcessor;
+use App\State\TeaSession\TeaSessionDeleteProcessor;
+use App\State\TeaSession\TeaSessionEditProcessor;
+use App\State\TeaSession\TeaSessionProvider;
+use App\State\TeaSession\TeaSessionsPaginatedProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
 	normalizationContext: ["embedded:brewingStep", "embedded:originPath"],
-	provider: DrinkProvider::class,
+	provider: TeaSessionProvider::class,
 )]
 #[GetCollection(
-	normalizationContext: ["groups" => ["drink:read", "embedded:tea", "embedded:teaType", "embedded:originPath"]],
+	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:originPath"]],
 	security: "is_granted('ROLE_USER')",
-	provider: DrinkProvider::class,
+	provider: TeaSessionProvider::class,
 	parameters: [
 		"cursor" => new QueryParameter(schema: ["type" => "date"], property: 'drankAt'),
 		"limit" => new QueryParameter(
@@ -40,27 +40,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	],
 )]
-#[Post(denormalizationContext: ["groups" => ["drink:create"]], processor: DrinkCreateProcessor::class)]
+#[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
 #[Patch(
-	denormalizationContext: ["groups" => ["drink:edit"]],
-	provider: DrinkProvider::class,
-	processor: DrinkEditProcessor::class,
+	denormalizationContext: ["groups" => ["teaSession:edit"]],
+	provider: TeaSessionProvider::class,
+	processor: TeaSessionEditProcessor::class,
 )]
-#[Delete(provider: DrinkProvider::class, processor: DrinkDeleteProcessor::class)]
+#[Delete(provider: TeaSessionProvider::class, processor: TeaSessionDeleteProcessor::class)]
 #[GetCollection(
-	uriTemplate: "/teas/{teaId}/drinks",
+	uriTemplate: "/teas/{teaId}/sessions",
 	uriVariables: ["teaId" => new Link(toProperty: "tea", fromClass: Tea::class)],
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
 	paginationMaximumItemsPerPage: 50,
 	paginationClientItemsPerPage: true,
-	normalizationContext: ["groups" => ["drink:minimal"]],
+	normalizationContext: ["groups" => ["teaSession:minimal"]],
 	security: "is_granted('ROLE_USER')",
-	provider: TeaDrinksPaginatedProvider::class,
+	provider: TeaSessionsPaginatedProvider::class,
 	parameters: [
 		"contentful" => new QueryParameter(
 			schema: ["type" => "boolean"],
-			description: "When true, consider only drinks that have at least a note, water or tea volume set",
+			description: "When true, consider only sessions that have at least a note, water or tea volume set",
 			castToNativeType: true,
 		),
 		"sort" => new QueryParameter(
@@ -70,44 +70,44 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	],
 )]
-class Drink
+class TeaSession
 {
-	#[Groups(["drink:read", "drink:minimal"])]
+	#[Groups(["teaSession:read", "teaSession:minimal"])]
 	#[ApiProperty(identifier: true)]
 	public ?int $id = null;
 
-	#[Groups(["drink:create", "drink:read"])]
+	#[Groups(["teaSession:create", "teaSession:read"])]
 	#[ApiProperty(readable: true, readableLink: true)]
 	public Tea $tea;
 
-	#[Groups(["drink:create", "drink:read", "drink:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?BrewingTechnic $technic = null;
 
 	#[Assert\Length(max: 1000)]
-	#[Groups(["drink:create", "drink:edit", "drink:read", "drink:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
 	public ?string $note = null;
 
 	/**
 	 * Tea quantity in grams
 	 */
 	#[Assert\GreaterThan(0)]
-	#[Groups(["drink:create", "drink:edit", "drink:read", "drink:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
 	public ?float $teaQuantity = null;
 
 	/**
 	 * Water quantity in ml
 	 */
 	#[Assert\GreaterThan(0)]
-	#[Groups(["drink:create", "drink:edit", "drink:read", "drink:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
 	public ?float $waterMl = null;
 
 	/** @var BrewingStep[] */
-	#[Groups(["drink:edit", "embedded:brewingStep"])]
+	#[Groups(["teaSession:edit", "embedded:brewingStep"])]
 	#[ApiProperty(genId: false)]
-	#[Link(toProperty: "drinkId")]
+	#[Link(toProperty: "sessionId")]
 	public array $brewingSteps = [];
 
-	#[Groups(["drink:create", "drink:read", "drink:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?\DateTimeImmutable $drankAt;
 
 	public function __construct()

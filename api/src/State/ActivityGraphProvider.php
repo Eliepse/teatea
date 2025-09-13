@@ -35,18 +35,18 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		$to = new \DateTimeImmutable()->setDate($year + 1, 0, 0)->setTime(0, 0);
 
 		$statsQB = $this->em->getConnection()->createQueryBuilder()
-			->select("count(*) as total", "drink.drank_at::date")
-			->from("drink")
-			->where("drink.drank_at >= :from") // Inclusive range
-			->andWhere("drink.drank_at < :to") // Exclusive range
-			->andWhere("drink.drinker_id = :drinkerId")
-			->groupBy("drink.drank_at::date")
-			->orderBy("drink.drank_at::date");
+			->select("count(*) as total", "session.drank_at::date")
+			->from("tea_session", "session")
+			->where("session.drank_at >= :from") // Inclusive range
+			->andWhere("session.drank_at < :to") // Exclusive range
+			->andWhere("session.author_id = :authorId")
+			->groupBy("session.drank_at::date")
+			->orderBy("session.drank_at::date");
 
 		$statsQB
 			->setParameter("from", $from->format("c"))
 			->setParameter("to", $to->format("c"))
-			->setParameter("drinkerId", $user->id);
+			->setParameter("authorId", $user->id);
 
 		$data = $statsQB->fetchAllAssociative();
 

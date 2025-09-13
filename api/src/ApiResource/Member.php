@@ -61,7 +61,7 @@ class Member
 	public array $roles = [];
 
 	#[Groups(["member:stats"])]
-	public int $statsDrinksTotal = 0;
+	public int $statsSessionsTotal = 0;
 
 	#[Groups(["member:stats"])]
 	public int $statsConsumedTeasTotal = 0;

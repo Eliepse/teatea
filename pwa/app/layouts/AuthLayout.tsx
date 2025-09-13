@@ -47,7 +47,7 @@ export function AuthLayout(props: PropsWithChildren<{ className?: string; active
 						</Link>
 					</li>
 					<li className="flex-1">
-						<Link to="/me/drinks">
+						<Link to="/me/sessions">
 							<NavItem
 								icon={<CalendarDaysIcon className="size-5" />}
 								label="Activity"

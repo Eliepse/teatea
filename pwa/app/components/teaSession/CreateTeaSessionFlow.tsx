@@ -3,17 +3,17 @@ import type { Tea } from "~t/types";
 import { brewingTechnic, type TechnicType } from "~/components/shared/BrewingTechnic";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { SelectTeaFrame } from "~/components/stackFrames/SelectTeaFrame";
-import { ParametersInput } from "~/components/drink/create/ParametersInput";
+import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 import { FrameDatePicker } from "~/components/shared/frame/FrameDatePicker";
 import { useMutation } from "@tanstack/react-query";
 import Leaf from "~/components/icons/leaf";
 import { fetchApi } from "~/utils/api";
-import type { DrinkRaw } from "~/utils/api/normalization/drink";
+import type { TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { formatISO } from "date-fns";
 import { useNavigate } from "react-router";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 
-export type DrinkForm = {
+export type SessionForm = {
 	tea?: Tea;
 	teaQuantity?: number;
 	waterVolume?: number;
@@ -26,18 +26,18 @@ const technicItems = Object.entries(brewingTechnic).map(([k, l]) => ({ value: k,
 	label: string;
 }[];
 
-export function CreateDrinkFlow(props: { tea?: Tea; onBack: () => void }) {
+export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 	const navigate = useNavigate();
 	const alert = useAlert();
-	const [form, setForm] = useState<DrinkForm>({ drankAt: new Date(), tea: props.tea });
+	const [form, setForm] = useState<SessionForm>({ drankAt: new Date(), tea: props.tea });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({
 		defaultFrame: { key: props.tea?.id ? "parameters:input" : "tea:select" },
 		onOverBack: props.onBack,
 	});
 
 	const mutation = useMutation({
-		mutationFn: async (data: DrinkForm & Required<Pick<DrinkForm, "tea">>) => {
-			const response = await fetchApi<DrinkRaw>("/drinks", {
+		mutationFn: async (data: SessionForm & Required<Pick<SessionForm, "tea">>) => {
+			const response = await fetchApi<TeaSeassionRaw>("/tea_sessions", {
 				method: "POST",
 				payload: {
 					drankAt: formatISO(data.drankAt),
@@ -54,7 +54,7 @@ export function CreateDrinkFlow(props: { tea?: Tea; onBack: () => void }) {
 			alert({ title: "Error while saving your experience", body: e.message });
 		},
 		onSuccess: (data) => {
-			setTimeout(() => navigate(`/me/drink/${data.id}`), 500);
+			setTimeout(() => navigate(`/me/sessions/${data.id}`), 500);
 		},
 	});
 
@@ -109,7 +109,7 @@ export function CreateDrinkFlow(props: { tea?: Tea; onBack: () => void }) {
 				<FrameDatePicker
 					onBack={stackNavigator.back}
 					defaultValue={form.drankAt}
-					buttonText="Save this drink"
+					buttonText="Save this session"
 					onConfirm={(date) => {
 						setForm({ ...form, drankAt: date });
 

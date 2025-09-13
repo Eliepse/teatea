@@ -28,10 +28,10 @@ readonly class TeaStatProvider implements ProviderInterface
 
 		$teaResult = $this->em->createQuery(
 			<<<DQL
-				SELECT tea.id, COUNT(drink) as drinks, COUNT(DISTINCT drinker) as drinkers
+				SELECT tea.id, COUNT(session) as sessions, COUNT(DISTINCT author) as authors
 				FROM App\Entity\Tea tea
-					LEFT JOIN tea.drinks drink
-					LEFT JOIN drink.drinker drinker
+					LEFT JOIN tea.sessions session
+					LEFT JOIN session.author author
 				WHERE tea.id = :teaId
 				GROUP BY tea.id
 				DQL,
@@ -42,8 +42,8 @@ readonly class TeaStatProvider implements ProviderInterface
 
 		$stats = new TeaStats();
 		$stats->teaId = $teaId;
-		$stats->drinksCount = $teaResult["drinks"];
-		$stats->drinkersCount = $teaResult["drinkers"];
+		$stats->sessionsCount = $teaResult["sessions"];
+		$stats->authorsCount = $teaResult["authors"];
 		return $stats;
 	}
 }

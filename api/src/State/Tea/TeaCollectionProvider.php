@@ -76,10 +76,10 @@ readonly class TeaCollectionProvider implements ProviderInterface
 
 		if ("popularity" === $sortParam) {
 			$searchQb
-				->leftJoin("tea.drinks", "drink", "WITH", ":popularSince <= drink.drankAt")
+				->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")
 				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
 
-			$searchQb->addOrderBy("count(drink.id)", "DESC");
+			$searchQb->addOrderBy("count(session.id)", "DESC");
 		}
 
 		$searchResults = $searchQb

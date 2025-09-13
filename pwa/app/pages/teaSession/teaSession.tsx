@@ -1,7 +1,7 @@
-import type { Route } from "../../../.react-router/types/app/pages/drink/+types/drink";
+import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
-import type { Drink } from "~t/types";
-import { denormalizeDrink, type DrinkRaw } from "~/utils/api/normalization/drink";
+import type { TeaSession } from "~t/types";
+import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { Link, useNavigate } from "react-router";
@@ -18,34 +18,34 @@ import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 
-export async function clientLoader(props: Route.ClientLoaderArgs): Promise<Drink> {
+export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
 
 	if (id <= 0) {
 		throw new Error("Ooops, the id is invalid!");
 	}
 
-	const response = await fetchApi<DrinkRaw>(`/drinks/${id}`);
-	return denormalizeDrink(await response.json());
+	const response = await fetchApi<TeaSeassionRaw>(`/tea_sessions/${id}`);
+	return denormalizeTeaSession(await response.json());
 }
 
-export default function DrinkPage(props: Route.ComponentProps) {
-	const drink = props.loaderData;
+export default function TeaSessionPage(props: Route.ComponentProps) {
+	const session = props.loaderData;
 	const navigate = useNavigate();
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
-	const [noteValue, setNoteValue] = useState(drink.note);
+	const [noteValue, setNoteValue] = useState(session.note);
 	const editMutation = useMutation({
-		mutationFn: async (args: Partial<Pick<Drink, "note">>) => {
-			const response = await patchApi<DrinkRaw>(`/drinks/${drink.id}`, args);
-			return denormalizeDrink(await response.json());
+		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
+			const response = await patchApi<TeaSeassionRaw>(`/tea_sessions/${session.id}`, args);
+			return denormalizeTeaSession(await response.json());
 		},
 		onSuccess: () => setShowNodeEditor(false),
 	});
 	const deleteMutation = useMutation({
-		mutationFn: async () => await deleteApi(`/drinks/${drink.id}`),
-		onSuccess: () => navigate("/me/drinks"),
+		mutationFn: async () => await deleteApi(`/tea_sessions/${session.id}`),
+		onSuccess: () => navigate("/me/sessions"),
 	});
-	const editableData = { ...drink, ...editMutation.data };
+	const editableData = { ...session, ...editMutation.data };
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
 		setNoteValue(e.currentTarget.value);
@@ -55,9 +55,9 @@ export default function DrinkPage(props: Route.ComponentProps) {
 		<AuthLayout className="px-4" activeKey="activity">
 			<header className="py-4">
 				<div className="flex">
-					<Link to="/me/drinks" className="block link mb-8">
+					<Link to="/me/sessions" className="block link mb-8">
 						<Arrow direction="left" className="inline size-4 mr-2" />
-						Drink history
+						Sessions history
 					</Link>
 
 					<div className="dropdown dropdown-end ml-auto">
@@ -79,39 +79,39 @@ export default function DrinkPage(props: Route.ComponentProps) {
 				</div>
 
 				<div className="uppercase text-xs text-base-content/60">
-					{intlFormat(drink.drankAt, { dateStyle: "long" })}
+					{intlFormat(session.drankAt, { dateStyle: "long" })}
 				</div>
 				<div className="text-2xl mt-2">
-					<Link to={`/tea/${drink.tea.id}`}>
-						{drink.tea.displayName}
+					<Link to={`/tea/${session.tea.id}`}>
+						{session.tea.displayName}
 						<ArrowTopRightOnSquareIcon className="size-4 text-base-content/60 inline-block ml-2" />
 					</Link>
 				</div>
 				<div className="text-sm mt-1">
 					<span>
-						<span className="capitalize">{drink.tea.family}</span> tea
+						<span className="capitalize">{session.tea.family}</span> tea
 					</span>
 
-					{drink.tea.originPath && (
+					{session.tea.originPath && (
 						<span>
 							{" "}
-							&middot; <FormatOriginPath originPath={drink.tea.originPath} />
+							&middot; <FormatOriginPath originPath={session.tea.originPath} />
 						</span>
 					)}
 				</div>
 
 				<div className="mt-4 grid grid-cols-2 gap-4">
-					{!!drink.teaQuantity && (
+					{!!session.teaQuantity && (
 						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
 							<Leaf className="size-3 text-green-300" />
-							<span>{`${drink.teaQuantity} g`}</span>
+							<span>{`${session.teaQuantity} g`}</span>
 						</div>
 					)}
 
-					{!!drink.waterMl && (
+					{!!session.waterMl && (
 						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
 							<WaterDrop className="size-3 text-blue-300" />
-							<span>{`${drink.waterMl} ml`}</span>
+							<span>{`${session.waterMl} ml`}</span>
 						</div>
 					)}
 				</div>

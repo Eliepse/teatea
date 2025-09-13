@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Drink;
+use App\Entity\TeaSession;
 use App\Entity\Origin;
 use App\Entity\Tea;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -24,13 +24,13 @@ class OriginRepository extends ServiceEntityRepository
 	 *
 	 * @return array<Origin>
 	 */
-	public function fetchOriginsFromDrink(?callable $queryModifier = null): array
+	public function fetchOriginsFromSession(?callable $queryModifier = null): array
 	{
 		$originQb = $this->createQueryBuilder("origin")
 			->select("origin")->distinct()
 			->innerJoin(Origin::class, "teaOrigin", "WITH", "CONTAINS(origin.path, teaOrigin.path) = TRUE")
 			->innerJoin(Tea::class, "tea", "WITH", "teaOrigin = tea.origin")
-			->innerJoin(Drink::class, "drink", "WITH", "tea = drink.tea");
+			->innerJoin(TeaSession::class, "session", "WITH", "tea = session.tea");
 
 		if (null === $queryModifier) {
 			return $originQb->getQuery()->getResult();

@@ -1,17 +1,17 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\BrewingStep;
-use App\ApiResource\Drink;
+use App\ApiResource\TeaSession;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
- * @implements ProcessorInterface<Drink>
+ * @implements ProcessorInterface<TeaSession>
  */
 readonly class BrewingStepDeleteProcessor implements ProcessorInterface
 {
@@ -28,17 +28,17 @@ readonly class BrewingStepDeleteProcessor implements ProcessorInterface
 		assert($data instanceof BrewingStep);
 		assert($user instanceof User);
 
-		$drink = $this->em->find(\App\Entity\Drink::class, $data->drink->id);
+		$session = $this->em->find(\App\Entity\TeaSession::class, $data->session->id);
 
 		// Only author can delete
-		assert($drink->drinker->id === $user->id);
+		assert($session->author->id === $user->id);
 
 		// Remove the step
-		if (false === $drink->removeBrewingStep($uriVariables["id"])) {
+		if (false === $session->removeBrewingStep($uriVariables["id"])) {
 			throw new \RuntimeException("Failed to remove the step");
 		}
 
-		$this->em->persist($drink);
+		$this->em->persist($session);
 		$this->em->flush();
 	}
 }

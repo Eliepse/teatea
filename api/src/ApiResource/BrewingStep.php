@@ -8,30 +8,30 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use App\State\Drink\BrewingStepCreateProcessor;
-use App\State\Drink\BrewingStepDeleteProcessor;
-use App\State\Drink\BrewingStepProvider;
+use App\State\TeaSession\BrewingStepCreateProcessor;
+use App\State\TeaSession\BrewingStepDeleteProcessor;
+use App\State\TeaSession\BrewingStepProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
-	uriTemplate: "/drinks/{drinkId}/brewing-steps/{id}",
+	uriTemplate: "/teaSessions/{sessionId}/brewing-steps/{id}",
 	uriVariables: [
-		"drinkId" => new Link(fromProperty: "drink", fromClass: Drink::class),
+		"sessionId" => new Link(fromProperty: "session", fromClass: TeaSession::class),
 		"id" => new Link(fromClass: BrewingStep::class),
 	],
 	provider: BrewingStepProvider::class,
 )]
 #[Post(
-	uriTemplate: "/drinks/{drinkId}/brewing-steps",
-	uriVariables: ["drinkId" => new Link(fromProperty: "drink", fromClass: Drink::class)],
+	uriTemplate: "/teaSessions/{sessionId}/brewing-steps",
+	uriVariables: ["sessionId" => new Link(fromProperty: "session", fromClass: TeaSession::class)],
 	processor: BrewingStepCreateProcessor::class,
 )]
 #[Delete(
-	uriTemplate: "/drinks/{drinkId}/brewing-steps/{id}",
+	uriTemplate: "/teaSessions/{sessionId}/brewing-steps/{id}",
 	uriVariables: [
-		"drinkId" => new Link(fromProperty: "drink", fromClass: Drink::class),
+		"sessionId" => new Link(fromProperty: "session", fromClass: TeaSession::class),
 		"id" => new Link(fromClass: BrewingStep::class),
 	],
 	provider: BrewingStepProvider::class,
@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 class BrewingStep
 {
 	#[ApiProperty(readable: false)]
-	public Drink $drink;
+	public TeaSession $session;
 
 	#[GreaterThanOrEqual(1)]
 	#[Groups(["embedded:brewingStep"])]
@@ -54,6 +54,6 @@ class BrewingStep
 		#[ApiProperty(readable: false, identifier: true)]
 		public ?int $id = null,
 	) {
-		$this->drink = new Drink();
+		$this->session = new TeaSession();
 	}
 }

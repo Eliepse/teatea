@@ -18,7 +18,7 @@ export type User = Resource & {
 };
 
 export type MemberStats = Resource & {
-	statsDrinksTotal: number;
+	statsSessionsTotal: number;
 	statsConsumedTeasTotal: number;
 	statsTopTeas: Tea[];
 };
@@ -54,7 +54,7 @@ export type Tea = Resource & {
 	addedAt: Date;
 };
 
-export type Drink = Resource<"Drink"> & {
+export type TeaSession = Resource<"TeaSession"> & {
 	tea: Tea;
 	note?: string;
 	teaQuantity?: number;
@@ -126,6 +126,6 @@ export type SearchResult = {
 
 export type TeaStats = Pick<Resource<"TeaStats">, "@type" | "@id"> & {
 	teaId: number;
-	drinksCount: number;
-	drinkersCount: number;
+	sessionsCount: number;
+	authorsCount: number;
 };

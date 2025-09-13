@@ -4,7 +4,7 @@ namespace App\Entity;
 
 use App\DTO\BrewingStep;
 use App\Enum\BrewingTechnic;
-use App\Repository\DrinkRepository;
+use App\Repository\TeaSessionRepository;
 use App\ValueObject\Duration;
 use App\ValueObject\Temperature;
 use App\ValueObject\Volume;
@@ -13,8 +13,8 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: DrinkRepository::class)]
-class Drink
+#[ORM\Entity(repositoryClass: TeaSessionRepository::class)]
+class TeaSession
 {
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
@@ -35,13 +35,13 @@ class Drink
 	private ?array $brewingSteps = null;
 
 	public function __construct(
-		#[ORM\ManyToOne(inversedBy: 'drinks')]
+		#[ORM\ManyToOne(inversedBy: 'sessions')]
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly Tea $tea,
 
-		#[ORM\ManyToOne(inversedBy: "drinks")]
+		#[ORM\ManyToOne(inversedBy: "sessions")]
 		#[ORM\JoinColumn(nullable: false)]
-		public readonly User $drinker,
+		public readonly User $author,
 
 		#[ORM\Column(nullable: true)]
 		public ?BrewingTechnic $technic = null,

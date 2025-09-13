@@ -1,10 +1,10 @@
 <?php
 
-namespace App\State\Drink;
+namespace App\State\TeaSession;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\ApiResource\Drink;
+use App\ApiResource\TeaSession;
 use App\Entity\Tea;
 use App\Entity\User;
 use App\ValueObject\Volume;
@@ -13,9 +13,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
- * @implements ProcessorInterface<Drink>
+ * @implements ProcessorInterface<TeaSession>
  */
-readonly class DrinkCreateProcessor implements ProcessorInterface
+readonly class TeaSessionCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -23,11 +23,11 @@ readonly class DrinkCreateProcessor implements ProcessorInterface
 	) {
 	}
 
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Drink
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaSession
 	{
 		$user = $this->security->getUser();
 
-		assert($data instanceof Drink);
+		assert($data instanceof TeaSession);
 		assert($user instanceof User);
 
 		$tea = $this->em->createQueryBuilder()
@@ -42,9 +42,9 @@ readonly class DrinkCreateProcessor implements ProcessorInterface
 			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
 		}
 
-		$entity = new \App\Entity\Drink(
+		$entity = new \App\Entity\TeaSession(
 			tea: $tea,
-			drinker: $user,
+			author: $user,
 			technic: $data->technic,
 			drankAt: $data->drankAt,
 		);
@@ -56,18 +56,18 @@ readonly class DrinkCreateProcessor implements ProcessorInterface
 		$this->em->flush();
 
 
-		$drink = new Drink();
-		$drink->id = $entity->id;
-		$drink->note = $entity->note;
-		$drink->teaQuantity = $entity->teaQuantity?->toGrams();
-		$drink->waterMl = $entity->waterVolume?->toMl();
-		$drink->drankAt = $entity->drankAt;
-		$drink->technic = $entity->technic;
+		$session = new TeaSession();
+		$session->id = $entity->id;
+		$session->note = $entity->note;
+		$session->teaQuantity = $entity->teaQuantity?->toGrams();
+		$session->waterMl = $entity->waterVolume?->toMl();
+		$session->drankAt = $entity->drankAt;
+		$session->technic = $entity->technic;
 
 		// No need to fully load the Tea resource as it will only be serialized as IRI
-		$drink->tea = new \App\ApiResource\Tea();
-		$drink->tea->id = $entity->tea->id;
+		$session->tea = new \App\ApiResource\Tea();
+		$session->tea->id = $entity->tea->id;
 
-		return $drink;
+		return $session;
 	}
 }

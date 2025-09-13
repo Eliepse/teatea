@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
-import { CreateDrinkFlow } from "~/components/drink/CreateDrinkFlow";
-import type { Route } from "../../../.react-router/types/app/pages/drink/+types/add-drink";
+import { CreateTeaSessionFlow } from "~/components/teaSession/CreateTeaSessionFlow";
+import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/add-session";
 import { getApi } from "~/utils/api";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
 
@@ -17,7 +17,7 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 	return {};
 }
 
-export default function LogDrinkPage(props: Route.ComponentProps) {
+export default function LogTeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
-	return <CreateDrinkFlow tea={props.loaderData.tea} onBack={() => navigate(-1)} />;
+	return <CreateTeaSessionFlow tea={props.loaderData.tea} onBack={() => navigate(-1)} />;
 }

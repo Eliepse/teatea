@@ -40,10 +40,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	private ?string $password = null;
 
 	/**
-	 * @var Collection<int, Drink>
+	 * @var Collection<int, TeaSession>
 	 */
-	#[ORM\OneToMany(targetEntity: Drink::class, mappedBy: 'drinker')]
-	private Collection $drinks;
+	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'author')]
+	private Collection $sessions;
 
 	/**
 	 * A visual identifier that represents this user.

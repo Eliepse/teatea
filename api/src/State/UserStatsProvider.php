@@ -33,8 +33,8 @@ readonly class UserStatsProvider implements ProviderInterface
 		$user = $this->security->getUser();
 		assert($user instanceof User);
 
-		$drinks = $this->em
-			->createQuery("SELECT COUNT(drink) FROM App\Entity\Drink drink WHERE drink.drinker = :user")
+		$sessions = $this->em
+			->createQuery("SELECT COUNT(session) FROM App\Entity\TeaSession session WHERE session.author = :user")
 			->setParameter("user", $user)
 			->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR);
 
@@ -43,8 +43,8 @@ readonly class UserStatsProvider implements ProviderInterface
 				<<<DQL
 				SELECT COUNT(DISTINCT tea.id)
 				FROM App\Entity\Tea tea
-					INNER JOIN tea.drinks drink
-				WHERE drink.drinker = :user
+					INNER JOIN tea.sessions session
+				WHERE session.author = :user
 				DQL,
 			)
 			->setParameter("user", $user)
@@ -59,9 +59,9 @@ readonly class UserStatsProvider implements ProviderInterface
 				WHERE tea.id IN (
 					SELECT searchTea.id
 					FROM App\Entity\Tea searchTea
-						LEFT JOIN searchTea.drinks drink WITH drink.drankAt >= :before AND drink.drinker = :user
+						LEFT JOIN searchTea.sessions session WITH session.drankAt >= :before AND session.author = :user
 					GROUP BY searchTea.id
-					ORDER BY COUNT(drink) DESC
+					ORDER BY COUNT(session) DESC
 				)
 				DQL,
 			)
@@ -84,7 +84,7 @@ readonly class UserStatsProvider implements ProviderInterface
 
 		$resource = new \App\ApiResource\Member();
 		$resource->id = $user->id;
-		$resource->statsDrinksTotal = $drinks ?: 0;
+		$resource->statsSessionsTotal = $sessions ?: 0;
 		$resource->statsConsumedTeasTotal = $teas ?: 0;
 
 		/** @var array<string, Origin> $originsMap */

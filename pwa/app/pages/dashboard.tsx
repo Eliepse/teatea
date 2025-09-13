@@ -9,7 +9,6 @@ import type { Route } from "../../.react-router/types/app/pages/+types/dashboard
 import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
 import { CoffeeCup } from "iconoir-react";
-import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
 
 export function meta() {
@@ -30,10 +29,10 @@ export default function Dashboard(props: Route.ComponentProps) {
 		<AuthLayout className="px-4" activeKey="home">
 			<h1 className="my-6 text-xl">Hi, {userQuery?.data?.username}!</h1>
 
-			{0 < props.loaderData.statsDrinksTotal && (
+			{0 < props.loaderData.statsSessionsTotal && (
 				<div className="grid grid-cols-2 gap-4">
-					<Link className="bg-primary/10 text-primary rounded-md px-4 py-3" to="/me/drinks">
-						<div className="text-4xl font-bold mb-1">{props.loaderData.statsDrinksTotal}</div>
+					<Link className="bg-primary/10 text-primary rounded-md px-4 py-3" to="/me/sessions">
+						<div className="text-4xl font-bold mb-1">{props.loaderData.statsSessionsTotal}</div>
 						<div className="text-sm mb-1 ">tea sessions</div>
 						<div className="flex text-primary/60 items-center text-sm">
 							See all <ArrowRightIcon className="ml-1 size-3" />
@@ -49,7 +48,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 			)}
 
 			<Link
-				to="/drink/new"
+				to="/session/new"
 				className="flex bg-primary/10 p-6 h-20 mt-4 items-center justify-between rounded-md text-lg text-primary"
 			>
 				Ready for some tea? <CoffeeCup className="size-7 opacity-60" />
