@@ -15,7 +15,7 @@ export default function TeaListPage() {
 
 	const teasQuery = useInfiniteQuery({
 		queryFn: async (context) => {
-			if (undefined === user.data?.id) {
+			if (undefined === user.data?.username) {
 				throw new Error("Couldn't get user's ID");
 			}
 
@@ -23,13 +23,13 @@ export default function TeaListPage() {
 
 			const payload = await (
 				await getApi<ApiPaginatedCollection<TeaRaw>>(
-					`/members/${user.data.id}/tea_lists/_tasted/teas?${context.pageParam}`,
+					`/members/${user.data.username}/tea_lists/_tasted/teas?${context.pageParam}`,
 				)
 			).json();
 			return { ...payload, member: payload.member.map(denormalizeTea) };
 		},
-		enabled: !!user.data?.id,
-		queryKey: ["tea", "tasted", user.data?.id],
+		enabled: !!user.data?.username,
+		queryKey: ["tea", "tasted", user.data?.username],
 		getPreviousPageParam: (lastPage) => lastPage.view.previous?.split("?")[1],
 		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
 		initialPageParam: "",

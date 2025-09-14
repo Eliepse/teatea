@@ -54,9 +54,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	processor: TeaCreateFromTypeProcessor::class,
 )]
 #[GetCollection(
-	uriTemplate: "/members/{memberId}/tea_lists/{slug}/teas",
+	uriTemplate: "/members/{username}/tea_lists/{slug}/teas",
 	uriVariables: [
-		"memberId" => new Link(fromProperty: "id", fromClass: Member::class),
+		"username" => new Link(
+			fromProperty: "username",
+			fromClass: Member::class,
+			compositeIdentifier: true,
+			required: true,
+		),
 		"slug" => new Link(
 			compositeIdentifier: true,
 			schema: ["pattern" => "/^[a-zA-Z0-9-_]+$/"],

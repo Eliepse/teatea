@@ -10,7 +10,6 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\Entity\Origin;
-use App\Entity\User;
 use App\Helper\Arr;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
@@ -34,9 +33,7 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 	{
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
 
-		$memberId = $uriVariables["memberId"] ?? null;
-
-		if (false === is_int($memberId) || 0 >= $memberId) {
+		if (empty($username = $uriVariables["username"] ?? null)) {
 			throw new NotFoundHttpException();
 		}
 
@@ -45,10 +42,10 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 			throw new NotFoundHttpException();
 		}
 
-		// Check if member exists
-		if (null === ($member = $this->em->find(User::class, $memberId))) {
-			throw new NotFoundHttpException();
-		}
+		$member = $this->em
+			->createQuery("SELECT u FROM App\Entity\User u WHERE u.username = :username")
+			->setParameter("username", $username)
+			->getSingleResult();
 
 		$current = $this->paginator->getPage($context);
 		$offset = $this->paginator->getOffset($operation, $context);
