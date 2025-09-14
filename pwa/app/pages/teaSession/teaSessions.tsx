@@ -115,7 +115,7 @@ export default function ListTeaSessions() {
 														grams={session.teaQuantity}
 														ml={session.waterMl}
 														username={session.author?.username}
-														drankAt={session.drankAt}
+														drankAt={isToday(session.drankAt) ? session.drankAt : undefined}
 													/>
 												</Link>
 											</li>
