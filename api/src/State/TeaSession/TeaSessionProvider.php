@@ -8,33 +8,28 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\BrewingStep;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaSession;
-use App\Entity\User;
 use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class TeaSessionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepository,
-		private Security $security,
 	) {
 	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
-		$user = $this->security->getUser();
-		assert($user instanceof User);
-
+		$username = $uriVariables["username"] ?? null;
 		$cursor = $context["filters"]["cursor"] ?? null;
 		$cursor = $cursor ? \DateTimeImmutable::createFromFormat("Y-m-d", $cursor)->setTime(0, 0) : null;
+		assert(false !== $cursor);
 		$limit = $context["filters"]["limit"] ?? 1;
 		$limit = is_numeric($limit) ? max(1, min(31, intval($limit))) : null;
-
-		assert(false !== $cursor);
 
 		$sessionQb = $this->em->createQueryBuilder()
 			->select("session", "tea", "type", "origin")
@@ -42,15 +37,25 @@ readonly class TeaSessionProvider implements ProviderInterface
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
-			->where("session.author = :author")->setParameter("author", $user)
 			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {
+			if(empty($username)) {
+				throw new NotFoundHttpException();
+			}
+
+			// Fetch the requested user (check if exist)
+			$member = $this->em
+				->createQuery("SELECT u FROM App\Entity\User u WHERE u.username = :username")
+				->setParameter("username", $username)
+				->getSingleResult();
+
 			// Fetch sessions for a fixed amount of days
-			$searchQb = $this->em->getConnection()->createQueryBuilder()
+			$searchQb = $this->em->getConnection()
+				->createQueryBuilder()
 				->select("array_agg(id) AS ids")
 				->from("tea_session")
-				->where("author_id = :authorId")->setParameter("authorId", $user->id)
+				->andWhere("author_id = :authorId")->setParameter("authorId", $member->id)
 				->groupBy("drank_at::date")
 				->orderBy("drank_at::date", "DESC")
 				->setMaxResults($limit);
@@ -71,13 +76,12 @@ readonly class TeaSessionProvider implements ProviderInterface
 				return [];
 			}
 
-			$sessionQb->andWhere("session.id IN (:sessionIds)")
+			$sessionQb
+				->andWhere("session.id IN (:sessionIds)")
 				->setParameter("sessionIds", $sessionIds, ArrayParameterType::INTEGER);
 
 			// TODO(elie): optimize to only fetch origins of requested sessions/teas
-			$origins = $this->originRepository->fetchOriginsFromSession(
-				fn($qb) => $qb->where("session.author = :author")->setParameter("author", $user),
-			);
+			$origins = $this->originRepository->findAll();
 
 			$originMap = TeaProvider::originsToMap($origins);
 

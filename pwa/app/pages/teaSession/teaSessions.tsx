@@ -1,7 +1,6 @@
 import { Link } from "react-router";
-import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSessions";
 import { fetchApi } from "~/utils/api";
-import type { ApiCollection, TeaSession, OriginPath, TeaFamily, TeaType } from "~t/types";
+import type { ApiCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
 import { formatDate, formatISO, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
@@ -12,16 +11,13 @@ import { PlusIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
-
-export async function clientLoader(_args: Route.ClientLoaderArgs) {
-	return await fetchSessions();
-}
+import { useUser } from "~/auth/hooks/useUser";
 
 const PAGE_SIZE = 14;
 
-async function fetchSessions(cursor?: string) {
+async function fetchSessions(username: string, cursor?: string) {
 	const queryParams = cursor ? `cursor=${cursor}&limit=${PAGE_SIZE}` : `limit=${PAGE_SIZE}`;
-	const response = await fetchApi<ApiCollection<TeaSeassionRaw>>(`/tea_sessions?${queryParams}`);
+	const response = await fetchApi<ApiCollection<TeaSeassionRaw>>(`/members/${username}/sessions?${queryParams}`);
 	const data = await response.json();
 	return { ...data, member: data.member.map(denormalizeTeaSession) };
 }
@@ -39,10 +35,18 @@ const TEA_FAMILY_BORDER_CLS = {
 	fermented: "border-stone-500",
 } as const;
 
-export default function ListTeaSessions(props: Route.ComponentProps) {
+export default function ListTeaSessions() {
+	const user = useUser();
 	const sessionsQuery = useInfiniteQuery({
-		queryFn: async (context) => await fetchSessions(context.pageParam),
-		queryKey: ["me", "sessions"],
+		queryFn: async (context) => {
+			if (undefined === user.data?.username) {
+				throw new Error("Username missing");
+			}
+
+			return await fetchSessions(user.data.username, context.pageParam);
+		},
+		queryKey: [user.data?.username, "sessions"],
+		enabled: undefined !== user.data?.username,
 		getPreviousPageParam: () => undefined,
 		getNextPageParam: (_last, allPages) => {
 			const lastPage = allPages.slice(-1)[0];
@@ -56,13 +60,13 @@ export default function ListTeaSessions(props: Route.ComponentProps) {
 			return lastItem ? getNextCursorFromSession(lastItem) : undefined;
 		},
 		initialPageParam: "",
-		initialData: { pages: [props.loaderData], pageParams: [] },
 	});
 
-	const items = sessionsQuery.data.pages.reduce((carr, p) => {
-		carr.push(...p.member);
-		return carr;
-	}, [] as TeaSession[]);
+	const items =
+		sessionsQuery.data?.pages?.reduce((carr, p) => {
+			carr.push(...p.member);
+			return carr;
+		}, [] as TeaSession[]) ?? [];
 
 	const sessionsByDay = items.reduce(
 		(days, session) => {
@@ -73,7 +77,7 @@ export default function ListTeaSessions(props: Route.ComponentProps) {
 		{} as { [key: string]: TeaSession[] },
 	);
 
-	if (0 === items.length) {
+	if (!sessionsQuery.isPending && 0 === sessionsQuery.data?.pages[0]?.member?.length) {
 		return (
 			<AuthLayout className="p-4 flex items-center" activeKey="activity">
 				<p className="text-base-content/60 text-center">
@@ -99,48 +103,52 @@ export default function ListTeaSessions(props: Route.ComponentProps) {
 			<p className="text-sm text-content/60">Your activity this year</p>
 			<ActivityGraph className="my-2" />
 
-			<ul className="mt-4">
-				{Object.entries(sessionsByDay).map(([dateKey, sessions]) => {
-					const date = sessions[0].drankAt;
+			{0 !== items.length && (
+				<>
+					<ul className="mt-4">
+						{Object.values(sessionsByDay).map((sessions) => {
+							const date = sessions[0].drankAt;
 
-					return (
-						<li key={dateKey} className="mb-12">
-							<div className="leading-tight mb-4 text-lg">
-								<span className="text-xs uppercase text-base-content/60">
-									{formatDate(date, "yyyy")}
-								</span>
-								<br />
-								<span>{formatDate(date, "d MMMM")}</span>
-							</div>
-							<ul>
-								{sessions.map((session) => (
-									<li key={session.id} className="mb-2">
-										<Link to={`/me/sessions/${session.id}`}>
-											<Item
-												family={session.tea.family}
-												type={session.tea.type}
-												path={session.tea.originPath}
-												note={session.note}
-												grams={session.teaQuantity}
-												ml={session.waterMl}
-											/>
-										</Link>
-									</li>
-								))}
-							</ul>
-						</li>
-					);
-				})}
-			</ul>
+							return (
+								<li key={formatISO(date, { representation: "date" })} className="mb-12">
+									<div className="leading-tight mb-4 text-lg">
+										<span className="text-xs uppercase text-base-content/60">
+											{formatDate(date, "yyyy")}
+										</span>
+										<br />
+										<span>{formatDate(date, "d MMMM")}</span>
+									</div>
+									<ul>
+										{sessions.map((session) => (
+											<li key={session.id} className="mb-2">
+												<Link to={`/me/sessions/${session.id}`}>
+													<Item
+														family={session.tea.family}
+														type={session.tea.type}
+														path={session.tea.originPath}
+														note={session.note}
+														grams={session.teaQuantity}
+														ml={session.waterMl}
+													/>
+												</Link>
+											</li>
+										))}
+									</ul>
+								</li>
+							);
+						})}
+					</ul>
 
-			{sessionsQuery.hasNextPage && (
-				<button
-					className="btn btn-block btn-outline"
-					onClick={handleUIEvent(() => sessionsQuery.fetchNextPage())}
-					disabled={sessionsQuery.isFetchingNextPage}
-				>
-					Load previous
-				</button>
+					{sessionsQuery.hasNextPage && (
+						<button
+							className="btn btn-block btn-outline"
+							onClick={handleUIEvent(() => sessionsQuery.fetchNextPage())}
+							disabled={sessionsQuery.isFetchingNextPage}
+						>
+							Load previous
+						</button>
+					)}
+				</>
 			)}
 
 			<Link

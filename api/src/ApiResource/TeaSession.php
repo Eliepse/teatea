@@ -27,8 +27,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 	provider: TeaSessionProvider::class,
 )]
 #[GetCollection(
+	uriTemplate: "/members/{username}/sessions",
+	uriVariables: [
+		"username" => new Link(
+			fromProperty: "username",
+			fromClass: Member::class,
+			compositeIdentifier: true,
+			schema: ["pattern" => "/^[\p{L}_]{2,16}$/i"],
+		),
+	],
 	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:originPath"]],
-	security: "is_granted('ROLE_USER')",
 	provider: TeaSessionProvider::class,
 	parameters: [
 		"cursor" => new QueryParameter(schema: ["type" => "date"], property: 'drankAt'),
