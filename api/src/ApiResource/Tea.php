@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\DTO\OriginPath;
 use App\Enum\TeaFamily;
+use App\State\Tea\ListedTeaCollectionProvider;
 use App\State\Tea\TeaCollectionProvider;
 use App\State\Tea\TeaCreateFromTypeProcessor;
 use App\State\Tea\TeaCreateProcess;
@@ -22,8 +23,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
-	provider: TeaProvider::class),
-]
+	provider: TeaProvider::class
+)]
 #[GetCollection(
 	paginationEnabled: false,
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
@@ -51,6 +52,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	normalizationContext: ["groups" => ["tea:read"]],
 	denormalizationContext: ["groups" => ["tea:createFromType"]],
 	processor: TeaCreateFromTypeProcessor::class,
+)]
+#[GetCollection(
+	uriTemplate: "/members/{memberId}/tea_lists/{slug}/teas",
+	uriVariables: [
+		"memberId" => new Link(fromProperty: "id", fromClass: Member::class),
+		"slug" => new Link(
+			compositeIdentifier: true,
+			schema: ["pattern" => "/^[a-zA-Z0-9-_]+$/"],
+			required: true,
+		),
+	],
+	paginationEnabled: true,
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
+	provider: ListedTeaCollectionProvider::class,
 )]
 class Tea
 {

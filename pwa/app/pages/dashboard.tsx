@@ -39,11 +39,13 @@ export default function Dashboard(props: Route.ComponentProps) {
 						</div>
 					</Link>
 
-					<div className="bg-primary/10 text-primary rounded-md px-4 py-3">
+					<Link className="bg-primary/10 text-primary rounded-md px-4 py-3" to="/me/teas">
 						<div className="text-4xl font-bold mb-1">{props.loaderData.statsConsumedTeasTotal}</div>
-						<div className="text-sm">teas tasted</div>
-						{/*<div className="flex text-white/80 items-center text-xs">See all <ArrowRightIcon className="ml-1 size-3" /></div>*/}
-					</div>
+						<div className="text-sm mb-1">teas tasted</div>
+						<div className="flex text-primary/60 items-center text-sm">
+							See all <ArrowRightIcon className="ml-1 size-3" />
+						</div>
+					</Link>
 				</div>
 			)}
 
