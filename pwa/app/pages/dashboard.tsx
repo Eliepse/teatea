@@ -77,16 +77,6 @@ export default function Dashboard(props: Route.ComponentProps) {
 				</>
 			)}
 
-			<p className="mt-8 text-base-content/60 text-sm">
-				Welcome to your personal tea-journal !
-				<br />
-				This app is currently in a prototyping phase. Don&#39;t hesitate to send me feedbacks for any problem,
-				idea or frustrations you have!
-				<br />
-				<br />
-				Élie
-			</p>
-
 			{pwaInstall.installable && false === pwaInstall.installed && (
 				<button
 					className="btn btn-outline btn-primary btn-block h-12 mt-8"
