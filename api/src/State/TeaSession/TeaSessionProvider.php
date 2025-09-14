@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\BrewingStep;
+use App\ApiResource\Member;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaSession;
 use App\Repository\OriginRepository;
@@ -137,6 +138,12 @@ readonly class TeaSessionProvider implements ProviderInterface
 
 		if ($tea) {
 			$resource->tea = $tea;
+		}
+
+		if($entity->author) {
+			$author = new Member();
+			$author->username = $entity->author->username;
+			$resource->author = $author;
 		}
 
 		return $resource;

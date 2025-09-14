@@ -1,23 +1,23 @@
 import { Link } from "react-router";
-import { fetchApi } from "~/utils/api";
-import type { ApiCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
-import { formatDate, formatISO, subDays } from "date-fns";
+import { fetchApi, getApi } from "~/utils/api";
+import type { ApiCollection, ApiPaginatedCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
+import { formatDate, formatDistanceToNow, formatISO, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { ActivityGraph } from "~/components/activity/ActivityGraph";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 import { useUser } from "~/auth/hooks/useUser";
+import { useState } from "react";
+import Leaf from "~/components/icons/leaf";
 
 const PAGE_SIZE = 14;
 
-async function fetchSessions(username: string, cursor?: string) {
-	const queryParams = cursor ? `cursor=${cursor}&limit=${PAGE_SIZE}` : `limit=${PAGE_SIZE}`;
-	const response = await fetchApi<ApiCollection<TeaSeassionRaw>>(`/members/${username}/sessions?${queryParams}`);
+async function fetchSessions(username?: string) {
+	const response = await fetchApi<ApiCollection<TeaSeassionRaw>>(`/tea_sessions`);
 	const data = await response.json();
 	return { ...data, member: data.member.map(denormalizeTeaSession) };
 }
@@ -35,30 +35,28 @@ const TEA_FAMILY_BORDER_CLS = {
 	fermented: "border-stone-500",
 } as const;
 
+const TEA_FAMILY_COLOR_CLS = {
+	yellow: "text-lime-200",
+	white: "text-cyan-200",
+	green: "text-green-300",
+	wulong: "text-indigo-300",
+	black: "text-orange-300",
+	fermented: "text-stone-500",
+} as const;
+
 export default function ListTeaSessions() {
 	const user = useUser();
+	const [filters, setFilters] = useState<{ username?: string }>({});
+
 	const sessionsQuery = useInfiniteQuery({
 		queryFn: async (context) => {
-			if (undefined === user.data?.username) {
-				throw new Error("Username missing");
-			}
-
-			return await fetchSessions(user.data.username, context.pageParam);
+			const response = await getApi<ApiPaginatedCollection<TeaSeassionRaw>>(`/tea_sessions?${context.pageParam}`);
+			const data = await response.json();
+			return { ...data, member: data.member.map(denormalizeTeaSession) };
 		},
-		queryKey: [user.data?.username, "sessions"],
-		enabled: undefined !== user.data?.username,
+		queryKey: ["sessions", filters],
 		getPreviousPageParam: () => undefined,
-		getNextPageParam: (_last, allPages) => {
-			const lastPage = allPages.slice(-1)[0];
-
-			// Incomplete page means last page
-			if (PAGE_SIZE > (lastPage?.member?.length ?? PAGE_SIZE)) {
-				return undefined;
-			}
-
-			const lastItem = lastPage.member?.slice(-1)[0];
-			return lastItem ? getNextCursorFromSession(lastItem) : undefined;
-		},
+		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
 		initialPageParam: "",
 	});
 
@@ -77,31 +75,11 @@ export default function ListTeaSessions() {
 		{} as { [key: string]: TeaSession[] },
 	);
 
-	if (!sessionsQuery.isPending && 0 === sessionsQuery.data?.pages[0]?.member?.length) {
-		return (
-			<AuthLayout className="p-4 flex items-center" activeKey="activity">
-				<p className="text-base-content/60 text-center">
-					This page shows your recent activity, but you haven't save any tea session yet. Start your tea
-					journal by{" "}
-					<Link to="/session/new" className="link link-primary">
-						recording your first session!
-					</Link>
-				</p>
-
-				<Link
-					to="/session/new"
-					className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 w-12 shadow-md"
-				>
-					<PlusIcon className="size-4" />
-				</Link>
-			</AuthLayout>
-		);
-	}
-
 	return (
 		<AuthLayout className="p-4 pb-18" activeKey="activity">
-			<p className="text-sm text-content/60">Your activity this year</p>
-			<ActivityGraph className="my-2" />
+			<ul>
+				<li></li>
+			</ul>
 
 			{0 !== items.length && (
 				<>
@@ -120,7 +98,7 @@ export default function ListTeaSessions() {
 									</div>
 									<ul>
 										{sessions.map((session) => (
-											<li key={session.id} className="mb-2">
+											<li key={session.id} className="mb-4">
 												<Link to={`/me/sessions/${session.id}`}>
 													<Item
 														family={session.tea.family}
@@ -129,6 +107,8 @@ export default function ListTeaSessions() {
 														note={session.note}
 														grams={session.teaQuantity}
 														ml={session.waterMl}
+														username={session.author?.username}
+														drankAt={session.drankAt}
 													/>
 												</Link>
 											</li>
@@ -168,16 +148,25 @@ function Item(props: {
 	note?: string;
 	grams?: number;
 	ml?: number;
+	username?: string;
+	drankAt?: Date;
 }) {
 	return (
-		<article
-			className={clsx("bg-base-200 rounded h-min-16 pt-2 pb-1 border-l-2", TEA_FAMILY_BORDER_CLS[props.family])}
-		>
+		<article className="bg-base-200 rounded h-min-16 pb-1">
+			<div className="py-2 px-3 mb-3 flex justify-between text-xs text-base-content/60 leading-tight border-b border-gray-200">
+				{!!props.drankAt && <span>{formatDistanceToNow(props.drankAt)} ago</span>}
+				{!!props.username && <span className="ml-auto">@{props.username}</span>}
+			</div>
+
 			<div className="px-3 flex justify-between text-xs text-base-content/60 leading-tight">
-				<span className="uppercase text-base-content/40">{props.family}</span>
+				<span className="uppercase text-base-content/40">
+					<Leaf className={clsx("size-3 inline-block mr-1 mb-0.5", TEA_FAMILY_COLOR_CLS[props.family])} />
+					{props.family}
+				</span>
 				{props.path && <FormatOriginPath originPath={props.path} />}
 			</div>
-			<div className="px-3 pb-1 flex">
+
+			<div className="px-3 pb-2 flex">
 				<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
 				<span className="ml-auto">
 					{[props.grams ? `${props.grams} g` : null, props.ml ? `${props.ml} ml` : null]
@@ -186,8 +175,8 @@ function Item(props: {
 				</span>
 			</div>
 			{!!props.note && (
-				<div className="border-t border-base-300 pt-2 pb-1 px-3 text-base-content/60 text-sm">
-					{limit(props.note, 96)}
+				<div className="border-t border-base-300 pt-2 pb-2 px-3 text-base-content/60 text-sm">
+					{limit(props.note, 126)}
 				</div>
 			)}
 		</article>

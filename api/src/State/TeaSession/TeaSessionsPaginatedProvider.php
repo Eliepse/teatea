@@ -8,16 +8,23 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Entity\TeaSession;
+use App\Helper\Arr;
+use App\Repository\OriginRepository;
+use App\Repository\UserRepository;
+use App\State\Tea\TeaProvider;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
+use Doctrine\Persistence\Proxy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private UserRepository $userRepo,
+		private OriginRepository $originRepo,
 		private Pagination $pagination,
-		private Security $security,
 	) {
 	}
 
@@ -32,6 +39,8 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		$currentPage = $this->pagination->getPage($context);
 		$itemsPerPage = $this->pagination->getLimit($operation, $context);
 		$offset = $this->pagination->getOffset($operation, $context);
+		$username = $context["filters"]["username"] ?? null;
+		$member = null;
 		$teaId = $context["filters"]["tea"] ?? null;
 		$tea = null;
 
@@ -39,15 +48,27 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 			throw new NotFoundHttpException();
 		}
 
+		if (null !== $username && null === ($member = $this->userRepo->findOneBy(["username" => $username]))) {
+			throw new NotFoundHttpException();
+		}
+
 		$expr = $this->em->createQueryBuilder()->expr();
 		$sessionQb = $this->em->createQueryBuilder()
-			->select("session")
+			->select("session", "tea", "type")
 			->from(\App\Entity\TeaSession::class, "session")
+			->leftJoin("session.tea", "tea")
+			->leftJoin("tea.type", "type")
 			->andWhere("session.teaQuantity IS NOT NULL")
 			->orderBy("session.drankAt", "DESC");
 
 		if (null !== $tea) {
 			$sessionQb->andWhere("session.tea = :tea")->setParameter("tea", $tea);
+		}
+
+		if (null !== $member) {
+			$sessionQb->andWhere("session.author = :author")->setParameter("author", $member);
+		} else {
+			$sessionQb->leftJoin("session.author", "author")->addSelect("author");
 		}
 
 		if ($isContentful) {
@@ -66,19 +87,26 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 			->getQuery()
 			->getSingleScalarResult();
 
-		if (0 < $total) {
-			$entities = $sessionQb
-				->setFirstResult($offset)
-				->setMaxResults($itemsPerPage)
-				->getQuery()->getResult();
-		} else {
-			$entities = [];
+		if (0 === $total) {
+			return new TraversablePaginator(new ArrayCollection(), $currentPage, $itemsPerPage, $total);
 		}
 
+		/** @var TeaSession[] $entities */
+		$entities = $sessionQb
+			->setFirstResult($offset)
+			->setMaxResults($itemsPerPage)
+			->getQuery()
+			->getResult();
+
 		$items = new \ArrayIterator();
+		$origins = $this->originRepo->getWithAncestors(array_map(fn($s) => $s->tea->originId, $entities));
+		$originsById = Arr::keyBy($origins, "id");
+		$originMap = TeaProvider::originsToMap($origins);
 
 		foreach ($entities as $entity) {
-			$items->append(TeaSessionProvider::hydrate($entity));
+			$path = TeaProvider::getOriginPath($originMap, $originsById[$entity->tea->originId]);
+			$tea = TeaProvider::hydrateResource($entity->tea, $path);
+			$items->append(TeaSessionProvider::hydrate($entity, $tea));
 		}
 
 		return new TraversablePaginator($items, $currentPage, $itemsPerPage, $total);

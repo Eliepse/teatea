@@ -22,6 +22,9 @@ class Tea
 	#[ORM\Column]
 	public TeaFamily $family;
 
+	#[ORM\Column]
+	public int $originId;
+
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	#[ORM\JoinColumn]
 	public ?TeaType $type = null;
@@ -30,6 +33,7 @@ class Tea
 	public ?Cultivar $cultivar = null;
 
 	#[ORM\ManyToOne(inversedBy: 'teas')]
+	#[ORM\JoinColumn("origin_id")]
 	public ?Origin $origin = null;
 
 	#[ORM\Column(nullable: true)]

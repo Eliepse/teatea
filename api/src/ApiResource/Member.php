@@ -49,7 +49,7 @@ class Member
 
 	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
-	#[Groups(["role:admin", "member:onboarding", "member:self"])]
+	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member"])]
 	public ?string $username;
 
 	#[Assert\Email]

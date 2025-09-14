@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\TeaSession;
 use App\Entity\Origin;
 use App\Entity\Tea;
+use App\Entity\TeaSession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,5 +37,26 @@ class OriginRepository extends ServiceEntityRepository
 		}
 
 		return $queryModifier(clone $originQb)->getQuery()->getResult();
+	}
+
+	/**
+	 * @param array<int|Origin> $origin
+	 *
+	 * @return array
+	 */
+	public function getWithAncestors(array $origin): array
+	{
+		$originIds = array_unique(array_filter(array_map(fn($o) => $o instanceof Origin ? $o->id : $o, $origin)));
+
+		if (empty($originIds)) {
+			return [];
+		}
+
+		return $this->createQueryBuilder("O")
+			->innerJoin(Origin::class, "base", "WITH", "CONTAINS(O.path, base.path) = TRUE")
+			->where("base.id IN (:ids)")
+			->setParameter("ids", $originIds)
+			->getQuery()
+			->getResult();
 	}
 }
