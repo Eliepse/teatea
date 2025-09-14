@@ -56,8 +56,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[Delete(provider: TeaSessionProvider::class, processor: TeaSessionDeleteProcessor::class)]
 #[GetCollection(
-	uriTemplate: "/teas/{teaId}/sessions",
-	uriVariables: ["teaId" => new Link(toProperty: "tea", fromClass: Tea::class)],
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
 	paginationMaximumItemsPerPage: 50,
@@ -66,6 +64,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 	security: "is_granted('ROLE_USER')",
 	provider: TeaSessionsPaginatedProvider::class,
 	parameters: [
+		"tea" => new QueryParameter(schema: ["type" => "integer", "minimum" => 1]),
+//		"member" => new QueryParameter(schema: ["pattern" => "/^[\p{L}_]{2,16}$/"]),
 		"contentful" => new QueryParameter(
 			schema: ["type" => "boolean"],
 			description: "When true, consider only sessions that have at least a note, water or tea volume set",

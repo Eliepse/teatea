@@ -26,26 +26,29 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		array $uriVariables = [],
 		array $context = [],
 	): PartialPaginatorInterface {
-//		$user = $this->security->getUser();
-//		assert($user instanceof User);
 		assert($operation instanceof CollectionOperationInterface);
-
-		if (null === $tea = $this->em->find(\App\Entity\Tea::class, $uriVariables["teaId"])) {
-			throw new NotFoundHttpException();
-		}
 
 		$isContentful = $operation->getParameters()->get("contentful")?->getValue() ?? false;
 		$currentPage = $this->pagination->getPage($context);
 		$itemsPerPage = $this->pagination->getLimit($operation, $context);
 		$offset = $this->pagination->getOffset($operation, $context);
+		$teaId = $context["filters"]["tea"] ?? null;
+		$tea = null;
+
+		if (null !== $teaId && null === ($tea = $this->em->find(\App\Entity\Tea::class, $teaId))) {
+			throw new NotFoundHttpException();
+		}
 
 		$expr = $this->em->createQueryBuilder()->expr();
 		$sessionQb = $this->em->createQueryBuilder()
 			->select("session")
 			->from(\App\Entity\TeaSession::class, "session")
-			->where("session.tea = :tea")->setParameter("tea", $tea)
 			->andWhere("session.teaQuantity IS NOT NULL")
 			->orderBy("session.drankAt", "DESC");
+
+		if (null !== $tea) {
+			$sessionQb->andWhere("session.tea = :tea")->setParameter("tea", $tea);
+		}
 
 		if ($isContentful) {
 			$sessionQb->andWhere(

@@ -46,7 +46,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 	const sessionsQuery = useQuery({
 		queryFn: async (): Promise<ApiPaginatedCollection<TeaSession>> => {
 			const response = await getApi<ApiPaginatedCollection<TeaSeassionRaw>>(
-				`/teas/${tea.id}/sessions?itemsPerPage=5&contentful=1`,
+				`/tea_sessions?tea=${tea.id}&itemsPerPage=5&contentful=1`,
 			);
 			const payload = await response.json();
 			return { ...payload, member: payload.member.map(denormalizeTeaSession) };
