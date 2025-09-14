@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { fetchApi, getApi } from "~/utils/api";
 import type { ApiCollection, ApiPaginatedCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
-import { formatDate, formatDistanceToNow, formatISO, subDays } from "date-fns";
+import { formatDate, formatDistanceToNow, formatISO, isToday, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { limit } from "~/utils/text";
@@ -90,12 +90,19 @@ export default function ListTeaSessions() {
 							return (
 								<li key={formatISO(date, { representation: "date" })} className="mb-12">
 									<div className="leading-tight mb-4 text-lg">
-										<span className="text-xs uppercase text-base-content/60">
-											{formatDate(date, "yyyy")}
-										</span>
-										<br />
-										<span>{formatDate(date, "d MMMM")}</span>
+										{isToday(date) ? (
+											<span>Today</span>
+										) : (
+											<>
+												<span className="text-xs uppercase text-base-content/60">
+													{formatDate(date, "yyyy")}
+												</span>
+												<br />
+												<span>{formatDate(date, "d MMMM")}</span>
+											</>
+										)}
 									</div>
+
 									<ul>
 										{sessions.map((session) => (
 											<li key={session.id} className="mb-4">
