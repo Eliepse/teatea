@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PartialPaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
+use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\TeaSession;
 use App\Helper\Arr;
@@ -36,6 +37,7 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		assert($operation instanceof CollectionOperationInterface);
 
 		$isContentful = $operation->getParameters()->get("contentful")?->getValue() ?? false;
+		$isContentful = !$isContentful instanceof ParameterNotFound;
 		$currentPage = $this->pagination->getPage($context);
 		$itemsPerPage = $this->pagination->getLimit($operation, $context);
 		$offset = $this->pagination->getOffset($operation, $context);
@@ -58,7 +60,6 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
-			->andWhere("session.teaQuantity IS NOT NULL")
 			->orderBy("session.drankAt", "DESC");
 
 		if (null !== $tea) {
