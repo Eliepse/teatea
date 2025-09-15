@@ -35,6 +35,8 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$searchText = $params->get("q")->getValue();
 		$searchText = $searchText instanceof ParameterNotFound ? null : trim($searchText);
 		$searchText = empty($searchText) ? null : $searchText;
+		$originPath = $params->get("originPath")->getValue();
+		$originPath = $originPath instanceof ParameterNotFound ? null : $originPath;
 
 		$sortParam = $params->get("sort")->getValue();
 		if ($sortParam instanceof ParameterNotFound) {
@@ -70,6 +72,12 @@ readonly class TeaCollectionProvider implements ProviderInterface
 						SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC
 					)",
 				);
+		}
+
+		if(false === empty($originPath)) {
+			$searchQb
+				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:originPath, origin.path) = TRUE")
+				->setParameter("originPath", $originPath);
 		}
 
 		// Sorting

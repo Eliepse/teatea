@@ -30,10 +30,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [
-//		"origin" => new QueryParameter(description: "Filter by origin"),
 //		"family" => new QueryParameter(description: "Filter by family"),
 //		"type" => new QueryParameter(description: "Filter by type"),
 		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
+		"originPath" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
 		"sort" => new QueryParameter(
 			schema: ["enum" => ["popularity"],],
 			openApi: new OpenApiParameter(name: "enum", in: "query"),
