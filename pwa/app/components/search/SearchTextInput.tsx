@@ -62,7 +62,7 @@ export function SearchTextInput(props: {
 			)}
 
 			{isFilled && !props.disabled && (
-				<button className="h-full px-4 flex-none" onClick={handleUIEvent(() => props.onChange(undefined))}>
+				<button className="h-full px-4 flex-none" onClick={handleUIEvent(clear)}>
 					<XCircleIcon className="size-4 cursor-pointer opacity-60 hover:opacity-100 active:opacity-100" />
 				</button>
 			)}
