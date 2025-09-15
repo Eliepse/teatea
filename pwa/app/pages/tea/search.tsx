@@ -8,6 +8,7 @@ export default function TeaSearchPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const queryText = (searchParams.get("q") ?? "").trim();
+	const originPath = (searchParams.get("originPath") ?? "").trim();
 
 	function openTea(tea: Tea) {
 		navigate(`/tea/${tea.id}`);
@@ -29,7 +30,10 @@ export default function TeaSearchPage(props: Route.ComponentProps) {
 			<TeaSearchEngine
 				onSelect={openTea}
 				onSearch={updateSearchParam}
-				defaultSearch={0 === queryText.length ? undefined : queryText}
+				defaultFilters={{
+					q: 0 !== queryText.length ? queryText : undefined,
+					originPath:  0 !== originPath.length ? originPath : undefined,
+			}}
 			/>
 		</AuthLayout>
 	);

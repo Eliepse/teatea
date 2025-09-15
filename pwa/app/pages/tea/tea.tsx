@@ -42,6 +42,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 	const { tea, stats } = props.loaderData;
 	const navigate = useNavigate();
 	const familyLabel = tea.family[0].toUpperCase() + tea.family.substring(1) + " tea";
+	const origin = tea.originPath?.locality ?? tea.originPath?.region ?? tea.originPath?.country;
 
 	const sessionsQuery = useQuery({
 		queryFn: async (): Promise<ApiPaginatedCollection<TeaSession>> => {
@@ -72,9 +73,9 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 					{!!tea.originPath && (
 						<li>
-							<div className="badge badge-soft badge-neutral">
+							<Link className="badge badge-soft badge-neutral" to={`/tea/search?originPath=${origin?.path?.join(".")}`}>
 								<FormatOriginPath originPath={tea.originPath} />
-							</div>
+							</Link>
 						</li>
 					)}
 				</ul>
