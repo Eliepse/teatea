@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Origin;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @implements ProviderInterface<Origin|null>
@@ -21,6 +22,11 @@ readonly class OriginProvider implements ProviderInterface
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Origin|array|null
 	{
 		$isCollection = $operation instanceof CollectionOperationInterface;
+		$path = $uriVariables["path"] ?? null;
+
+		if(null !== $path && empty($path)) {
+			throw new BadRequestHttpException();
+		}
 
 		$originQb = $this->em->createQueryBuilder()
 			->select("origin")
@@ -34,7 +40,12 @@ readonly class OriginProvider implements ProviderInterface
 			);
 		}
 
-		$originQb->where("origin.id = :id")->setParameter("id", $uriVariables["id"]);
+		if (null !== $uriVariables["path"]) {
+			$originQb->where("origin.path = :path")->setParameter("path", $uriVariables["path"]);
+		} else {
+			$originQb->where("origin.id = :id")->setParameter("id", $uriVariables["id"]);
+		}
+
 		$originQb->setMaxResults(1);
 
 		/** @var \App\Entity\Origin|null $typeEntities */
