@@ -17,7 +17,15 @@ function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Or
 	return originMap[parentPathNodes.join(".")] ?? undefined;
 }
 
-export function SelectOrigin(props: { onSelect: (value: Origin) => void; onBack: () => void; defaultValue?: Origin }) {
+export function SelectOrigin(
+	props: {
+		onBack: () => void;
+		defaultValue?: Origin;
+	} & (
+		| { onSelect: (value?: Origin) => void; allowToggle: true }
+		| { onSelect: (value: Origin) => void; allowToggle?: false }
+	),
+) {
 	const { data, isLoading } = useOriginByPath();
 	const [selected, setSelected] = useState(props.defaultValue);
 	const leavesPaths = useMemo(() => {
@@ -60,10 +68,20 @@ export function SelectOrigin(props: { onSelect: (value: Origin) => void; onBack:
 	}
 
 	function changeOrigin(origin: Origin): void {
+		if (true === props.allowToggle) {
+			setSelected((st) => (origin.id === st?.id ? undefined : origin));
+			return;
+		}
+
 		setSelected(origin);
 	}
 
 	function confirm() {
+		if(true === props.allowToggle) {
+			props.onSelect(selected);
+			return;
+		}
+
 		if (!selected) {
 			console.warn("Can't submit: no origin selected!");
 			return;
@@ -78,7 +96,11 @@ export function SelectOrigin(props: { onSelect: (value: Origin) => void; onBack:
 			onBack={back}
 			bodyClassName="pb-20"
 			action={
-				<button className="ml-auto btn btn-primary" onClick={confirm} disabled={!selected}>
+				<button
+					className="ml-auto btn btn-primary"
+					onClick={confirm}
+					disabled={true !== props.allowToggle && !selected}
+				>
 					Next
 					<ArrowRightIcon className="size-4" />
 				</button>
