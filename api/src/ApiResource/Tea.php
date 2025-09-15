@@ -22,12 +22,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin"]],
 	provider: TeaProvider::class
 )]
 #[GetCollection(
 	paginationEnabled: false,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [
 //		"family" => new QueryParameter(description: "Filter by family"),
@@ -69,7 +69,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		),
 	],
 	paginationEnabled: true,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:originPath"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin"]],
 	provider: ListedTeaCollectionProvider::class,
 )]
 class Tea
@@ -85,7 +85,7 @@ class Tea
 	public ?TeaType $type = null;
 
 	#[ApiProperty(genId: false)]
-	#[Groups(["embedded:tea", "embedded:originPath"])]
+	#[Groups(["embedded:tea", "embedded:origin"])]
 	public ?OriginPath $originPath = null;
 
 	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]

@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[Get(
 	uriTemplate: "/members/me/stats",
-	normalizationContext: ["groups" => ["member:stats", "embedded:tea", "embedded:originPath", "embedded:teaType"]],
+	normalizationContext: ["groups" => ["member:stats", "embedded:tea", "embedded:origin", "embedded:teaType"]],
 	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
 	provider: UserStatsProvider::class
 )]

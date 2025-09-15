@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
-	normalizationContext: ["embedded:brewingStep", "embedded:originPath"],
+	normalizationContext: ["embedded:brewingStep", "embedded:origin"],
 	provider: TeaSessionProvider::class,
 )]
 #[GetCollection(
@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			schema: ["pattern" => "/^[\p{L}_]{2,16}$/i"],
 		),
 	],
-	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:originPath"]],
+	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:origin"]],
 	provider: TeaSessionProvider::class,
 	parameters: [
 		"cursor" => new QueryParameter(schema: ["type" => "date"], property: 'drankAt'),
@@ -65,7 +65,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"teaSession:read",
 			"embedded:tea",
 			"embedded:teaType",
-			"embedded:originPath",
+			"embedded:origin",
 			"embedded:member"
 		]
 	],

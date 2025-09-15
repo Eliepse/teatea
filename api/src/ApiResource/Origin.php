@@ -38,7 +38,7 @@ class Origin
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 24)]
-	#[Groups("embedded:originPath")]
+	#[Groups("embedded:origin")]
 	public string $name;
 
 	#[Groups(["embedded:origin"])]

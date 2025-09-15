@@ -8,11 +8,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 readonly class OriginPath
 {
 	public function __construct(
-		#[Groups(["embedded:tea", "embedded:originPath"])]
+		#[Groups(["embedded:tea", "embedded:origin"])]
 		public Origin $country,
-		#[Groups(["embedded:tea", "embedded:originPath"])]
+		#[Groups(["embedded:tea", "embedded:origin"])]
 		public ?Origin $region = null,
-		#[Groups(["embedded:tea", "embedded:originPath"])]
+		#[Groups(["embedded:tea", "embedded:origin"])]
 		public ?Origin $locality = null,
 	) {
 		if (null === $this->region && null !== $this->locality) {
