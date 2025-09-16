@@ -61,7 +61,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 					<div className="mt-6 mb-2 text-xs uppercase text-base-content/60">What you drank the most</div>
 					<ul>
 						{props.loaderData.statsTopTeas.map((tea) => (
-							<li key={tea.family}>
+							<li key={tea.id}>
 								<Link to={`/tea/${tea.id}`}>
 									<TeaShortCard
 										title={tea.displayName}
