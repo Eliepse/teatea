@@ -73,12 +73,14 @@ export default function TeaListPage() {
 						{teasQuery.data?.pages.map((page) =>
 							page.member.map((tea) => (
 								<li key={tea.id} className="mb-2">
-									<TeaShortCard
-										title={tea.displayName}
-										family={tea.family}
-										type={tea.type?.name}
-										originPath={tea.originPath}
-									/>
+									<Link to={`/tea/${tea.id}`}>
+										<TeaShortCard
+											title={tea.displayName}
+											family={tea.family}
+											type={tea.type?.name}
+											originPath={tea.originPath}
+										/>
+									</Link>
 								</li>
 							)),
 						)}
