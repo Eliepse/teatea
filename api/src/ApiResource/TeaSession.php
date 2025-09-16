@@ -21,7 +21,10 @@ use App\State\TeaSession\TeaSessionsPaginatedProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(security: "is_granted('ROLE_USER')")]
+#[ApiResource(
+	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:origin"]],
+	security: "is_granted('ROLE_USER')",
+)]
 #[Get(
 	normalizationContext: ["embedded:brewingStep"],
 	provider: TeaSessionProvider::class,
@@ -36,7 +39,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 			schema: ["pattern" => "/^[\p{L}_]{2,16}$/i"],
 		),
 	],
-	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType"]],
 	provider: TeaSessionProvider::class,
 	parameters: [
 		"cursor" => new QueryParameter(schema: ["type" => "date"], property: 'drankAt'),
@@ -65,7 +67,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"teaSession:read",
 			"embedded:tea",
 			"embedded:teaType",
-			"embedded:member"
+			"embedded:origin",
+			"embedded:member",
 		]
 	],
 	security: "is_granted('ROLE_USER')",
