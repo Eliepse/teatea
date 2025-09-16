@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\Entity\Origin;
 use App\Entity\Tea;
 use App\Entity\TeaSession;
@@ -58,5 +59,11 @@ class OriginRepository extends ServiceEntityRepository
 			->setParameter("ids", $originIds)
 			->getQuery()
 			->getResult();
+	}
+
+	public function byPath(string|LTreePath $path): ?Origin
+	{
+		$search = $path instanceof LTreePath ? $path : LTreePath::fromString($path);
+		return $this->findOneBy(["path" => $search]);
 	}
 }

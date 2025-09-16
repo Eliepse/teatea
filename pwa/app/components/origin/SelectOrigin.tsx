@@ -8,7 +8,7 @@ import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 
 function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
-	const parentPathNodes = node.path.slice(0, -1);
+	const parentPathNodes = node.path.split(".").slice(0, -1);
 
 	if (0 === parentPathNodes.length) {
 		return undefined;
@@ -33,14 +33,15 @@ export function SelectOrigin(
 		return paths.filter((key) => !paths.some((path) => path.startsWith(`${key}.`)));
 	}, [data]);
 
-	const isLeaf = selected ? leavesPaths.includes(selected.path.join(".")) : true;
+	const isLeaf = selected ? leavesPaths.includes(selected.path) : true;
 	const displayedParent = selected ? (isLeaf && data ? getOriginParent(data, selected) : selected) : undefined;
+	const displayedParentNodes = displayedParent?.path?.split(".");
 
 	const originList = useMemo(() => {
-		const search = displayedParent?.path?.join(".");
-		const level = (displayedParent?.path?.length ?? 0) + 1;
+		const search = displayedParent?.path;
+		const level = (displayedParent?.path?.split(".")?.length ?? 0) + 1;
 		return Object.entries(data ?? [])
-			.filter(([k, node]) => node.path.length === level && (undefined === search || k.startsWith(`${search}.`)))
+			.filter(([k, node]) => node.path?.split(".")?.length === level && (undefined === search || k.startsWith(`${search}.`)))
 			.map(([_, o]) => o);
 	}, [data, displayedParent]);
 
@@ -50,7 +51,7 @@ export function SelectOrigin(
 			return;
 		}
 
-		const parentPath = selected.path.slice(0, -1).join(".");
+		const parentPath = selected.path.split(".").slice(0, -1).join(".");
 		const parent = data[parentPath];
 
 		if (0 === parentPath.length) {
@@ -69,7 +70,7 @@ export function SelectOrigin(
 
 	function changeOrigin(origin: Origin): void {
 		if (true === props.allowToggle) {
-			setSelected((st) => (origin.id === st?.id ? undefined : origin));
+			setSelected((st) => (origin.path === st?.path ? undefined : origin));
 			return;
 		}
 
@@ -118,17 +119,17 @@ export function SelectOrigin(
 
 			{!isLoading && displayedParent && (
 				<div className="text-xs text-base-content/60 my-4 uppercase">
-					{displayedParent && 1 === displayedParent.path.length && "Regions"}
-					{displayedParent && 2 === displayedParent.path.length && "Localities"}
+					{displayedParent && 1 === displayedParentNodes?.length && "Regions"}
+					{displayedParent && 2 === displayedParentNodes?.length && "Localities"}
 				</div>
 			)}
 
 			{originList.map((origin) => (
 				<OriginItem
-					key={origin.id}
+					key={origin.path}
 					label={origin.name}
-					selected={selected?.id === origin.id}
-					hasChildren={!leavesPaths.includes(origin.path.join("."))}
+					selected={selected?.path === origin.path}
+					hasChildren={!leavesPaths.includes(origin.path)}
 					onSelect={() => changeOrigin(origin)}
 				/>
 			))}

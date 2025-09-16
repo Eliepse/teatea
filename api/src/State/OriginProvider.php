@@ -24,7 +24,7 @@ readonly class OriginProvider implements ProviderInterface
 		$isCollection = $operation instanceof CollectionOperationInterface;
 		$path = $uriVariables["path"] ?? null;
 
-		if(null !== $path && empty($path)) {
+		if (null !== $path && empty($path)) {
 			throw new BadRequestHttpException();
 		}
 
@@ -40,29 +40,25 @@ readonly class OriginProvider implements ProviderInterface
 			);
 		}
 
-		if (null !== $uriVariables["path"]) {
-			$originQb->where("origin.path = :path")->setParameter("path", $uriVariables["path"]);
-		} else {
-			$originQb->where("origin.id = :id")->setParameter("id", $uriVariables["id"]);
-		}
-
-		$originQb->setMaxResults(1);
+		$originQb
+			->where("origin.path = :path")
+			->setParameter("path", $uriVariables["path"])
+			->setMaxResults(1);
 
 		/** @var \App\Entity\Origin|null $typeEntities */
 		$typeEntities = $originQb->getQuery()->getResult()[0] ?? null;
 		return static::fromEntity($typeEntities);
 	}
 
-	public static function fromEntity(?\App\Entity\Origin $type): ?Origin
+	public static function fromEntity(?\App\Entity\Origin $entity): ?Origin
 	{
-		if (null === $type) {
+		if (null === $entity) {
 			return null;
 		}
 
 		$resource = new Origin();
-		$resource->id = $type->id;
-		$resource->name = $type->name;
-		$resource->path = $type->path;
+		$resource->name = $entity->name;
+		$resource->path = $entity->path->getPath();
 		return $resource;
 	}
 }

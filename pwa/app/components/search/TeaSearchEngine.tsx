@@ -42,7 +42,7 @@ export function TeaSearchEngine(props: {
 	});
 	const originQuery = useQuery({
 		queryFn: async (ctx) => {
-			return await (await getApi<Origin>(`/origins/path/${ctx.queryKey[1]}`)).json();
+			return await (await getApi<Origin>(`/origins/${ctx.queryKey[1]}`)).json();
 		},
 		queryKey: ["origin", filters?.originPath],
 		enabled: !filters?.origin && !!filters?.originPath,
@@ -143,7 +143,7 @@ export function TeaSearchEngine(props: {
 			<Paged open={"origin" === filterSelect}>
 				<SelectOrigin
 					onSelect={(o) => {
-						setFilters((st) => ({ ...st, origin: o, originPath: o?.path?.join(".") }));
+						setFilters((st) => ({ ...st, origin: o, originPath: o?.path }));
 						setFilterSelect(undefined);
 					}}
 					onBack={() => setFilterSelect(undefined)}

@@ -5,7 +5,7 @@ import { ResultItem } from "./resultItem";
 import { type FilterValue, SearchFilters } from "./searchFilters";
 
 async function searchTeas(
-	params: { types?: number[]; origins?: number[]; text?: string },
+	params: { types?: number[]; origins?: string[]; text?: string },
 	signal?: AbortSignal,
 ): Promise<Tea[]> {
 	const sp = new URLSearchParams();
@@ -28,7 +28,7 @@ export function TeaSearch(props: { onSelect?: (tea: Tea) => void }) {
 			return await searchTeas(
 				{
 					types: filters.types?.map((t) => t.id),
-					origins: filters.origins?.map((o) => o.id),
+					origins: filters.origins?.map((o) => o.path),
 					text: filters.text,
 				},
 				query.signal,

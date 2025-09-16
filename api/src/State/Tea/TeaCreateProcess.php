@@ -5,8 +5,8 @@ namespace App\State\Tea;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
-use App\Entity\Origin;
 use App\Entity\User;
+use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
 use App\State\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
@@ -20,6 +20,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private TeaRepository $teaRepository,
+		private OriginRepository $originRepo,
 		private Security $security,
 	) {
 	}
@@ -40,7 +41,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
-		if (null === $origin = $this->em->find(Origin::class, $data->origin->id)) {
+		if (null === $origin = $this->originRepo->byPath($data->origin->path)) {
 			throw new BadRequestException("The given origin doesn't exist");
 		}
 

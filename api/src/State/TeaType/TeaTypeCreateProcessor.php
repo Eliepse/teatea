@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\TeaType;
 use App\Entity\Origin;
 use App\Entity\User;
+use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -14,6 +15,7 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private OriginRepository $originRepo,
 		private Security $security,
 	) {
 	}
@@ -30,7 +32,7 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$entity->name = trim($data->name);
 		$entity->createdBy = $user;
 
-		$origin = $this->em->find(Origin::class, $data->origin->id);
+		$origin = $this->originRepo->byPath($data->origin->path);
 		assert($origin instanceof Origin);
 
 		$entity->isProtectedOrigin = $data->isPDO;
@@ -42,9 +44,11 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$this->em->flush();
 
 		$data->id = $entity->id;
+		$data->name = $entity->name;
+		$data->family = $entity->family;
 		$data->origin = new \App\ApiResource\Origin();
-		$data->origin->id = $entity->origin->id;
-
+		$data->origin->path = $entity->origin->path;
+		$data->origin->name = $entity->origin->name;
 		return $data;
 	}
 }

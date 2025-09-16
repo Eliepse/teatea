@@ -73,7 +73,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 					{!!tea.originPath && (
 						<li>
-							<Link className="badge badge-soft badge-neutral" to={`/tea/search?originPath=${origin?.path?.join(".")}`}>
+							<Link className="badge badge-soft badge-neutral" to={`/tea/search?originPath=${origin?.path}`}>
 								<FormatOriginPath originPath={tea.originPath} />
 							</Link>
 						</li>

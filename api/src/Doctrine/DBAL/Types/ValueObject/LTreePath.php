@@ -56,4 +56,16 @@ final readonly class LTreePath implements \Stringable
 
 		return join(".", array_slice($this->nodes, 0, -1));
 	}
+
+	public function isParent(string|LTreePath $path): bool
+	{
+		$haystack = $path instanceof LTreePath ? $path->getPath() : $path;
+		return str_starts_with("$haystack.", $this->getPath() . ".");
+	}
+
+	public function isDescendant(string|LTreePath $path): bool
+	{
+		$needle = $path instanceof LTreePath ? $path->getPath() : $path;
+		return str_starts_with($this->getPath() . ".", "$needle.");
+	}
 }

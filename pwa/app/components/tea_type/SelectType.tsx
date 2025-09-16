@@ -32,7 +32,7 @@ export function SelectType(props: {
 
 		return types.member.reduce(
 			(groups, type) => {
-				const path = type.origin.path.join(".");
+				const path = type.origin.path;
 				const pathNodes = origin.split(".");
 
 				if (3 === pathNodes.length && origin === path) {

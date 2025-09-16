@@ -9,7 +9,7 @@ async function fetchOriginsKeyByPath(
 ): Promise<{ [key: string]: Origin }> {
 	const filters = ctx.queryKey[2];
 	const data = await (await fetchApi<ApiCollection<Origin>>("/origins", { payload: filters })).json();
-	return Object.fromEntries(data.member.map((origin: Origin) => [origin.path.join("."), origin]));
+	return Object.fromEntries(data.member.map((origin: Origin) => [origin.path, origin]));
 }
 
 export function useOriginByPath(filters?: Filters) {

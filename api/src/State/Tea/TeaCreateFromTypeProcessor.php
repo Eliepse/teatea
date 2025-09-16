@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
 use App\Entity\User;
+use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
 use App\State\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
@@ -20,6 +21,7 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private TeaRepository $repository,
+		private OriginRepository $originRepo,
 		private Security $security,
 	) {
 	}
@@ -47,30 +49,25 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
-		$teaOrigin = $this->em->find(\App\Entity\Origin::class, $data->origin->id);
-
-		if (null === $teaOrigin) {
+		if (null === $teaOrigin = $this->originRepo->byPath($data->origin->path)) {
 			throw new ItemNotFoundException("Tea origin doesn't exist");
 		}
 
 		// Check origins compatibility
 
-		$teaOriginPath = $teaOrigin->path->getPath();
-		$typeOriginPath = $typeEntity->origin->path->getPath();
-
-		if ($data->origin->path->getNodes()[0] !== $typeEntity->origin->path->getNodes()[0]) {
+		$countryKey = $teaOrigin->path->getNodes()[0];
+		if (false === $typeEntity->origin->path->isDescendant($countryKey)) {
 			throw new \RuntimeException("The origin must be of the same country than the tea type one");
 		}
 
-		if ($typeEntity->isProtectedOrigin && false === str_starts_with($teaOriginPath, $typeOriginPath)) {
+		if ($typeEntity->isProtectedOrigin && false === $teaOrigin->path->isDescendant($typeEntity->origin->path)) {
 			throw new \RuntimeException("The origin must be contained by the protected origin of the tea type");
 		}
-
 
 		$entity = new \App\Entity\Tea();
 		$entity->family = $typeEntity->family;
 		$entity->type = $typeEntity;
-		$entity->origin = $this->em->getReference(\App\Entity\Origin::class, $data->origin->id);
+		$entity->origin = $teaOrigin;
 		$entity->createdBy = $user;
 
 		if ($this->repository->hasDuplicate($entity)) {

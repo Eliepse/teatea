@@ -96,6 +96,7 @@ readonly class UserStatsProvider implements ProviderInterface
 			$originNodes = TeaProvider::getOriginPath($originsMap, $teaEntity->origin);
 			$teas[] = TeaProvider::hydrateResource($teaEntity, $originNodes);
 		}
+
 		$resource->statsTopTeas = $teas;
 
 		return $resource;

@@ -25,20 +25,17 @@ class Origin
 	public LTreePath $path;
 
 	#[ORM\Column(type: Types::TEXT)]
-	#[Groups(["embedded:tea", "embedded:origin"])]
 	public string $name;
 
 	/**
 	 * @var Collection<int, Tea>
 	 */
-	#[Ignore]
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'origin')]
 	private Collection $teas;
 
 	/**
 	 * @var Collection<int, TeaType>
 	 */
-	#[Ignore]
 	#[ORM\OneToMany(targetEntity: TeaType::class, mappedBy: "origin")]
 	private Collection $types;
 
@@ -51,7 +48,6 @@ class Origin
 	/**
 	 * @return Collection<int, Tea>
 	 */
-	#[Ignore]
 	public function getTeas(): Collection
 	{
 		return $this->teas;

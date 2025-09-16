@@ -34,9 +34,9 @@ export type Cultivar = Resource & {
 	name: string;
 };
 
-export type Origin = Resource & {
+export type Origin = Omit<Resource, "id"> & {
 	name: string;
-	path: LTreePath;
+	path: string;
 	isPDO: boolean;
 };
 
