@@ -14,14 +14,13 @@ use App\State\TeaType\TeaTypeProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(security: "is_granted('ROLE_USER')")]
-#[Get(
-	normalizationContext: ["groups" => ["read:origin"]],
-	provider: TeaTypeProvider::class,
-)]
+#[ApiResource(
+	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
+	security: "is_granted('ROLE_USER')"),
+]
+#[Get(provider: TeaTypeProvider::class)]
 #[GetCollection(
 	paginationEnabled: false,
-	normalizationContext: ["groups" => ["read:origin"]],
 	provider: TeaTypeProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
