@@ -212,7 +212,7 @@ function NumberInput(props: {
 			placeholder={props.defaultValue.toString().padStart(2, "0")}
 			value={value}
 			onChange={handleChange}
-			pattern="\d+"
+			pattern="\d*"
 			maxLength={maxLength}
 			onFocus={(e) => e.target.select()}
 			onBlur={handleBlur}
