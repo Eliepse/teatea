@@ -5,8 +5,6 @@ namespace App\Entity;
 use App\DTO\SteepValue;
 use App\Enum\BrewingTechnic;
 use App\Repository\TeaSessionRepository;
-use App\ValueObject\Duration;
-use App\ValueObject\Temperature;
 use App\ValueObject\Volume;
 use App\ValueObject\Weight;
 use DateTimeImmutable;
@@ -63,7 +61,7 @@ class TeaSession
 	{
 		// Edit an existing steep (if exists)
 		foreach ($this->steeps ?? [] as $i => $raw) {
-			if($raw["key"] === $steep->key) {
+			if ($raw["key"] === $steep->key) {
 				$this->steeps[$i] = $steep->toArray();
 				return;
 			}
@@ -71,5 +69,22 @@ class TeaSession
 
 		// Fallback on adding a new one
 		$this->steeps = [...($this->steeps ?? []), $steep->toArray()];
+	}
+
+	public function removeSteep(SteepValue|string $value): void
+	{
+		$key = $value instanceof SteepValue ? $value->key : $value;
+		$original = $this->steeps ?? [];
+
+		// Delete the steep
+		$filtered = array_values(array_filter($original, fn($raw) => $raw["key"] !== $key));
+
+		// Check if a steep has been correctly deleted
+		if (count($original) === count($filtered)) {
+			throw new \RuntimeException("Steep '$key' doesn't exist");
+		}
+
+		// Save the change
+		$this->steeps = $filtered;
 	}
 }

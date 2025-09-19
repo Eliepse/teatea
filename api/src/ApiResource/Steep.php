@@ -9,7 +9,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\State\TeaSession\BrewingStepDeleteProcessor;
+use App\State\TeaSession\SteepDeleteProcessor;
 use App\State\TeaSession\SteepPatchProcessor;
 use App\State\TeaSession\SteepProvider;
 use App\State\TeaSession\SteepCreateProcessor;
@@ -46,7 +46,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 		"key" => new Link(fromProperty: "key"),
 	],
 	provider: SteepProvider::class,
-	processor: BrewingStepDeleteProcessor::class,
+	processor: SteepDeleteProcessor::class,
 )]
 class Steep
 {

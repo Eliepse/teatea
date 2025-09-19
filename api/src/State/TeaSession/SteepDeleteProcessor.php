@@ -7,16 +7,20 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Steep;
 use App\ApiResource\TeaSession;
 use App\Entity\User;
+use App\Repository\TeaSessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @implements ProcessorInterface<TeaSession>
  */
-readonly class BrewingStepDeleteProcessor implements ProcessorInterface
+readonly class SteepDeleteProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private TeaSessionRepository $repo,
 		private Security $security,
 	) {
 	}
@@ -28,15 +32,19 @@ readonly class BrewingStepDeleteProcessor implements ProcessorInterface
 		assert($data instanceof Steep);
 		assert($user instanceof User);
 
-		$session = $this->em->find(\App\Entity\TeaSession::class, $data->session->id);
+		/** @var \App\Entity\TeaSession|null $session */
+		$session = $this->repo->find($data->session->id);
 
-		// Only author can delete
-		assert($session->author->id === $user->id);
-
-		// Remove the step
-		if (false === $session->removeSteep($uriVariables["id"])) {
-			throw new \RuntimeException("Failed to remove the step");
+		if (null === $session) {
+			throw new NotFoundHttpException();
 		}
+
+		// Only authors can delete
+		if ($session->author->id !== $user->id) {
+			throw new AccessDeniedHttpException();
+		}
+
+		$session->removeSteep($data->key);
 
 		$this->em->persist($session);
 		$this->em->flush();

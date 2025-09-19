@@ -36,26 +36,10 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [session, setSession] = useState(props.loaderData);
-	const [editSteep, setEditSteep] = useState<Partial<SteepValues & Pick<Steep, "@id">>>();
+	const [editSteep, setEditSteep] = useState<Partial<SteepValues> | (SteepValues & Steep)>();
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
-	const steepMutations = useSteepMutations(session.id, (action, steep) => {
-		if ("delete" !== action && steep) {
-			setSession((st) => {
-				let steeps = st.steeps ?? [];
-
-				if (steeps.some((s) => s.key === steep.key)) {
-					steeps = steeps.map((s) => (s.key === steep.key ? steep : s));
-				} else {
-					steeps = [...steeps, steep];
-				}
-
-				return { ...st, steeps };
-			});
-		}
-
-		setEditSteep(undefined);
-	});
+	const steepMutations = useSteepMutations(session.id);
 	const editMutation = useMutation({
 		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
 			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${session.id}`, args);
@@ -79,12 +63,29 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	async function submitSteep(data: SteepValues) {
-		if (undefined !== editSteep?.["@id"]) {
-			await steepMutations.edit.mutateAsync({ ...data, "@id": editSteep["@id"] });
+		if (undefined !== editSteep && "@id" in editSteep) {
+			const steep = await steepMutations.edit.mutateAsync({ ...data, "@id": editSteep["@id"] });
+			// Replace the displayed steep with the updated one
+			setSession((sess) => ({ ...sess, steeps: sess.steeps?.map((s) => (s.key === steep.key ? steep : s)) }));
+			setEditSteep(undefined);
 			return;
 		}
 
-		await steepMutations.add.mutateAsync(data);
+		const steep = await steepMutations.add.mutateAsync(data);
+		setSession((sess) => ({ ...sess, steeps: [...(sess.steeps ?? []), steep] }));
+		setEditSteep(undefined);
+	}
+
+	function makeRemoveHandler() {
+		if (undefined === editSteep || !("@id" in editSteep)) {
+			return undefined;
+		}
+
+		return async () => {
+			const steep = await steepMutations.delete.mutateAsync(editSteep);
+			setSession((sess) => ({ ...sess, steeps: sess?.steeps?.filter((stp) => steep.key !== stp.key) }));
+			setEditSteep(undefined);
+		};
 	}
 
 	return (
@@ -203,9 +204,10 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			{editSteep && (
 				<SteepFormModal
 					open={undefined !== editSteep}
+					defaultValue={editSteep}
 					onClose={() => setEditSteep(undefined)}
 					onSubmit={submitSteep}
-					defaultValue={editSteep}
+					onRemove={makeRemoveHandler()}
 				/>
 			)}
 
@@ -229,7 +231,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	);
 }
 
-function useSteepMutations(sessionId: number, onSuccess: (action: "add" | "change" | "delete", steep?: Steep) => void) {
+function useSteepMutations(sessionId: number) {
 	const uriPrefix = `/teaSessions/${sessionId}/steeps`;
 	const alert = useAlert();
 
@@ -241,7 +243,6 @@ function useSteepMutations(sessionId: number, onSuccess: (action: "add" | "chang
 			});
 			return denormalizeSteep(await response.json());
 		},
-		onSuccess: (steep) => onSuccess("add", steep),
 		onError: (e) => alert({ title: "Failed to add the steep", body: e.message }),
 	});
 
@@ -253,9 +254,16 @@ function useSteepMutations(sessionId: number, onSuccess: (action: "add" | "chang
 			});
 			return denormalizeSteep(await response.json());
 		},
-		onSuccess: (steep) => onSuccess("change", steep),
 		onError: (e) => alert({ title: "Failed to edit the steep", body: e.message }),
 	});
 
-	return { add: addMutation, edit: editMutation };
+	const deleteMutation = useMutation({
+		mutationFn: async (data: Steep) => {
+			await deleteApi(data["@id"]);
+			return data;
+		},
+		onError: (e) => alert({ title: "Failed to remove the steep", body: e.message }),
+	});
+
+	return { add: addMutation, edit: editMutation, delete: deleteMutation };
 }

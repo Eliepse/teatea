@@ -13,6 +13,7 @@ export function SteepFormModal(props: {
 	onClose: () => void;
 	defaultValue?: Partial<SteepValues>;
 	onSubmit?: (values: SteepValues) => Promise<void>;
+	onRemove?: () => Promise<void>;
 }) {
 	const [loading, setLoading] = useState<"save" | "delete">();
 	const [values, setValues] = useState<SteepValues>({
@@ -35,6 +36,15 @@ export function SteepFormModal(props: {
 		props.onSubmit({ ...values, temperature }).finally(() => setLoading(undefined));
 	}
 
+	function remove() {
+		if (!props.onRemove) {
+			return;
+		}
+
+		setLoading("delete");
+		props.onRemove().finally(() => setLoading(undefined));
+	}
+
 	return (
 		<Modal onClose={props.onClose} open={props.open} className="h-full flex flex-col" position="bottom" backdrop>
 			<div className="flex justify-between">
@@ -51,7 +61,7 @@ export function SteepFormModal(props: {
 				</button>
 			</div>
 
-			<div className="flex-1 mt-12">
+			<div className="flex-1 mt-12 flex flex-col">
 				<div className="flex justify-between items-center">
 					<div className="mr-auto">
 						<ClockIcon className="size-5 inline-block relative bottom-0.5 mr-2" />
@@ -63,7 +73,7 @@ export function SteepFormModal(props: {
 					/>
 				</div>
 
-				<div className="flex items-center justify-between mt-12">
+				<div className="flex items-center justify-between my-12">
 					<div>
 						<FireFlame className="size-5 text-orange-500 relative bottom-0.5 inline-block mr-2" />
 						Temperature
@@ -77,6 +87,16 @@ export function SteepFormModal(props: {
 						<span className="text-xl ml-1">°C</span>
 					</div>
 				</div>
+
+				{props.onRemove && (
+					<button
+						className="btn btn-outline btn-block btn-error mt-auto"
+						onClick={handleUIEvent(remove)}
+						disabled={"delete" === loading}
+					>
+						{"delete" === loading ? "Deleting..." : "Remove this steep"}
+					</button>
+				)}
 			</div>
 		</Modal>
 	);
