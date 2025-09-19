@@ -78,13 +78,13 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 		setEditSteep({});
 	}
 
-	function submitSteep(data: SteepValues) {
+	async function submitSteep(data: SteepValues) {
 		if (undefined !== editSteep?.["@id"]) {
-			steepMutations.edit.mutate({ ...data, "@id": editSteep["@id"] });
+			await steepMutations.edit.mutateAsync({ ...data, "@id": editSteep["@id"] });
 			return;
 		}
 
-		steepMutations.add.mutate(data);
+		await steepMutations.add.mutateAsync(data);
 	}
 
 	return (

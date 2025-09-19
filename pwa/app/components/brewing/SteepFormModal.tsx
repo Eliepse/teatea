@@ -12,8 +12,9 @@ export function SteepFormModal(props: {
 	open: boolean;
 	onClose: () => void;
 	defaultValue?: Partial<SteepValues>;
-	onSubmit?: (values: SteepValues) => void;
+	onSubmit?: (values: SteepValues) => Promise<void>;
 }) {
+	const [loading, setLoading] = useState<"save" | "delete">();
 	const [values, setValues] = useState<SteepValues>({
 		duration: new Duration(0),
 		temperature: null,
@@ -25,21 +26,28 @@ export function SteepFormModal(props: {
 			return;
 		}
 
-		props.onSubmit &&
-			props.onSubmit({
-				...values,
-				temperature: 0 === values.temperature?.deg ? null : values.temperature,
-			});
+		if (!props.onSubmit) {
+			return;
+		}
+
+		setLoading("save");
+		const temperature = 0 === values.temperature?.deg ? null : values.temperature;
+		props.onSubmit({ ...values, temperature }).finally(() => setLoading(undefined));
 	}
 
 	return (
 		<Modal onClose={props.onClose} open={props.open} className="h-full flex flex-col" position="bottom" backdrop>
 			<div className="flex justify-between">
-				<button className="btn btn-outline" onClick={handleUIEvent(props.onClose)}>
+				<button
+					className="btn btn-outline"
+					onClick={handleUIEvent(props.onClose)}
+					disabled={undefined !== loading}
+				>
 					Cancel
 				</button>
-				<button className="btn btn-primary" onClick={handleUIEvent(submitForm)}>
-					Save
+
+				<button className="btn btn-primary" onClick={handleUIEvent(submitForm)} disabled={"save" === loading}>
+					{"save" === loading ? "Saving..." : "Done"}
 				</button>
 			</div>
 
