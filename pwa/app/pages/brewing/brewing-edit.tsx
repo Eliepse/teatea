@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 import Leaf from "~/components/icons/leaf";
 import { type TeawareType, teawareTypes } from "~t/teawareType";
 import { Modal } from "~/components/shared/modal/Modal";
-import { SteepForm } from "~/components/brewing/SteepForm";
+import { SteepFormModal } from "~/components/brewing/SteepFormModal";
 import Steep from "~/utils/value-objects/Steep";
 import { useMutation } from "@tanstack/react-query";
 import { FormattedDuration } from "~/components/shared/FormattedDuration";
@@ -275,7 +275,7 @@ export default function BrewingEdit(props: any) {
 			</div>
 
 			<Modal open={steepFormOpen} onClose={() => setSteepFormOpen(false)} position="bottom" backdrop>
-				<SteepForm
+				<SteepFormModal
 					initVolume={lastSteep?.water ?? brew.teaware?.volume}
 					initDegrees={lastSteep?.temperature}
 					onSubmit={saveSteep}

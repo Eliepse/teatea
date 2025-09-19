@@ -1,6 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
-import type { TeaSession } from "~t/types";
+import type { Steep, TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
@@ -17,6 +17,9 @@ import { ArrowTopRightOnSquareIcon, TrashIcon } from "@heroicons/react/16/solid"
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
+import { SteepCard } from "~/components/brewing/steepCard";
+import { Duration, Temperature } from "~/utils/value-objects/units";
+import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -32,6 +35,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const session = props.loaderData;
 	const navigate = useNavigate();
+	const [editSteep, setEditSteep] = useState<Partial<SteepValues & Pick<Steep, "@id">>>();
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
 	const editMutation = useMutation({
@@ -49,6 +53,14 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
 		setNoteValue(e.currentTarget.value);
+	}
+
+	function newSteep() {
+		setEditSteep({});
+	}
+
+	function submitSteep(data: SteepValues) {
+		console.debug(editSteep, data);
 	}
 
 	return (
@@ -117,7 +129,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</div>
 			</header>
 
-			<div className="py-4">
+			<div className="mt-4 mb-12">
 				{!!editableData.note && (
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
@@ -144,6 +156,33 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</button>
 				)}
 			</div>
+
+			<h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>
+			<ul className="">
+				<li className="mb-2">
+					<SteepCard duration={new Duration(60)} temperature={new Temperature(70)} order={1} editable />
+				</li>
+				<li className="mb-2">
+					<SteepCard duration={new Duration(30)} temperature={new Temperature(80)} order={2} editable />
+				</li>
+				<li className="mb-2">
+					<SteepCard duration={new Duration(60)} temperature={new Temperature(90)} order={3} editable />
+				</li>
+				<li className="mb-2">
+					<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
+						Add a steep
+					</button>
+				</li>
+			</ul>
+
+			{editSteep && (
+				<SteepFormModal
+					open={undefined !== editSteep}
+					onClose={() => setEditSteep(undefined)}
+					onSubmit={submitSteep}
+					defaultValue={editSteep}
+				/>
+			)}
 
 			<Modal onClose={() => setShowNodeEditor(false)} open={showNodeEditor} position="bottom" backdrop>
 				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
