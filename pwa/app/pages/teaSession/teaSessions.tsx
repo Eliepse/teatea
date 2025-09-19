@@ -3,7 +3,7 @@ import { fetchApi, getApi } from "~/utils/api";
 import type { ApiCollection, ApiPaginatedCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
 import { formatDate, formatDistanceToNow, formatISO, isToday, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
+import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { PlusIcon } from "@heroicons/react/24/outline";
@@ -17,7 +17,7 @@ import Leaf from "~/components/icons/leaf";
 const PAGE_SIZE = 14;
 
 async function fetchSessions(username?: string) {
-	const response = await fetchApi<ApiCollection<TeaSeassionRaw>>(`/tea_sessions`);
+	const response = await fetchApi<ApiCollection<TeaSessionRaw>>(`/tea_sessions`);
 	const data = await response.json();
 	return { ...data, member: data.member.map(denormalizeTeaSession) };
 }
@@ -50,7 +50,7 @@ export default function ListTeaSessions() {
 
 	const sessionsQuery = useInfiniteQuery({
 		queryFn: async (context) => {
-			const response = await getApi<ApiPaginatedCollection<TeaSeassionRaw>>(`/tea_sessions?${context.pageParam}`);
+			const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(`/tea_sessions?${context.pageParam}`);
 			const data = await response.json();
 			return { ...data, member: data.member.map(denormalizeTeaSession) };
 		},

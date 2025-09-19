@@ -1,4 +1,4 @@
-import { Duration, type Volume, type Weight } from "~/utils/value-objects/units";
+import { Duration, Temperature, type Volume, type Weight } from "~/utils/value-objects/units";
 import type { TeawareType } from "./teawareType";
 
 export type Id = number;
@@ -60,7 +60,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	waterMl?: number;
 	drankAt: Date;
 	author?: Pick<Member, "username">;
-	steeps: Steep[];
+	steeps?: Steep[];
 };
 
 export type TeaTypeTreeNode = TeaType & LTreeNode;
@@ -134,5 +134,6 @@ export type TeaStats = Pick<Resource<"TeaStats">, "@type" | "@id"> & {
 export type Steep = Omit<Resource<"Steep">, "id"> & {
 	key: string;
 	duration: Duration;
+	temperature?: Temperature;
 	order: number;
 };

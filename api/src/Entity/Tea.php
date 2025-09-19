@@ -22,8 +22,8 @@ class Tea
 	#[ORM\Column]
 	public TeaFamily $family;
 
-	#[ORM\Column]
-	public int $originId;
+	#[ORM\Column(nullable: true)]
+	public ?int $originId = null;
 
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	#[ORM\JoinColumn]

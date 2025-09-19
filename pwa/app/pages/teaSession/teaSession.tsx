@@ -1,7 +1,7 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
-import { deleteApi, fetchApi, patchApi } from "~/utils/api";
+import { deleteApi, fetchApi, patchApi, postApi } from "~/utils/api";
 import type { Steep, TeaSession } from "~t/types";
-import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
+import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { Link, useNavigate } from "react-router";
@@ -20,6 +20,8 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { SteepCard } from "~/components/brewing/steepCard";
 import { Duration, Temperature } from "~/utils/value-objects/units";
 import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
+import { denormalizeSteep, type SteepRaw } from "~/utils/api/normalization/steep";
+import { useAlert } from "~/components/shared/modal/AlertManager";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -28,19 +30,26 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 		throw new Error("Ooops, the id is invalid!");
 	}
 
-	const response = await fetchApi<TeaSeassionRaw>(`/tea_sessions/${id}`);
+	const response = await fetchApi<TeaSessionRaw>(`/tea_sessions/${id}`);
 	return denormalizeTeaSession(await response.json());
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
-	const session = props.loaderData;
 	const navigate = useNavigate();
+	const [session, setSession] = useState(props.loaderData);
 	const [editSteep, setEditSteep] = useState<Partial<SteepValues & Pick<Steep, "@id">>>();
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
+	const steepMutations = useSteepMutations(session.id, (action, steep) => {
+		if ("add" === action && steep) {
+			setSession((st) => ({ ...st, steeps: [...(st.steeps ?? []), steep] }));
+			setEditSteep(undefined);
+			return;
+		}
+	});
 	const editMutation = useMutation({
 		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
-			const response = await patchApi<TeaSeassionRaw>(`/tea_sessions/${session.id}`, args);
+			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${session.id}`, args);
 			return denormalizeTeaSession(await response.json());
 		},
 		onSuccess: () => setShowNodeEditor(false),
@@ -49,6 +58,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 		mutationFn: async () => await deleteApi(`/tea_sessions/${session.id}`),
 		onSuccess: () => navigate("/me/sessions"),
 	});
+
 	const editableData = { ...session, ...editMutation.data };
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
@@ -60,7 +70,10 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	function submitSteep(data: SteepValues) {
-		console.debug(editSteep, data);
+		if(undefined === editSteep?.["@id"]) {
+			steepMutations.add.mutate(data);
+			return;
+		}
 	}
 
 	return (
@@ -159,15 +172,11 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 			<h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>
 			<ul className="">
-				<li className="mb-2">
-					<SteepCard duration={new Duration(60)} temperature={new Temperature(70)} order={1} editable />
-				</li>
-				<li className="mb-2">
-					<SteepCard duration={new Duration(30)} temperature={new Temperature(80)} order={2} editable />
-				</li>
-				<li className="mb-2">
-					<SteepCard duration={new Duration(60)} temperature={new Temperature(90)} order={3} editable />
-				</li>
+				{session.steeps?.map((steep, i) => (
+					<li key={steep.key} className="mb-2">
+						<SteepCard duration={steep.duration} temperature={steep.temperature} order={i + 1} />
+					</li>
+				))}
 				<li className="mb-2">
 					<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
 						Add a steep
@@ -202,4 +211,23 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			</Modal>
 		</AuthLayout>
 	);
+}
+
+function useSteepMutations(sessionId: number, onSuccess: (action: "add" | "change" | "delete", steep?: Steep) => void) {
+	const uriPrefix = `/teaSessions/${sessionId}/steeps`;
+	const alert = useAlert();
+
+	const addMutation = useMutation({
+		mutationFn: async (data: SteepValues) => {
+			const response = await postApi<SteepRaw>(uriPrefix, {
+				temperature: data.temperature?.deg,
+				duration: data.duration.totalSeconds,
+			});
+			return denormalizeSteep(await response.json());
+		},
+		onSuccess: (steep) => onSuccess("add", steep),
+		onError: (e) => alert({ title: "Failed to add the steep", body: e.message }),
+	});
+
+	return { add: addMutation };
 }

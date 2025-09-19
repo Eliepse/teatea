@@ -8,7 +8,7 @@ import { FrameDatePicker } from "~/components/shared/frame/FrameDatePicker";
 import { useMutation } from "@tanstack/react-query";
 import Leaf from "~/components/icons/leaf";
 import { fetchApi } from "~/utils/api";
-import type { TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
+import type { TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { formatISO } from "date-fns";
 import { useNavigate } from "react-router";
 import { useAlert } from "~/components/shared/modal/AlertManager";
@@ -37,7 +37,7 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 
 	const mutation = useMutation({
 		mutationFn: async (data: SessionForm & Required<Pick<SessionForm, "tea">>) => {
-			const response = await fetchApi<TeaSeassionRaw>("/tea_sessions", {
+			const response = await fetchApi<TeaSessionRaw>("/tea_sessions", {
 				method: "POST",
 				payload: {
 					drankAt: formatISO(data.drankAt),

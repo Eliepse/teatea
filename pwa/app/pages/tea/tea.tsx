@@ -6,7 +6,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { useQuery } from "@tanstack/react-query";
-import { denormalizeTeaSession, type TeaSeassionRaw } from "~/utils/api/normalization/teaSession";
+import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { formatDistanceToNow, intlFormat } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
@@ -46,7 +46,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 	const sessionsQuery = useQuery({
 		queryFn: async (): Promise<ApiPaginatedCollection<TeaSession>> => {
-			const response = await getApi<ApiPaginatedCollection<TeaSeassionRaw>>(
+			const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(
 				`/tea_sessions?tea=${tea.id}&itemsPerPage=5&contentful=1`,
 			);
 			const payload = await response.json();

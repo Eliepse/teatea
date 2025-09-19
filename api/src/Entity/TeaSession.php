@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\DTO\BrewingStep;
+use App\DTO\SteepValue;
 use App\Enum\BrewingTechnic;
 use App\Repository\TeaSessionRepository;
 use App\ValueObject\Duration;
@@ -30,9 +30,9 @@ class TeaSession
 	#[ORM\Column(type: "volume", nullable: true)]
 	public ?Volume $waterVolume = null;
 
-	/** @var array<BrewingStep> */
+	/** @var array<SteepValue> */
 	#[ORM\Column(type: Types::JSONB, nullable: true)]
-	private ?array $brewingSteps = null;
+	private ?array $steeps = null;
 
 	public function __construct(
 		#[ORM\ManyToOne(inversedBy: 'sessions')]
@@ -52,58 +52,37 @@ class TeaSession
 	}
 
 	/**
-	 * @param BrewingStep $step
+	 * @param SteepValue $steep
 	 *
-	 * @return int
+	 * @return void
 	 */
-	public function addBrewingStep(BrewingStep $step): int
+	public function addSteep(SteepValue $steep): void
 	{
-		$normalizedStep = ["deg" => $step->temperature->degrees, "sec" => $step->duration->seconds];
-		$lastStep = array_slice($this->brewingSteps ?? [], -1)[0] ?? null;
-
-		// Initiate the array of steps
-		if (null === $lastStep) {
-			$this->brewingSteps = [[...$normalizedStep, "i" => 1]];
-			return 1;
+		if (array_any($this->steeps ?? [], fn($data) => $data["key"] === $steep->key)) {
+			throw new \RuntimeException("Trying to add a steep that already exists");
 		}
 
-		// Push a new step
-		$i = $lastStep["i"] + 1;
-		$this->brewingSteps[] = [...$normalizedStep, "i" => $i];
+		$normalizedStep = [
+			"key" => $steep->key,
+			"dur" => $steep->duration->seconds,
+			"deg" => $steep->temperature?->degrees ?: null,
+		];
 
-		return $i;
+		$this->steeps = [...($this->steeps ?? []), $normalizedStep];
 	}
 
 	/**
-	 * @return array<int, BrewingStep>
+	 * @return SteepValue[]
 	 */
-	public function getBrewingStepsMap(): array
+	public function getSteeps(): array
 	{
-		return array_reduce(
-			$this->brewingSteps ?? [],
-			function ($map, $step) {
-				$map[$step["i"]] = new BrewingStep(new Temperature($step["deg"]), new Duration($step["sec"]));
-				return $map;
-			},
-			[],
+		return array_map(
+			fn($data) => new SteepValue(
+				$data["key"],
+				new Duration($data["dur"]),
+				$data["deg"] ? new Temperature($data["deg"]) : null,
+			),
+			$this->steeps ?? [],
 		);
-	}
-
-	public function removeBrewingStep(int $index): bool
-	{
-		$key = array_find_key($this->brewingSteps, fn($bs) => $index === $bs["i"]);
-
-		if (null === $key) {
-			return false;
-		}
-
-		array_splice($this->brewingSteps, $key, 1);
-
-		// Prevent empty array to optimize storage and queries
-		if (0 === count($this->brewingSteps)) {
-			$this->brewingSteps = null;
-		}
-
-		return true;
 	}
 }

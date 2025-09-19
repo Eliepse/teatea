@@ -95,11 +95,11 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
 	public ?float $waterMl = null;
 
-	/** @var BrewingStep[] */
-	#[Groups(["teaSession:edit", "embedded:brewingStep"])]
+	/** @var Steep[] */
+	#[Groups(["teaSession:edit", "embedded:steep"])]
 	#[ApiProperty(genId: false)]
 	#[Link(toProperty: "sessionId")]
-	public array $brewingSteps = [];
+	public array $steeps = [];
 
 	#[Groups(["teaSession:read"])]
 	public Member $author;

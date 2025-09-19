@@ -5,7 +5,7 @@ namespace App\State\TeaSession;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\BrewingStep;
+use App\ApiResource\Steep;
 use App\ApiResource\Member;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaSession;
@@ -119,22 +119,10 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$resource->waterMl = $entity->waterVolume?->toMl();
 		$resource->drankAt = $entity->drankAt;
 
-		$brewingSteps = $entity->getBrewingStepsMap();
-
-		if (0 !== count($brewingSteps)) {
-			$resource->brewingSteps = array_map(
-				function (\App\DTO\BrewingStep $bs, int $i) use ($resource) {
-					$r = new BrewingStep();
-					$r->id = $i;
-					$r->duration = $bs->duration->seconds;
-					$r->temperature = $bs->temperature->degrees;
-					$r->session = $resource;
-					return $r;
-				},
-				$brewingSteps,
-				array_keys($brewingSteps),
-			);
-		}
+		$resource->steeps = array_map(
+			fn($steepValue) => SteepProvider::hydrate($steepValue, $entity),
+			$entity->getSteeps(),
+		);
 
 		if ($tea) {
 			$resource->tea = $tea;
