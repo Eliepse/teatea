@@ -25,31 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:origin"]],
 	security: "is_granted('ROLE_USER')",
 )]
-#[Get(
-	normalizationContext: ["embedded:brewingStep"],
-	provider: TeaSessionProvider::class,
-)]
-#[GetCollection(
-	uriTemplate: "/members/{username}/sessions",
-	uriVariables: [
-		"username" => new Link(
-			fromProperty: "username",
-			fromClass: Member::class,
-			compositeIdentifier: true,
-			schema: ["pattern" => "/^[\p{L}_]{2,16}$/i"],
-		),
-	],
-	provider: TeaSessionProvider::class,
-	parameters: [
-		"cursor" => new QueryParameter(schema: ["type" => "date"], property: 'drankAt'),
-		"limit" => new QueryParameter(
-			schema: ["type" => "integer", "minimum" => 1, "maximum" => 14],
-			property: 'drankAt',
-			description: "Maximum days to return (excluding gaps)",
-			castToNativeType: true,
-		),
-	],
-)]
+#[Get(normalizationContext: ["embedded:steep"], provider: TeaSessionProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
 #[Patch(
 	denormalizationContext: ["groups" => ["teaSession:edit"]],
