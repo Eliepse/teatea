@@ -18,7 +18,6 @@ import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { SteepCard } from "~/components/brewing/steepCard";
-import { Duration, Temperature } from "~/utils/value-objects/units";
 import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
 import { denormalizeSteep, type SteepRaw } from "~/utils/api/normalization/steep";
 import { useAlert } from "~/components/shared/modal/AlertManager";
@@ -41,11 +40,21 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
 	const steepMutations = useSteepMutations(session.id, (action, steep) => {
-		if ("add" === action && steep) {
-			setSession((st) => ({ ...st, steeps: [...(st.steeps ?? []), steep] }));
-			setEditSteep(undefined);
-			return;
+		if ("delete" !== action && steep) {
+			setSession((st) => {
+				let steeps = st.steeps ?? [];
+
+				if (steeps.some((s) => s.key === steep.key)) {
+					steeps = steeps.map((s) => (s.key === steep.key ? steep : s));
+				} else {
+					steeps = [...steeps, steep];
+				}
+
+				return { ...st, steeps };
+			});
 		}
+
+		setEditSteep(undefined);
 	});
 	const editMutation = useMutation({
 		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
@@ -70,10 +79,12 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	function submitSteep(data: SteepValues) {
-		if(undefined === editSteep?.["@id"]) {
-			steepMutations.add.mutate(data);
+		if (undefined !== editSteep?.["@id"]) {
+			steepMutations.edit.mutate({ ...data, "@id": editSteep["@id"] });
 			return;
 		}
+
+		steepMutations.add.mutate(data);
 	}
 
 	return (
@@ -174,7 +185,12 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			<ul className="">
 				{session.steeps?.map((steep, i) => (
 					<li key={steep.key} className="mb-2">
-						<SteepCard duration={steep.duration} temperature={steep.temperature} order={i + 1} />
+						<SteepCard
+							duration={steep.duration}
+							temperature={steep.temperature}
+							order={i + 1}
+							onEdit={() => setEditSteep(steep)}
+						/>
 					</li>
 				))}
 				<li className="mb-2">
@@ -229,5 +245,17 @@ function useSteepMutations(sessionId: number, onSuccess: (action: "add" | "chang
 		onError: (e) => alert({ title: "Failed to add the steep", body: e.message }),
 	});
 
-	return { add: addMutation };
+	const editMutation = useMutation({
+		mutationFn: async (data: SteepValues & Pick<Steep, "@id">) => {
+			const response = await patchApi<SteepRaw>(data["@id"], {
+				temperature: data.temperature?.deg,
+				duration: data.duration.totalSeconds,
+			});
+			return denormalizeSteep(await response.json());
+		},
+		onSuccess: (steep) => onSuccess("change", steep),
+		onError: (e) => alert({ title: "Failed to edit the steep", body: e.message }),
+	});
+
+	return { add: addMutation, edit: editMutation };
 }

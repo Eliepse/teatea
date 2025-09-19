@@ -7,8 +7,10 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\State\TeaSession\BrewingStepDeleteProcessor;
+use App\State\TeaSession\SteepPatchProcessor;
 use App\State\TeaSession\SteepProvider;
 use App\State\TeaSession\SteepCreateProcessor;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -27,6 +29,15 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 	uriTemplate: "/teaSessions/{sessionId}/steeps",
 	uriVariables: ["sessionId" => new Link(fromProperty: "id", toProperty: "session", fromClass: TeaSession::class)],
 	processor: SteepCreateProcessor::class,
+)]
+#[Patch(
+	uriTemplate: "/teaSessions/{sessionId}/steeps/{key}",
+	uriVariables: [
+		"sessionId" => new Link(fromProperty: "id", toProperty: "session", fromClass: TeaSession::class),
+		"key" => new Link(fromProperty: "key"),
+	],
+	provider: SteepProvider::class,
+	processor: SteepPatchProcessor::class,
 )]
 #[Delete(
 	uriTemplate: "/teaSessions/{sessionId}/steeps/{key}",

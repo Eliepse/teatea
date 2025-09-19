@@ -52,37 +52,24 @@ class TeaSession
 	}
 
 	/**
-	 * @param SteepValue $steep
-	 *
-	 * @return void
-	 */
-	public function addSteep(SteepValue $steep): void
-	{
-		if (array_any($this->steeps ?? [], fn($data) => $data["key"] === $steep->key)) {
-			throw new \RuntimeException("Trying to add a steep that already exists");
-		}
-
-		$normalizedStep = [
-			"key" => $steep->key,
-			"dur" => $steep->duration->seconds,
-			"deg" => $steep->temperature?->degrees ?: null,
-		];
-
-		$this->steeps = [...($this->steeps ?? []), $normalizedStep];
-	}
-
-	/**
 	 * @return SteepValue[]
 	 */
 	public function getSteeps(): array
 	{
-		return array_map(
-			fn($data) => new SteepValue(
-				$data["key"],
-				new Duration($data["dur"]),
-				$data["deg"] ? new Temperature($data["deg"]) : null,
-			),
-			$this->steeps ?? [],
-		);
+		return array_map(fn($data) => SteepValue::fromArray($data), $this->steeps ?? []);
+	}
+
+	public function persistSteep(SteepValue $steep): void
+	{
+		// Edit an existing steep (if exists)
+		foreach ($this->steeps ?? [] as $i => $raw) {
+			if($raw["key"] === $steep->key) {
+				$this->steeps[$i] = $steep->toArray();
+				return;
+			}
+		}
+
+		// Fallback on adding a new one
+		$this->steeps = [...($this->steeps ?? []), $steep->toArray()];
 	}
 }

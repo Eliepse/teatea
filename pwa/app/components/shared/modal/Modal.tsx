@@ -35,7 +35,7 @@ function ModalContent(props: ModalType) {
       // aria-hidden={ariaHidden}
       open={props.open}
       aria-modal={props.open}
-      className={clsx("modal", positionCls)}
+      className={clsx("modal z-40", positionCls)}
     >
       <div className={clsx("modal-box", props.className)}>{props.children}</div>
       {true === backdrop && (

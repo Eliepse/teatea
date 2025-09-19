@@ -20,6 +20,6 @@ export class ApiError extends Error {
 
 	static async fromResponse(response: Response) {
 		const error = (await response.json()) as ErrorPayload;
-		return new ApiError(error?.description ?? error?.title ?? response.statusText, error);
+		return new ApiError(error?.detail ?? error?.description ?? error?.title ?? response.statusText, error);
 	}
 }

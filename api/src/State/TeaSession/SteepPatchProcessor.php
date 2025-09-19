@@ -11,7 +11,6 @@ use App\Repository\TeaSessionRepository;
 use App\ValueObject\Duration;
 use App\ValueObject\Temperature;
 use Doctrine\ORM\EntityManagerInterface;
-use Nette\Utils\Random;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -19,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * @implements ProcessorInterface<Steep>
  */
-readonly class SteepCreateProcessor implements ProcessorInterface
+readonly class SteepPatchProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -40,7 +39,7 @@ readonly class SteepCreateProcessor implements ProcessorInterface
 		assert($user instanceof User);
 
 		/** @var \App\Entity\TeaSession|null $session */
-		$session = $this->sessionRepository->find($uriVariables["sessionId"]);
+		$session = $this->sessionRepository->find($data->session->id);
 
 		if (null === $session) {
 			throw new NotFoundHttpException();
@@ -50,21 +49,14 @@ readonly class SteepCreateProcessor implements ProcessorInterface
 			throw new AccessDeniedHttpException();
 		}
 
-		$steeps = $session->getSteeps();
-		$tries = 3;
-		do {
-			$key = Random::generate(6);
-			$hasDuplicate = array_any($steeps, fn($steep) => $key === $steep->key);
-			$tries--;
-		} while (0 !== $tries && true === $hasDuplicate);
-
 		$session->persistSteep(
 			$steep = new SteepValue(
-				$key,
+				$data->key,
 				new Duration($data->duration),
 				null !== $data->temperature ? new Temperature($data->temperature) : null,
 			),
 		);
+
 		$this->em->persist($session);
 		$this->em->flush();
 
