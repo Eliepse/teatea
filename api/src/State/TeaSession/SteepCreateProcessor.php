@@ -11,7 +11,6 @@ use App\Repository\TeaSessionRepository;
 use App\ValueObject\Duration;
 use App\ValueObject\Temperature;
 use Doctrine\ORM\EntityManagerInterface;
-use Nette\Utils\Random;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -53,7 +52,7 @@ readonly class SteepCreateProcessor implements ProcessorInterface
 		$steeps = $session->getSteeps();
 		$tries = 3;
 		do {
-			$key = Random::generate(6);
+			$key = bin2hex(random_bytes(6));
 			$hasDuplicate = array_any($steeps, fn($steep) => $key === $steep->key);
 			$tries--;
 		} while (0 !== $tries && true === $hasDuplicate);
