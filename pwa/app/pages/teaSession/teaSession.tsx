@@ -24,11 +24,6 @@ import { useAlert } from "~/components/shared/modal/AlertManager";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
-
-	if (id <= 0) {
-		throw new Error("Ooops, the id is invalid!");
-	}
-
 	const response = await fetchApi<TeaSessionRaw>(`/tea_sessions/${id}`);
 	return denormalizeTeaSession(await response.json());
 }
@@ -59,7 +54,14 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	function newSteep() {
-		setEditSteep({});
+		const lastSteep = session.steeps?.slice(-1)[0] ?? null;
+
+		if (!lastSteep) {
+			setEditSteep({});
+			return;
+		}
+
+		setEditSteep({ duration: lastSteep.duration, temperature: lastSteep.temperature });
 	}
 
 	async function submitSteep(data: SteepValues) {
