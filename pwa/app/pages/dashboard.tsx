@@ -10,6 +10,7 @@ import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
 import { CoffeeCup } from "iconoir-react";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
+import { IfAdmin } from "~/auth/components/voters/IfAdmin";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -87,11 +88,11 @@ export default function Dashboard(props: Route.ComponentProps) {
 				</button>
 			)}
 
-			{token?.roles?.includes("ROLE_ADMIN") && (
-				<Link to="/admin" className="btn btn-block h-12 mt-40">
+			<IfAdmin>
+				<Link to="/admin" className="btn btn-block h-12 mt-40 mb-8">
 					Admin dashboard
 				</Link>
-			)}
+			</IfAdmin>
 		</AuthLayout>
 	);
 }
