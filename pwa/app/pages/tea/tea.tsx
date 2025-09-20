@@ -73,7 +73,10 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 					{!!tea.originPath && (
 						<li>
-							<Link className="badge badge-soft badge-neutral" to={`/tea/search?originPath=${origin?.path}`}>
+							<Link
+								className="badge badge-soft badge-neutral"
+								to={`/tea/search?originPath=${origin?.path}`}
+							>
 								<FormatOriginPath originPath={tea.originPath} />
 							</Link>
 						</li>
@@ -111,32 +114,34 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<ul>
 							{sessionsQuery.data?.member?.map((session) => (
 								<li className="mb-2" key={session.id}>
-									<article className="px-2 py-2 bg-base-200 rounded">
-										<div className="flex text-xs gap-2 items-center">
-											{!!session.teaQuantity && (
-												<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
-													<Leaf className="size-3 text-green-300 mr-2" />
-													<span>{`${session.teaQuantity} g`}</span>
-												</div>
-											)}
+									<Link to={`/me/sessions/${session.id}`}>
+										<article className="px-2 py-2 bg-base-200 rounded">
+											<div className="flex text-xs gap-2 items-center">
+												{!!session.teaQuantity && (
+													<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
+														<Leaf className="size-3 text-green-300 mr-2" />
+														<span>{`${session.teaQuantity} g`}</span>
+													</div>
+												)}
 
-											{!!session.waterMl && (
-												<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
-													<WaterDrop className="size-3 text-blue-300 mr-2" />
-													<span>{`${session.waterMl} ml`}</span>
-												</div>
-											)}
+												{!!session.waterMl && (
+													<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
+														<WaterDrop className="size-3 text-blue-300 mr-2" />
+														<span>{`${session.waterMl} ml`}</span>
+													</div>
+												)}
 
-											<div className="ml-auto text-sm text-base-content/60">
-												{formatDistanceToNow(session.drankAt)} ago
+												<div className="ml-auto text-sm text-base-content/60">
+													{formatDistanceToNow(session.drankAt)} ago
+												</div>
 											</div>
-										</div>
-										{!!session.note && (
-											<p className="mt-4 pt-2 italic border-t border-gray-300 text-sm text-base-content/70">
-												{limit(session.note, 96)}
-											</p>
-										)}
-									</article>
+											{!!session.note && (
+												<p className="mt-4 pt-2 italic border-t border-gray-300 text-sm text-base-content/70">
+													{limit(session.note, 96)}
+												</p>
+											)}
+										</article>
+									</Link>
 								</li>
 							))}
 						</ul>
