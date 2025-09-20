@@ -106,7 +106,7 @@ export default function ListTeaSessions() {
 									<ul>
 										{sessions.map((session) => (
 											<li key={session.id} className="mb-4">
-												<Link to={`/me/sessions/${session.id}`}>
+												<Link to={`/sessions/${session.id}`}>
 													<Item
 														family={session.tea.family}
 														type={session.tea.type}

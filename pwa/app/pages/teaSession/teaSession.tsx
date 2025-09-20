@@ -84,7 +84,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 		<AuthLayout className="px-4" activeKey="activity">
 			<header className="py-4">
 				<div className="flex">
-					<Link to="/me/sessions" className="block link mb-8">
+					<Link to="/sessions" className="block link mb-8">
 						<Arrow direction="left" className="inline size-4 mr-2" />
 						Sessions history
 					</Link>
@@ -248,7 +248,7 @@ function useSessionMutations(sessionId: number) {
 	});
 	const deleteMutation = useMutation({
 		mutationFn: async () => await deleteApi(`/tea_sessions/${sessionId}`),
-		onSuccess: () => navigate("/me/sessions"),
+		onSuccess: () => navigate("/sessions"),
 	});
 
 	return { edit: editMutation, delete: deleteMutation };

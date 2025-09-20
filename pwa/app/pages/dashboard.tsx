@@ -32,7 +32,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 
 			{0 < props.loaderData.statsSessionsTotal && (
 				<div className="grid grid-cols-2 gap-4">
-					<Link className="bg-primary/10 text-primary rounded-md px-4 py-3" to="/me/sessions">
+					<Link className="bg-primary/10 text-primary rounded-md px-4 py-3" to="/sessions">
 						<div className="text-4xl font-bold mb-1">{props.loaderData.statsSessionsTotal}</div>
 						<div className="text-sm mb-1 ">tea sessions</div>
 						<div className="flex text-primary/60 items-center text-sm">

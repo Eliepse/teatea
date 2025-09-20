@@ -8,14 +8,17 @@ export default [
 
 	layout("auth/components/AuthenticatedGuard.tsx", [
 		route("/welcome", "pages/dashboard.tsx"),
-		route("/session/new", "pages/teaSession/add-session.tsx"),
+
 		route("/tea/new", "pages/tea/tea-create.tsx"),
 		route("/tea/search", "pages/tea/search.tsx"),
 		route("/tea/:id", "pages/tea/tea.tsx"),
+
+		route("/session/new", "pages/teaSession/add-session.tsx"),
+		route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
+		route("/sessions", "pages/teaSession/teaSessions.tsx"),
+
 		...prefix("/me", [
 			route("/teas", "pages/tea/tea-list.tsx"),
-			route("/sessions", "pages/teaSession/teaSessions.tsx"),
-			route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
 		]),
 	]),
 

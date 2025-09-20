@@ -114,7 +114,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<ul>
 							{sessionsQuery.data?.member?.map((session) => (
 								<li className="mb-2" key={session.id}>
-									<Link to={`/me/sessions/${session.id}`}>
+									<Link to={`/sessions/${session.id}`}>
 										<article className="px-2 py-2 bg-base-200 rounded">
 											<div className="flex text-xs gap-2 items-center">
 												{!!session.teaQuantity && (
