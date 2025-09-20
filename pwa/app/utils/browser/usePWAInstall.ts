@@ -4,7 +4,6 @@ export let installPrompt: (Event & { prompt: () => Promise<{ outcome: "accepted"
 	undefined;
 
 if (!import.meta.env.SSR) {
-	console.debug("ran");
 	window.addEventListener("beforeinstallprompt", (e) => {
 		console.debug("triggered");
 		e.preventDefault();

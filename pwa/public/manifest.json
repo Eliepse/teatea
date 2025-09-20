@@ -3,18 +3,31 @@
 	"description": "Social and collaborative tea journal",
 	"start_url": "/welcome",
 	"display": "standalone",
-	"display-override": "standalone",
+	"display_override": [
+		"standalone"
+	],
 	"orientation": "portrait",
 	"icons": [
 		{
-			"src": "icons/leaf_192.png",
-			"type": "image/png",
-			"sizes": "192x192"
+			"src": "pwa-64x64.png",
+			"sizes": "64x64",
+			"type": "image/png"
 		},
 		{
-			"src": "icons/leaf_512.png",
+			"src": "pwa-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		},
+		{
+			"src": "pwa-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png"
+		},
+		{
+			"src": "maskable-icon-512x512.png",
+			"sizes": "512x512",
 			"type": "image/png",
-			"sizes": "512x512"
+			"purpose": "maskable"
 		}
 	],
 	"background_color": "white",
