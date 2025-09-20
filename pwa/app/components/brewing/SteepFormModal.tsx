@@ -62,7 +62,7 @@ export function SteepFormModal(props: {
 			</div>
 
 			<div className="flex-1 mt-12 flex flex-col">
-				<div className="flex justify-between items-center">
+				<div className="flex justify-between items-center pr-2">
 					<div className="mr-auto">
 						<ClockIcon className="size-5 inline-block relative bottom-0.5 mr-2" />
 						<span>Duration</span>
