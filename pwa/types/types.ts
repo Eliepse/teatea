@@ -60,7 +60,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	teaQuantity?: number;
 	waterMl?: number;
 	drankAt: Date;
-	author?: Iri;
+	author?: Iri | Member;
 	steeps?: Steep[];
 };
 

@@ -1,5 +1,8 @@
 import type { SyntheticEvent } from "react";
 
+export const fn = () => {};
+export const f = (clb: any) => typeof clb === "function" ? clb : fn;
+
 export function warnNotImplemented(): void {
 	console.warn("Not implemented!");
 }

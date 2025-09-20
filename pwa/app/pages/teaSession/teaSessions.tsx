@@ -8,11 +8,12 @@ import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { handleUIEvent } from "~/utils/function";
+import { f, handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 import { useUser } from "~/auth/hooks/useUser";
 import { useState } from "react";
 import Leaf from "~/components/icons/leaf";
+import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 
 const PAGE_SIZE = 14;
 
@@ -50,7 +51,11 @@ export default function ListTeaSessions() {
 
 	const sessionsQuery = useInfiniteQuery({
 		queryFn: async (context) => {
-			const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(`/tea_sessions?${context.pageParam}`);
+			const filters = typeof context.queryKey[1] === "string" ? {} : context.queryKey[1];
+			const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(
+				`/tea_sessions?${context.pageParam}`,
+				context.pageParam ? undefined : filters,
+			);
 			const data = await response.json();
 			return { ...data, member: data.member.map(denormalizeTeaSession) };
 		},
@@ -77,9 +82,11 @@ export default function ListTeaSessions() {
 
 	return (
 		<AuthLayout className="p-4 pb-18" activeKey="activity">
-			<ul>
-				<li></li>
-			</ul>
+			<SessionsUserFilter
+				username={filters.username}
+				onChange={(u) => setFilters((f) => ({ ...f, username: u }))}
+				className="mb-8"
+			/>
 
 			{0 !== items.length && (
 				<>
@@ -104,22 +111,33 @@ export default function ListTeaSessions() {
 									</div>
 
 									<ul>
-										{sessions.map((session) => (
-											<li key={session.id} className="mb-4">
-												<Link to={`/sessions/${session.id}`}>
-													<Item
-														family={session.tea.family}
-														type={session.tea.type}
-														path={session.tea.originPath}
-														note={session.note}
-														grams={session.teaQuantity}
-														ml={session.waterMl}
-														username={session.author?.username}
-														drankAt={isToday(session.drankAt) ? session.drankAt : undefined}
-													/>
-												</Link>
-											</li>
-										))}
+										{sessions.map((session) => {
+											const username =
+												typeof session.author !== "string"
+													? session.author?.username
+													: undefined;
+											return (
+												<li key={session.id} className="mb-4">
+													<Link to={`/sessions/${session.id}`}>
+														<Item
+															family={session.tea.family}
+															type={session.tea.type}
+															path={session.tea.originPath}
+															note={session.note}
+															grams={session.teaQuantity}
+															ml={session.waterMl}
+															username={username}
+															drankAt={
+																isToday(session.drankAt) ? session.drankAt : undefined
+															}
+															onAuthorClick={() =>
+																setFilters((f) => ({ ...f, username }))
+															}
+														/>
+													</Link>
+												</li>
+											);
+										})}
 									</ul>
 								</li>
 							);
@@ -157,12 +175,17 @@ function Item(props: {
 	ml?: number;
 	username?: string;
 	drankAt?: Date;
+	onAuthorClick?: () => void;
 }) {
 	return (
 		<article className="bg-base-200 rounded h-min-16 pb-1">
 			<div className="py-2 px-3 mb-3 flex justify-between text-xs text-base-content/60 leading-tight border-b border-gray-200">
 				{!!props.drankAt && <span>{formatDistanceToNow(props.drankAt)} ago</span>}
-				{!!props.username && <span className="ml-auto">@{props.username}</span>}
+				{!!props.username && (
+					<span className="ml-auto" onClick={handleUIEvent(f(props.onAuthorClick))}>
+						@{props.username}
+					</span>
+				)}
 			</div>
 
 			<div className="px-3 flex justify-between text-xs text-base-content/60 leading-tight">
