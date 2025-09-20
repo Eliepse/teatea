@@ -21,6 +21,7 @@ import { SteepCard } from "~/components/brewing/steepCard";
 import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
 import { denormalizeSteep, type SteepRaw } from "~/utils/api/normalization/steep";
 import { useAlert } from "~/components/shared/modal/AlertManager";
+import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -31,23 +32,13 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [session, setSession] = useState(props.loaderData);
+	const isAuthor = useIsAuthor(session?.author);
 	const [editSteep, setEditSteep] = useState<Partial<SteepValues> | (SteepValues & Steep)>();
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
+	const sessionMutations = useSessionMutations(session.id);
 	const steepMutations = useSteepMutations(session.id);
-	const editMutation = useMutation({
-		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
-			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${session.id}`, args);
-			return denormalizeTeaSession(await response.json());
-		},
-		onSuccess: () => setShowNodeEditor(false),
-	});
-	const deleteMutation = useMutation({
-		mutationFn: async () => await deleteApi(`/tea_sessions/${session.id}`),
-		onSuccess: () => navigate("/me/sessions"),
-	});
-
-	const editableData = { ...session, ...editMutation.data };
+	const editableData = { ...session, ...sessionMutations.edit.data };
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
 		setNoteValue(e.currentTarget.value);
@@ -99,22 +90,27 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						Sessions history
 					</Link>
 
-					<div className="dropdown dropdown-end ml-auto">
-						<div tabIndex={0} role="button" className="m-1">
-							<EllipsisVerticalIcon className="size-5" />
+					<IfAuthor iri={session.author}>
+						<div className="dropdown dropdown-end ml-auto">
+							<div tabIndex={0} role="button" className="m-1">
+								<EllipsisVerticalIcon className="size-5" />
+							</div>
+							<ul
+								tabIndex={0}
+								className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+							>
+								<li
+									className="text-error"
+									onClick={handleUIEvent(() => sessionMutations.delete.mutate())}
+								>
+									<span>
+										<TrashIcon className="size-3 inline mr-1" />
+										Delete
+									</span>
+								</li>
+							</ul>
 						</div>
-						<ul
-							tabIndex={0}
-							className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-						>
-							<li className="text-error" onClick={handleUIEvent(() => deleteMutation.mutate())}>
-								<span>
-									<TrashIcon className="size-3 inline mr-1" />
-									Delete
-								</span>
-							</li>
-						</ul>
-					</div>
+					</IfAuthor>
 				</div>
 
 				<div className="uppercase text-xs text-base-content/60">
@@ -174,34 +170,42 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</>
 				)}
 
-				{!editableData.note && (
-					<button
-						className="btn btn-block btn-dash mt-2"
-						onClick={handleUIEvent(() => setShowNodeEditor(true))}
-					>
-						Add a tasting note
-					</button>
-				)}
+				<IfAuthor iri={session.author}>
+					{!editableData.note && (
+						<button
+							className="btn btn-block btn-dash mt-2"
+							onClick={handleUIEvent(() => setShowNodeEditor(true))}
+						>
+							Add a tasting note
+						</button>
+					)}
+				</IfAuthor>
 			</div>
 
-			<h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>
-			<ul className="">
-				{session.steeps?.map((steep, i) => (
-					<li key={steep.key} className="mb-2">
-						<SteepCard
-							duration={steep.duration}
-							temperature={steep.temperature}
-							order={i + 1}
-							onEdit={() => setEditSteep(steep)}
-						/>
-					</li>
-				))}
-				<li className="mb-2">
-					<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
-						Add a steep
-					</button>
-				</li>
-			</ul>
+			{!!session.steeps?.length && (
+				<>
+					<h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>
+					<ul>
+						{session.steeps.map((steep, i) => (
+							<li key={steep.key} className="mb-2">
+								<SteepCard
+									duration={steep.duration}
+									temperature={steep.temperature}
+									order={i + 1}
+									onEdit={isAuthor ? () => setEditSteep(steep) : undefined}
+								/>
+							</li>
+						))}
+						<IfAuthor iri={session.author}>
+							<li className="mb-2">
+								<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
+									Add a steep
+								</button>
+							</li>
+						</IfAuthor>
+					</ul>
+				</>
+			)}
 
 			{editSteep && (
 				<SteepFormModal
@@ -222,8 +226,11 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</button>
 					<button
 						className="btn btn-primary ml-auto"
-						onClick={handleUIEvent(() => editMutation.mutate({ note: noteValue }))}
-						disabled={editMutation.isPending}
+						onClick={handleUIEvent(async () => {
+							await sessionMutations.edit.mutateAsync({ note: noteValue });
+							setShowNodeEditor(false);
+						})}
+						disabled={sessionMutations.edit.isPending}
 					>
 						Save
 					</button>
@@ -231,6 +238,23 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			</Modal>
 		</AuthLayout>
 	);
+}
+
+function useSessionMutations(sessionId: number) {
+	const navigate = useNavigate();
+
+	const editMutation = useMutation({
+		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
+			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, args);
+			return denormalizeTeaSession(await response.json());
+		},
+	});
+	const deleteMutation = useMutation({
+		mutationFn: async () => await deleteApi(`/tea_sessions/${sessionId}`),
+		onSuccess: () => navigate("/me/sessions"),
+	});
+
+	return { edit: editMutation, delete: deleteMutation };
 }
 
 function useSteepMutations(sessionId: number) {
