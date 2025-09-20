@@ -3,8 +3,10 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\State\Member\MemberCreateProcessor;
@@ -16,18 +18,22 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[Get(
-	uriTemplate: "/members/me",
-	normalizationContext: ["groups" => ["member:self"]],
-	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
-	provider: UserProvider::class
+	uriTemplate: "/members/{username}",
+	security: "is_granted('ROLE_ADMIN')",
+	provider: MemberProvider::class,
 )]
 #[Get(
-	uriTemplate: "/members/me/stats",
+	uriTemplate: "/me",
+	normalizationContext: ["groups" => ["member:self"]],
+	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
+	provider: UserProvider::class,
+)]
+#[Get(
+	uriTemplate: "/me/stats",
 	normalizationContext: ["groups" => ["member:stats", "embedded:tea", "embedded:origin", "embedded:teaType"]],
 	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
 	provider: UserStatsProvider::class
 )]
-#[Get(security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class)]
 #[GetCollection(normalizationContext: ["groups" => ["role:admin"]], security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class,)]
 #[Post(
 	denormalizationContext: ["groups" => "member:create"],
@@ -36,17 +42,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[Patch(
 	uriTemplate: "/members/{id}/onboarding",
+	uriVariables: ["id" => new Link(fromProperty: "id")],
 	denormalizationContext: ["groups" => "member:onboarding"],
 	security: "is_granted('ROLE_ONBOARDING')",
 	provider: MemberProvider::class,
-	processor: MemberOnboardingProcessor::class,
+	processor: MemberOnboardingProcessor::class
 )]
 class Member
 {
 	#[Groups(["role:admin", "member:self", "member:stats"])]
-	#[ApiProperty(identifier: true)]
+	#[ApiProperty(identifier: false)]
 	public ?int $id;
 
+	#[ApiProperty(identifier: true)]
 	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
 	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member"])]

@@ -16,7 +16,7 @@ export function meta() {
 }
 
 export async function clientLoader(): Promise<MemberStats> {
-	const response = await getApi<MemberStats>("/members/me/stats");
+	const response = await getApi<MemberStats>("/me/stats");
 	return await response.json();
 }
 

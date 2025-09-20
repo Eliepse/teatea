@@ -8,6 +8,7 @@ use App\ApiResource\ActivityGraph;
 use App\Entity\Origin;
 use App\Entity\User;
 use App\Helper\Arr;
+use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
@@ -82,8 +83,7 @@ readonly class UserStatsProvider implements ProviderInterface
 		->setParameter("ids", Arr::pluck($topTeas, fn($t) => $t->origin->id, true), ArrayParameterType::INTEGER)
 		->getResult();
 
-		$resource = new \App\ApiResource\Member();
-		$resource->id = $user->id;
+		$resource = MemberProvider::hydrate($user);
 		$resource->statsSessionsTotal = $sessions ?: 0;
 		$resource->statsConsumedTeasTotal = $teas ?: 0;
 

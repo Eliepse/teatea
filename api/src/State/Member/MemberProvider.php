@@ -10,6 +10,7 @@ use App\ApiResource\Member;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Uid\Uuid;
 
 /**
  * @implements ProviderInterface<ActivityGraph|null>
@@ -45,7 +46,7 @@ readonly class MemberProvider implements ProviderInterface
 	{
 		$resource = new Member();
 		$resource->id = $user->id;
-		$resource->username = $user->username;
+		$resource->username = $user->username ?? Uuid::v4();
 		$resource->email = $user->email;
 		$resource->roles = $user->getRoles();
 		return $resource;
