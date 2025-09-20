@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\ORM\TimestampedEntity;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -16,6 +17,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+	use TimestampedEntity;
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]

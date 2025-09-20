@@ -45,7 +45,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			throw new BadRequestException("The given origin doesn't exist");
 		}
 
-		$teaEntity = new \App\Entity\Tea(createdAt: $data->addedAt);
+		$teaEntity = new \App\Entity\Tea();
 		$teaEntity->family = $data->family;
 		$teaEntity->origin = $origin;
 		$teaEntity->createdBy = $user;

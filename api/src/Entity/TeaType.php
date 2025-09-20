@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\ORM\TimestampedEntity;
 use App\Enum\TeaFamily;
 use App\Repository\TeaTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,6 +13,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TeaTypeRepository::class)]
 class TeaType
 {
+	use TimestampedEntity;
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
@@ -43,13 +46,9 @@ class TeaType
 	#[ORM\JoinColumn("created_by", nullable: false)]
 	public User $createdBy;
 
-	#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-	public \DateTimeImmutable $createdAt;
-
 	public function __construct()
 	{
 		$this->teas = new ArrayCollection();
-		$this->createdAt = new \DateTimeImmutable();
 	}
 
 	public function getId(): ?int

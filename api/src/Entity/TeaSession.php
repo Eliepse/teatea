@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\ORM\TimestampedEntity;
 use App\DTO\SteepValue;
 use App\Enum\BrewingTechnic;
 use App\Repository\TeaSessionRepository;
@@ -14,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: TeaSessionRepository::class)]
 class TeaSession
 {
+	use TimestampedEntity;
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]

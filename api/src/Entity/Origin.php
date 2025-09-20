@@ -2,20 +2,20 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiProperty;
 use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
+use App\Doctrine\ORM\TimestampedEntity;
 use App\Repository\OriginRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: OriginRepository::class)]
 #[ORM\Index("path_gist_idx", fields: ["path"])]
 class Origin
 {
+	use TimestampedEntity;
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]

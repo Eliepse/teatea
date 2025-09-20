@@ -2,18 +2,20 @@
 
 namespace App\Entity;
 
+use App\Doctrine\ORM\TimestampedEntity;
 use App\Enum\RoastLevel;
 use App\Enum\TeaFamily;
 use App\Repository\TeaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TeaRepository::class)]
 class Tea
 {
+	use TimestampedEntity;
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
@@ -55,14 +57,12 @@ class Tea
 	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'tea')]
 	private Collection $sessions;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    public ?User $createdBy = null;
+	#[ORM\ManyToOne]
+	#[ORM\JoinColumn(nullable: false)]
+	public ?User $createdBy = null;
 
-	public function __construct(
-		#[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
-		public readonly \DateTimeImmutable $createdAt = new \DateTimeImmutable(),
-	) {
+	public function __construct()
+	{
 		$this->sessions = new ArrayCollection();
 	}
 
@@ -90,7 +90,7 @@ class Tea
 	{
 		if (!$this->sessions->contains($session)) {
 			$this->sessions->add($session);
-			$session->setTea($this);
+//			$session->setTea($this);
 		}
 
 		return $this;
@@ -98,12 +98,12 @@ class Tea
 
 	public function removeSession(TeaSession $session): static
 	{
-		if ($this->sessions->removeElement($session)) {
-			// set the owning side to null (unless already changed)
-			if ($session->getTea() === $this) {
-				$session->setTea(null);
-			}
-		}
+//		if ($this->sessions->removeElement($session)) {
+		// set the owning side to null (unless already changed)
+//			if ($session->getTea() === $this) {
+//				$session->setTea(null);
+//			}
+//		}
 
 		return $this;
 	}
