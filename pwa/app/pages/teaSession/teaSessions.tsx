@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { fetchApi, getApi } from "~/utils/api";
 import type { ApiCollection, ApiPaginatedCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
-import { formatDate, formatDistanceToNow, formatISO, isToday, subDays } from "date-fns";
+import { formatDate, formatDistanceToNow, formatISO, isToday, isYesterday, subDays } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { limit } from "~/utils/text";
@@ -99,6 +99,8 @@ export default function ListTeaSessions() {
 									<div className="leading-tight mb-4 text-lg">
 										{isToday(date) ? (
 											<span>Today</span>
+										) : isYesterday(date) ? (
+											<span>Yesterday</span>
 										) : (
 											<>
 												<span className="text-xs uppercase text-base-content/60">
@@ -180,12 +182,12 @@ function Item(props: {
 	return (
 		<article className="bg-base-200 rounded h-min-16 pb-1">
 			<div className="py-2 px-3 mb-3 flex justify-between text-xs text-base-content/60 leading-tight border-b border-gray-200">
-				{!!props.drankAt && <span>{formatDistanceToNow(props.drankAt)} ago</span>}
 				{!!props.username && (
-					<span className="ml-auto" onClick={handleUIEvent(f(props.onAuthorClick))}>
+					<span className="mr-auto" onClick={handleUIEvent(f(props.onAuthorClick))}>
 						@{props.username}
 					</span>
 				)}
+				{!!props.drankAt && <span>{formatDistanceToNow(props.drankAt)} ago</span>}
 			</div>
 
 			<div className="px-3 flex justify-between text-xs text-base-content/60 leading-tight">
