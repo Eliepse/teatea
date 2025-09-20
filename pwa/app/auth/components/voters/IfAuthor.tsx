@@ -5,20 +5,22 @@ import type { Iri, User } from "~t/types";
 type Author = Partial<Pick<User, "username" | "id" | "@id">>;
 
 export function IfAuthor(props: PropsWithChildren<{ author: Author | undefined } | { iri: Iri | undefined }>) {
+	let author = undefined;
+
 	if ("author" in props) {
-		return useIsAuthor(props.author);
+		author = props.author;
+	} else if ("iri" in props) {
+		author = props.iri;
 	}
 
-	if ("iri" in props) {
-		return useIsAuthor(props.iri);
-	}
+	const isAuthor = useIsAuthor(author);
 
-	return null;
+	return isAuthor ? props.children : null;
 }
 
 export function useIsAuthor(author?: Author | Iri) {
 	const user = useUser();
-	const userIri = user.data ? `/members/${user.data.username}` : undefined;
+	const userIri = user.data ? `/api/members/${user.data.username}` : undefined;
 
 	if (typeof author === "string") {
 		return author === userIri;
