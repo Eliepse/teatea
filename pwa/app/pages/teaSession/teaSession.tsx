@@ -157,12 +157,14 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
 							<span>Tasting note</span>
-							<button
-								className="ml-auto py-2 -my-2 flex items-center text-info"
-								onClick={handleUIEvent(() => setShowNodeEditor(true))}
-							>
-								<PencilSquare className="size-3 inline mr-2" version="micro" /> Edit
-							</button>
+							<IfAuthor iri={session.author}>
+								<button
+									className="ml-auto py-2 -my-2 flex items-center text-info"
+									onClick={handleUIEvent(() => setShowNodeEditor(true))}
+								>
+									<PencilSquare className="size-3 inline mr-2" version="micro" /> Edit
+								</button>
+							</IfAuthor>
 						</h2>
 						<p className="leading-normal rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
 							{nl2br(editableData.note)}
@@ -182,30 +184,26 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</IfAuthor>
 			</div>
 
-			{!!session.steeps?.length && (
-				<>
-					<h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>
-					<ul>
-						{session.steeps.map((steep, i) => (
-							<li key={steep.key} className="mb-2">
-								<SteepCard
-									duration={steep.duration}
-									temperature={steep.temperature}
-									order={i + 1}
-									onEdit={isAuthor ? () => setEditSteep(steep) : undefined}
-								/>
-							</li>
-						))}
-						<IfAuthor iri={session.author}>
-							<li className="mb-2">
-								<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
-									Add a steep
-								</button>
-							</li>
-						</IfAuthor>
-					</ul>
-				</>
-			)}
+			{!!session.steeps?.length && <h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>}
+			<ul>
+				{session.steeps?.map((steep, i) => (
+					<li key={steep.key} className="mb-2">
+						<SteepCard
+							duration={steep.duration}
+							temperature={steep.temperature}
+							order={i + 1}
+							onEdit={isAuthor ? () => setEditSteep(steep) : undefined}
+						/>
+					</li>
+				))}
+				<IfAuthor iri={session.author}>
+					<li className="mb-2">
+						<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
+							Add a steep
+						</button>
+					</li>
+				</IfAuthor>
+			</ul>
 
 			{editSteep && (
 				<SteepFormModal
