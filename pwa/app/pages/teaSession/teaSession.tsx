@@ -30,7 +30,6 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
-	const navigate = useNavigate();
 	const [session, setSession] = useState(props.loaderData);
 	const isAuthor = useIsAuthor(session?.author);
 	const [editSteep, setEditSteep] = useState<Partial<SteepValues> | (SteepValues & Steep)>();

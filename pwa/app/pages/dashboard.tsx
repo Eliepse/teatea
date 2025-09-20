@@ -8,7 +8,7 @@ import { ArrowDownCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline
 import type { Route } from "../../.react-router/types/app/pages/+types/dashboard";
 import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
-import { CoffeeCup } from "iconoir-react";
+import { CoffeeCup, Plus } from "iconoir-react";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
 import { IfAdmin } from "~/auth/components/voters/IfAdmin";
 
@@ -52,9 +52,10 @@ export default function Dashboard(props: Route.ComponentProps) {
 
 			<Link
 				to="/session/new"
-				className="flex bg-primary/10 p-6 h-20 mt-4 items-center justify-between rounded-md text-lg text-primary"
+				className="flex bg-primary/10 p-6 h-20 mt-4 items-center rounded-md text-lg text-primary"
 			>
-				Ready for some tea? <CoffeeCup className="size-7 opacity-60" />
+				<span className="inline-flex items-center">Ready for some tea? <CoffeeCup className="ml-2 size-5 opacity-60" /></span>
+				<Plus className="ml-auto size-7" />
 			</Link>
 
 			{0 < props.loaderData.statsTopTeas.length && (
