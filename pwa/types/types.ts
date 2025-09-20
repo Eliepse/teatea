@@ -14,6 +14,7 @@ type LTreePath = string[];
 
 export type User = Resource & {
 	username: string;
+	roles?: string[];
 };
 
 export type MemberStats = Resource & {

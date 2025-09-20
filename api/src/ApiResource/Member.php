@@ -57,7 +57,8 @@ class Member
 	public string $email;
 
 	/** @var string[] */
-	#[Groups(["role:admin"])]
+	#[Groups(["member:self", "role:admin"])]
+	#[ApiProperty(security: "is_granted('ROLE_ADMIN') or (object.id == user.id)")]
 	public array $roles = [];
 
 	#[Groups(["member:stats"])]

@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ActivityGraph;
 use App\Entity\User;
+use App\State\Member\MemberProvider;
 use Symfony\Bundle\SecurityBundle\Security;
 
 /**
@@ -24,10 +25,6 @@ readonly class UserProvider implements ProviderInterface
 	): array|null|object {
 		$user = $this->security->getUser();
 		assert($user instanceof User);
-
-		$resource = new \App\ApiResource\Member();
-		$resource->id = $user->id;
-		$resource->username = $user->username;
-		return $resource;
+		return MemberProvider::hydrate($user);
 	}
 }
