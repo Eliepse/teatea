@@ -28,6 +28,21 @@ export const links: Route.LinksFunction = () => [
 
 const queryClient = new QueryClient();
 
+if ('serviceWorker' in navigator) {
+	navigator.serviceWorker.register("/sw.js");
+}
+
+export let installPrompt: (Event & { prompt: () => Promise<{ outcome: "accepted" | "dismissed" }> }) | undefined =
+	undefined;
+
+if (!import.meta.env.SSR) {
+	window.addEventListener("beforeinstallprompt", (e) => {
+		console.debug("triggered");
+		e.preventDefault();
+		installPrompt = e as typeof installPrompt;
+	});
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">

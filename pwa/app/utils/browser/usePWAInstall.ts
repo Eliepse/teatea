@@ -1,15 +1,5 @@
 import { useState } from "react";
-
-export let installPrompt: (Event & { prompt: () => Promise<{ outcome: "accepted" | "dismissed" }> }) | undefined =
-	undefined;
-
-if (!import.meta.env.SSR) {
-	window.addEventListener("beforeinstallprompt", (e) => {
-		console.debug("triggered");
-		e.preventDefault();
-		installPrompt = e as typeof installPrompt;
-	});
-}
+import { installPrompt } from "~/root";
 
 function getPWADisplayMode() {
 	if (document.referrer.startsWith("android-app://")) return "twa";
@@ -38,7 +28,7 @@ export function usePWAInstall() {
 			return false;
 		}
 
-		installPrompt = undefined;
+		// installPrompt = undefined;
 		setIsInstalled(true);
 		return true;
 	}
