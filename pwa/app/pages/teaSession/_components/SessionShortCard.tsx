@@ -3,6 +3,7 @@ import { f, handleUIEvent } from "~/utils/function";
 import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { CoffeeCup } from "iconoir-react";
+import clsx from "clsx";
 
 export function SessionShortCard(props: {
 	family: TeaFamily;
@@ -10,9 +11,15 @@ export function SessionShortCard(props: {
 	path?: OriginPath;
 	author: Pick<Member, "username">;
 	onAuthorClick?: () => void;
+	className?: string;
 }) {
 	return (
-		<article className="bg-slate-100 rounded-md px-3 py-2 flex items-center text-base-content/80">
+		<article
+			className={clsx(
+				"bg-slate-50 rounded-md px-3 py-2 flex items-center text-base-content/80",
+				props.className,
+			)}
+		>
 			<div className="mr-auto inline-flex items-center">
 				<CoffeeCup className="mr-2 size-4 text-base-content/60" />
 				<span onClick={handleUIEvent(f(props.onAuthorClick))}>{props.author.username}</span>
