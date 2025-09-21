@@ -31,7 +31,8 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const [session, setSession] = useState(props.loaderData);
-	const isAuthor = useIsAuthor(session?.author);
+	const author = typeof session.author === "string" ? { "@id": session.author } : session.author;
+	const isAuthor = useIsAuthor(author);
 	const [editSteep, setEditSteep] = useState<Partial<SteepValues> | (SteepValues & Steep)>();
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
@@ -89,7 +90,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						Sessions history
 					</Link>
 
-					<IfAuthor iri={session.author}>
+					<IfAuthor author={author}>
 						<div className="dropdown dropdown-end ml-auto">
 							<div tabIndex={0} role="button" className="m-1">
 								<EllipsisVerticalIcon className="size-5" />
@@ -156,7 +157,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
 							<span>Tasting note</span>
-							<IfAuthor iri={session.author}>
+							<IfAuthor author={author}>
 								<button
 									className="ml-auto py-2 -my-2 flex items-center text-info"
 									onClick={handleUIEvent(() => setShowNodeEditor(true))}
@@ -165,13 +166,13 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 								</button>
 							</IfAuthor>
 						</h2>
-						<p className="leading-normal rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
+						<p className="leading-normal text-lg rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
 							{nl2br(editableData.note)}
 						</p>
 					</>
 				)}
 
-				<IfAuthor iri={session.author}>
+				<IfAuthor author={author}>
 					{!editableData.note && (
 						<button
 							className="btn btn-block btn-dash mt-2"
@@ -195,7 +196,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						/>
 					</li>
 				))}
-				<IfAuthor iri={session.author}>
+				<IfAuthor author={author}>
 					<li className="mb-2">
 						<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
 							Add a steep

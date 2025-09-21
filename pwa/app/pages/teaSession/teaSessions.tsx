@@ -14,6 +14,8 @@ import { useUser } from "~/auth/hooks/useUser";
 import { useState } from "react";
 import Leaf from "~/components/icons/leaf";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
+import { SessionShortCard } from "~/pages/teaSession/_components/SessionShortCard";
+import { SessionRichCard } from "~/pages/teaSession/_components/SessionRichCard";
 
 const PAGE_SIZE = 14;
 
@@ -65,6 +67,10 @@ export default function ListTeaSessions() {
 		initialPageParam: "",
 	});
 
+	function filterUser(username: string | undefined) {
+		setFilters((f) => ({ ...f, username: username }));
+	}
+
 	const items =
 		sessionsQuery.data?.pages?.reduce((carr, p) => {
 			carr.push(...p.member);
@@ -82,11 +88,7 @@ export default function ListTeaSessions() {
 
 	return (
 		<AuthLayout className="p-4 pb-18" activeKey="activity">
-			<SessionsUserFilter
-				username={filters.username}
-				onChange={(u) => setFilters((f) => ({ ...f, username: u }))}
-				className="mb-8"
-			/>
+			<SessionsUserFilter username={filters.username} onChange={filterUser} className="mb-8" />
 
 			{0 !== items.length && (
 				<>
@@ -114,27 +116,39 @@ export default function ListTeaSessions() {
 
 									<ul>
 										{sessions.map((session) => {
-											const username =
-												typeof session.author !== "string"
-													? session.author?.username
-													: undefined;
+											const author = session.author;
+
+											if (!author || typeof author === "string") {
+												return null;
+											}
+
+											if (!session.note?.trim()?.length) {
+												return (
+													<li key={session.id} className="mb-4">
+														<Link to={`/sessions/${session.id}`}>
+															<SessionShortCard
+																family={session.tea.family}
+																type={session.tea.type}
+																path={session.tea.originPath}
+																author={author}
+																onAuthorClick={() => filterUser(author.username)}
+															/>
+														</Link>
+													</li>
+												);
+											}
+
 											return (
 												<li key={session.id} className="mb-4">
 													<Link to={`/sessions/${session.id}`}>
-														<Item
+														<SessionRichCard
+															teaId={session.tea.id}
 															family={session.tea.family}
 															type={session.tea.type}
 															path={session.tea.originPath}
 															note={session.note}
-															grams={session.teaQuantity}
-															ml={session.waterMl}
-															username={username}
-															drankAt={
-																isToday(session.drankAt) ? session.drankAt : undefined
-															}
-															onAuthorClick={() =>
-																setFilters((f) => ({ ...f, username }))
-															}
+															author={author}
+															onAuthorClick={() => filterUser(author.username)}
 														/>
 													</Link>
 												</li>
