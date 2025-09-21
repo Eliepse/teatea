@@ -1,5 +1,6 @@
 {
-	"name": "Teatea",
+	"name": "Teatea Club",
+	"short_name": "Teatea",
 	"description": "Social and collaborative tea journal",
 	"start_url": "/welcome",
 	"display": "standalone",
