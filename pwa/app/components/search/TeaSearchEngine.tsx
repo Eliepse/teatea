@@ -125,6 +125,7 @@ export function TeaSearchEngine(props: {
 										family={tea.family}
 										type={tea.type?.name}
 										originPath={tea.originPath}
+										cultivar={tea.cultivar}
 										onClick={() => props.onSelect(tea)}
 										selected={props.value?.id === tea.id}
 										className="mb-2"

@@ -133,6 +133,17 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 							&middot; <FormatOriginPath originPath={session.tea.originPath} />
 						</span>
 					)}
+
+					{session.tea.cultivar?.name && (
+						<>
+							{" "}
+							&middot;
+							<span className="ml-1 inline-flex items-center">
+								<Leaf className="size-3 mr-1 text-base-content/60" />
+								{session.tea.cultivar.name}
+							</span>
+						</>
+					)}
 				</div>
 
 				<div className="mt-4 grid grid-cols-2 gap-4">

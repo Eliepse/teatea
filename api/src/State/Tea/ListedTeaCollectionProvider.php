@@ -74,10 +74,11 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 			->fetchFirstColumn();
 
 		$teas = $this->em->createQueryBuilder()
-			->select("tea", "type", "origin")
+			->select("tea", "type", "origin", "cultivar")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
+			->leftJoin("tea.cultivar", "cultivar")
 			->where("tea.id IN (:ids)")
 			->setParameter("ids", $teaIds, ArrayParameterType::INTEGER)
 			->getQuery()

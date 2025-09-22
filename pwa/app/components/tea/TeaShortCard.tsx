@@ -1,6 +1,7 @@
-import type { OriginPath, TeaFamily } from "~t/types";
+import type { Cultivar, OriginPath, TeaFamily } from "~t/types";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import clsx from "clsx";
+import Leaf from "~/components/icons/leaf";
 
 const TEA_FAMILY_CLS = {
 	yellow: "border-lime-200",
@@ -13,13 +14,15 @@ const TEA_FAMILY_CLS = {
 
 export function TeaShortCard(props: {
 	title: string;
+	family: TeaFamily;
 	onClick?: () => void;
 	selected?: boolean;
 	className?: string;
 	originPath?: OriginPath;
-	family: TeaFamily;
+	cultivar?: Cultivar;
 	type?: string;
 }) {
+	console.debug(props.cultivar);
 	const familyLabel = props.family[0].toUpperCase() + props.family.substring(1);
 
 	if (!props.type) {
@@ -85,8 +88,18 @@ export function TeaShortCard(props: {
 					{props.originPath && <FormatOriginPath originPath={props.originPath} />}
 				</span>
 			</div>
-			<div>
-				<div className="">{props.type}</div>
+			<div className="flex justify-between">
+				<div>{props.type}</div>
+				{props.cultivar && (
+					<div
+						className={clsx(
+							"inline-flex items-center text-xs text-right",
+							props.selected ? "text-white" : "text-green-600",
+						)}
+					>
+						<Leaf className="size-3 mr-1" /> {props.cultivar.name}
+					</div>
+				)}
 			</div>
 		</article>
 	);

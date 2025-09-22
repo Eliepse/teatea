@@ -1,4 +1,4 @@
-import type { Member, OriginPath, Tea, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Member, OriginPath, Tea, TeaFamily, TeaType } from "~t/types";
 import { nl2br } from "~/utils/content";
 import { f, handleUIEvent } from "~/utils/function";
 import { CoffeeCup } from "iconoir-react";
@@ -6,14 +6,16 @@ import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { Link } from "react-router";
 import clsx from "clsx";
+import Leaf from "~/components/icons/leaf";
 
 export function SessionRichCard(props: {
 	teaId: Tea["id"];
 	family: TeaFamily;
+	note: string;
+	author: Pick<Member, "username">;
 	type?: TeaType;
 	path?: OriginPath;
-	author: Pick<Member, "username">;
-	note: string;
+	cultivar?: Cultivar;
 	onAuthorClick?: () => void;
 	className?: string;
 }) {
@@ -33,8 +35,18 @@ export function SessionRichCard(props: {
 						<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
 					</div>
 
-					<div className="text-xs text-base-content/60 leading-tight">
-						{props.path && <FormatOriginPath originPath={props.path} />}
+					<div className="text-xs text-base-content/60 leading-tight text-right">
+						{props.path && (
+							<div>
+								<FormatOriginPath originPath={props.path} />
+							</div>
+						)}
+						{props.cultivar && (
+							<div className="flex items-center justify-end">
+								<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
+								{props.cultivar.name}
+							</div>
+						)}
 					</div>
 				</div>
 			</Link>

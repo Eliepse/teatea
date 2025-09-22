@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { SelectFamily } from "../family/SelectFamily";
-import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { warnNotImplemented } from "~/utils/function";
 import { fetchApi } from "~/utils/api";
@@ -11,6 +11,7 @@ import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation
 import { SelectType } from "~/components/tea_type/SelectType";
 import { AskName } from "~/components/tea/create/AskName";
 import { useAlert } from "~/components/shared/modal/AlertManager";
+import { SelectCultivar } from "~/components/cultivar/SelectCultivar";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -22,6 +23,7 @@ type FormValue = {
 	family?: TeaFamily;
 	type?: TeaType | { name: string; isPDO: boolean };
 	origin?: Origin;
+	cultivar?: Cultivar;
 	altitude?: number;
 	appellation?: boolean;
 };
@@ -41,6 +43,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 			type: !data.type || "id" in data.type ? undefined : data.type,
 			altitude: data.altitude,
 			isAppellation: data.appellation,
+			cultivar: data.cultivar?.["@id"],
 		},
 	});
 
@@ -131,14 +134,14 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onBack={() => navStack.back()}
 						onSkip={() => {
 							contextValue.patchForm({ type: undefined });
-							navStack.next({ key: "recap" });
+							navStack.next({ key: "select:cultivar" });
 						}}
 						onCreate={() => {
 							if (formValue.type && "@id" in formValue.type) {
 								contextValue.patchForm({ type: undefined });
 							}
 
-							navStack.next({ key: "name:ask" });
+							navStack.next({ key: "select:cultivar" });
 						}}
 						onSelect={(type) => {
 							if (undefined === type) {
@@ -146,14 +149,43 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 									contextValue.patchForm({ type: undefined });
 								}
 
-								navStack.next({ key: "name:ask" });
+								navStack.next({ key: "select:cultivar" });
 							} else {
 								contextValue.patchForm({ type });
-								navStack.next({ key: "recap" });
+								navStack.next({ key: "select:cultivar" });
 							}
 						}}
 						defaultValue={formValue.type && "id" in formValue.type ? formValue.type : undefined}
 						filters={{ family: formValue.family, originPath: formValue.origin?.path }}
+					/>
+				</StackFrame>
+				<StackFrame frameKey="select:cultivar">
+					<SelectCultivar
+						onBack={() => navStack.back()}
+						onSkip={() => {
+							contextValue.patchForm({ cultivar: undefined });
+							navStack.next({ key: "recap" });
+						}}
+						onCreate={() => {
+							if (formValue.cultivar && "@id" in formValue.cultivar) {
+								contextValue.patchForm({ cultivar: undefined });
+							}
+
+							navStack.next({ key: "name:ask" });
+						}}
+						onSelect={(cultivar) => {
+							if (undefined === cultivar) {
+								if (formValue.cultivar && "@id" in formValue.cultivar) {
+									contextValue.patchForm({ cultivar: undefined });
+								}
+
+								navStack.next({ key: "name:ask" });
+							} else {
+								contextValue.patchForm({ cultivar });
+								navStack.next({ key: "recap" });
+							}
+						}}
+						defaultValue={formValue.cultivar && "id" in formValue.cultivar ? formValue.cultivar : undefined}
 					/>
 				</StackFrame>
 				<StackFrame frameKey="name:ask">
@@ -171,22 +203,6 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						defaultValue={formValue.type?.name}
 					/>
 				</StackFrame>
-				{/*<StackFrame frameKey="pdo:ask">*/}
-				{/*	<IsProtectedOrigin*/}
-				{/*		onBack={() => navStack.back()}*/}
-				{/*		onConfirm={(value) => {*/}
-				{/*			setFormValue((st) => {*/}
-				{/*				if (!st.type) {*/}
-				{/*					throw new Error("Type isn't defined!");*/}
-				{/*				}*/}
-
-				{/*				return { ...st, type: { ...st.type, isPDO: value } };*/}
-				{/*			});*/}
-				{/*			navStack.next({ key: "recap" });*/}
-				{/*		}}*/}
-				{/*		defaultValue={formValue.type?.isPDO}*/}
-				{/*	/>*/}
-				{/*</StackFrame>*/}
 				<StackFrame frameKey="recap">
 					<TeaFormConfirmation onBack={() => navStack.back()} values={formValue} onConfirm={submit} />
 				</StackFrame>

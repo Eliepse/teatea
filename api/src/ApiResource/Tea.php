@@ -22,12 +22,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: TeaProvider::class
 )]
 #[GetCollection(
 	paginationEnabled: false,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [
 //		"family" => new QueryParameter(description: "Filter by family"),
@@ -69,7 +69,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		),
 	],
 	paginationEnabled: true,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: ListedTeaCollectionProvider::class,
 )]
 class Tea
@@ -90,6 +90,10 @@ class Tea
 
 	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
 	public ?Origin $origin = null;
+
+	#[ApiProperty(readableLink: true)]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
+	public ?Cultivar $cultivar = null;
 
 	#[Groups(["tea:read"])]
 	public \DateTimeImmutable $addedAt;

@@ -22,10 +22,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:teaType", "embedded:origin"]],
+	normalizationContext: [
+		"groups" => [
+			"teaSession:read",
+			"embedded:tea",
+			"embedded:teaType",
+			"embedded:origin",
+			"embedded:cultivar"
+		]
+	],
 	security: "is_granted('ROLE_USER')",
 )]
-#[Get(normalizationContext: ["embedded:steep"], provider: TeaSessionProvider::class)]
+#[Get(normalizationContext: ["embedded:steep", "embedded:tea", "embedded:cultivar"], provider: TeaSessionProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
 #[Patch(
 	denormalizationContext: ["groups" => ["teaSession:edit"]],
@@ -45,6 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"embedded:teaType",
 			"embedded:origin",
 			"embedded:member",
+			"embedded:cultivar",
 		]
 	],
 	security: "is_granted('ROLE_USER')",

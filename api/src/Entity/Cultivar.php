@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Doctrine\ORM\TimestampedEntity;
 use App\Repository\CultivarRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -10,72 +11,59 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CultivarRepository::class)]
-#[ApiResource]
 class Cultivar
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private int $id;
+	use TimestampedEntity;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private string $name;
+	#[ORM\Id]
+	#[ORM\GeneratedValue]
+	#[ORM\Column]
+	private(set) int $id;
 
-    /**
-     * @var Collection<int, Tea>
-     */
-    #[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'cultivar')]
-    private Collection $teas;
+	#[ORM\Column(type: Types::TEXT)]
+	public string $name;
 
-    public function __construct()
-    {
-        $this->teas = new ArrayCollection();
-    }
+	#[ORM\ManyToOne(targetEntity: User::class)]
+	public ?User $author = null;
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+	/**
+	 * @var Collection<int, Tea>
+	 */
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'cultivar')]
+	private Collection $teas;
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
+	public function __construct()
+	{
+		$this->teas = new ArrayCollection();
+	}
 
-    public function setName(string $name): static
-    {
-        $this->name = $name;
+	/**
+	 * @return Collection<int, Tea>
+	 */
+	public function getTeas(): Collection
+	{
+		return $this->teas;
+	}
 
-        return $this;
-    }
+	public function addTea(Tea $tea): static
+	{
+		if (!$this->teas->contains($tea)) {
+			$this->teas->add($tea);
+			$tea->setCultivar($this);
+		}
 
-    /**
-     * @return Collection<int, Tea>
-     */
-    public function getTeas(): Collection
-    {
-        return $this->teas;
-    }
+		return $this;
+	}
 
-    public function addTea(Tea $tea): static
-    {
-        if (!$this->teas->contains($tea)) {
-            $this->teas->add($tea);
-            $tea->setCultivar($this);
-        }
+	public function removeTea(Tea $tea): static
+	{
+		if ($this->teas->removeElement($tea)) {
+			// set the owning side to null (unless already changed)
+//            if ($tea->getCultivar() === $this) {
+//                $tea->setCultivar(null);
+//            }
+		}
 
-        return $this;
-    }
-
-    public function removeTea(Tea $tea): static
-    {
-        if ($this->teas->removeElement($tea)) {
-            // set the owning side to null (unless already changed)
-            if ($tea->getCultivar() === $this) {
-                $tea->setCultivar(null);
-            }
-        }
-
-        return $this;
-    }
+		return $this;
+	}
 }

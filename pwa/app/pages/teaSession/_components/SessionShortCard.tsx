@@ -1,4 +1,4 @@
-import type { Member, OriginPath, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Member, OriginPath, TeaFamily, TeaType } from "~t/types";
 import { f, handleUIEvent } from "~/utils/function";
 import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
@@ -7,9 +7,10 @@ import clsx from "clsx";
 
 export function SessionShortCard(props: {
 	family: TeaFamily;
+	author: Pick<Member, "username">;
 	type?: TeaType;
 	path?: OriginPath;
-	author: Pick<Member, "username">;
+	cultivar?: Cultivar;
 	onAuthorClick?: () => void;
 	className?: string;
 }) {
@@ -28,6 +29,7 @@ export function SessionShortCard(props: {
 				<div>
 					<Family family={props.family} iconOnly className="mr-1" />
 					<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
+					{props.cultivar && <span className="text-base-content/60"> ({props.cultivar.name})</span>}
 				</div>
 
 				<div className="text-xs text-base-content/60 leading-tight">

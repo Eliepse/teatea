@@ -81,6 +81,15 @@ export default function TeaPage(props: Route.ComponentProps) {
 							</Link>
 						</li>
 					)}
+
+					{!!tea.cultivar?.name && (
+						<li>
+							<div className="badge badge-outline">
+								<Leaf className="size-3 text-base-content/60" />
+								{tea.cultivar.name}
+							</div>
+						</li>
+					)}
 				</ul>
 			</header>
 

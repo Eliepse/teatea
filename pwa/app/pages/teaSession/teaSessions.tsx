@@ -131,6 +131,7 @@ export default function ListTeaSessions() {
 																type={session.tea.type}
 																path={session.tea.originPath}
 																author={author}
+																cultivar={session.tea.cultivar}
 																onAuthorClick={() => filterUser(author.username)}
 															/>
 														</Link>
@@ -148,6 +149,7 @@ export default function ListTeaSessions() {
 															path={session.tea.originPath}
 															note={session.note}
 															author={author}
+															cultivar={session.tea.cultivar}
 															onAuthorClick={() => filterUser(author.username)}
 														/>
 													</Link>

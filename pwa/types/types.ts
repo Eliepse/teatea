@@ -30,7 +30,7 @@ export type TeaType = Resource<"TeaType"> & {
 	isPDO: boolean;
 };
 
-export type Cultivar = Resource & {
+export type Cultivar = Resource<"Cultivar"> & {
 	name: string;
 };
 
@@ -47,10 +47,11 @@ export type OriginPath = {
 
 export type Tea = Resource & {
 	family: TeaFamily;
+	displayName: string;
 	type?: TeaType;
 	origin?: Origin;
 	originPath?: OriginPath;
-	displayName: string;
+	cultivar?: Cultivar;
 	addedAt: Date;
 };
 

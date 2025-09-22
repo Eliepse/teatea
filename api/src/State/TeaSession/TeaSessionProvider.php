@@ -33,11 +33,12 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$limit = is_numeric($limit) ? max(1, min(31, intval($limit))) : null;
 
 		$sessionQb = $this->em->createQueryBuilder()
-			->select("session", "tea", "type", "origin")
+			->select("session", "tea", "type", "origin", "cultivar")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
+			->leftJoin("tea.cultivar", "cultivar")
 			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {

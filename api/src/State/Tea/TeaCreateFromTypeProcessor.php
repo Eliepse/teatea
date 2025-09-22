@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
+use App\Entity\Cultivar;
 use App\Entity\User;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
@@ -69,6 +70,7 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		$entity->type = $typeEntity;
 		$entity->origin = $teaOrigin;
 		$entity->createdBy = $user;
+		$entity->cultivar = $data->cultivar ? $this->em->getReference(Cultivar::class, $data->cultivar->id) : null;
 
 		if ($this->repository->hasDuplicate($entity)) {
 			throw new BadRequestException("This tea already exists");

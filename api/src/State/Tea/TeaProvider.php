@@ -8,6 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\State\Cultivar\CultivarProvider;
 use App\State\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,10 +28,11 @@ readonly class TeaProvider implements ProviderInterface
 		assert(false === ($operation instanceof CollectionOperationInterface), "Collection operation not supported");
 
 		$teaQb = $this->em->createQueryBuilder()
-			->select("tea", "type", "origin")
+			->select("tea", "type", "origin", "cultivar")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
+			->leftJoin("tea.cultivar", "cultivar")
 			->andWhere("tea.id = :teaId")
 			->setParameter("teaId", $uriVariables["id"])
 			->setMaxResults(1);
@@ -101,6 +103,7 @@ readonly class TeaProvider implements ProviderInterface
 		$tea->id = $entity->id;
 		$tea->type = TeaTypeProvider::fromEntity($entity->type);
 		$tea->originPath = $originPath;
+		$tea->cultivar = CultivarProvider::fromEntity($entity->cultivar);
 		$tea->addedAt = $entity->createdAt;
 
 		return $tea;
