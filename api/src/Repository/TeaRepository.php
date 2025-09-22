@@ -29,6 +29,12 @@ class TeaRepository extends ServiceEntityRepository
 			$qb->andWhere("tea.type IS NULL");
 		}
 
+		if (null !== $tea->cultivar?->id) {
+			$qb->andWhere("tea.cultivar = :cultivar")->setParameter("cultivar", $tea->cultivar);
+		} else {
+			$qb->andWhere("tea.cultivar IS NULL");
+		}
+
 		return 0 !== $qb->getQuery()->getSingleScalarResult();
 	}
 }
