@@ -1,6 +1,6 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { type ApiCollection, type Cultivar } from "~t/types";
-import { type ChangeEvent, useCallback, useEffect, useState } from "react";
+import { type ChangeEvent, useCallback, useState } from "react";
 import clsx from "clsx";
 import { handleUIEvent } from "~/utils/function";
 import Arrow from "~/components/icons/arrow";
@@ -115,7 +115,6 @@ function CreateCultivarButton(props: { onCultivarCreated: (value: Cultivar) => v
 	const alert = useAlert();
 	const [name, setName] = useState("");
 
-
 	const create = useMutation({
 		mutationFn: async (name: string) => await (await postApi<Cultivar>("/cultivars", { name })).json(),
 		onSuccess: (cultivar) => {
@@ -129,17 +128,12 @@ function CreateCultivarButton(props: { onCultivarCreated: (value: Cultivar) => v
 
 	const isValid = 3 <= name.length && 32 >= name.length;
 
-	useEffect(() => {
-		console.debug("mount");
-		return () => console.debug("unmount");
-	}, []);
-
 	function handleChange(e: ChangeEvent<HTMLInputElement>) {
 		const value = e.currentTarget.value;
 		// Remove any non-word character (supports all languages) and extra spaces
 		setName(
 			value
-				.replaceAll(/[^\p{L}_\-]/giu, "")
+				.replaceAll(/[^\p{L}_\-0-9 ]/giu, "")
 				.replaceAll(/\s+/g, " ")
 				.substring(0, limit),
 		);
@@ -173,7 +167,14 @@ function CreateCultivarButton(props: { onCultivarCreated: (value: Cultivar) => v
 
 				<fieldset className="fieldset">
 					<legend className="fieldset-legend">Cultivar name</legend>
-					<input type="text" className="input" onChange={handleChange} minLength={3} maxLength={limit} />
+					<input
+						type="text"
+						className="input"
+						value={name}
+						onChange={handleChange}
+						minLength={3}
+						maxLength={limit}
+					/>
 					<p className="label">Use latin/international version if possible</p>
 				</fieldset>
 			</Modal>
