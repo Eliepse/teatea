@@ -22,7 +22,6 @@ export function TeaShortCard(props: {
 	cultivar?: Cultivar;
 	type?: string;
 }) {
-	console.debug(props.cultivar);
 	const familyLabel = props.family[0].toUpperCase() + props.family.substring(1);
 
 	if (!props.type) {

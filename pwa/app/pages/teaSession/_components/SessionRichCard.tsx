@@ -4,7 +4,6 @@ import { f, handleUIEvent } from "~/utils/function";
 import { CoffeeCup } from "iconoir-react";
 import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { Link } from "react-router";
 import clsx from "clsx";
 import Leaf from "~/components/icons/leaf";
 
@@ -28,28 +27,26 @@ export function SessionRichCard(props: {
 
 			<p className="text-lg leading-snug px-3 mb-3">{nl2br(props.note)}</p>
 
-			<Link to={`/tea/${props.teaId}`}>
-				<div className="flex items-center mx-2 px-3 py-2 rounded-md bg-white/80">
-					<div className="mr-auto">
-						<Family family={props.family} iconOnly className="mr-2" />
-						<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
-					</div>
-
-					<div className="text-xs text-base-content/60 leading-tight text-right">
-						{props.path && (
-							<div>
-								<FormatOriginPath originPath={props.path} />
-							</div>
-						)}
-						{props.cultivar && (
-							<div className="flex items-center justify-end">
-								<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
-								{props.cultivar.name}
-							</div>
-						)}
-					</div>
+			<div className="flex items-center mx-2 px-3 py-2 rounded-md bg-white/80">
+				<div className="mr-auto">
+					<Family family={props.family} iconOnly className="mr-2" />
+					<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
 				</div>
-			</Link>
+
+				<div className="text-xs text-base-content/60 leading-tight text-right">
+					{props.path && (
+						<div>
+							<FormatOriginPath originPath={props.path} />
+						</div>
+					)}
+					{props.cultivar && (
+						<div className="flex items-center justify-end">
+							<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
+							{props.cultivar.name}
+						</div>
+					)}
+				</div>
+			</div>
 		</article>
 	);
 }
