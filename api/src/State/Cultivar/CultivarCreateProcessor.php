@@ -8,6 +8,7 @@ use App\ApiResource\Cultivar;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 readonly class CultivarCreateProcessor implements ProcessorInterface
 {
@@ -23,6 +24,19 @@ readonly class CultivarCreateProcessor implements ProcessorInterface
 
 		assert($data instanceof Cultivar);
 		assert($user instanceof User);
+
+		$refinedName = preg_replace("/\s+/", " ", $data->name);
+
+		$exitingId = $this->em
+			->createQuery(
+				"SELECT c.id FROM App\Entity\Cultivar c WHERE lower(unaccent(c.name)) = lower(unaccent(:name))",
+			)
+			->setParameter("name", $refinedName)
+			->getSingleScalarResult();
+
+		if (false === empty($exitingId)) {
+			throw new BadRequestHttpException("A cultivar with the same name already exists");
+		}
 
 		$entity = new \App\Entity\Cultivar();
 		$entity->name = trim($data->name);

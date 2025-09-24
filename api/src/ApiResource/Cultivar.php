@@ -28,7 +28,7 @@ class Cultivar
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 3, max: 32)]
-	#[Assert\Regex("/^[\p{L}_\-0-9 ]+$/")]
+	#[Assert\Regex("/^[\p{L}_\-0-9 ]+$/u")]
 	#[Groups(["cultivar:write", "cultivar:read", "embedded:cultivar"])]
 	public string $name;
 }
