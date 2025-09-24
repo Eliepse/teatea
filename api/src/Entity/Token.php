@@ -22,13 +22,13 @@ class Token
 	public readonly \DateTimeImmutable $createdAt;
 
 	public function __construct(
-		#[ORM\ManyToOne]
-		#[ORM\JoinColumn(nullable: false)]
-		public readonly ?User $owner = null,
-
 		#[Assert\Unique]
 		#[ORM\Column(type: Types::TEXT, nullable: false)]
 		public readonly string $tokenKey,
+
+		#[ORM\ManyToOne]
+		#[ORM\JoinColumn(nullable: false)]
+		public readonly ?User $owner = null,
 
 		#[ORM\Column(type: Types::TEXT)]
 		public readonly ?string $signature = null,

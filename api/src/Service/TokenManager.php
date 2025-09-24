@@ -33,7 +33,7 @@ final readonly class TokenManager
 		$payload = [$salt, $type, $owner->id, $expiredAt->getTimestamp()];
 		$encodedPayload = base64_encode(serialize($payload));
 
-		$token = new Token($owner, $key, $this->sign($encodedPayload), $expiredAt);
+		$token = new Token($key, $owner, $this->sign($encodedPayload), $expiredAt);
 		return new GeneratedToken("$key$salt", $token);
 	}
 
