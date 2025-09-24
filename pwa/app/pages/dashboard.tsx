@@ -9,7 +9,7 @@ import type { Route } from "../../.react-router/types/app/pages/+types/dashboard
 import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
 import { CoffeeCup, Plus } from "iconoir-react";
-import { TeaShortCard } from "~/components/tea/TeaShortCard";
+import { TeaCard } from "~/components/tea/TeaCard";
 import { IfAdmin } from "~/auth/components/voters/IfAdmin";
 
 export function meta() {
@@ -65,7 +65,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 						{props.loaderData.statsTopTeas.map((tea) => (
 							<li key={tea.id}>
 								<Link to={`/tea/${tea.id}`}>
-									<TeaShortCard
+									<TeaCard
 										title={tea.displayName}
 										family={tea.family}
 										type={tea.type?.name}

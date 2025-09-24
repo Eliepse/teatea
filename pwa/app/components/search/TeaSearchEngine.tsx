@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import type { ApiCollection, Origin, Tea } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
-import { TeaShortCard } from "~/components/tea/TeaShortCard";
+import { TeaCard } from "~/components/tea/TeaCard";
 import { SearchTextInput } from "~/components/search/SearchTextInput";
 import { Paged } from "~/components/shared/paged/Paged";
 import { SelectOrigin } from "~/components/origin/SelectOrigin";
@@ -120,7 +120,7 @@ export function TeaSearchEngine(props: {
 						<ul>
 							{teasQuery.data.member?.map((tea) => (
 								<li key={tea.id}>
-									<TeaShortCard
+									<TeaCard
 										title={tea.displayName}
 										family={tea.family}
 										type={tea.type?.name}

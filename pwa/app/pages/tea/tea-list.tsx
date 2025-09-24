@@ -6,8 +6,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection } from "~t/types";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { TeaShortCard } from "~/components/tea/TeaShortCard";
 import { useUser } from "~/auth/hooks/useUser";
+import { TeaShortCard } from "~/components/tea/TeaShortCard";
 
 export default function TeaListPage() {
 	const navigate = useNavigate();
@@ -18,8 +18,6 @@ export default function TeaListPage() {
 			if (undefined === user.data?.username) {
 				throw new Error("Couldn't get user's ID");
 			}
-
-			console.debug(context.pageParam);
 
 			const payload = await (
 				await getApi<ApiPaginatedCollection<TeaRaw>>(
@@ -75,10 +73,11 @@ export default function TeaListPage() {
 								<li key={tea.id} className="mb-2">
 									<Link to={`/tea/${tea.id}`}>
 										<TeaShortCard
-											title={tea.displayName}
 											family={tea.family}
-											type={tea.type?.name}
-											originPath={tea.originPath}
+											type={tea.type}
+											path={tea.originPath}
+											cultivar={tea.cultivar}
+											className="bg-slate-100 min-h-14"
 										/>
 									</Link>
 								</li>

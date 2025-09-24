@@ -7,7 +7,7 @@ const ICON_COLOR = {
 	white: "text-cyan-200",
 	green: "text-green-300",
 	wulong: "text-indigo-300",
-	black: "text-orange-300",
+	black: "text-orange-400",
 	fermented: "text-stone-500",
 } as const;
 

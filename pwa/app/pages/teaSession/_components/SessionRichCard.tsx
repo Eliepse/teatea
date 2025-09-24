@@ -2,10 +2,8 @@ import type { Cultivar, Member, OriginPath, Tea, TeaFamily, TeaType } from "~t/t
 import { nl2br } from "~/utils/content";
 import { f, handleUIEvent } from "~/utils/function";
 import { CoffeeCup } from "iconoir-react";
-import { Family } from "~/components/tea/Family";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import clsx from "clsx";
-import Leaf from "~/components/icons/leaf";
+import { TeaShortCard } from "~/components/tea/TeaShortCard";
 
 export function SessionRichCard(props: {
 	teaId: Tea["id"];
@@ -27,26 +25,13 @@ export function SessionRichCard(props: {
 
 			<p className="text-lg leading-snug px-3 mb-3">{nl2br(props.note)}</p>
 
-			<div className="flex items-center mx-2 px-3 py-2 rounded-md bg-white/80">
-				<div className="mr-auto">
-					<Family family={props.family} iconOnly className="mr-2" />
-					<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
-				</div>
-
-				<div className="text-xs text-base-content/60 leading-tight text-right">
-					{props.path && (
-						<div>
-							<FormatOriginPath originPath={props.path} />
-						</div>
-					)}
-					{props.cultivar && (
-						<div className="flex items-center justify-end">
-							<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
-							{props.cultivar.name}
-						</div>
-					)}
-				</div>
-			</div>
+			<TeaShortCard
+				family={props.family}
+				cultivar={props.cultivar}
+				path={props.path}
+				type={props.type}
+				className="mx-2 bg-white/80"
+			/>
 		</article>
 	);
 }
