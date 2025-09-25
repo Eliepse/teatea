@@ -13,7 +13,7 @@ import { useAlert } from "~/components/shared/modal/AlertManager";
 export function SelectCultivar(props: {
 	onBack: () => void;
 	onSelect: (value: Cultivar) => void;
-	onCreate?: () => void;
+	allowCreate?: boolean;
 	onSkip?: () => void;
 	defaultValue?: Cultivar;
 }) {
@@ -92,7 +92,7 @@ export function SelectCultivar(props: {
 				/>
 			))}
 
-			{props.onCreate && <CreateCultivarButton onCultivarCreated={cultivarCreated} />}
+			{props.allowCreate && <CreateCultivarButton onCultivarCreated={cultivarCreated} />}
 		</PageLayout>
 	);
 }

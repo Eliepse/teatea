@@ -141,7 +141,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 								contextValue.patchForm({ type: undefined });
 							}
 
-							navStack.next({ key: "select:cultivar" });
+							navStack.next({ key: "name:ask" });
 						}}
 						onSelect={(type) => {
 							if (undefined === type) {
@@ -166,26 +166,12 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 							contextValue.patchForm({ cultivar: undefined });
 							navStack.next({ key: "recap" });
 						}}
-						onCreate={() => {
-							if (formValue.cultivar && "@id" in formValue.cultivar) {
-								contextValue.patchForm({ cultivar: undefined });
-							}
-
-							navStack.next({ key: "name:ask" });
-						}}
 						onSelect={(cultivar) => {
-							if (undefined === cultivar) {
-								if (formValue.cultivar && "@id" in formValue.cultivar) {
-									contextValue.patchForm({ cultivar: undefined });
-								}
-
-								navStack.next({ key: "name:ask" });
-							} else {
-								contextValue.patchForm({ cultivar });
-								navStack.next({ key: "recap" });
-							}
+							contextValue.patchForm({ cultivar });
+							navStack.next({ key: "recap" });
 						}}
 						defaultValue={formValue.cultivar && "id" in formValue.cultivar ? formValue.cultivar : undefined}
+						allowCreate
 					/>
 				</StackFrame>
 				<StackFrame frameKey="name:ask">
@@ -194,11 +180,12 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onConfirm={(name) => {
 							if (undefined === name) {
 								setFormValue((st) => ({ ...st, type: undefined }));
-								navStack.next({ key: "recap" });
+								navStack.next({ key: "select:cultivar" });
 								return;
 							}
+
 							setFormValue((st) => ({ ...st, type: { name, isPDO: st.type?.isPDO ?? false } }));
-							navStack.next({ key: "recap" });
+							navStack.next({ key: "select:cultivar" });
 						}}
 						defaultValue={formValue.type?.name}
 					/>
