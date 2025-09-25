@@ -54,7 +54,9 @@ export default function Dashboard(props: Route.ComponentProps) {
 				to="/session/new"
 				className="flex bg-primary/10 p-6 h-20 mt-4 items-center rounded-md text-lg text-primary"
 			>
-				<span className="inline-flex items-center">Ready for some tea? <CoffeeCup className="ml-2 size-5 opacity-60" /></span>
+				<span className="inline-flex items-center">
+					Ready for some tea? <CoffeeCup className="ml-2 size-5 opacity-60" />
+				</span>
 				<Plus className="ml-auto size-7" />
 			</Link>
 
@@ -78,6 +80,12 @@ export default function Dashboard(props: Route.ComponentProps) {
 					</ul>
 				</>
 			)}
+
+			<p className="my-8 text-center">
+				If you need help or have any feedback,
+				<br />
+				contact me at: {import.meta.env.PUBLIC_SUPPORT_EMAIL}
+			</p>
 
 			{pwaInstall.installable && false === pwaInstall.installed && (
 				<button

@@ -52,6 +52,7 @@ services:
     environment:
       PUBLIC_POSTHOG_KEY: ${POSTHOG_KEY:-}
       PUBLIC_POSTHOG_HOST: ${POSTHOG_HOST:-}
+      PUBLIC_SUPPORT_EMAIL: "exemple@test.com"
     depends_on:
       - api
     volumes:
