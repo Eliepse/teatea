@@ -27,14 +27,14 @@ readonly class CultivarCreateProcessor implements ProcessorInterface
 
 		$refinedName = preg_replace("/\s+/", " ", $data->name);
 
-		$exitingId = $this->em
+		$exitingIds = $this->em
 			->createQuery(
 				"SELECT c.id FROM App\Entity\Cultivar c WHERE lower(unaccent(c.name)) = lower(unaccent(:name))",
 			)
 			->setParameter("name", $refinedName)
-			->getSingleScalarResult();
+			->getScalarResult();
 
-		if (false === empty($exitingId)) {
+		if (false === empty($exitingIds)) {
 			throw new BadRequestHttpException("A cultivar with the same name already exists");
 		}
 
