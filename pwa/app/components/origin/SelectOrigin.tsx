@@ -52,6 +52,21 @@ export function SelectOrigin(
 		},
 		queryKey: ["origins", { parent: viewPath }],
 	});
+	const { data: popularOrigins, ...popularsQuery } = useQuery({
+		queryFn: async (ctx) => {
+			const queryKey = ctx.queryKey[2] ?? null;
+			const params = typeof queryKey === "string" ? { limit: 3 } : queryKey;
+			const filters = {
+				...params,
+				sort: "popularity",
+				level: 1,
+			};
+			const data = await (await getApi<ApiCollection<Origin>>("/origins", filters)).json();
+			return data.member;
+		},
+		queryKey: ["origins", "populars", { limit: 3 }],
+		enabled: undefined === viewPath,
+	});
 
 	function back() {
 		if (undefined === viewPath) {
@@ -109,6 +124,31 @@ export function SelectOrigin(
 				</button>
 			}
 		>
+			{undefined === viewPath && (
+				<>
+					<div className="text-xs text-base-content/60 mb-4 uppercase">Popular origins</div>
+					{popularsQuery.isLoading ? (
+						<>
+							<div className="skeleton h-14 mb-2" />
+							<div className="skeleton h-14 mb-2" />
+							<div className="skeleton h-14 mb-2" />
+						</>
+					) : (
+						(popularOrigins ?? []).map((origin) => (
+							<OriginItem
+								key={origin.path}
+								label={origin.name}
+								selected={selectionPath === origin.path}
+								hasChildren={!origin.isLeaf}
+								onSelect={() => changePath(origin)}
+							/>
+						))
+					)}
+
+					<hr className="border-stone-200 mt-2 mb-4" />
+				</>
+			)}
+
 			{viewOriginQuery.isLoading && <div className="skeleton h-14 mb-2" />}
 			{!viewOriginQuery.isLoading && viewOrigin && (
 				<OriginItem

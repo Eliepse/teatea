@@ -27,8 +27,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 			description: "Determine the specific level to return (1: country, 2: Region, 3: locality)",
 			castToNativeType: true,
 		),
-//		"sort" => new QueryParameter(schema: ["enum" => ["popularity", "name"]]),
-//		"limit" => new QueryParameter(schema: ["type" => "integer", "min" => 1]),
+		"sort" => new QueryParameter(
+			schema: ["enum" => ["popularity", "name"]],
+			description: "Order of returned origins",
+		),
+		"limit" => new QueryParameter(
+			schema: ["type" => "integer", "min" => 1],
+			description: "Max origins to return",
+			castToNativeType: true,
+		),
 	],
 )]
 class Origin
