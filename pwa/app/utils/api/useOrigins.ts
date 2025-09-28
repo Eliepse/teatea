@@ -1,20 +1,20 @@
-import type { ApiCollection, Iri, Origin } from "~t/types";
-import { fetchApi } from "~/utils/api";
-import { type QueryFunctionContext, useQuery } from "@tanstack/react-query";
+import type { ApiCollection, Iri, Origin, OriginWithLeaf } from "~t/types";
+import { fetchApi, getApi } from "~/utils/api";
+import { useQuery } from "@tanstack/react-query";
 
-type Filters = {};
-
-async function fetchOriginsKeyByPath(
-	ctx: QueryFunctionContext<[string, string, Filters | undefined]>,
-): Promise<{ [key: string]: Origin }> {
-	const filters = ctx.queryKey[2];
-	const data = await (await fetchApi<ApiCollection<Origin>>("/origins", { payload: filters })).json();
-	return Object.fromEntries(data.member.map((origin: Origin) => [origin.path, origin]));
-}
+type Filters = {
+	sort?: "popularity" | "name";
+};
 
 export function useOriginByPath(filters?: Filters) {
 	return useQuery({
-		queryFn: fetchOriginsKeyByPath,
+		queryFn: async (ctx) => {
+			const queryKey = ctx.queryKey[2] ?? {};
+			const filters = typeof queryKey === "string" ? undefined : queryKey;
+
+			const data = await (await getApi<ApiCollection<OriginWithLeaf>>("/origins", filters)).json();
+			return Object.fromEntries(data.member.map((origin: OriginWithLeaf) => [origin.path, origin]));
+		},
 		queryKey: ["origins", "keyByPath", filters],
 	});
 }

@@ -5,12 +5,10 @@ namespace App\State\TeaType;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Origin;
 use App\ApiResource\TeaType;
 use App\Enum\TeaFamily;
-use App\State\OriginProvider;
+use App\State\Origin\OriginProvider;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\Expr\Join;
 
 /**
  * @implements ProviderInterface<TeaType|null>

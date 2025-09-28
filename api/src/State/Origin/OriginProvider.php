@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State;
+namespace App\State\Origin;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -21,26 +21,17 @@ readonly class OriginProvider implements ProviderInterface
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Origin|array|null
 	{
-		$isCollection = $operation instanceof CollectionOperationInterface;
+		assert(false === ($operation instanceof CollectionOperationInterface));
 		$path = $uriVariables["path"] ?? null;
 
-		if (null !== $path && empty($path)) {
+		if (empty($path)) {
 			throw new BadRequestHttpException();
 		}
 
 		$originQb = $this->em->createQueryBuilder()
 			->select("origin")
 			->from(\App\Entity\Origin::class, "origin")
-			->orderBy("origin.path", "ASC");
-
-		if ($isCollection) {
-			return array_map(
-				fn(\App\Entity\Origin $type) => static::fromEntity($type),
-				$originQb->getQuery()->getResult(),
-			);
-		}
-
-		$originQb
+			->orderBy("origin.path", "ASC")
 			->where("origin.path = :path")
 			->setParameter("path", $uriVariables["path"])
 			->setMaxResults(1);

@@ -8,7 +8,7 @@ use App\ApiResource\Tea;
 use App\Entity\User;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
-use App\State\OriginProvider;
+use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;

@@ -26,14 +26,10 @@ export function SelectOrigin(
 		| { onSelect: (value: Origin) => void; allowToggle?: false }
 	),
 ) {
-	const { data, isLoading } = useOriginByPath();
+	const { data, isLoading } = useOriginByPath({ sort: "popularity" });
 	const [selected, setSelected] = useState(props.defaultValue);
-	const leavesPaths = useMemo(() => {
-		const paths = Object.keys(data ?? {});
-		return paths.filter((key) => !paths.some((path) => path.startsWith(`${key}.`)));
-	}, [data]);
 
-	const isLeaf = selected ? leavesPaths.includes(selected.path) : true;
+	const isLeaf = selected && data ? data[selected.path]?.isLeaf : true;
 	const displayedParent = selected ? (isLeaf && data ? getOriginParent(data, selected) : selected) : undefined;
 	const displayedParentNodes = displayedParent?.path?.split(".");
 
@@ -129,7 +125,7 @@ export function SelectOrigin(
 					key={origin.path}
 					label={origin.name}
 					selected={selected?.path === origin.path}
-					hasChildren={!leavesPaths.includes(origin.path)}
+					hasChildren={!origin.isLeaf}
 					onSelect={() => changeOrigin(origin)}
 				/>
 			))}

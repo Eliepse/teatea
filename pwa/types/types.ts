@@ -37,8 +37,9 @@ export type Cultivar = Resource<"Cultivar"> & {
 export type Origin = Omit<Resource, "id"> & {
 	name: string;
 	path: string;
-	isPDO: boolean;
 };
+
+export type OriginWithLeaf = Origin & { isLeaf?: boolean };
 
 export type OriginPath = {
 	"@type": "OriginPath";

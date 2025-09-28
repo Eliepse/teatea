@@ -9,7 +9,7 @@ use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
 use App\State\Cultivar\CultivarProvider;
-use App\State\OriginProvider;
+use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 
