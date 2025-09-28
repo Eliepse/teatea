@@ -34,12 +34,13 @@ export type Cultivar = Resource<"Cultivar"> & {
 	name: string;
 };
 
+export type TreePath = string;
+
 export type Origin = Omit<Resource, "id"> & {
 	name: string;
-	path: string;
+	path: TreePath;
+	isLeaf?: boolean;
 };
-
-export type OriginWithLeaf = Origin & { isLeaf?: boolean };
 
 export type OriginPath = {
 	"@type": "OriginPath";

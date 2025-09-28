@@ -103,7 +103,7 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 							contextValue.patchForm({ origin });
 							navStack.next({ key: "family:select" });
 						}}
-						defaultValue={formValue.origin}
+						defaultOriginPath={formValue.origin?.path}
 					/>
 				</StackFrame>
 				{/*<StackFrame frameKey="pdo:ask">*/}

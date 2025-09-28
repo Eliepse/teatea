@@ -1,11 +1,13 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
-import { type Origin } from "~t/types";
-import { useMemo, useState } from "react";
+import { type ApiCollection, type Origin } from "~t/types";
+import { useState } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
-import { useOriginByPath } from "~/utils/api/useOrigins";
 import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
+import { useQuery } from "@tanstack/react-query";
+import { getApi } from "~/utils/api";
+import { getParentPath, useOrigin } from "~/utils/api/useOrigins";
 
 function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
 	const parentPathNodes = node.path.split(".").slice(0, -1);
@@ -20,61 +22,65 @@ function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Or
 export function SelectOrigin(
 	props: {
 		onBack: () => void;
-		defaultValue?: Origin;
+		defaultOriginPath?: Origin["path"];
 	} & (
 		| { onSelect: (value?: Origin) => void; allowToggle: true }
 		| { onSelect: (value: Origin) => void; allowToggle?: false }
 	),
 ) {
-	const { data, isLoading } = useOriginByPath({ sort: "popularity" });
-	const [selected, setSelected] = useState(props.defaultValue);
+	// Path of the parent of the displayed origins
+	const [viewPath, setViewPath] = useState(getParentPath(props.defaultOriginPath));
+	const { data: viewOrigin, ...viewOriginQuery } = useOrigin(viewPath);
+	const viewOriginLevel = viewOrigin?.path?.split(".")?.length ?? 0;
 
-	const isLeaf = selected && data ? data[selected.path]?.isLeaf : true;
-	const displayedParent = selected ? (isLeaf && data ? getOriginParent(data, selected) : selected) : undefined;
-	const displayedParentNodes = displayedParent?.path?.split(".");
+	// Path of the currently selected origin
+	const [selectionPath, setSelectionPath] = useState(props.defaultOriginPath);
+	const { data: origins, isLoading } = useQuery({
+		queryFn: async (ctx) => {
+			const queryKey = ctx.queryKey[1] ?? null;
+			const params = typeof queryKey === "string" ? { parent: undefined } : queryKey;
+			const parentLevel = params.parent?.split(".")?.length ?? 0;
 
-	const originList = useMemo(() => {
-		const search = displayedParent?.path;
-		const level = (displayedParent?.path?.split(".")?.length ?? 0) + 1;
-		return Object.entries(data ?? [])
-			.filter(([k, node]) => node.path?.split(".")?.length === level && (undefined === search || k.startsWith(`${search}.`)))
-			.map(([_, o]) => o);
-	}, [data, displayedParent]);
+			const filters = {
+				parent: params.parent,
+				// Fetch children, but never lower than localities
+				level: Math.min(parentLevel + 1, 3),
+			};
+
+			const data = await (await getApi<ApiCollection<Origin>>("/origins", filters)).json();
+			return data.member;
+		},
+		queryKey: ["origins", { parent: viewPath }],
+	});
 
 	function back() {
-		if (!selected || !data) {
+		if (undefined === viewPath) {
 			props.onBack();
 			return;
 		}
 
-		const parentPath = selected.path.split(".").slice(0, -1).join(".");
-		const parent = data[parentPath];
-
-		if (0 === parentPath.length) {
-			setSelected(undefined);
-			return;
-		}
-
-		if (!parent) {
-			setSelected(undefined);
-			console.warn(`Failed to find the parent origin of ${parentPath}`);
-			return;
-		}
-
-		setSelected(parent);
+		setSelectionPath(undefined);
+		setViewPath((st) => {
+			const parentNodes = st?.split(".")?.slice(0, -1) ?? [];
+			return 0 === parentNodes.length ? undefined : parentNodes.join(".");
+		});
 	}
 
-	function changeOrigin(origin: Origin): void {
-		if (true === props.allowToggle) {
-			setSelected((st) => (origin.path === st?.path ? undefined : origin));
-			return;
-		}
+	function changePath(origin: Origin): void {
+		setSelectionPath((st) => (props.allowToggle && origin.path === st ? undefined : origin.path));
+		setViewPath((st) => {
+			if (origin.isLeaf) {
+				return st;
+			}
 
-		setSelected(origin);
+			return origin.path;
+		});
 	}
 
 	function confirm() {
-		if(true === props.allowToggle) {
+		const selected = origins?.find((o) => o.path === selectionPath);
+
+		if (true === props.allowToggle) {
 			props.onSelect(selected);
 			return;
 		}
@@ -96,37 +102,47 @@ export function SelectOrigin(
 				<button
 					className="ml-auto btn btn-primary"
 					onClick={confirm}
-					disabled={true !== props.allowToggle && !selected}
+					disabled={true !== props.allowToggle && !selectionPath}
 				>
 					Next
 					<ArrowRightIcon className="size-4" />
 				</button>
 			}
 		>
-			{isLoading && "Loading..."}
-
-			{!isLoading && displayedParent && (
+			{viewOriginQuery.isLoading && <div className="skeleton h-14 mb-2" />}
+			{!viewOriginQuery.isLoading && viewOrigin && (
 				<OriginItem
-					label={displayedParent.name}
-					selected={displayedParent === selected}
-					onSelect={() => changeOrigin(displayedParent)}
+					label={viewOrigin.name}
+					selected={viewOrigin.path === selectionPath}
+					onSelect={() => changePath(viewOrigin)}
 				/>
 			)}
 
-			{!isLoading && displayedParent && (
+			{0 !== viewOriginLevel && (
 				<div className="text-xs text-base-content/60 my-4 uppercase">
-					{displayedParent && 1 === displayedParentNodes?.length && "Regions"}
-					{displayedParent && 2 === displayedParentNodes?.length && "Localities"}
+					{1 === viewOriginLevel && "Regions"}
+					{2 === viewOriginLevel && "Localities"}
 				</div>
 			)}
 
-			{originList.map((origin) => (
+			{isLoading && (
+				<>
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+				</>
+			)}
+
+			{(origins ?? []).map((origin) => (
 				<OriginItem
 					key={origin.path}
 					label={origin.name}
-					selected={selected?.path === origin.path}
+					selected={selectionPath === origin.path}
 					hasChildren={!origin.isLeaf}
-					onSelect={() => changeOrigin(origin)}
+					onSelect={() => changePath(origin)}
 				/>
 			))}
 		</PageLayout>

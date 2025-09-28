@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(normalizationContext: ["groups" => ["origin:read"]], security: "is_granted('ROLE_USER')")]
 #[Get(uriTemplate: "/origins/{path}", provider: OriginProvider::class)]
 #[GetCollection(
-	normalizationContext: ["groups" => ["origin:read", "origin:collection"]],
+	normalizationContext: ["groups" => ["origin:read"]],
 	provider: OriginCollectionProvider::class,
 	parameters: [
 		"parent" => new QueryParameter(
@@ -25,6 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		"level" => new QueryParameter(
 			schema: ["type" => "integer", "min" => 1, "max" => 3],
 			description: "Determine the specific level to return (1: country, 2: Region, 3: locality)",
+			castToNativeType: true,
 		),
 //		"sort" => new QueryParameter(schema: ["enum" => ["popularity", "name"]]),
 //		"limit" => new QueryParameter(schema: ["type" => "integer", "min" => 1]),
@@ -41,6 +42,6 @@ class Origin
 	#[Groups(["origin:read", "embedded:origin"])]
 	public string $name;
 
-	#[Groups(["origin:collection"])]
+	#[Groups(["origin:read"])]
 	public bool $isLeaf = true;
 }

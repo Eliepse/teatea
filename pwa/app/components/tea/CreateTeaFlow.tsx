@@ -116,7 +116,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 							contextValue.patchForm({ origin });
 							navStack.next({ key: "family:select" });
 						}}
-						defaultValue={formValue.origin}
+						defaultOriginPath={formValue.origin?.path}
 					/>
 				</StackFrame>
 				<StackFrame frameKey="family:select">

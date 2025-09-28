@@ -35,6 +35,22 @@ readonly class OriginCollectionProvider implements ProviderInterface
 			->groupBy("origin")
 			->orderBy("origin.path", "ASC");
 
+		// Filter by parent
+		$parentPath = $this->getParameter($operation, "parent");
+		if (is_string($parentPath)) {
+			$originQb
+				->andWhere("IS_CONTAINED_BY(origin.path, :parentPath) = TRUE")
+				->setParameter("parentPath", $parentPath);
+		}
+
+		// Filter by level
+		$level = $this->getParameter($operation, "level");
+		if (is_int($level)) {
+			$originQb
+				->andWhere("NLEVEL(origin.path) = :nlevel")
+				->setParameter("nlevel", $level);
+		}
+
 		return array_map(
 			function ($row) {
 				$entity = $row[0];
@@ -44,5 +60,17 @@ readonly class OriginCollectionProvider implements ProviderInterface
 			},
 			$originQb->getQuery()->getResult(),
 		);
+	}
+
+	private function getParameter(Operation $operation, string $key): mixed
+	{
+		$parameter = $operation->getParameters()?->get($key);
+
+		if (null === $parameter) {
+			return null;
+		}
+
+		$value = $parameter->getValue();
+		return $value instanceof ParameterNotFound ? null : $value;
 	}
 }

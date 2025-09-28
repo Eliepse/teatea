@@ -29,16 +29,29 @@ readonly class OriginProvider implements ProviderInterface
 		}
 
 		$originQb = $this->em->createQueryBuilder()
-			->select("origin")
+			->select("origin", "COUNT(child) as children")
 			->from(\App\Entity\Origin::class, "origin")
+			->leftJoin(
+				\App\Entity\Origin::class,
+				"child",
+				"WITH",
+				"child.id != origin.id AND IS_CONTAINED_BY(child.path, origin.path) = TRUE",
+			)
 			->orderBy("origin.path", "ASC")
 			->where("origin.path = :path")
 			->setParameter("path", $uriVariables["path"])
+			->groupBy("origin")
 			->setMaxResults(1);
 
-		/** @var \App\Entity\Origin|null $typeEntities */
-		$typeEntities = $originQb->getQuery()->getResult()[0] ?? null;
-		return static::fromEntity($typeEntities);
+		$result = $originQb->getQuery()->getResult()[0] ?? null;
+
+		if (null === $result) {
+			return null;
+		}
+
+		$resource = static::fromEntity($result[0]);
+		$resource->isLeaf = 0 !== $result["children"];
+		return $resource;
 	}
 
 	public static function fromEntity(?\App\Entity\Origin $entity): ?Origin

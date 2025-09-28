@@ -11,7 +11,7 @@ type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
 		  }
 		| {
 				method?: "GET";
-				payload?: Record<string, string | undefined>;
+				payload?: Record<string, string | number | undefined>;
 		  }
 	);
 
@@ -76,7 +76,7 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 
 export async function getApi<T>(
 	url: string,
-	payload?: Record<string, string | undefined>,
+	payload?: Record<string, string | number | undefined>,
 	config?: Omit<FetchApiConfig, "payload" | "method">,
 ): Promise<TResponse<T>> {
 	return fetchApi<T>(url, { ...config, method: "GET", payload });

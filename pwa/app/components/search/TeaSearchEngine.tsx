@@ -148,7 +148,7 @@ export function TeaSearchEngine(props: {
 						setFilterSelect(undefined);
 					}}
 					onBack={() => setFilterSelect(undefined)}
-					defaultValue={originFilter}
+					defaultOriginPath={originFilter?.path}
 					allowToggle
 				/>
 			</Paged>

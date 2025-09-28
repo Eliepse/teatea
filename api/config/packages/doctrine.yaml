@@ -199,6 +199,7 @@ doctrine:
                 TO_NUMBER: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\ToNumber
                 TO_TIMESTAMP: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\ToTimestamp
             numeric_functions:
+                NLEVEL: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\Ltree\Nlevel
                 ltree: App\Doctrine\ORM\Functions\LTreeOperatorFunction
                 similarity: App\Doctrine\ORM\Functions\TrgmSimilarityFunction
                 row_number: App\Doctrine\ORM\Functions\RowNumberFunction
