@@ -1,5 +1,5 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
-import { type ApiCollection, type Origin } from "~t/types";
+import { type ApiCollection, type Origin, type TreePath } from "~t/types";
 import { useState } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
@@ -8,16 +8,6 @@ import { handleUIEvent } from "~/utils/function";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import { getParentPath, useOrigin } from "~/utils/api/useOrigins";
-
-function getOriginParent(originMap: { [key: string]: Origin }, node: Origin): Origin | undefined {
-	const parentPathNodes = node.path.split(".").slice(0, -1);
-
-	if (0 === parentPathNodes.length) {
-		return undefined;
-	}
-
-	return originMap[parentPathNodes.join(".")] ?? undefined;
-}
 
 export function SelectOrigin(
 	props: {
@@ -52,21 +42,6 @@ export function SelectOrigin(
 		},
 		queryKey: ["origins", { parent: viewPath }],
 	});
-	const { data: popularOrigins, ...popularsQuery } = useQuery({
-		queryFn: async (ctx) => {
-			const queryKey = ctx.queryKey[2] ?? null;
-			const params = typeof queryKey === "string" ? { limit: 3 } : queryKey;
-			const filters = {
-				...params,
-				sort: "popularity",
-				level: 1,
-			};
-			const data = await (await getApi<ApiCollection<Origin>>("/origins", filters)).json();
-			return data.member;
-		},
-		queryKey: ["origins", "populars", { limit: 3 }],
-		enabled: undefined === viewPath,
-	});
 
 	function back() {
 		if (undefined === viewPath) {
@@ -81,7 +56,7 @@ export function SelectOrigin(
 		});
 	}
 
-	function changePath(origin: Origin): void {
+	function changeSelection(origin: Origin): void {
 		setSelectionPath((st) => (props.allowToggle && origin.path === st ? undefined : origin.path));
 		setViewPath((st) => {
 			if (origin.isLeaf) {
@@ -124,37 +99,14 @@ export function SelectOrigin(
 				</button>
 			}
 		>
-			{undefined === viewPath && (
-				<>
-					<div className="text-xs text-base-content/60 mb-4 uppercase">Popular origins</div>
-					{popularsQuery.isLoading ? (
-						<>
-							<div className="skeleton h-14 mb-2" />
-							<div className="skeleton h-14 mb-2" />
-							<div className="skeleton h-14 mb-2" />
-						</>
-					) : (
-						(popularOrigins ?? []).map((origin) => (
-							<OriginItem
-								key={origin.path}
-								label={origin.name}
-								selected={selectionPath === origin.path}
-								hasChildren={!origin.isLeaf}
-								onSelect={() => changePath(origin)}
-							/>
-						))
-					)}
-
-					<hr className="border-stone-200 mt-2 mb-4" />
-				</>
-			)}
+			{undefined === viewPath && <PopularOrigins selectionPath={selectionPath} onSelect={changeSelection} />}
 
 			{viewOriginQuery.isLoading && <div className="skeleton h-14 mb-2" />}
 			{!viewOriginQuery.isLoading && viewOrigin && (
 				<OriginItem
 					label={viewOrigin.name}
 					selected={viewOrigin.path === selectionPath}
-					onSelect={() => changePath(viewOrigin)}
+					onSelect={() => changeSelection(viewOrigin)}
 				/>
 			)}
 
@@ -182,10 +134,54 @@ export function SelectOrigin(
 					label={origin.name}
 					selected={selectionPath === origin.path}
 					hasChildren={!origin.isLeaf}
-					onSelect={() => changePath(origin)}
+					onSelect={() => changeSelection(origin)}
 				/>
 			))}
 		</PageLayout>
+	);
+}
+
+function PopularOrigins(props: { selectionPath?: TreePath; onSelect: (origin: Origin) => void }) {
+	const { data: popularOrigins, ...popularsQuery } = useQuery({
+		queryFn: async (ctx) => {
+			const queryKey = ctx.queryKey[2] ?? null;
+			const params = typeof queryKey === "string" ? { limit: 3 } : queryKey;
+			const filters = {
+				...params,
+				sort: "popularity",
+				level: 1,
+			};
+			const data = await (await getApi<ApiCollection<Origin>>("/origins", filters)).json();
+			return data.member;
+		},
+		queryKey: ["origins", "populars", { limit: 3 }],
+		refetchOnMount: false,
+	});
+
+	return (
+		<>
+			<div className="text-xs text-base-content/60 mb-4 uppercase">Popular origins</div>
+
+			{popularsQuery.isLoading ? (
+				<>
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+					<div className="skeleton h-14 mb-2" />
+				</>
+			) : (
+				(popularOrigins ?? []).map((origin) => (
+					<OriginItem
+						key={origin.path}
+						label={origin.name}
+						selected={props.selectionPath === origin.path}
+						hasChildren={!origin.isLeaf}
+						onSelect={() => props.onSelect(origin)}
+					/>
+				))
+			)}
+
+			<hr className="border-stone-200 mt-2 mb-4" />
+		</>
 	);
 }
 
