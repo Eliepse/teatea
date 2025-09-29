@@ -27,6 +27,9 @@ class Origin
 	#[ORM\Column(type: Types::TEXT)]
 	public string $name;
 
+	#[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+	public ?\DateTimeImmutable $validatedAt = null;
+
 	/**
 	 * @var Collection<int, Tea>
 	 */

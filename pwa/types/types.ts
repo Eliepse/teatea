@@ -40,6 +40,7 @@ export type Origin = Omit<Resource, "id"> & {
 	name: string;
 	path: TreePath;
 	isLeaf?: boolean;
+	proposal?: boolean;
 };
 
 export type OriginPath = {

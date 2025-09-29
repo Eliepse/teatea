@@ -6,13 +6,19 @@ use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\State\Origin\OriginCollectionProvider;
+use App\State\Origin\OriginProcessor;
 use App\State\Origin\OriginProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(normalizationContext: ["groups" => ["origin:read"]], security: "is_granted('ROLE_USER')")]
+#[ApiResource(
+	normalizationContext: ["groups" => ["origin:read"]],
+	denormalizationContext: ["groups" => ["origin:write"]],
+	security: "is_granted('ROLE_USER')",
+)]
 #[Get(uriTemplate: "/origins/{path}", provider: OriginProvider::class)]
 #[GetCollection(
 	normalizationContext: ["groups" => ["origin:read"]],
@@ -38,6 +44,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	],
 )]
+#[Post(processor: OriginProcessor::class)]
 class Origin
 {
 	#[ApiProperty(identifier: true)]
@@ -46,9 +53,16 @@ class Origin
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 24)]
-	#[Groups(["origin:read", "embedded:origin"])]
+	#[Assert\Regex("/^[\p{L}_\-0-9 ]+$/u")]
+	#[Groups(["origin:read", "embedded:origin", "origin:write"])]
 	public string $name;
 
 	#[Groups(["origin:read"])]
 	public bool $isLeaf = true;
+
+	#[Groups(["origin:read"])]
+	public bool $proposal = true;
+
+	#[Groups(["origin:write"])]
+	public string $parentPath;
 }

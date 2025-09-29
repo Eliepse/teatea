@@ -63,6 +63,7 @@ readonly class OriginProvider implements ProviderInterface
 		$resource = new Origin();
 		$resource->name = $entity->name;
 		$resource->path = $entity->path->getPath();
+		$resource->proposal = null === $entity->validatedAt;
 		return $resource;
 	}
 }

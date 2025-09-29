@@ -117,6 +117,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 							navStack.next({ key: "family:select" });
 						}}
 						defaultOriginPath={formValue.origin?.path}
+						allowCreation
 					/>
 				</StackFrame>
 				<StackFrame frameKey="family:select">

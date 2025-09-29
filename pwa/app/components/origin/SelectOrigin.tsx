@@ -1,18 +1,21 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { type ApiCollection, type Origin, type TreePath } from "~t/types";
-import { useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import clsx from "clsx";
 import Chevron from "~/components/icons/chevron";
-import { ArrowRightIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon, CheckIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
-import { useQuery } from "@tanstack/react-query";
-import { getApi } from "~/utils/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getApi, postApi } from "~/utils/api";
 import { getParentPath, useOrigin } from "~/utils/api/useOrigins";
+import { useAlert } from "~/components/shared/modal/AlertManager";
+import { Modal } from "~/components/shared/modal/Modal";
 
 export function SelectOrigin(
 	props: {
 		onBack: () => void;
 		defaultOriginPath?: Origin["path"];
+		allowCreation?: boolean;
 	} & (
 		| { onSelect: (value?: Origin) => void; allowToggle: true }
 		| { onSelect: (value: Origin) => void; allowToggle?: false }
@@ -25,7 +28,11 @@ export function SelectOrigin(
 
 	// Path of the currently selected origin
 	const [selectionPath, setSelectionPath] = useState(props.defaultOriginPath);
-	const { data: origins, isLoading } = useQuery({
+	const {
+		data: origins,
+		isLoading,
+		...listQuery
+	} = useQuery({
 		queryFn: async (ctx) => {
 			const queryKey = ctx.queryKey[1] ?? null;
 			const params = typeof queryKey === "string" ? { parent: undefined } : queryKey;
@@ -135,8 +142,19 @@ export function SelectOrigin(
 					selected={selectionPath === origin.path}
 					hasChildren={!origin.isLeaf}
 					onSelect={() => changeSelection(origin)}
+					isProposal={true === origin.proposal}
 				/>
 			))}
+
+			{true === props.allowCreation && (
+				<CreateOriginButton
+					parent={viewOrigin}
+					onOriginCreated={(o) => {
+						changeSelection(o);
+						void listQuery.refetch();
+					}}
+				/>
+			)}
 		</PageLayout>
 	);
 }
@@ -185,15 +203,109 @@ function PopularOrigins(props: { selectionPath?: TreePath; onSelect: (origin: Or
 	);
 }
 
-function OriginItem(props: { label: string; selected: boolean; hasChildren?: boolean; onSelect: () => void }) {
+function OriginItem(props: {
+	label: string;
+	selected: boolean;
+	hasChildren?: boolean;
+	onSelect: () => void;
+	isProposal?: boolean;
+}) {
 	return (
 		<button
 			onClick={handleUIEvent(props.onSelect)}
 			className={clsx("mb-2 btn btn-block h-14", props.selected && "btn-primary")}
 		>
 			<span className="mr-auto">{props.label}</span>
+
+			{props.isProposal && <em className="mr-auto font-normal">(under validation)</em>}
+
 			{props.selected && <CheckIcon className="size-4" />}
 			{props.hasChildren && <Chevron direction="right" className="size-4" />}
 		</button>
+	);
+}
+
+function CreateOriginButton(props: { parent?: Origin | null; onOriginCreated: (value: Origin) => void }) {
+	const limit = 24;
+	const [isCreating, setIsCreating] = useState(false);
+	const alert = useAlert();
+	const [name, setName] = useState("");
+	const level = props.parent?.path?.split(".")?.length ?? 0;
+	const newLevel = 0 === level ? "Country" : 1 === level ? "Region" : "Locality";
+
+	const create = useMutation({
+		mutationFn: async (data: { parentPath: TreePath | undefined; name: string }) => {
+			return await (await postApi<Origin>("/origins", { name: data.name, parentPath: data.parentPath })).json();
+		},
+		onSuccess: (origin) => {
+			props.onOriginCreated(origin);
+			setIsCreating(false);
+		},
+		onError: (e) => {
+			alert({ title: "Failed to create the origin", body: e.message });
+		},
+	});
+
+	const isValid = 3 <= name.length && 32 >= name.length;
+
+	function handleChange(e: ChangeEvent<HTMLInputElement>) {
+		// Remove any non-word character (supports all languages) and extra spaces
+		setName(
+			e.currentTarget.value
+				.replaceAll(/[^\p{L}_\-0-9 ]/giu, "")
+				.replaceAll(/\s+/g, " ")
+				.substring(0, limit),
+		);
+	}
+
+	function submit() {
+		if (false === isValid) {
+			return;
+		}
+
+		create.mutate({ parentPath: props.parent?.path, name: name.trim() });
+	}
+
+	return (
+		<>
+			<button className="btn btn-block btn-dash justify-between h-12 mt-4" onClick={() => setIsCreating(true)}>
+				Propose a new {newLevel} <PlusIcon className="size-4" />
+			</button>
+
+			<Modal onClose={() => setIsCreating(false)} open={isCreating}>
+				<div className="flex justify-between mb-6">
+					<button className="btn" onClick={handleUIEvent(() => setIsCreating(false))}>
+						Cancel
+					</button>
+					<button
+						className="btn btn-primary"
+						disabled={!isValid || create.isPending}
+						onClick={handleUIEvent(submit)}
+					>
+						{create.isPending ? "Saving..." : "Create"}
+					</button>
+				</div>
+
+				{props.parent && (
+					<fieldset className="fieldset mb-4">
+						<legend className="fieldset-legend">Parent {1 === level ? "country" : "region"}</legend>
+						<input type="text" className="input" value={props.parent.name} disabled />
+					</fieldset>
+				)}
+
+				<fieldset className="fieldset">
+					<legend className="fieldset-legend">{newLevel} name</legend>
+					<input
+						type="text"
+						className="input"
+						value={name}
+						onChange={handleChange}
+						minLength={3}
+						maxLength={limit}
+					/>
+					<p className="label">Use english version</p>
+				</fieldset>
+			</Modal>
+		</>
 	);
 }
