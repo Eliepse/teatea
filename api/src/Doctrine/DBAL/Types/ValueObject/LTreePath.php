@@ -68,4 +68,9 @@ final readonly class LTreePath implements \Stringable
 		$needle = $path instanceof LTreePath ? $path->getPath() : $path;
 		return str_starts_with($this->getPath() . ".", "$needle.");
 	}
+
+	public function level(): int
+	{
+		return count($this->nodes);
+	}
 }
