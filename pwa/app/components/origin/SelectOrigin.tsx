@@ -7,7 +7,7 @@ import { ArrowRightIcon, CheckIcon, PlusIcon } from "@heroicons/react/24/outline
 import { handleUIEvent } from "~/utils/function";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getApi, postApi } from "~/utils/api";
-import { getParentPath, useOrigin } from "~/utils/api/useOrigins";
+import { getOriginLevel, getParentPath, useOrigin } from "~/utils/api/useOrigins";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { Modal } from "~/components/shared/modal/Modal";
 
@@ -28,11 +28,7 @@ export function SelectOrigin(
 
 	// Path of the currently selected origin
 	const [selectionPath, setSelectionPath] = useState(props.defaultOriginPath);
-	const {
-		data: origins,
-		isLoading,
-		...listQuery
-	} = useQuery({
+	const { data: origins, ...listQuery } = useQuery({
 		queryFn: async (ctx) => {
 			const queryKey = ctx.queryKey[1] ?? null;
 			const params = typeof queryKey === "string" ? { parent: undefined } : queryKey;
@@ -49,6 +45,7 @@ export function SelectOrigin(
 		},
 		queryKey: ["origins", { parent: viewPath }],
 	});
+	const selectedOrigin = origins?.find((o) => o.path === selectionPath);
 
 	function back() {
 		if (undefined === viewPath) {
@@ -124,7 +121,7 @@ export function SelectOrigin(
 				</div>
 			)}
 
-			{isLoading && (
+			{listQuery.isLoading && (
 				<>
 					<div className="skeleton h-14 mb-2" />
 					<div className="skeleton h-14 mb-2" />
@@ -151,6 +148,17 @@ export function SelectOrigin(
 					parent={viewOrigin}
 					onOriginCreated={(o) => {
 						changeSelection(o);
+						void listQuery.refetch();
+					}}
+				/>
+			)}
+
+			{true === props.allowCreation && !!selectedOrigin && 3 > (getOriginLevel(selectedOrigin) ?? 3) && (
+				<CreateOriginButton
+					parent={selectedOrigin}
+					onOriginCreated={(o) => {
+						changeSelection(o);
+						setViewPath(selectedOrigin.path);
 						void listQuery.refetch();
 					}}
 				/>
@@ -230,8 +238,8 @@ function CreateOriginButton(props: { parent?: Origin | null; onOriginCreated: (v
 	const [isCreating, setIsCreating] = useState(false);
 	const alert = useAlert();
 	const [name, setName] = useState("");
-	const level = props.parent?.path?.split(".")?.length ?? 0;
-	const newLevel = 0 === level ? "Country" : 1 === level ? "Region" : "Locality";
+	const level = getOriginLevel(props.parent) ?? 0;
+	const newLevel = 0 === level ? "country" : 1 === level ? "region" : "locality";
 
 	const create = useMutation({
 		mutationFn: async (data: { parentPath: TreePath | undefined; name: string }) => {
@@ -269,7 +277,8 @@ function CreateOriginButton(props: { parent?: Origin | null; onOriginCreated: (v
 	return (
 		<>
 			<button className="btn btn-block btn-dash justify-between h-12 mt-4" onClick={() => setIsCreating(true)}>
-				Propose a new {newLevel} <PlusIcon className="size-4" />
+				Propose a new {props.parent && 0 !== level && props.parent.name} {newLevel}{" "}
+				<PlusIcon className="size-4" />
 			</button>
 
 			<Modal onClose={() => setIsCreating(false)} open={isCreating}>

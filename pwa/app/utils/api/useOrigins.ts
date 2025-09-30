@@ -52,3 +52,8 @@ export function getParentPath(path?: TreePath): TreePath | undefined {
 
 	return 0 !== parentNodes.length ? parentNodes.join(".") : undefined;
 }
+
+export function getOriginLevel(value?: TreePath | Origin | null): number | undefined {
+	const path = typeof value === "string" ? value : value?.path;
+	return path?.split(".")?.length;
+}
