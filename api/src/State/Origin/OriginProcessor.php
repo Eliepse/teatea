@@ -28,7 +28,6 @@ readonly class OriginProcessor implements ProcessorInterface
 	{
 		assert($data instanceof Origin);
 
-		$parent = null;
 		$parentPath = new LTreePath([]);
 
 		if (false === empty($data->parentPath)) {
@@ -65,9 +64,5 @@ readonly class OriginProcessor implements ProcessorInterface
 		$resource = OriginProvider::fromEntity($entity);
 		$resource->isLeaf = true;
 		return $resource;
-	}
-
-	private function generatePath(string $name): string
-	{
 	}
 }
