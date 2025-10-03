@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { fetchApi, getApi } from "~/utils/api";
 import type { ApiCollection, ApiPaginatedCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
 import { formatDate, formatDistanceToNow, formatISO, isToday, isYesterday, subDays } from "date-fns";
@@ -16,6 +16,7 @@ import Leaf from "~/components/icons/leaf";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 import { SessionShortCard } from "~/pages/teaSession/_components/SessionShortCard";
 import { SessionRichCard } from "~/pages/teaSession/_components/SessionRichCard";
+import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSessions";
 
 const PAGE_SIZE = 14;
 
@@ -47,9 +48,10 @@ const TEA_FAMILY_COLOR_CLS = {
 	fermented: "text-stone-500",
 } as const;
 
-export default function ListTeaSessions() {
+export default function ListTeaSessions(props: Route.ComponentProps) {
 	const user = useUser();
-	const [filters, setFilters] = useState<{ username?: string }>({});
+	const [params] = useSearchParams();
+	const [filters, setFilters] = useState<{ username?: string }>({ username: params.get("username") ?? undefined });
 
 	const sessionsQuery = useInfiniteQuery({
 		queryFn: async (context) => {
