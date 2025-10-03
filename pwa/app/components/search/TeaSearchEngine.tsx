@@ -18,7 +18,7 @@ export function TeaSearchEngine(props: {
 	allowCreation?: boolean;
 	onSearch?: (text: string | undefined) => void;
 }) {
-	const [filterSelect, setFilterSelect] = useState<"origin">();
+	const [filterSelector, setFilterSelector] = useState<"origin">();
 	const [filters, setFilters] = useState<(typeof props.defaultFilters & { origin?: Origin }) | undefined>(
 		props.defaultFilters,
 	);
@@ -74,7 +74,7 @@ export function TeaSearchEngine(props: {
 					<li>
 						<button
 							className={clsx("btn", !!filters?.originPath && "btn-primary")}
-							onClick={handleUIEvent(() => setFilterSelect("origin"))}
+							onClick={handleUIEvent(() => setFilterSelector("origin"))}
 						>
 							{originQuery.isLoading ? (
 								<span className="skeleton w-16 h-4" />
@@ -141,14 +141,15 @@ export function TeaSearchEngine(props: {
 				)}
 			</div>
 
-			<Paged open={"origin" === filterSelect}>
+			<Paged open={"origin" === filterSelector}>
 				<SelectOrigin
 					onSelect={(o) => {
+						console.debug(o);
 						setFilters((st) => ({ ...st, origin: o, originPath: o?.path }));
-						setFilterSelect(undefined);
+						setFilterSelector(undefined);
 					}}
-					onBack={() => setFilterSelect(undefined)}
-					defaultOriginPath={originFilter?.path}
+					onBack={() => setFilterSelector(undefined)}
+					defaultOriginPath={filters?.originPath}
 					allowToggle
 				/>
 			</Paged>

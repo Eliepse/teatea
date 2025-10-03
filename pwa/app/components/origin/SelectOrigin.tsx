@@ -72,7 +72,12 @@ export function SelectOrigin(
 	}
 
 	function confirm() {
-		const selected = origins?.find((o) => o.path === selectionPath);
+		let selected = origins?.find((o) => o.path === selectionPath);
+
+		// If the selection is the current view (the parent of displayed list)
+		if (viewOrigin && !selected && viewOrigin.path === selectionPath) {
+			selected = viewOrigin;
+		}
 
 		if (true === props.allowToggle) {
 			props.onSelect(selected);
