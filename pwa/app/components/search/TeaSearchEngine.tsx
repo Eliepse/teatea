@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
-import type { ApiCollection, Origin, Tea } from "~t/types";
+import type { ApiCollection, Origin, Tea, TeaFamily } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { SearchTextInput } from "~/components/search/SearchTextInput";
@@ -10,15 +10,16 @@ import { SelectOrigin } from "~/components/origin/SelectOrigin";
 import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 import { XCircleIcon } from "@heroicons/react/16/solid";
+import { SelectFamily } from "~/components/family/SelectFamily";
 
 export function TeaSearchEngine(props: {
 	onSelect: (tea: Tea) => void;
-	defaultFilters?: { q?: string; originPath?: string };
+	defaultFilters?: { q?: string; originPath?: string; family?: TeaFamily };
 	value?: Tea;
 	allowCreation?: boolean;
 	onSearch?: (text: string | undefined) => void;
 }) {
-	const [filterSelector, setFilterSelector] = useState<"origin">();
+	const [filterSelector, setFilterSelector] = useState<"origin" | "family">();
 	const [filters, setFilters] = useState<(typeof props.defaultFilters & { origin?: Origin }) | undefined>(
 		props.defaultFilters,
 	);
@@ -73,6 +74,15 @@ export function TeaSearchEngine(props: {
 				<ul className="overflow-y-auto flex gap-x-2 px-4 mt-2">
 					<li>
 						<button
+							className={clsx("btn", !!filters?.family && "btn-primary")}
+							onClick={handleUIEvent(() => setFilterSelector("family"))}
+						>
+							{filters?.family ?? "Family"}
+							{!!filters?.family && <XCircleIcon className="size-4 ml-2" />}
+						</button>
+					</li>
+					<li>
+						<button
 							className={clsx("btn", !!filters?.originPath && "btn-primary")}
 							onClick={handleUIEvent(() => setFilterSelector("origin"))}
 						>
@@ -86,11 +96,6 @@ export function TeaSearchEngine(props: {
 							)}
 						</button>
 					</li>
-					{/*<li>*/}
-					{/*	<button className="btn" disabled>*/}
-					{/*		Type*/}
-					{/*	</button>*/}
-					{/*</li>*/}
 				</ul>
 			</div>
 
@@ -144,13 +149,23 @@ export function TeaSearchEngine(props: {
 			<Paged open={"origin" === filterSelector}>
 				<SelectOrigin
 					onSelect={(o) => {
-						console.debug(o);
 						setFilters((st) => ({ ...st, origin: o, originPath: o?.path }));
 						setFilterSelector(undefined);
 					}}
 					onBack={() => setFilterSelector(undefined)}
 					defaultOriginPath={filters?.originPath}
 					allowToggle
+				/>
+			</Paged>
+
+			<Paged open={"family" === filterSelector}>
+				<SelectFamily
+					onSelect={(family) => {
+						setFilters((st) => ({ ...st, family }));
+						setFilterSelector(undefined);
+					}}
+					onBack={() => setFilterSelector(undefined)}
+					defaultValue={filters?.family}
 				/>
 			</Paged>
 		</div>

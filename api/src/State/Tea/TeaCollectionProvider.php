@@ -9,6 +9,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\Entity\Origin;
 use App\Helper\Arr;
+use App\Helper\OperationHelper;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -37,6 +38,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$searchText = empty($searchText) ? null : $searchText;
 		$originPath = $params->get("originPath")->getValue();
 		$originPath = $originPath instanceof ParameterNotFound ? null : $originPath;
+		$familyFilter = OperationHelper::getParameter($operation, "family");
 
 		$sortParam = $params->get("sort")->getValue();
 		if ($sortParam instanceof ParameterNotFound) {
@@ -56,25 +58,25 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			->leftJoin("tea.type", "type")
 			->groupBy("tea.id");
 
+		// Text search
 		if (null !== $searchText) {
 			$searchQb
-				->andWhere(
-					$expr->orX(
-						"0.1 < SIMILARITY(tea.family, UNACCENT(:searchText))",
-						"0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))",
-					),
-				)
+				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
 				->setParameter("searchText", $searchText)
 				->addGroupBy("type.name")
 				->orderBy(
-					"ROW_NUMBER(ORDER BY
-						SIMILARITY(tea.family, unaccent(':searchText')) DESC,
-						SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC
-					)",
+					"SIMILARITY(unaccent(type.name), unaccent(':searchText'))",
+//					"ROW_NUMBER(ORDER BY SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC)",
 				);
 		}
 
-		if(false === empty($originPath)) {
+		// Family
+		if (null !== $familyFilter) {
+			$searchQb->andWhere("tea.family = :family")->setParameter("family", $familyFilter);
+		}
+
+		// Origin
+		if (false === empty($originPath)) {
 			$searchQb
 				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:originPath, origin.path) = TRUE")
 				->setParameter("originPath", $originPath);

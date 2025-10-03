@@ -18,6 +18,7 @@ use App\State\Tea\TeaCreateFromTypeProcessor;
 use App\State\Tea\TeaCreateProcess;
 use App\State\Tea\TeaProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
@@ -30,7 +31,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [
-//		"family" => new QueryParameter(description: "Filter by family"),
+		"family" => new QueryParameter(
+			schema: ["enum" => TeaFamily::QUERY_PARAMS],
+			description: "Filter by family",
+			castToNativeType: true,
+		),
 //		"type" => new QueryParameter(description: "Filter by type"),
 		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
 		"originPath" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
