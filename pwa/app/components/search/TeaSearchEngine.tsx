@@ -166,6 +166,7 @@ export function TeaSearchEngine(props: {
 					}}
 					onBack={() => setFilterSelector(undefined)}
 					defaultValue={filters?.family}
+					allowToggle
 				/>
 			</Paged>
 		</div>
