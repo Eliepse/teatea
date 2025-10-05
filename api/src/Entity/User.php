@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -47,6 +48,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	 */
 	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'author')]
 	private Collection $sessions;
+
+    /**
+     * @var Collection<int, TeaList>
+     */
+    #[ORM\OneToMany(targetEntity: TeaList::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $teaLists;
+
+    public function __construct()
+    {
+        $this->teaLists = new ArrayCollection();
+    }
 
 	/**
 	 * A visual identifier that represents this user.
