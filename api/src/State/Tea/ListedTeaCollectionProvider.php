@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @implements ProviderInterface<Tea|null>
+ * @implements ProviderInterface<PaginatorInterface>
  */
 readonly class ListedTeaCollectionProvider implements ProviderInterface
 {
