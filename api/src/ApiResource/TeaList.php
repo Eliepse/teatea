@@ -19,14 +19,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	denormalizationContext: ["groups" => ["teaList:write"]],
 	security: "is_granted('ROLE_USER')"
 )]
-#[Get(uriTemplate: "/collections/{id}", provider: TeaListProvider::class)]
+#[Get(uriTemplate: "/lists/favorites", provider: TeaListProvider::class, extraProperties: ["nativeList" => "favorites"])]
+#[Get(uriTemplate: "/lists/wishlist", provider: TeaListProvider::class, extraProperties: ["nativeList" => "wishlist"])]
+#[Get(uriTemplate: "/lists/{id}", provider: TeaListProvider::class)]
 #[GetCollection(
-	uriTemplate: "/members/{username}/collections",
+	uriTemplate: "/members/{username}/lists",
 	uriVariables: ["username" => new Link(fromProperty: "username", toProperty: "owner", fromClass: Member::class)],
 	provider: TeaListCollectionProvider::class,
 )]
 #[Post(
-	uriTemplate: "/members/{username}/collections",
+	uriTemplate: "/members/{username}/lists",
 	uriVariables: ["username" => new Link(fromProperty: "username", toProperty: "owner", fromClass: Member::class)],
 	processor: TeaListProcessor::class,
 )]

@@ -142,3 +142,11 @@ export type Steep = Omit<Resource<"Steep">, "id"> & {
 	temperature?: Temperature;
 	order: number;
 };
+
+export type TeaListType = "favorites" | "wishlist" | "custom";
+
+export type TeaList = Resource<"TeaList"> & {
+	name: string;
+	type: TeaListType;
+	owner: Iri;
+};

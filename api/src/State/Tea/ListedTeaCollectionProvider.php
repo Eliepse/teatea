@@ -8,7 +8,6 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Tea;
 use App\Entity\Origin;
 use App\Helper\Arr;
 use Doctrine\Common\Collections\ArrayCollection;

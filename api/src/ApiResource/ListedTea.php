@@ -7,20 +7,32 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
-use App\State\Tea\ListedTeaCollectionProvider;
+use App\State\TeaList\ListedTeaCollectionProvider;
 use App\State\TeaList\ListedTeaProvider;
 
 #[ApiResource(
+	normalizationContext: ["groups" => ["listedTea:read"]],
+	denormalizationContext: ["groups" => ["listedTea:write"]],
+	security: "is_granted('ROLE_USER')",
+)]
+#[Get(
 	uriTemplate: "/lists/{listId}/teas/{id}",
 	uriVariables: [
 		"listId" => new Link(fromProperty: "id", toProperty: "list", fromClass: TeaList::class),
 		"id" => new Link(fromProperty: "id", toProperty: "tea", fromClass: Tea::class),
 	],
-	normalizationContext: ["groups" => ["listedTea:read"]],
-	denormalizationContext: ["groups" => ["listedTea:write"]],
-	security: "is_granted('ROLE_USER')",
+	provider: ListedTeaProvider::class,
 )]
-#[Get(provider: ListedTeaProvider::class)]
+#[GetCollection(
+	uriTemplate: "/lists/favorites/teas",
+	provider: ListedTeaCollectionProvider::class,
+	extraProperties: ["nativeList" => "favorites"],
+)]
+#[GetCollection(
+	uriTemplate: "/lists/wishlist/teas",
+	provider: ListedTeaCollectionProvider::class,
+	extraProperties: ["nativeList" => "wishlist"],
+)]
 #[GetCollection(
 	uriTemplate: "/lists/{listId}/teas",
 	uriVariables: [
@@ -28,8 +40,8 @@ use App\State\TeaList\ListedTeaProvider;
 	],
 	provider: ListedTeaCollectionProvider::class,
 )]
-//#[Post(uriTemplate: "/lists/" . TeaListType::Favorites->value . "/teas")]
-//#[Post(uriTemplate: "/lists/" . TeaListType::Wishlist->value . "/teas")]
+//#[Post(uriTemplate: "/lists/favorites/teas")]
+//#[Post(uriTemplate: "/lists/wishlist/teas")]
 class ListedTea
 {
 	#[ApiProperty(identifier: true)]

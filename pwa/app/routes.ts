@@ -7,7 +7,7 @@ export default [
 	route("/onboarding", "pages/auth/onboarding.tsx"),
 
 	layout("auth/components/AuthenticatedGuard.tsx", [
-		route("/welcome", "pages/dashboard.tsx"),
+		route("/welcome", "pages/dashboard/dashboard.tsx"),
 
 		route("/tea/new", "pages/tea/tea-create.tsx"),
 		route("/tea/search", "pages/tea/search.tsx"),
@@ -17,9 +17,9 @@ export default [
 		route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
 		route("/sessions", "pages/teaSession/teaSessions.tsx"),
 
-		...prefix("/me", [
-			route("/teas", "pages/tea/tea-list.tsx"),
-		]),
+		route("/lists/:id", "pages/lists/teaList.tsx"),
+
+		...prefix("/me", [route("/teas", "pages/tea/tea-list.tsx")]),
 	]),
 
 	layout("auth/components/AdminGuard.tsx", [

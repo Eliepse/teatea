@@ -30,20 +30,25 @@ readonly class TeaListProvider implements ProviderInterface
 		assert(false === ($operation instanceof CollectionOperationInterface));
 		assert($user instanceof User);
 
-		$slug = $uriVariables["slug"] ?? null;
+		$nativeList = $operation->getExtraProperties()["nativeList"] ?? null;
+		$nativeListType = $nativeList ? TeaListType::tryFrom($nativeList) : null;
+		$id = $uriVariables["id"] ?? null;
 
-		if (empty($slug)) {
-			throw new BadRequestHttpException();
-		}
 
 		$listQuery = $this->em->createQueryBuilder()
 			->select("list", "owner")
 			->from(\App\Entity\TeaList::class, "list")
 			->leftJoin("list.owner", "owner")
 			->where("list.owner = :member")
-			->andWhere("list.slug = :slug")
-			->setParameter("member", $user)
-			->setParameter("slug", $uriVariables["path"]);
+			->setParameter("member", $user);
+
+		if(false === empty($id)){
+			$listQuery->andWhere("list.id = :id")->setParameter("id", $id);
+		} elseif(null !== $nativeListType) {
+			$listQuery->andWhere("list.type = :type")->setParameter("type", $nativeListType);
+		} else {
+			throw new BadRequestHttpException();
+		}
 
 		$result = $listQuery->getQuery()->getOneOrNullResult();
 
@@ -56,15 +61,15 @@ readonly class TeaListProvider implements ProviderInterface
 		// in database. They're auto persisted on the first tea added.
 
 		$entity = new \App\Entity\TeaList();
+		$entity->id = -1;
 		$entity->owner = $user;
-		$entity->slug = $slug;
 
-		if ("_" . TeaListType::Favorites->value === $slug) {
+		if (TeaListType::Favorites === $nativeListType) {
 			$entity->type = TeaListType::Favorites;
 			return static::fromEntity($entity);
 		}
 
-		if ("_" . TeaListType::Wishlist->value === $slug) {
+		if (TeaListType::Wishlist === $nativeListType) {
 			$entity->type = TeaListType::Wishlist;
 			return static::fromEntity($entity);
 		}

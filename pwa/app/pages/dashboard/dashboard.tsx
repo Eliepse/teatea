@@ -5,12 +5,13 @@ import { useToken } from "~/auth/hooks/useToken";
 import { usePWAInstall } from "~/utils/browser/usePWAInstall";
 import { handleUIEvent } from "~/utils/function";
 import { ArrowDownCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
-import type { Route } from "../../.react-router/types/app/pages/+types/dashboard";
+import type { Route } from "../../../.react-router/types/app/pages/dashboard/+types/dashboard";
 import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
 import { CoffeeCup, Plus } from "iconoir-react";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { IfAdmin } from "~/auth/components/voters/IfAdmin";
+import { TeaLists } from "~/pages/dashboard/_components/TeaLists";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -83,6 +84,8 @@ export default function Dashboard(props: Route.ComponentProps) {
 					</ul>
 				</>
 			)}
+
+			<TeaLists />
 
 			<p className="my-8 text-center">
 				If you need help or have any feedback,
