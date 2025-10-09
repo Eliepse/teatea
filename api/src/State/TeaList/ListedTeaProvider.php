@@ -9,6 +9,8 @@ use App\ApiResource\ListedTea;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaList;
 use App\Entity\User;
+use App\Repository\OriginRepository;
+use App\State\Tea\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -63,8 +65,11 @@ readonly class ListedTeaProvider implements ProviderInterface
 		$resource->tea = new Tea();
 		$resource->tea->id = $entity->tea->id;
 
-		$resource->list = new TeaList();
-		$resource->list->id = $entity->list->id;
+		if (null !== $entity->list) {
+			$resource->list = new TeaList();
+			$resource->list->id = $entity->list->id;
+		}
+
 		$resource->createdAt = $entity->createdAt;
 
 		return $resource;

@@ -1,11 +1,11 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
-import { getApi } from "~/utils/api";
+import { getApi, postApi } from "~/utils/api";
 import type { ApiPaginatedCollection, TeaSession, TeaStats } from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { formatDistanceToNow, intlFormat } from "date-fns";
 import Leaf from "~/components/icons/leaf";
@@ -13,6 +13,7 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { limit } from "~/utils/text";
 import clsx from "clsx";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
+import { Heart } from "iconoir-react";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const tea = denormalizeTea(await (await getApi<TeaRaw>(`/teas/${args.params.id}`)).json());
@@ -55,12 +56,27 @@ export default function TeaPage(props: Route.ComponentProps) {
 		queryKey: ["page", tea["@id"], "sessions"],
 	});
 
+	const changeFavorite = useMutation({
+		mutationFn: async (state: boolean) => await (await postApi(`/lists/favorites/teas`, { tea: tea["@id"] })).json(),
+		onSuccess: console.debug,
+	});
+
 	return (
 		<div className="pb-22">
 			<header className={clsx("p-4 bg-stone-50 border-t-3", TEA_FAMILY_BORDER_CLS[tea.family])}>
-				<button className="btn btn-ghost p-0 mb-4" onClick={handleUIEvent(() => navigate(-1))}>
-					<ArrowLeftIcon className="size-4 mr-1" /> Back
-				</button>
+				<div className="flex mb-4">
+					<button className="btn btn-ghost p-0 mr-auto" onClick={handleUIEvent(() => navigate(-1))}>
+						<ArrowLeftIcon className="size-4 mr-1" /> Back
+					</button>
+
+					<button
+						className="btn btn-outline btn-secondary btn-circle"
+						onClick={handleUIEvent(() => changeFavorite.mutate(true))}
+					>
+						<Heart className="size-5" />
+						{/*<HeartSolid className="size-5" />*/}
+					</button>
+				</div>
 
 				<h1 className="text-3xl mb-2">{tea.type?.name ?? familyLabel}</h1>
 

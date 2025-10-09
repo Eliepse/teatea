@@ -10,8 +10,6 @@ interface Resource<TType extends string = string> {
 	"@type": TType;
 }
 
-type LTreePath = string[];
-
 export type User = Resource & {
 	username: string;
 	roles?: string[];
@@ -143,9 +141,23 @@ export type Steep = Omit<Resource<"Steep">, "id"> & {
 	order: number;
 };
 
-export type TeaListType = "favorites" | "wishlist" | "custom";
+export const TeaListTypeEnum = {
+	Custom: 0,
+	Favorites: 1,
+	Wishlist: 2,
+} as const;
+
+export type TeaListType = (typeof TeaListTypeEnum)[keyof typeof TeaListTypeEnum];
 
 export type TeaList = Resource<"TeaList"> & {
 	name: string;
 	owner: Iri;
+};
+
+export type ListedTea = Resource & {
+	id: Id;
+	tea: Tea;
+	list?: Iri;
+	type: TeaListType;
+	createdAt: Date;
 };

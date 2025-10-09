@@ -32,7 +32,6 @@ readonly class TeaListProcessor implements ProcessorInterface
 		assert($user instanceof User);
 
 		$entity = new \App\Entity\TeaList();
-		$entity->type = $data->type;
 		$entity->owner = $user;
 		$entity->slug = trim(new UnicodeString($data->name)->trim()->ascii()->kebab()->toString(), "_");
 
