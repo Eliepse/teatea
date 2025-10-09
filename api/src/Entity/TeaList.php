@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
-use App\Enum\TeaListType;
+use App\Enum\TeaListPivotType;
 use App\Repository\TeaListRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -22,10 +22,6 @@ class TeaList
 
 	#[ORM\Column(type: Types::TEXT, unique: true)]
 	public string $slug;
-
-	#[ORM\Column(type: Types::TEXT)]
-	public TeaListType $type = TeaListType::Custom;
-
 
 	#[ORM\Column(type: Types::TEXT, nullable: true)]
 	public ?string $name = null;

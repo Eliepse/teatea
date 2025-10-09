@@ -58,6 +58,7 @@ readonly class ListedTeaProvider implements ProviderInterface
 
 		$resource = new ListedTea();
 		$resource->id = $entity->id;
+		$resource->type = $entity->type;
 
 		$resource->tea = new Tea();
 		$resource->tea->id = $entity->tea->id;

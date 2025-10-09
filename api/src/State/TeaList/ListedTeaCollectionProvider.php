@@ -6,12 +6,9 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ListedTea;
-use App\Entity\TeaList;
-use App\Entity\TeaListPivot;
 use App\Entity\User;
-use App\Enum\TeaListType;
+use App\Enum\TeaListPivotType;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -32,17 +29,19 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
 		assert($user instanceof User);
 
-		$nativeList = $operation->getExtraProperties()["nativeList"] ?? null;
-		$nativeListType = $nativeList ? TeaListType::tryFrom($nativeList) : null;
+		$nativeList = $operation->getExtraProperties()["nativeList"];
+		$nativeList = $nativeList instanceof TeaListPivotType ? $nativeList : null;
 
 		$listedTeaQuery = $this->em->createQueryBuilder()
 			->select("pivot")
-			->from(TeaListPivot::class, "pivot");
+			->from(\App\Entity\TeaListPivot::class, "pivot");
 
-		if (null !== $nativeListType) {
+		if (null !== $nativeList) {
 			$listedTeaQuery
-				->innerJoin("pivot.list", "list", "WITH", "list.type = :type")
-				->setParameter("type", $nativeListType);
+				->andWhere("pivot.author = :member")
+				->andWhere("pivot.type = :type")
+				->setParameter("member", $user)
+				->setParameter("type", $nativeList);
 
 			return array_map(
 				fn($entity) => ListedTeaProvider::fromEntity($entity),
@@ -50,8 +49,7 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 			);
 		}
 
-		$list = $this->em->find(TeaList::class, $uriVariables["listId"]);
-
+		$list = $this->em->find(\App\Entity\TeaList::class, $uriVariables["listId"]);
 		if (empty($list)) {
 			throw new NotFoundHttpException();
 		}

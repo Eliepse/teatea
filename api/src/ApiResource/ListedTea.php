@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use App\Enum\TeaListPivotType;
 use App\State\TeaList\ListedTeaCollectionProvider;
 use App\State\TeaList\ListedTeaProvider;
 
@@ -26,12 +27,12 @@ use App\State\TeaList\ListedTeaProvider;
 #[GetCollection(
 	uriTemplate: "/lists/favorites/teas",
 	provider: ListedTeaCollectionProvider::class,
-	extraProperties: ["nativeList" => "favorites"],
+	extraProperties: ["nativeList" => TeaListPivotType::Favorites],
 )]
 #[GetCollection(
 	uriTemplate: "/lists/wishlist/teas",
 	provider: ListedTeaCollectionProvider::class,
-	extraProperties: ["nativeList" => "wishlist"],
+	extraProperties: ["nativeList" => TeaListPivotType::Wishlist],
 )]
 #[GetCollection(
 	uriTemplate: "/lists/{listId}/teas",
@@ -50,6 +51,8 @@ class ListedTea
 	public Tea $tea;
 
 	public TeaList $list;
+
+	public TeaListPivotType $type;
 
 	public \DateTimeImmutable $createdAt;
 }

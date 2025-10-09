@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
-use App\Enum\TeaListType;
+use App\Enum\TeaListPivotType;
 use App\State\TeaList\TeaListCollectionProvider;
 use App\State\TeaList\TeaListProcessor;
 use App\State\TeaList\TeaListProvider;
@@ -19,8 +19,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	denormalizationContext: ["groups" => ["teaList:write"]],
 	security: "is_granted('ROLE_USER')"
 )]
-#[Get(uriTemplate: "/lists/favorites", provider: TeaListProvider::class, extraProperties: ["nativeList" => "favorites"])]
-#[Get(uriTemplate: "/lists/wishlist", provider: TeaListProvider::class, extraProperties: ["nativeList" => "wishlist"])]
+#[Get(
+	uriTemplate: "/lists/favorites",
+	provider: TeaListProvider::class,
+	extraProperties: ["nativeList" => TeaListPivotType::Favorites],
+)]
+#[Get(
+	uriTemplate: "/lists/wishlist",
+	provider: TeaListProvider::class,
+	extraProperties: ["nativeList" => TeaListPivotType::Wishlist],
+)]
 #[Get(uriTemplate: "/lists/{id}", provider: TeaListProvider::class)]
 #[GetCollection(
 	uriTemplate: "/members/{username}/lists",
@@ -44,9 +52,6 @@ class TeaList
 
 	#[Groups(["teaList:read", "teaList:write"])]
 	public string $name;
-
-	#[Groups(["teaList:read"])]
-	public TeaListType $type;
 
 	#[Groups(["teaList:read"])]
 	public Member $owner;

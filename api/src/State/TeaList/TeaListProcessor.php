@@ -7,7 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TeaList;
 use App\Entity\User;
-use App\Enum\TeaListType;
+use App\Enum\TeaListPivotType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
