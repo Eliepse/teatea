@@ -147,6 +147,5 @@ export type TeaListType = "favorites" | "wishlist" | "custom";
 
 export type TeaList = Resource<"TeaList"> & {
 	name: string;
-	type: TeaListType;
 	owner: Iri;
 };

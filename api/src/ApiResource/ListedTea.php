@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\Link;
 use App\Enum\TeaListPivotType;
 use App\State\TeaList\ListedTeaCollectionProvider;
 use App\State\TeaList\ListedTeaProvider;
+use App\State\TeaList\NativeListedTeaCollectionProvider;
 
 #[ApiResource(
 	normalizationContext: ["groups" => ["listedTea:read"]],
@@ -26,13 +27,13 @@ use App\State\TeaList\ListedTeaProvider;
 )]
 #[GetCollection(
 	uriTemplate: "/lists/favorites/teas",
-	provider: ListedTeaCollectionProvider::class,
-	extraProperties: ["nativeList" => TeaListPivotType::Favorites],
+	provider: NativeListedTeaCollectionProvider::class,
+	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
 #[GetCollection(
 	uriTemplate: "/lists/wishlist/teas",
-	provider: ListedTeaCollectionProvider::class,
-	extraProperties: ["nativeList" => TeaListPivotType::Wishlist],
+	provider: NativeListedTeaCollectionProvider::class,
+	extraProperties: ["list" => TeaListPivotType::Wishlist],
 )]
 #[GetCollection(
 	uriTemplate: "/lists/{listId}/teas",

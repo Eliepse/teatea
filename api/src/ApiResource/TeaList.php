@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Enum\TeaListPivotType;
+use App\State\TeaList\NativeTeaListProvider;
 use App\State\TeaList\TeaListCollectionProvider;
 use App\State\TeaList\TeaListProcessor;
 use App\State\TeaList\TeaListProvider;
@@ -21,13 +22,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 )]
 #[Get(
 	uriTemplate: "/lists/favorites",
-	provider: TeaListProvider::class,
-	extraProperties: ["nativeList" => TeaListPivotType::Favorites],
+	provider: NativeTeaListProvider::class,
+	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
 #[Get(
 	uriTemplate: "/lists/wishlist",
-	provider: TeaListProvider::class,
-	extraProperties: ["nativeList" => TeaListPivotType::Wishlist],
+	provider: NativeTeaListProvider::class,
+	extraProperties: ["list" => TeaListPivotType::Wishlist],
 )]
 #[Get(uriTemplate: "/lists/{id}", provider: TeaListProvider::class)]
 #[GetCollection(
