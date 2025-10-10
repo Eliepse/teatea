@@ -1,13 +1,12 @@
 <?php
 
-namespace App\State\TeaList;
+namespace App\State\MemberTea;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\MemberTea;
 use App\Entity\User;
-use App\Enum\TeaListPivotType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -15,7 +14,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * @implements ProviderInterface<MemberTea[]>
  */
-readonly class ListedTeaCollectionProvider implements ProviderInterface
+readonly class MemberTeaCollectionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -42,7 +41,7 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 			->setParameter("list", $list);
 
 		return array_map(
-			fn($entity) => ListedTeaProvider::fromEntity($entity),
+			fn($entity) => MemberTeaProvider::fromEntity($entity),
 			$listedTeaQuery->getQuery()->getResult(),
 		);
 	}

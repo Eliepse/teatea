@@ -9,9 +9,9 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Enum\TeaListPivotType;
-use App\State\TeaList\ListedTeaProvider;
-use App\State\TeaList\NativeListedTeaCollectionProvider;
-use App\State\TeaList\NativeListedTeaProcessor;
+use App\State\MemberTea\MemberTeaProvider;
+use App\State\MemberTea\NativeListMemberTeaCollectionProvider;
+use App\State\MemberTea\NativeListMemberTeaProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
@@ -33,22 +33,22 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		"username" => new Link(fromProperty: "username", toProperty: "author", fromClass: Member::class),
 		"pivotId" => new Link(identifiers: ["id"]),
 	],
-	provider: ListedTeaProvider::class
+	provider: MemberTeaProvider::class
 )]
 #[GetCollection(
 	uriTemplate: "/members/{username}/teas",
-	provider: NativeListedTeaCollectionProvider::class,
+	provider: NativeListMemberTeaCollectionProvider::class,
 	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
 #[Post(
 	uriTemplate: "/lists/favorites/teas",
 	denormalizationContext: ["groups" => "listedTea:write-native"],
-	processor: NativeListedTeaProcessor::class,
+	processor: NativeListMemberTeaProcessor::class,
 	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
 #[GetCollection(
 	uriTemplate: "/lists/wishlist/teas",
-	provider: NativeListedTeaCollectionProvider::class,
+	provider: NativeListMemberTeaCollectionProvider::class,
 	extraProperties: ["list" => TeaListPivotType::Wishlist],
 )]
 class MemberTea

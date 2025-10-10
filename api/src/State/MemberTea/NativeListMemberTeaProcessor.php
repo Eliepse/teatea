@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State\TeaList;
+namespace App\State\MemberTea;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 /**
  * @implements ProviderInterface<MemberTea>
  */
-readonly class NativeListedTeaProcessor implements ProcessorInterface
+readonly class NativeListMemberTeaProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -58,6 +58,6 @@ readonly class NativeListedTeaProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		return ListedTeaProvider::fromEntity($entity);
+		return MemberTeaProvider::fromEntity($entity);
 	}
 }

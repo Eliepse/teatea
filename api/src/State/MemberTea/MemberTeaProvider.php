@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State\TeaList;
+namespace App\State\MemberTea;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 /**
  * @implements ProviderInterface<MemberTea|null>
  */
-readonly class ListedTeaProvider implements ProviderInterface
+readonly class MemberTeaProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,

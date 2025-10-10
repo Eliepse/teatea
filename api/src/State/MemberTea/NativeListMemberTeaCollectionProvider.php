@@ -1,6 +1,6 @@
 <?php
 
-namespace App\State\TeaList;
+namespace App\State\MemberTea;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -11,8 +11,6 @@ use App\Enum\TeaListPivotType;
 use App\Helper\Arr;
 use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
-use App\State\TeaSession\TeaSessionProvider;
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -21,7 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security;
  *
  * @implements ProviderInterface<MemberTea[]>
  */
-readonly class NativeListedTeaCollectionProvider implements ProviderInterface
+readonly class NativeListMemberTeaCollectionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -58,7 +56,7 @@ readonly class NativeListedTeaCollectionProvider implements ProviderInterface
 		$results = [];
 
 		foreach ($entities as $entity) {
-			$resource = ListedTeaProvider::fromEntity($entity);
+			$resource = MemberTeaProvider::fromEntity($entity);
 
 			$path = TeaProvider::getOriginPath($originMap, $originsById[$entity->tea->originId]);
 			$resource->tea = TeaProvider::hydrateResource($entity->tea, $path);
