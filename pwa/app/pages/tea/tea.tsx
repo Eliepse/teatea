@@ -1,6 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
 import { getApi, postApi } from "~/utils/api";
-import type { ApiPaginatedCollection, TeaSession, TeaStats } from "~t/types";
+import type { ApiCollection, ApiPaginatedCollection, TeaList, TeaSession, TeaStats } from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
@@ -13,12 +13,18 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { limit } from "~/utils/text";
 import clsx from "clsx";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { Heart } from "iconoir-react";
+import { Heart, HeartSolid } from "iconoir-react";
+import { useState } from "react";
+import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const tea = denormalizeTea(await (await getApi<TeaRaw>(`/teas/${args.params.id}`)).json());
+	const favorites = await (
+		await getApi<ApiCollection<TeaList>>(`/lists/favorites/teas`, { tea: args.params.id })
+	).json();
 	const stats = await (await getApi<TeaStats>(`/teas/${args.params.id}/stats`)).json();
-	return { tea, stats };
+
+	return { tea, stats, isFavorite: 0 !== favorites.member.length };
 }
 
 const TEA_FAMILY_BADGE_CLS = {
@@ -42,6 +48,7 @@ const TEA_FAMILY_BORDER_CLS = {
 export default function TeaPage(props: Route.ComponentProps) {
 	const { tea, stats } = props.loaderData;
 	const navigate = useNavigate();
+	const [isFavorite, setIsFavorite] = useState(props.loaderData.isFavorite);
 	const familyLabel = tea.family[0].toUpperCase() + tea.family.substring(1) + " tea";
 	const origin = tea.originPath?.locality ?? tea.originPath?.region ?? tea.originPath?.country;
 
@@ -57,8 +64,10 @@ export default function TeaPage(props: Route.ComponentProps) {
 	});
 
 	const changeFavorite = useMutation({
-		mutationFn: async (state: boolean) => await (await postApi(`/lists/favorites/teas`, { tea: tea["@id"] })).json(),
-		onSuccess: console.debug,
+		mutationFn: async (state: boolean) => {
+			return await (await postApi(`/lists/favorites/teas`, { tea: tea["@id"] })).json();
+		},
+		onSuccess: () => setIsFavorite((st) => !st),
 	});
 
 	return (
@@ -69,13 +78,16 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<ArrowLeftIcon className="size-4 mr-1" /> Back
 					</button>
 
-					<button
-						className="btn btn-outline btn-secondary btn-circle"
-						onClick={handleUIEvent(() => changeFavorite.mutate(true))}
-					>
-						<Heart className="size-5" />
-						{/*<HeartSolid className="size-5" />*/}
-					</button>
+					<IfAuthenticated>
+						<button
+							className="btn btn-outline btn-secondary btn-circle"
+							onClick={handleUIEvent(() => changeFavorite.mutate(isFavorite))}
+							disabled={changeFavorite.isPending}
+						>
+							{isFavorite && <HeartSolid className="size-5" />}
+							{!isFavorite && <Heart className="size-5" />}
+						</button>
+					</IfAuthenticated>
 				</div>
 
 				<h1 className="text-3xl mb-2">{tea.type?.name ?? familyLabel}</h1>

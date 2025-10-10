@@ -9,6 +9,7 @@ use App\ApiResource\MemberTea;
 use App\Entity\User;
 use App\Enum\TeaListPivotType;
 use App\Helper\Arr;
+use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
@@ -31,12 +32,10 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
 	{
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
+		assert(($user = $this->security->getUser()) instanceof User);
+		assert(($listType = $operation->getExtraProperties()["list"]) instanceof TeaListPivotType);
 
-		$user = $this->security->getUser();
-		assert($user instanceof User);
-
-		$listType = $operation->getExtraProperties()["list"];
-		assert($listType instanceof TeaListPivotType);
+		$teaSearch = OperationHelper::getParameter($operation, "tea");
 
 		$listedTeaQuery = $this->em->createQueryBuilder()
 			->select("pivot", "tea")
@@ -46,6 +45,10 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 			->andWhere("pivot.type = :type")
 			->setParameter("member", $user)
 			->setParameter("type", $listType);
+
+		if (is_int($teaSearch)) {
+			$listedTeaQuery->andWhere("pivot.tea = :tea")->setParameter("tea", $teaSearch);
+		}
 
 		$entities = $listedTeaQuery->getQuery()->getResult();
 

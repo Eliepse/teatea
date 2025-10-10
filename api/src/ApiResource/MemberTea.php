@@ -4,10 +4,12 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Enum\TeaListPivotType;
 use App\State\MemberTea\MemberTeaProvider;
 use App\State\MemberTea\NativeListMemberTeaCollectionProvider;
@@ -44,6 +46,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	uriTemplate: "/lists/favorites/teas",
 	denormalizationContext: ["groups" => "listedTea:write-native"],
 	processor: NativeListMemberTeaProcessor::class,
+	extraProperties: ["list" => TeaListPivotType::Favorites],
+)]
+#[GetCollection(
+	uriTemplate: "/lists/favorites/teas",
+	provider: NativeListMemberTeaCollectionProvider::class,
+	parameters: ["tea" => new QueryParameter(schema: ["type" => "integer", "minimum" => 1], castToNativeType: true)],
 	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
 #[GetCollection(
