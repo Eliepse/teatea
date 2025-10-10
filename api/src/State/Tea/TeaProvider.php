@@ -8,10 +8,13 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\Entity\User;
 use App\State\Cultivar\CultivarProvider;
 use App\State\Origin\OriginProvider;
+use App\State\TeaList\TeaListProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @implements ProviderInterface<Tea|null>
@@ -20,10 +23,11 @@ readonly class TeaProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private Security $security,
 	) {
 	}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Tea|null
 	{
 		assert(false === ($operation instanceof CollectionOperationInterface), "Collection operation not supported");
 
@@ -34,11 +38,14 @@ readonly class TeaProvider implements ProviderInterface
 			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.cultivar", "cultivar")
 			->andWhere("tea.id = :teaId")
-			->setParameter("teaId", $uriVariables["id"])
-			->setMaxResults(1);
+			->setParameter("teaId", $uriVariables["id"]);
 
-		/** @var array<\App\Entity\Tea> $teaEntities */
-		$teaEntities = $teaQb->getQuery()->getResult();
+		/** @var \App\Entity\Tea|null $teaEntity */
+		$teaEntity = $teaQb->getQuery()->getOneOrNullResult();
+
+		if(null === $teaEntity) {
+			return null;
+		}
 
 		$originsQb = $this->em->createQueryBuilder()
 			->select("origin")
@@ -46,15 +53,8 @@ readonly class TeaProvider implements ProviderInterface
 
 		/** @var array<string, Origin> $originsMap */
 		$originsMap = self::originsToMap($originsQb->getQuery()->getResult());
-
-		$resources = [];
-
-		foreach ($teaEntities as $teaEntity) {
-			$originNodes = self::getOriginPath($originsMap, $teaEntity->origin);
-			$resources[] = self::hydrateResource($teaEntity, $originNodes);
-		}
-
-		return $resources[0] ?? null;
+		$originNodes = self::getOriginPath($originsMap, $teaEntity->origin);
+		return self::hydrateResource($teaEntity, $originNodes);
 	}
 
 	/**
