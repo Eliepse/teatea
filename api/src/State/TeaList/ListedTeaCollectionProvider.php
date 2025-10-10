@@ -5,7 +5,7 @@ namespace App\State\TeaList;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\ListedTea;
+use App\ApiResource\MemberTea;
 use App\Entity\User;
 use App\Enum\TeaListPivotType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +13,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @implements ProviderInterface<ListedTea[]>
+ * @implements ProviderInterface<MemberTea[]>
  */
 readonly class ListedTeaCollectionProvider implements ProviderInterface
 {

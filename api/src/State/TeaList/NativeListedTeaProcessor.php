@@ -5,7 +5,7 @@ namespace App\State\TeaList;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\ListedTea;
+use App\ApiResource\MemberTea;
 use App\Entity\User;
 use App\Enum\TeaListPivotType;
 use Doctrine\ORM\AbstractQuery;
@@ -14,7 +14,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * @implements ProviderInterface<ListedTea>
+ * @implements ProviderInterface<MemberTea>
  */
 readonly class NativeListedTeaProcessor implements ProcessorInterface
 {
@@ -24,9 +24,9 @@ readonly class NativeListedTeaProcessor implements ProcessorInterface
 	) {
 	}
 
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ListedTea
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): MemberTea
 	{
-		assert($data instanceof ListedTea);
+		assert($data instanceof MemberTea);
 
 		$user = $this->security->getUser();
 		assert($user instanceof User);

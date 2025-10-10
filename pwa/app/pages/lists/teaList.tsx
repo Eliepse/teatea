@@ -1,6 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/lists/+types/teaList";
 import { getApi } from "~/utils/api";
-import type { ApiCollection, ListedTea, TeaList } from "~t/types";
+import type { ApiCollection, MemberTea, TeaList } from "~t/types";
 import { PageLayout } from "~/components/shared/paged/PageLayout";
 import { Link, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ export default function TeaListPage(props: Route.ComponentProps) {
 	const teaLinks = useQuery({
 		queryFn: async (ctx) => {
 			let id = ctx.queryKey[1];
-			const response = await getApi<ApiCollection<ListedTea>>(`/lists/${id}/teas`);
+			const response = await getApi<ApiCollection<MemberTea>>(`/lists/${id}/teas`);
 			return await response.json();
 		},
 		queryKey: ["tea-list", props.params.id],

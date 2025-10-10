@@ -9,28 +9,34 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use App\Enum\TeaListPivotType;
-use App\State\TeaList\ListedTeaCollectionProvider;
 use App\State\TeaList\ListedTeaProvider;
 use App\State\TeaList\NativeListedTeaCollectionProvider;
 use App\State\TeaList\NativeListedTeaProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-//	normalizationContext: ["groups" => ["listedTea:read"]],
-//	denormalizationContext: ["groups" => ["listedTea:write"]],
+	normalizationContext: [
+		"groups" => [
+			"listedTea:read",
+			"embedded:tea",
+			"embedded:origin",
+			"embedded:teaType",
+			"embedded:cultivar"
+		]
+	],
+	denormalizationContext: ["groups" => ["listedTea:write"]],
 	security: "is_granted('ROLE_USER')",
 )]
 #[Get(
-	uriTemplate: "/listed-teas/{id}",
-//	uriVariables: [
-//		"listId" => new Link(fromProperty: "id", toProperty: "list", fromClass: TeaList::class),
-//		"id" => new Link(fromProperty: "id", toProperty: "tea", fromClass: Tea::class),
-//	],
-	provider: ListedTeaProvider::class,
+	uriTemplate: "/members/{username}/teas/{pivotId}",
+	uriVariables: [
+		"username" => new Link(fromProperty: "username", toProperty: "author", fromClass: Member::class),
+		"pivotId" => new Link(identifiers: ["id"]),
+	],
+	provider: ListedTeaProvider::class
 )]
 #[GetCollection(
-	uriTemplate: "/lists/favorites/teas",
-	normalizationContext: ["groups" => ["listedTea:read", "embedded:tea", "embedded:origin", "embedded:teaType", "embedded:cultivar"]],
+	uriTemplate: "/members/{username}/teas",
 	provider: NativeListedTeaCollectionProvider::class,
 	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
@@ -45,15 +51,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	provider: NativeListedTeaCollectionProvider::class,
 	extraProperties: ["list" => TeaListPivotType::Wishlist],
 )]
-//#[Post(uriTemplate: "/lists/wishlist/teas")]
-#[GetCollection(
-	uriTemplate: "/lists/{listId}/teas",
-	uriVariables: [
-		"listId" => new Link(fromProperty: "id", toProperty: "list", fromClass: TeaList::class),
-	],
-	provider: ListedTeaCollectionProvider::class,
-)]
-class ListedTea
+class MemberTea
 {
 	#[ApiProperty(identifier: true)]
 	#[Groups(["listedTea:read"])]
@@ -67,6 +65,9 @@ class ListedTea
 
 	#[Groups(["listedTea:read"])]
 	public TeaListPivotType $type;
+
+	#[Groups(["listedTea:read"])]
+	public Member $author;
 
 	#[Groups(["listedTea:read"])]
 	public \DateTimeImmutable $createdAt;

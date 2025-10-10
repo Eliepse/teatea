@@ -154,10 +154,11 @@ export type TeaList = Resource<"TeaList"> & {
 	owner: Iri;
 };
 
-export type ListedTea = Resource & {
+export type MemberTea = Resource & {
 	id: Id;
 	tea: Tea;
 	list?: Iri;
 	type: TeaListType;
+	author: Iri;
 	createdAt: Date;
 };

@@ -5,7 +5,7 @@ namespace App\State\TeaList;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\ListedTea;
+use App\ApiResource\MemberTea;
 use App\Entity\User;
 use App\Enum\TeaListPivotType;
 use App\Helper\Arr;
@@ -19,7 +19,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 /**
  * Native lists doesn't need to be linked to a list entity
  *
- * @implements ProviderInterface<ListedTea[]>
+ * @implements ProviderInterface<MemberTea[]>
  */
 readonly class NativeListedTeaCollectionProvider implements ProviderInterface
 {
