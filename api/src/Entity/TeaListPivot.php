@@ -15,7 +15,7 @@ class TeaListPivot
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
-	public readonly int $id;
+	public int $id;
 
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(nullable: false)]
