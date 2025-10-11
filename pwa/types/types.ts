@@ -4,7 +4,7 @@ import type { TeawareType } from "./teawareType";
 export type Id = number;
 export type Iri = string;
 
-interface Resource<TType extends string = string> {
+export interface Resource<TType extends string = string> {
 	id: Id;
 	"@id": Iri;
 	"@type": TType;

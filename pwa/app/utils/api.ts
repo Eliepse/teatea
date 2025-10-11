@@ -2,6 +2,7 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import { UnauthenticatedError } from "~/auth/errors/UnauthenticatedError";
 import { ApiError } from "~/api/errors/ApiError";
 import { refreshToken } from "~/auth/requests";
+import type { Resource } from "~t/types";
 
 type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
 	(
@@ -31,7 +32,7 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 
 	let token = TokenUtils.getRaw();
 
-	if(null === TokenUtils.get()) {
+	if (null === TokenUtils.get()) {
 		await refreshToken();
 		token = TokenUtils.getRaw();
 	}
@@ -106,6 +107,9 @@ export async function patchApi<T>(
 	});
 }
 
-export async function deleteApi<T>(url: string, config?: Omit<FetchApiConfig, "method">): Promise<TResponse<T>> {
-	return fetchApi<T>(url, { ...config, method: "DELETE" });
+export async function deleteApi<T>(
+	url: string | Resource,
+	config?: Omit<FetchApiConfig, "method">,
+): Promise<TResponse<T>> {
+	return fetchApi<T>(typeof url === "string" ? url : url["@id"], { ...config, method: "DELETE" });
 }
