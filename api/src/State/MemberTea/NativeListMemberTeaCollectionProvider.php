@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\MemberTea;
+use App\ApiResource\TeaList;
 use App\Entity\User;
 use App\Enum\TeaListPivotType;
 use App\Helper\Arr;
@@ -58,11 +59,19 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 
 		$results = [];
 
+		// Hydrate native list
+		$list = new TeaList();
+		$list->id = 0;
+		$list->name = $listType->name;
+		$list->slug = $listType->getSlug();
+
 		foreach ($entities as $entity) {
 			$resource = MemberTeaProvider::fromEntity($entity);
 
 			$path = TeaProvider::getOriginPath($originMap, $originsById[$entity->tea->originId]);
 			$resource->tea = TeaProvider::hydrateResource($entity->tea, $path);
+			$resource->list = $list;
+			$resource->list->owner = $resource->author;
 
 			$results[] = $resource;
 		}

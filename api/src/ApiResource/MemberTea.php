@@ -18,9 +18,9 @@ use App\State\MemberTea\NativeListMemberTeaProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-	uriTemplate: "/members/{username}/teas/{id}",
+	uriTemplate: "/lists/{slug}/teas/{id}",
 	uriVariables: [
-		"username" => new Link(fromProperty: "username", toProperty: "author", fromClass: Member::class),
+		"slug" => new Link(fromProperty: "slug", toProperty: "list", fromClass: TeaList::class),
 		"id" => new Link(identifiers: ["id"]),
 	],
 	normalizationContext: [

@@ -2,14 +2,13 @@
 
 namespace App\State\MemberTea;
 
-use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\MemberTea;
+use App\ApiResource\TeaList;
 use App\Entity\User;
 use App\Enum\TeaListPivotType;
-use App\Helper\OperationHelper;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -33,7 +32,8 @@ readonly class NativeListMemberTeaProcessor implements ProcessorInterface
 		$user = $this->security->getUser();
 		assert($user instanceof User);
 
-		assert(($listType = $operation->getExtraProperties()["list"]) instanceof TeaListPivotType);
+		$listType = $operation->getExtraProperties()["list"];
+		assert($listType instanceof TeaListPivotType);
 
 		$entity = new \App\Entity\TeaListPivot();
 		$entity->type = $listType;
@@ -60,6 +60,15 @@ readonly class NativeListMemberTeaProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		return MemberTeaProvider::fromEntity($entity);
+		$resource = MemberTeaProvider::fromEntity($entity);
+
+		// Hydrate native list
+		$resource->list = new TeaList();
+		$resource->list->id = 0;
+		$resource->list->name = $listType->name;
+		$resource->list->slug = $listType->getSlug();
+		$resource->list->owner = $resource->author;
+
+		return $resource;
 	}
 }

@@ -10,9 +10,9 @@ use App\ApiResource\MemberTea;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaList;
 use App\Entity\User;
+use App\Enum\TeaListPivotType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @implements ProviderInterface<MemberTea|null>
@@ -32,28 +32,43 @@ readonly class MemberTeaProvider implements ProviderInterface
 		$user = $this->security->getUser();
 		assert($user instanceof User);
 
-		$username = $uriVariables["username"] ?? null;
+		$listSlug = $uriVariables["slug"] ?? null;
 		$pivotId = $uriVariables["id"] ?? null;
 
-		if ($user->username !== $username) {
-			throw new AccessDeniedHttpException();
-		}
-
-		if (empty($username) || empty($pivotId)) {
+		if (empty($listSlug) || empty($pivotId)) {
 			return null;
 		}
+
+		$type = TeaListPivotType::tryFromSlug($listSlug) ?? TeaListPivotType::Custom;
 
 		$listQuery = $this->em->createQueryBuilder()
 			->select("pivot", "author", "list")
 			->from(\App\Entity\TeaListPivot::class, "pivot")
-			->innerJoin("pivot.author", "author", "WITH", "author.username = :username")
+			->leftJoin("pivot.author", "author")
 			->leftJoin("pivot.list", "list")
 			->where("pivot = :pivot")
-			->setParameter("username", $username)
-			->setParameter("pivot", $pivotId);
+			->andWhere("pivot.type = :type AND author = :author")
+			->setParameter("pivot", $pivotId)
+			->setParameter("type", $type)
+			->setParameter("author", $user);
+
+		if (TeaListPivotType::Custom === $type) {
+			$listQuery->andWhere("pivot.slug = :slug", $listSlug);
+		}
 
 		$result = $listQuery->getQuery()->getOneOrNullResult();
-		return static::fromEntity($result);
+		$resource = static::fromEntity($result);
+
+		// Hydrate native list
+		if (TeaListPivotType::Custom !== $type) {
+			$resource->list = new TeaList();
+			$resource->list->id = 0;
+			$resource->list->name = $type->name;
+			$resource->list->slug = $type->getSlug();
+			$resource->list->owner = $resource->author;
+		}
+
+		return $resource;
 	}
 
 	public static function fromEntity(?\App\Entity\TeaListPivot $entity): ?MemberTea

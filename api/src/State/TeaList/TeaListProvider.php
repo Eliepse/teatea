@@ -26,26 +26,27 @@ readonly class TeaListProvider implements ProviderInterface
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaList|null
 	{
-		$user = $this->security->getUser();
 		assert(false === ($operation instanceof CollectionOperationInterface));
+
+		$user = $this->security->getUser();
 		assert($user instanceof User);
 
-		$nativeList = $operation->getExtraProperties()["nativeList"] ?? null;
-		$nativeList = $nativeList instanceof TeaListPivotType ? $nativeList : null;
+		if (empty($slug = $uriVariables["slug"] ?? null)) {
+			throw new BadRequestHttpException();
+		}
+
+		$type = TeaListPivotType::tryFromSlug($slug);
 
 		// Handle native lists
 		// Those list are available to query even if not persisted
 		// in database. They're auto persisted on the first tea added.
-		if (null !== $nativeList) {
+		if (TeaListPivotType::Custom !== $type) {
 			$entity = new \App\Entity\TeaList();
 			$entity->id = -1;
+			$entity->slug = $type->getSlug();
+			$entity->name = $type->name;
 			$entity->owner = $user;
-			$entity->name = $nativeList->name;
 			return static::fromEntity($entity);
-		}
-
-		if (empty($id = $uriVariables["id"] ?? null)) {
-			throw new BadRequestHttpException();
 		}
 
 		$listQuery = $this->em->createQueryBuilder()
@@ -54,8 +55,8 @@ readonly class TeaListProvider implements ProviderInterface
 			->leftJoin("list.owner", "owner")
 			->where("list.owner = :member")
 			->setParameter("member", $user)
-			->andWhere("list.id = :id")
-			->setParameter("id", $id);
+			->andWhere("list.slug = :slug")
+			->setParameter("slug", $slug);
 
 		return static::fromEntity($listQuery->getQuery()->getOneOrNullResult());
 	}
@@ -68,6 +69,7 @@ readonly class TeaListProvider implements ProviderInterface
 
 		$resource = new TeaList();
 		$resource->id = $entity->id;
+		$resource->slug = $entity->slug;
 		$resource->name = $entity->name;
 		$resource->owner = new Member();
 		$resource->owner->username = $entity->owner->username;
