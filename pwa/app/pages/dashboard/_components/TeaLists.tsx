@@ -11,11 +11,6 @@ export function TeaLists(props: {}) {
 					Favorites <Heart />
 				</ListButton>
 			</li>
-			<li>
-				<ListButton list="wishlist">
-					Wishlist <Star />
-				</ListButton>
-			</li>
 		</ul>
 	);
 }

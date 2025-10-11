@@ -23,7 +23,6 @@ readonly class TeaProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private Security $security,
 	) {
 	}
 

@@ -33,7 +33,7 @@ readonly class MemberTeaProvider implements ProviderInterface
 		assert($user instanceof User);
 
 		$username = $uriVariables["username"] ?? null;
-		$pivotId = $uriVariables["pivotId"] ?? null;
+		$pivotId = $uriVariables["id"] ?? null;
 
 		if ($user->username !== $username) {
 			throw new AccessDeniedHttpException();
@@ -44,9 +44,9 @@ readonly class MemberTeaProvider implements ProviderInterface
 		}
 
 		$listQuery = $this->em->createQueryBuilder()
-			->select("pivot", "member", "tea", "list")
+			->select("pivot", "author", "list")
 			->from(\App\Entity\TeaListPivot::class, "pivot")
-			->innerJoin("pivot.author", "member", "WITH", "member.username = :username")
+			->innerJoin("pivot.author", "author", "WITH", "author.username = :username")
 			->leftJoin("pivot.list", "list")
 			->where("pivot = :pivot")
 			->setParameter("username", $username)
@@ -70,6 +70,7 @@ readonly class MemberTeaProvider implements ProviderInterface
 		$resource->tea->id = $entity->tea->id;
 
 		$resource->author = new Member();
+		$resource->author->id = $entity->author->id;
 		$resource->author->username = $entity->author->username;
 
 		if (null !== $entity->list) {

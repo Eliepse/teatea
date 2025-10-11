@@ -11,53 +11,40 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Enum\TeaListPivotType;
+use App\State\MemberTea\MemberTeaDeleteProcessor;
 use App\State\MemberTea\MemberTeaProvider;
 use App\State\MemberTea\NativeListMemberTeaCollectionProvider;
 use App\State\MemberTea\NativeListMemberTeaProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
+	uriTemplate: "/members/{username}/teas/{id}",
+	uriVariables: [
+		"username" => new Link(fromProperty: "username", toProperty: "author", fromClass: Member::class),
+		"id" => new Link(identifiers: ["id"]),
+	],
 	normalizationContext: [
-		"groups" => [
-			"listedTea:read",
-			"embedded:tea",
-			"embedded:origin",
-			"embedded:teaType",
-			"embedded:cultivar"
-		]
+		"groups" => ["listedTea:read", "embedded:tea", "embedded:origin", "embedded:teaType", "embedded:cultivar"],
 	],
 	denormalizationContext: ["groups" => ["listedTea:write"]],
 	security: "is_granted('ROLE_USER')",
+	provider: MemberTeaProvider::class,
 )]
-#[Get(
-	uriTemplate: "/members/{username}/teas/{pivotId}",
-	uriVariables: [
-		"username" => new Link(fromProperty: "username", toProperty: "author", fromClass: Member::class),
-		"pivotId" => new Link(identifiers: ["id"]),
-	],
-	provider: MemberTeaProvider::class
-)]
-#[GetCollection(
-	uriTemplate: "/members/{username}/teas",
-	provider: NativeListMemberTeaCollectionProvider::class,
-	extraProperties: ["list" => TeaListPivotType::Favorites],
-)]
+#[Get]
+#[Delete(processor: MemberTeaDeleteProcessor::class)]
 #[Post(
 	uriTemplate: "/lists/favorites/teas",
+	uriVariables: [],
 	denormalizationContext: ["groups" => "listedTea:write-native"],
 	processor: NativeListMemberTeaProcessor::class,
 	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
 #[GetCollection(
 	uriTemplate: "/lists/favorites/teas",
+	uriVariables: [],
 	provider: NativeListMemberTeaCollectionProvider::class,
 	parameters: ["tea" => new QueryParameter(schema: ["type" => "integer", "minimum" => 1], castToNativeType: true)],
 	extraProperties: ["list" => TeaListPivotType::Favorites],
-)]
-#[GetCollection(
-	uriTemplate: "/lists/wishlist/teas",
-	provider: NativeListMemberTeaCollectionProvider::class,
-	extraProperties: ["list" => TeaListPivotType::Wishlist],
 )]
 class MemberTea
 {
