@@ -1,6 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
-import { deleteApi, fetchApi, patchApi, postApi } from "~/utils/api";
-import type { Steep, TeaSession } from "~t/types";
+import { deleteApi, fetchApi, patchApi } from "~/utils/api";
+import type { TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
@@ -17,11 +17,8 @@ import { ArrowTopRightOnSquareIcon, TrashIcon } from "@heroicons/react/16/solid"
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
-import { SteepCard } from "~/components/brewing/steepCard";
-import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
-import { denormalizeSteep, type SteepRaw } from "~/utils/api/normalization/steep";
-import { useAlert } from "~/components/shared/modal/AlertManager";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
+import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -31,54 +28,15 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const [session, setSession] = useState(props.loaderData);
-	const author = typeof session.author === "string" ? { "@id": session.author } : session.author;
-	const isAuthor = useIsAuthor(author);
-	const [editSteep, setEditSteep] = useState<Partial<SteepValues> | (SteepValues & Steep)>();
+	const authorIri = !!session.author && typeof session.author !== "string" ? session.author["@id"] : session.author;
+	const isAuthor = useIsAuthor(session.author);
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
 	const sessionMutations = useSessionMutations(session.id);
-	const steepMutations = useSteepMutations(session.id);
 	const editableData = { ...session, ...sessionMutations.edit.data };
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
 		setNoteValue(e.currentTarget.value);
-	}
-
-	function newSteep() {
-		const lastSteep = session.steeps?.slice(-1)[0] ?? null;
-
-		if (!lastSteep) {
-			setEditSteep({});
-			return;
-		}
-
-		setEditSteep({ duration: lastSteep.duration, temperature: lastSteep.temperature });
-	}
-
-	async function submitSteep(data: SteepValues) {
-		if (undefined !== editSteep && "@id" in editSteep) {
-			const steep = await steepMutations.edit.mutateAsync({ ...data, "@id": editSteep["@id"] });
-			// Replace the displayed steep with the updated one
-			setSession((sess) => ({ ...sess, steeps: sess.steeps?.map((s) => (s.key === steep.key ? steep : s)) }));
-			setEditSteep(undefined);
-			return;
-		}
-
-		const steep = await steepMutations.add.mutateAsync(data);
-		setSession((sess) => ({ ...sess, steeps: [...(sess.steeps ?? []), steep] }));
-		setEditSteep(undefined);
-	}
-
-	function makeRemoveHandler() {
-		if (undefined === editSteep || !("@id" in editSteep)) {
-			return undefined;
-		}
-
-		return async () => {
-			const steep = await steepMutations.delete.mutateAsync(editSteep);
-			setSession((sess) => ({ ...sess, steeps: sess?.steeps?.filter((stp) => steep.key !== stp.key) }));
-			setEditSteep(undefined);
-		};
 	}
 
 	return (
@@ -90,7 +48,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						Sessions history
 					</Link>
 
-					<IfAuthor author={author}>
+					<IfAuthor iri={authorIri}>
 						<div className="dropdown dropdown-end ml-auto">
 							<div tabIndex={0} role="button" className="m-1">
 								<EllipsisVerticalIcon className="size-5" />
@@ -168,7 +126,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
 							<span>Tasting note</span>
-							<IfAuthor author={author}>
+							<IfAuthor iri={authorIri}>
 								<button
 									className="ml-auto py-2 -my-2 flex items-center text-info"
 									onClick={handleUIEvent(() => setShowNodeEditor(true))}
@@ -183,7 +141,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</>
 				)}
 
-				<IfAuthor author={author}>
+				<IfAuthor iri={authorIri}>
 					{!editableData.note && (
 						<button
 							className="btn btn-block btn-dash mt-2"
@@ -196,35 +154,12 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			</div>
 
 			{!!session.steeps?.length && <h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>}
-			<ul>
-				{session.steeps?.map((steep, i) => (
-					<li key={steep.key} className="mb-2">
-						<SteepCard
-							duration={steep.duration}
-							temperature={steep.temperature}
-							order={i + 1}
-							onEdit={isAuthor ? () => setEditSteep(steep) : undefined}
-						/>
-					</li>
-				))}
-				<IfAuthor author={author}>
-					<li className="mb-2">
-						<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
-							Add a steep
-						</button>
-					</li>
-				</IfAuthor>
-			</ul>
-
-			{editSteep && (
-				<SteepFormModal
-					open={undefined !== editSteep}
-					defaultValue={editSteep}
-					onClose={() => setEditSteep(undefined)}
-					onSubmit={submitSteep}
-					onRemove={makeRemoveHandler()}
-				/>
-			)}
+			<EditableSteepsList
+				sessionId={session.id}
+				author={authorIri}
+				steeps={session.steeps ?? []}
+				onChange={(steeps) => setSession((s) => ({ ...s, steeps }))}
+			/>
 
 			<Modal onClose={() => setShowNodeEditor(false)} open={showNodeEditor} position="bottom" backdrop>
 				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
@@ -264,41 +199,4 @@ function useSessionMutations(sessionId: number) {
 	});
 
 	return { edit: editMutation, delete: deleteMutation };
-}
-
-function useSteepMutations(sessionId: number) {
-	const uriPrefix = `/teaSessions/${sessionId}/steeps`;
-	const alert = useAlert();
-
-	const addMutation = useMutation({
-		mutationFn: async (data: SteepValues) => {
-			const response = await postApi<SteepRaw>(uriPrefix, {
-				temperature: data.temperature?.deg,
-				duration: data.duration.totalSeconds,
-			});
-			return denormalizeSteep(await response.json());
-		},
-		onError: (e) => alert({ title: "Failed to add the steep", body: e.message }),
-	});
-
-	const editMutation = useMutation({
-		mutationFn: async (data: SteepValues & Pick<Steep, "@id">) => {
-			const response = await patchApi<SteepRaw>(data["@id"], {
-				temperature: data.temperature?.deg,
-				duration: data.duration.totalSeconds,
-			});
-			return denormalizeSteep(await response.json());
-		},
-		onError: (e) => alert({ title: "Failed to edit the steep", body: e.message }),
-	});
-
-	const deleteMutation = useMutation({
-		mutationFn: async (data: Steep) => {
-			await deleteApi(data["@id"]);
-			return data;
-		},
-		onError: (e) => alert({ title: "Failed to remove the steep", body: e.message }),
-	});
-
-	return { add: addMutation, edit: editMutation, delete: deleteMutation };
 }
