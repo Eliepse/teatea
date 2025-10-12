@@ -33,8 +33,12 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
 	{
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
-		assert(($user = $this->security->getUser()) instanceof User);
-		assert(($listType = $operation->getExtraProperties()["list"]) instanceof TeaListPivotType);
+
+		$user = $this->security->getUser();
+		assert($user instanceof User);
+
+		$listType = $operation->getExtraProperties()["list"];
+		assert($listType instanceof TeaListPivotType);
 
 		$teaSearch = OperationHelper::getParameter($operation, "tea");
 
