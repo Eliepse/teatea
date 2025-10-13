@@ -22,6 +22,8 @@ import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteep
 import { BrewingQualityInput, QualityIcon, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
 import { Check, Edit } from "iconoir-react";
 import clsx from "clsx";
+import { useMember } from "~/utils/api/useMember";
+import { IfNotAuthor } from "~/auth/components/voters/IfNotAuthor";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -37,6 +39,9 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	const [noteValue, setNoteValue] = useState(session.note);
 	const sessionMutations = useSessionMutations(session.id);
 	const editableData = { ...session, ...sessionMutations.edit.data };
+	const member = useMember({
+		iri: typeof session.author === "string" ? session.author : (session.author ?? {})["@id"],
+	});
 
 	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
 		setNoteValue(e.currentTarget.value);
@@ -89,6 +94,9 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 				<div className="uppercase text-xs text-base-content/60">
 					{intlFormat(session.drankAt, { dateStyle: "long" })}
+					<IfNotAuthor author={session.author}>
+						{member.data && <> &middot; @{member.data.username}</>}
+					</IfNotAuthor>
 				</div>
 				<div className="text-2xl mt-2">
 					<Link to={`/tea/${session.tea.id}`}>
