@@ -22,28 +22,33 @@ readonly class MemberProvider implements ProviderInterface
 	) {
 	}
 
-	public function provide(
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): array|null|object {
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Member|array|null
+	{
 		$query = $this->em->createQueryBuilder()->select("user")->from(User::class, "user");
 
 		if ($operation instanceof CollectionOperationInterface) {
 			return array_map(fn($u) => self::hydrate($u), $query->getQuery()->getResult());
 		}
 
-		if (empty($uriVariables["id"] ?? null)) {
+		$username = $uriVariables["username"] ?? null;
+		if (empty($username)) {
 			throw new NotFoundHttpException();
 		}
 
-		$user = $query->where("user.id = :id")->setParameter("id", $uriVariables["id"])->getQuery()->getSingleResult();
+		$user = $query->where("user.username = :username")
+			->setParameter("username", $username)
+			->getQuery()
+			->getOneOrNullResult();
 
 		return self::hydrate($user);
 	}
 
-	public static function hydrate(User $user): Member
+	public static function hydrate(?User $user): ?Member
 	{
+		if (null === $user) {
+			return null;
+		}
+
 		$resource = new Member();
 		$resource->id = $user->id;
 		$resource->username = $user->username ?? Uuid::v4();
