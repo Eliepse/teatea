@@ -42,7 +42,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="px-4" activeKey="activity">
+		<AuthLayout className="px-4 pb-12" activeKey="activity">
 			<header className="py-4">
 				<div className="flex">
 					<Link to="/sessions" className="block link mb-8">
