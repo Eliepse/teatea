@@ -4,7 +4,7 @@ import type { TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import Arrow from "~/components/icons/arrow";
 import { Modal } from "~/components/shared/modal/Modal";
 import { type ChangeEvent, useState } from "react";
@@ -17,10 +17,11 @@ import { ArrowTopRightOnSquareIcon, TrashIcon } from "@heroicons/react/16/solid"
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
-import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
+import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityIcon, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import { IfNotAuthor } from "~/auth/components/voters/IfNotAuthor";
+import { Check, Edit } from "iconoir-react";
+import clsx from "clsx";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -29,9 +30,9 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
+	const [searchParams] = useSearchParams();
 	const [session, setSession] = useState(props.loaderData);
-	const authorIri = !!session.author && typeof session.author !== "string" ? session.author["@id"] : session.author;
-	const isAuthor = useIsAuthor(session.author);
+	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
 	const sessionMutations = useSessionMutations(session.id);
@@ -41,20 +42,33 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 		setNoteValue(e.currentTarget.value);
 	}
 
+	function toggleEditMode() {
+		setEditMode((st) => !st);
+	}
+
 	return (
 		<AuthLayout className="px-4 pb-12" activeKey="activity">
 			<header className="py-4">
-				<div className="flex">
-					<Link to="/sessions" className="block link mb-8">
+				<div className="flex items-center mb-6">
+					<Link to="/sessions" className="block link mr-auto">
 						<Arrow direction="left" className="inline size-4 mr-2" />
 						Sessions history
 					</Link>
 
-					<IfAuthor iri={authorIri}>
-						<div className="dropdown dropdown-end ml-auto">
-							<div tabIndex={0} role="button" className="m-1">
+					<IfAuthor author={session.author}>
+						<button
+							className={clsx("ml-2 btn btn-sm rounded-full", editMode ? "btn-primary" : "btn-soft")}
+							onClick={toggleEditMode}
+						>
+							{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
+							{editMode ? "Done" : "Edit"}
+						</button>
+
+						<div className="dropdown dropdown-end ml-2">
+							<button className="btn btn-sm btn-circle btn-soft m-1">
 								<EllipsisVerticalIcon className="size-5" />
-							</div>
+							</button>
+
 							<ul
 								tabIndex={0}
 								className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
@@ -121,14 +135,12 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						</div>
 					)}
 
-					<IfNotAuthor author={session.author}>
-						{undefined !== session.quality && (
-							<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-								{QualityIcon[session.quality]}
-								<span>{QualityLabel[session.quality]} brew</span>
-							</div>
-						)}
-					</IfNotAuthor>
+					{!editMode && undefined !== session.quality && (
+						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+							{QualityIcon[session.quality]}
+							<span>{QualityLabel[session.quality]} brew</span>
+						</div>
+					)}
 				</div>
 			</header>
 
@@ -137,14 +149,16 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
 							<span>Tasting note</span>
-							<IfAuthor iri={authorIri}>
-								<button
-									className="ml-auto py-2 -my-2 flex items-center text-info"
-									onClick={handleUIEvent(() => setShowNodeEditor(true))}
-								>
-									<PencilSquare className="size-3 inline mr-2" version="micro" /> Edit
-								</button>
-							</IfAuthor>
+							{editMode && (
+								<IfAuthor author={session.author}>
+									<button
+										className="ml-auto py-2 -my-2 flex items-center text-info"
+										onClick={handleUIEvent(() => setShowNodeEditor(true))}
+									>
+										<PencilSquare className="size-3 inline mr-2" version="micro" /> Edit
+									</button>
+								</IfAuthor>
+							)}
 						</h2>
 						<p className="leading-normal text-lg rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
 							{nl2br(editableData.note)}
@@ -152,8 +166,8 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</>
 				)}
 
-				<IfAuthor iri={authorIri}>
-					{!editableData.note && (
+				<IfAuthor author={session.author}>
+					{!editableData.note && editMode && (
 						<button
 							className="btn btn-block btn-dash mt-2"
 							onClick={handleUIEvent(() => setShowNodeEditor(true))}
@@ -167,27 +181,32 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			{!!session.steeps?.length && <h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>}
 			<EditableSteepsList
 				sessionId={session.id}
-				author={authorIri}
+				author={session.author}
 				steeps={session.steeps ?? []}
 				onChange={(steeps) => setSession((s) => ({ ...s, steeps }))}
 				className="mb-12"
+				readonly={!editMode}
 			/>
 
-			<IfAuthor author={session.author}>
-				<h2 className="uppercase text-xs text-base-content/60 mb-2">Brewing quality</h2>
-				<BrewingQualityInput
-					onChange={async (quality) => {
-						await sessionMutations.edit.mutateAsync({ quality });
-					}}
-					value={editableData.quality}
-					readonly={!isAuthor}
-				/>
-			</IfAuthor>
+			{editMode && (
+				<IfAuthor author={session.author}>
+					<h2 className="uppercase text-xs text-base-content/60 mb-2">Brewing quality</h2>
+					<BrewingQualityInput
+						onChange={async (quality) => {
+							await sessionMutations.edit.mutateAsync({ quality });
+						}}
+						value={editableData.quality}
+					/>
+				</IfAuthor>
+			)}
 
-			<Modal onClose={() => setShowNodeEditor(false)} open={showNodeEditor} position="bottom" backdrop>
-				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
-
-				<div className="flex mt-2">
+			<Modal
+				onClose={() => setShowNodeEditor(false)}
+				open={editMode && showNodeEditor}
+				position="bottom"
+				backdrop
+			>
+				<div className="flex mb-2">
 					<button className="btn" onClick={handleUIEvent(() => setShowNodeEditor(false))}>
 						Cancel
 					</button>
@@ -202,6 +221,8 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						Save
 					</button>
 				</div>
+
+				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
 			</Modal>
 		</AuthLayout>
 	);

@@ -1,7 +1,7 @@
 import { SteepCard } from "~/components/brewing/steepCard";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 import { handleUIEvent } from "~/utils/function";
-import type { Id, Iri, Steep } from "~t/types";
+import type { Id, Iri, Member, Steep } from "~t/types";
 import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
 import { useState } from "react";
 import { useAlert } from "~/components/shared/modal/AlertManager";
@@ -11,10 +11,11 @@ import { deleteApi, patchApi, postApi } from "~/utils/api";
 
 export function EditableSteepsList(props: {
 	sessionId: Id;
-	author?: Iri;
+	author?: Iri | Member;
 	steeps: Steep[];
 	onChange: (steeps: Steep[]) => void;
 	className?: string;
+	readonly?: boolean;
 }) {
 	const isAuthor = useIsAuthor(props.author);
 	const steepMutations = useSteepMutations(props.sessionId);
@@ -33,6 +34,10 @@ export function EditableSteepsList(props: {
 	}
 
 	async function submitSteep(data: SteepValues) {
+		if (true === props.readonly) {
+			return;
+		}
+
 		if (undefined !== edit && "@id" in edit) {
 			const steep = await steepMutations.edit.mutateAsync({ ...data, "@id": edit["@id"] });
 			// Replace the displayed steep with the updated one
@@ -52,6 +57,10 @@ export function EditableSteepsList(props: {
 		}
 
 		return async () => {
+			if (true === props.readonly) {
+				return;
+			}
+
 			const steep = await steepMutations.delete.mutateAsync(edit);
 			props.onChange(props.steeps.filter((stp) => steep.key !== stp.key));
 			setEdit(undefined);
@@ -67,20 +76,23 @@ export function EditableSteepsList(props: {
 							duration={steep.duration}
 							temperature={steep.temperature}
 							order={i + 1}
-							onEdit={isAuthor ? () => setEdit(steep) : undefined}
+							onEdit={isAuthor && true !== props.readonly ? () => setEdit(steep) : undefined}
 						/>
 					</li>
 				))}
-				<IfAuthor iri={props.author}>
-					<li className="mb-2">
-						<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
-							Add a steep
-						</button>
-					</li>
-				</IfAuthor>
+
+				{true !== props.readonly && (
+					<IfAuthor author={props.author}>
+						<li className="mb-2">
+							<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
+								Add a steep
+							</button>
+						</li>
+					</IfAuthor>
+				)}
 			</ul>
 
-			{edit && (
+			{edit && true !== props.readonly && (
 				<SteepFormModal
 					open={undefined !== edit}
 					defaultValue={edit}
