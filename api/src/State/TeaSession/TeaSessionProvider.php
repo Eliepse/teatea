@@ -119,6 +119,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$resource->teaQuantity = $entity->teaQuantity?->toGrams();
 		$resource->waterMl = $entity->waterVolume?->toMl();
 		$resource->drankAt = $entity->drankAt;
+		$resource->quality = $entity->quality;
 
 		$resource->steeps = array_map(
 			fn($steepValue) => SteepProvider::hydrate($steepValue, $entity),

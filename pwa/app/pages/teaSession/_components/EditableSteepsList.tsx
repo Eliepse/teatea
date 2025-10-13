@@ -14,6 +14,7 @@ export function EditableSteepsList(props: {
 	author?: Iri;
 	steeps: Steep[];
 	onChange: (steeps: Steep[]) => void;
+	className?: string;
 }) {
 	const isAuthor = useIsAuthor(props.author);
 	const steepMutations = useSteepMutations(props.sessionId);
@@ -59,7 +60,7 @@ export function EditableSteepsList(props: {
 
 	return (
 		<>
-			<ul>
+			<ul className={props.className}>
 				{props.steeps.map((steep, i) => (
 					<li key={steep.key} className="mb-2">
 						<SteepCard

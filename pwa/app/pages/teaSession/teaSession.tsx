@@ -19,6 +19,8 @@ import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
+import { BrewingQualityInput, QualityIcon, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
+import { IfNotAuthor } from "~/auth/components/voters/IfNotAuthor";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -118,6 +120,15 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 							<span>{`${session.waterMl} ml`}</span>
 						</div>
 					)}
+
+					<IfNotAuthor author={session.author}>
+						{undefined !== session.quality && (
+							<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+								{QualityIcon[session.quality]}
+								<span>{QualityLabel[session.quality]} brew</span>
+							</div>
+						)}
+					</IfNotAuthor>
 				</div>
 			</header>
 
@@ -159,7 +170,19 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				author={authorIri}
 				steeps={session.steeps ?? []}
 				onChange={(steeps) => setSession((s) => ({ ...s, steeps }))}
+				className="mb-12"
 			/>
+
+			<IfAuthor author={session.author}>
+				<h2 className="uppercase text-xs text-base-content/60 mb-2">Brewing quality</h2>
+				<BrewingQualityInput
+					onChange={async (quality) => {
+						await sessionMutations.edit.mutateAsync({ quality });
+					}}
+					value={editableData.quality}
+					readonly={!isAuthor}
+				/>
+			</IfAuthor>
 
 			<Modal onClose={() => setShowNodeEditor(false)} open={showNodeEditor} position="bottom" backdrop>
 				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
@@ -188,11 +211,12 @@ function useSessionMutations(sessionId: number) {
 	const navigate = useNavigate();
 
 	const editMutation = useMutation({
-		mutationFn: async (args: Partial<Pick<TeaSession, "note">>) => {
+		mutationFn: async (args: Partial<Pick<TeaSession, "note" | "quality">>) => {
 			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, args);
 			return denormalizeTeaSession(await response.json());
 		},
 	});
+
 	const deleteMutation = useMutation({
 		mutationFn: async () => await deleteApi(`/tea_sessions/${sessionId}`),
 		onSuccess: () => navigate("/sessions"),

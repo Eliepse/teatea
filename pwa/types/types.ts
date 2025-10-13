@@ -61,6 +61,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	note?: string;
 	teaQuantity?: number;
 	waterMl?: number;
+	quality?: BrewingQuality;
 	drankAt: Date;
 	author?: Iri | Member;
 	steeps?: Steep[];
@@ -140,6 +141,15 @@ export type Steep = Omit<Resource<"Steep">, "id"> & {
 	temperature?: Temperature;
 	order: number;
 };
+
+export const BrewingQualityEnum = {
+	Good: 4,
+	Correct: 2,
+	Improvable: 0,
+	Bad: -2,
+} as const;
+
+export type BrewingQuality = (typeof BrewingQualityEnum)[keyof typeof BrewingQualityEnum];
 
 export const TeaListTypeEnum = {
 	Custom: 0,

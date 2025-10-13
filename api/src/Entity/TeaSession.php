@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
 use App\DTO\SteepValue;
+use App\Enum\BrewingQuality;
 use App\Enum\BrewingTechnic;
 use App\Repository\TeaSessionRepository;
 use App\ValueObject\Volume;
@@ -34,6 +35,9 @@ class TeaSession
 	/** @var array<SteepValue> */
 	#[ORM\Column(type: Types::JSONB, nullable: true)]
 	private ?array $steeps = null;
+
+	#[ORM\Column(nullable: true)]
+	public ?BrewingQuality $quality = null;
 
 	public function __construct(
 		#[ORM\ManyToOne(inversedBy: 'sessions')]

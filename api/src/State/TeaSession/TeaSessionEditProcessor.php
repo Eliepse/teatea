@@ -23,14 +23,19 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 	) {
 	}
 
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaSession
-	{
+	public function process(
+		mixed $data,
+		Operation $operation,
+		array $uriVariables = [],
+		array $context = [],
+	): TeaSession {
 		assert($data instanceof TeaSession);
 
 		$entity = $this->em->find(\App\Entity\TeaSession::class, $data->id);
 		$entity->note = trim($data->note ?? "") ?: null;
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
+		$entity->quality = $data->quality;
 		$this->em->persist($entity);
 		$this->em->flush();
 

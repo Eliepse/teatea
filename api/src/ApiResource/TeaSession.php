@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use App\Enum\BrewingQuality;
 use App\Enum\BrewingTechnic;
 use App\State\TeaSession\TeaSessionCreateProcessor;
 use App\State\TeaSession\TeaSessionDeleteProcessor;
@@ -109,6 +110,9 @@ class TeaSession
 	#[ApiProperty(genId: false)]
 	#[Link(toProperty: "sessionId")]
 	public array $steeps = [];
+
+	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal", "teaSession:edit"])]
+	public ?BrewingQuality $quality = null;
 
 	#[Groups(["teaSession:read"])]
 	public Member $author;

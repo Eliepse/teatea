@@ -4,7 +4,7 @@ import type { Iri, User } from "~t/types";
 
 type Author = Partial<Pick<User, "username" | "id" | "@id">>;
 
-export function IfAuthor(props: PropsWithChildren<{ author?: Author; iri?: Iri }>) {
+export function IfAuthor(props: PropsWithChildren<{ author?: Author|Iri; iri?: Iri }>) {
 	let author = undefined;
 
 	if ("author" in props) {
@@ -14,7 +14,6 @@ export function IfAuthor(props: PropsWithChildren<{ author?: Author; iri?: Iri }
 	}
 
 	const isAuthor = useIsAuthor(author);
-
 	return isAuthor ? props.children : null;
 }
 
