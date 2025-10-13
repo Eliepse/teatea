@@ -1,7 +1,16 @@
 import type { SyntheticEvent } from "react";
 
+/**
+ * Empty function that can be called as a safe fallback
+ */
 export const fn = () => {};
-export const f = (clb: any) => typeof clb === "function" ? clb : fn;
+
+/**
+ * Allow calling functions that might be undefined
+ */
+export function f<T extends Function|undefined>(clb: T) {
+	return typeof clb === "function" ? clb : fn;
+}
 
 export function warnNotImplemented(): void {
 	console.warn("Not implemented!");

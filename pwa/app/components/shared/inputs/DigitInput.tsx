@@ -1,46 +1,60 @@
-import { type ChangeEvent, type FocusEvent, type Ref, useImperativeHandle, useRef, useState } from "react";
+import { type ChangeEvent, type FocusEvent, type Ref, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { clamp } from "~/utils/math";
+import { f } from "~/utils/function";
 
 export type DigitInputRef = { focus: () => void; blur: () => void };
 
+function cleanInput(raw: string): string {
+	return raw.trim().replaceAll(/\D/g, "");
+}
+
 export function DigitInput(props: {
 	max: number;
-	defaultValue: number;
-	onBlur: (value: number) => void;
+	value: number;
+	onChange?: (value: number) => void;
+	onBlur?: (value: number) => void;
 	onFilled?: (value: number) => void;
 	padded?: boolean;
 	ref?: Ref<DigitInputRef>;
 }) {
+	const maxLength = props.max.toFixed().length;
 	const input = useRef<HTMLInputElement>(null);
-	const maxLength = props.max.toString().length;
-	const [value, setValue] = useState(formatValue(props.defaultValue));
+	const [inputText, setInputText] = useState(formatValue(props.value));
+
+	useEffect(() => setInputText(formatValue(props.value)), [props.value]);
 
 	function formatValue(value: number): string {
-		return true === props.padded ? value.toString().padStart(maxLength, "0") : value.toString();
+		if (props.padded) {
+			return value.toFixed().padStart(maxLength, "0");
+		}
+
+		return value.toFixed();
 	}
 
-	function clampValue(value: number): number {
-		return Math.max(0, Math.min(props.max, value));
-	}
+	function parseValue(raw: string | number): number {
+		if (typeof raw === "number") {
+			return clamp(0, raw, props.max);
+		}
 
-	function parseValue(raw: string): number {
-		const cleaned = raw.trim().replaceAll(/\D/g, "");
-		return clampValue(cleaned.length ? parseInt(cleaned) : 0);
+		return clamp(0, raw.length ? parseInt(raw) : 0, props.max);
 	}
 
 	function handleBlur(e: FocusEvent<HTMLInputElement>) {
-		const value = parseValue(e.currentTarget.value);
-		setValue(formatValue(value));
-		props.onBlur(value);
+		const value = parseValue(cleanInput(e.currentTarget.value));
+		setInputText(formatValue(value));
+		f(props.onChange)(value);
+		f(props.onBlur)(value);
 	}
 
 	function handleChange(e: ChangeEvent<HTMLInputElement>) {
-		const rawValue = e.target.value;
-		setValue(rawValue);
+		const rawValue = cleanInput(e.currentTarget.value);
+		setInputText(rawValue);
 
 		if (maxLength <= rawValue.length) {
-			const value = parseValue(e.currentTarget.value);
-			setValue(formatValue(value));
-			props.onFilled && props.onFilled(value);
+			const value = parseValue(rawValue);
+			setInputText(formatValue(value));
+			f(props.onChange)(value);
+			f(props.onFilled)(value);
 			return;
 		}
 	}
@@ -58,8 +72,8 @@ export function DigitInput(props: {
 		<input
 			ref={input}
 			className="min-w-12 px-1 text-center text-base-content bg-stone-100 rounded-md font-mono"
-			placeholder={props.defaultValue.toString().padStart(2, "0")}
-			value={value}
+			placeholder={formatValue(0)}
+			value={inputText}
 			onChange={handleChange}
 			pattern="\d+"
 			inputMode="numeric"

@@ -33,7 +33,7 @@ export function DurationInput(props: { value: Duration; onChange: (value: Durati
 			{/*<span className="mx-1">:</span>*/}
 			<DigitInput
 				ref={inputMinutes}
-				defaultValue={props.value.minutes}
+				value={props.value.minutes}
 				max={60}
 				onBlur={updateMinutes}
 				onFilled={() => inputSeconds.current?.focus()}
@@ -42,7 +42,7 @@ export function DurationInput(props: { value: Duration; onChange: (value: Durati
 			<span className="mx-1">:</span>
 			<DigitInput
 				ref={inputSeconds}
-				defaultValue={props.value.seconds}
+				value={props.value.seconds}
 				max={60}
 				onBlur={updateSeconds}
 				onFilled={() => inputSeconds.current?.blur()}

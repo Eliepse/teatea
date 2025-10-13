@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { type PropsWithChildren, useRef, useState } from "react";
 import { Duration, Temperature } from "~/utils/value-objects/units";
 import { handleUIEvent } from "~/utils/function";
 import { ClockIcon } from "@heroicons/react/24/outline";
 import { FireFlame } from "iconoir-react";
 import { Modal } from "~/components/shared/modal/Modal";
 import { DurationInput } from "~/components/shared/inputs/DurationInput";
-import { DigitInput } from "~/components/shared/inputs/DigitInput";
+import { DigitInput, type DigitInputRef } from "~/components/shared/inputs/DigitInput";
+import { clamp } from "~/utils/math";
 
 export type SteepValues = { duration: Duration; temperature: Temperature | null };
 
@@ -81,9 +82,9 @@ export function SteepFormModal(props: {
 					</div>
 					<div className="text-4xl">
 						<DigitInput
-							defaultValue={values.temperature?.deg ?? 0}
 							max={100}
-							onBlur={(v) => setValues((s) => ({ ...s, temperature: new Temperature(v) }))}
+							value={values.temperature?.deg ?? 0}
+							onChange={(v) => setValues((s) => ({ ...s, temperature: new Temperature(v) }))}
 						/>
 						<span className="text-xl ml-1">°C</span>
 					</div>
