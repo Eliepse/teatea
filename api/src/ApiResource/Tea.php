@@ -26,7 +26,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	provider: TeaProvider::class
 )]
 #[GetCollection(
-	paginationEnabled: false,
+	paginationEnabled: true,
+	paginationItemsPerPage: 15,
+	paginationMaximumItemsPerPage: 50,
+	paginationClientItemsPerPage: true,
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [

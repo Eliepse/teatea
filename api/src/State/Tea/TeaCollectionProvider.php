@@ -4,33 +4,41 @@ namespace App\State\Tea;
 
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\Pagination;
+use ApiPlatform\State\Pagination\PaginatorInterface;
+use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Tea;
 use App\Entity\Origin;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
- * @implements ProviderInterface<Tea|null>
+ * @implements ProviderInterface<PaginatorInterface|null>
  */
 readonly class TeaCollectionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
 		private LoggerInterface $logger,
+		private Pagination $pagination,
 	) {
 	}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
 
 		// Query parameters
 
+		$page = $this->pagination->getPage($context);
+		$offset = $this->pagination->getOffset($operation, $context);
+		$limit = $this->pagination->getLimit($operation, $context);
 		$params = $operation->getParameters();
 
 		$searchText = $params->get("q")->getValue();
@@ -92,14 +100,24 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			$searchQb->addOrderBy("count(session.id)", "DESC");
 		}
 
+		$total = (clone $searchQb)
+			->select("COUNT(DISTINCT tea.id)")
+			->resetDQLPart("groupBy")
+			->resetDQLPart("orderBy")
+			->getQuery()
+			->getSingleScalarResult();
+
+		if (0 === $total) {
+			return new TraversablePaginator(new ArrayCollection(), $page, $limit, $total);
+		}
+
 		$searchResults = $searchQb
 			->addOrderBy("tea.createdBy", "DESC")
+			->setFirstResult($offset)
+			->setMaxResults($limit)
 			->getQuery()
 			->getResult();
 
-		if (0 === count($searchResults)) {
-			return [];
-		}
 
 		/*
 		| --------------------------------
@@ -144,6 +162,6 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			$resources[] = TeaProvider::hydrateResource($tea, $originNodes);
 		}
 
-		return $resources;
+		return new TraversablePaginator(new ArrayCollection($resources), $page, $limit, $total);
 	}
 }

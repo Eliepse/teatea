@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
-import type { ApiCollection, Origin, Tea, TeaFamily } from "~t/types";
+import type { ApiPaginatedCollection, Origin, Tea, TeaFamily } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { SearchTextInput } from "~/components/search/SearchTextInput";
@@ -24,22 +24,29 @@ export function TeaSearchEngine(props: {
 		props.defaultFilters,
 	);
 
-	const teasQuery = useQuery({
-		queryFn: async ({ queryKey }) => {
+	const teasQuery = useInfiniteQuery({
+		queryFn: async ({ queryKey, pageParam }) => {
 			const filters = queryKey[1];
 
 			if (typeof filters === "string") {
 				throw new Error("Invalid search");
 			}
-
-			const response = await getApi<ApiCollection<Tea>>("/teas", {
+			const queryParams = {
 				...filters,
 				origin: undefined, // Remove original filter
 				originPath: filters.originPath,
-			});
+			};
+
+			const response = await getApi<ApiPaginatedCollection<Tea>>(
+				pageParam ? `/teas?${pageParam}` : `/teas`,
+				pageParam ? {} : queryParams,
+			);
 			return await response.json();
 		},
-		queryKey: ["search", { ...filters, sort: "popularity" }],
+		queryKey: ["search", { ...filters, limit: 10, sort: "popularity" }],
+		getPreviousPageParam: (lastPage) => lastPage.view.previous?.split("?")[1],
+		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
+		initialPageParam: "",
 	});
 	const originQuery = useQuery({
 		queryFn: async (ctx) => {
@@ -118,26 +125,37 @@ export function TeaSearchEngine(props: {
 				{teasQuery.isSuccess && teasQuery.data && (
 					<div className="px-4">
 						<div className="uppercase text-xs text-base-content/60 flex justify-between mb-4">
-							<span>{teasQuery.data.totalItems} results</span>
+							<span>{teasQuery.data.pages[0].totalItems} results</span>
 							<span>Sorted by popularity</span>
 						</div>
 
 						<ul>
-							{teasQuery.data.member?.map((tea) => (
-								<li key={tea.id}>
-									<TeaCard
-										title={tea.displayName}
-										family={tea.family}
-										type={tea.type?.name}
-										originPath={tea.originPath}
-										cultivar={tea.cultivar}
-										onClick={() => props.onSelect(tea)}
-										selected={props.value?.id === tea.id}
-										className="mb-2"
-									/>
-								</li>
-							))}
+							{teasQuery.data.pages.map((page) =>
+								page.member?.map((tea) => (
+									<li key={tea.id}>
+										<TeaCard
+											title={tea.displayName}
+											family={tea.family}
+											type={tea.type?.name}
+											originPath={tea.originPath}
+											cultivar={tea.cultivar}
+											onClick={() => props.onSelect(tea)}
+											selected={props.value?.id === tea.id}
+											className="mb-2"
+										/>
+									</li>
+								)),
+							)}
 						</ul>
+
+						{!!teasQuery.hasNextPage && (
+							<button
+								className="btn btn-outline btn-secondary btn-block h-14 mt-4"
+								onClick={() => teasQuery.fetchNextPage()}
+							>
+								Load more
+							</button>
+						)}
 
 						{!!props.allowCreation && (
 							<CreateTeaButton className="btn-dash btn-block h-14 mt-8" onCreated={onTeaCreated} />
