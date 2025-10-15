@@ -72,10 +72,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
 				->setParameter("searchText", $searchText)
 				->addGroupBy("type.name")
-				->orderBy(
-					"SIMILARITY(unaccent(type.name), unaccent(':searchText'))",
-//					"ROW_NUMBER(ORDER BY SIMILARITY(unaccent(type.name), unaccent(':searchText')) DESC)",
-				);
+				->orderBy("SIMILARITY(unaccent(type.name), unaccent(:searchText))", "DESC");
 		}
 
 		// Family
@@ -117,7 +114,6 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			->setMaxResults($limit)
 			->getQuery()
 			->getResult();
-
 
 		/*
 		| --------------------------------
