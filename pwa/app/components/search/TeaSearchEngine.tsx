@@ -43,7 +43,7 @@ export function TeaSearchEngine(props: {
 			);
 			return await response.json();
 		},
-		queryKey: ["search", { ...filters, limit: 10, sort: "popularity" }],
+		queryKey: ["search", { ...filters, itemsPerPage: 10, sort: "popularity" }],
 		getPreviousPageParam: (lastPage) => lastPage.view.previous?.split("?")[1],
 		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
 		initialPageParam: "",
