@@ -7,8 +7,10 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Origin;
 use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
+use App\Entity\User;
 use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 use function Symfony\Component\String\u;
@@ -19,6 +21,7 @@ use function Symfony\Component\String\u;
 readonly class OriginProcessor implements ProcessorInterface
 {
 	public function __construct(
+		private Security $security,
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 	) {
@@ -27,6 +30,9 @@ readonly class OriginProcessor implements ProcessorInterface
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
 	{
 		assert($data instanceof Origin);
+
+		$user = $this->security->getUser();
+		assert($user instanceof User);
 
 		$parentPath = new LTreePath([]);
 
@@ -47,6 +53,7 @@ readonly class OriginProcessor implements ProcessorInterface
 
 		$entity = new \App\Entity\Origin();
 		$entity->name = $data->name;
+		$entity->author = $user;
 
 		$pathNode = u($data->name)->pascal();
 		$entity->path = new LTreePath([...$parentPath->getNodes(), $pathNode]);
