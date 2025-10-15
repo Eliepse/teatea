@@ -19,9 +19,9 @@ final class Version20251015193538 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE origin ADD CONSTRAINT fk_def1561ef675f31b FOREIGN KEY (author_id) REFERENCES "user" (id) ON DELETE SET NULL NOT DEFERRABLE');
-        $this->addSql('CREATE INDEX idx_def1561ef675f31b ON origin (author_id)');
+	    $this->addSql('ALTER TABLE origin ADD author_id INT DEFAULT NULL');
+	    $this->addSql('ALTER TABLE origin ADD CONSTRAINT fk_def1561ef675f31b FOREIGN KEY (author_id) REFERENCES "user" (id) ON DELETE SET NULL NOT DEFERRABLE');
+	    $this->addSql('CREATE INDEX idx_def1561ef675f31b ON origin (author_id)');
     }
 
     public function down(Schema $schema): void
