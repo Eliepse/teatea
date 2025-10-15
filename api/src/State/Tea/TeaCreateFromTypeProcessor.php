@@ -50,19 +50,22 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
-		if (null === $teaOrigin = $this->originRepo->byPath($data->origin->path)) {
+		$teaOrigin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
+		if (null !== $data->origin && null === $teaOrigin) {
 			throw new ItemNotFoundException("Tea origin doesn't exist");
 		}
 
 		// Check origins compatibility
 
-		$countryKey = $teaOrigin->path->getNodes()[0];
-		if (false === $typeEntity->origin->path->isDescendant($countryKey)) {
-			throw new \RuntimeException("The origin must be of the same country than the tea type one");
-		}
+		if (null !== $teaOrigin) {
+			$countryKey = $teaOrigin->path->getNodes()[0];
+			if (false === $typeEntity->origin->path->isDescendant($countryKey)) {
+				throw new \RuntimeException("The origin must be of the same country than the tea type one");
+			}
 
-		if ($typeEntity->isProtectedOrigin && false === $teaOrigin->path->isDescendant($typeEntity->origin->path)) {
-			throw new \RuntimeException("The origin must be contained by the protected origin of the tea type");
+			if ($typeEntity->isProtectedOrigin && false === $teaOrigin->path->isDescendant($typeEntity->origin->path)) {
+				throw new \RuntimeException("The origin must be contained by the protected origin of the tea type");
+			}
 		}
 
 		$entity = new \App\Entity\Tea();

@@ -39,7 +39,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 		method: "POST",
 		payload: {
 			family: data.family,
-			origin: data.origin["@id"],
+			origin: data.origin ? data.origin["@id"] : undefined,
 			type: !data.type || "id" in data.type ? undefined : data.type,
 			altitude: data.altitude,
 			isAppellation: data.appellation,
@@ -89,7 +89,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 
 	function submit() {
 		// Make sure minimum info are filled in
-		if (!formValue.origin || !formValue.family) {
+		if (!formValue.family) {
 			throw new Error("Incomplete form");
 		}
 
@@ -118,6 +118,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						}}
 						defaultOriginPath={formValue.origin?.path}
 						allowCreation
+						allowSkip
 					/>
 				</StackFrame>
 				<StackFrame frameKey="family:select">

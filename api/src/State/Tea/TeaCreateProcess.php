@@ -41,7 +41,8 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
-		if (null === $origin = $this->originRepo->byPath($data->origin->path)) {
+		$origin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
+		if (null !== $data->origin && null === $origin) {
 			throw new BadRequestException("The given origin doesn't exist");
 		}
 

@@ -11,16 +11,14 @@ import { getOriginLevel, getParentPath, useOrigin } from "~/utils/api/useOrigins
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { Modal } from "~/components/shared/modal/Modal";
 
-export function SelectOrigin(
-	props: {
-		onBack: () => void;
-		defaultOriginPath?: Origin["path"];
-		allowCreation?: boolean;
-	} & (
-		| { onSelect: (value?: Origin) => void; allowToggle: true }
-		| { onSelect: (value: Origin) => void; allowToggle?: false }
-	),
-) {
+export function SelectOrigin(props: {
+	onBack: () => void;
+	defaultOriginPath?: Origin["path"];
+	allowCreation?: boolean;
+	allowSkip?: boolean;
+	allowToggle?: boolean;
+	onSelect: (value?: Origin) => void;
+}) {
 	// Path of the parent of the displayed origins
 	const [viewPath, setViewPath] = useState(getParentPath(props.defaultOriginPath));
 	const { data: viewOrigin, ...viewOriginQuery } = useOrigin(viewPath);
@@ -108,6 +106,18 @@ export function SelectOrigin(
 				</button>
 			}
 		>
+			{props.allowSkip && (
+				<>
+					<button
+						className="btn btn-block btn-outline btn-secondary justify-between h-12 mb-4"
+						onClick={handleUIEvent(() => props.onSelect(undefined))}
+					>
+						I don't know the origin of this tea <ArrowRightIcon className="size-4" />
+					</button>
+					<hr className="border-stone-200 mt-2 mb-4" />
+				</>
+			)}
+
 			{undefined === viewPath && <PopularOrigins selectionPath={selectionPath} onSelect={changeSelection} />}
 
 			{viewOriginQuery.isLoading && <div className="skeleton h-14 mb-2" />}
