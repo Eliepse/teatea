@@ -16,7 +16,6 @@ use App\Repository\UserRepository;
 use App\State\Tea\TeaProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\Proxy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class TeaSessionsPaginatedProvider implements ProviderInterface
@@ -105,7 +104,10 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		$originMap = TeaProvider::originsToMap($origins);
 
 		foreach ($entities as $entity) {
-			$path = TeaProvider::getOriginPath($originMap, $originsById[$entity->tea->originId]);
+			$path = $entity->tea->originId ? TeaProvider::getOriginPath(
+				$originMap,
+				$originsById[$entity->tea->originId],
+			) : null;
 			$tea = TeaProvider::hydrateResource($entity->tea, $path);
 			$items->append(TeaSessionProvider::hydrate($entity, $tea));
 		}

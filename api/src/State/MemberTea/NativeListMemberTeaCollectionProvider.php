@@ -72,7 +72,10 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 		foreach ($entities as $entity) {
 			$resource = MemberTeaProvider::fromEntity($entity);
 
-			$path = TeaProvider::getOriginPath($originMap, $originsById[$entity->tea->originId]);
+			$path = $entity->tea->originId ? TeaProvider::getOriginPath(
+				$originMap,
+				$originsById[$entity->tea->originId],
+			) : null;
 			$resource->tea = TeaProvider::hydrateResource($entity->tea, $path);
 			$resource->list = $list;
 			$resource->list->owner = $resource->author;
