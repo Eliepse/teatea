@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Origin, Tea, TeaFamily } from "~t/types";
@@ -63,10 +63,13 @@ export function TeaSearchEngine(props: {
 		setFilters((st) => ({ ...st, q: text }));
 	}
 
-	async function onTeaCreated(tea: Tea) {
-		void teasQuery.refetch();
-		props.onSelect(tea);
-	}
+	const onTeaCreated = useCallback(
+		async (tea: Tea) => {
+			void teasQuery.refetch();
+			props.onSelect(tea);
+		},
+		[props.onSelect],
+	);
 
 	return (
 		<div className="h-full flex flex-col">
@@ -158,10 +161,12 @@ export function TeaSearchEngine(props: {
 								Load more
 							</button>
 						)}
+					</div>
+				)}
 
-						{!!props.allowCreation && (
-							<CreateTeaButton className="btn-dash btn-block h-14 mt-8" onCreated={onTeaCreated} />
-						)}
+				{teasQuery.isSuccess && true === props.allowCreation && (
+					<div className="px-4 mt-4">
+						<CreateTeaButton className="btn-dash btn-block h-14 mt-8" onCreated={onTeaCreated} />
 					</div>
 				)}
 			</div>
