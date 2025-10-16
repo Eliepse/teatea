@@ -6,14 +6,12 @@ import { RefreshDouble } from "iconoir-react";
 export const QualityIcon = {
 	[BrewingQualityEnum.Bad]: "☹️",
 	[BrewingQualityEnum.Improvable]: "😐",
-	[BrewingQualityEnum.Correct]: "🙂",
 	[BrewingQualityEnum.Good]: "😀",
 } as const;
 
 export const QualityLabel = {
 	[BrewingQualityEnum.Bad]: "Bad",
 	[BrewingQualityEnum.Improvable]: "Improvable",
-	[BrewingQualityEnum.Correct]: "Correct",
 	[BrewingQualityEnum.Good]: "Good",
 } as const;
 
@@ -51,13 +49,6 @@ export function BrewingQualityInput(props: {
 				active={BrewingQualityEnum.Improvable === props.value}
 				onSelect={() => handleSelect(BrewingQualityEnum.Improvable)}
 				loading={saving === BrewingQualityEnum.Improvable}
-				readonly={props.readonly}
-			/>
-			<OptionBtn
-				value={BrewingQualityEnum.Correct}
-				active={BrewingQualityEnum.Correct === props.value}
-				onSelect={() => handleSelect(BrewingQualityEnum.Correct)}
-				loading={saving === BrewingQualityEnum.Correct}
 				readonly={props.readonly}
 			/>
 			<OptionBtn

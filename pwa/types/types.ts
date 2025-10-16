@@ -143,8 +143,7 @@ export type Steep = Omit<Resource<"Steep">, "id"> & {
 };
 
 export const BrewingQualityEnum = {
-	Good: 4,
-	Correct: 2,
+	Good: 2,
 	Improvable: 0,
 	Bad: -2,
 } as const;
