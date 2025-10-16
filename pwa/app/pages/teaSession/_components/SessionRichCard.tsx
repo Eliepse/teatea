@@ -31,6 +31,7 @@ export function SessionRichCard(props: {
 				path={props.path}
 				type={props.type}
 				className="mx-2 bg-white/80"
+				noStyle
 			/>
 		</article>
 	);

@@ -9,9 +9,9 @@ import type { Route } from "../../../.react-router/types/app/pages/dashboard/+ty
 import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
 import { CoffeeCup, Plus } from "iconoir-react";
-import { TeaCard } from "~/components/tea/TeaCard";
 import { IfAdmin } from "~/auth/components/voters/IfAdmin";
 import { TeaLists } from "~/pages/dashboard/_components/TeaLists";
+import { TeaShortCard } from "~/components/tea/TeaShortCard";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -69,14 +69,14 @@ export default function Dashboard(props: Route.ComponentProps) {
 					<div className="mt-6 mb-2 text-xs uppercase text-base-content/60">What you drank the most</div>
 					<ul>
 						{props.loaderData.statsTopTeas.map((tea) => (
-							<li key={tea.id}>
+							<li key={tea.id} className="mb-2">
 								<Link to={`/tea/${tea.id}`}>
-									<TeaCard
-										title={tea.displayName}
+									<TeaShortCard
 										family={tea.family}
-										type={tea.type?.name}
-										originPath={tea.originPath}
-										className="mb-2"
+										type={tea.type}
+										path={tea.originPath}
+										cultivar={tea.cultivar}
+										className="bg-slate-100"
 									/>
 								</Link>
 							</li>

@@ -10,9 +10,16 @@ export function TeaShortCard(props: {
 	path?: OriginPath;
 	cultivar?: Cultivar;
 	className?: string;
+	noStyle?: boolean;
 }) {
 	return (
-		<div className={clsx("flex items-center px-3 py-2 rounded-md", props.className)}>
+		<div
+			className={clsx(
+				"flex items-center px-3 py-2 rounded-md",
+				true !== props.noStyle && "min-h-14 cursor-pointer select-none",
+				props.className,
+			)}
+		>
 			<div className="mr-auto">
 				<Family family={props.family} iconOnly className="mr-2" />
 				<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>

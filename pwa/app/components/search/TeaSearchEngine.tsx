@@ -3,7 +3,6 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Origin, Tea, TeaFamily } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
-import { TeaCard } from "~/components/tea/TeaCard";
 import { SearchTextInput } from "~/components/search/SearchTextInput";
 import { Paged } from "~/components/shared/paged/Paged";
 import { SelectOrigin } from "~/components/origin/SelectOrigin";
@@ -11,6 +10,7 @@ import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 import { XCircleIcon } from "@heroicons/react/16/solid";
 import { SelectFamily } from "~/components/family/SelectFamily";
+import { TeaShortCard } from "~/components/tea/TeaShortCard";
 
 export function TeaSearchEngine(props: {
 	onSelect: (tea: Tea) => void;
@@ -132,16 +132,18 @@ export function TeaSearchEngine(props: {
 						<ul>
 							{teasQuery.data.pages.map((page) =>
 								page.member?.map((tea) => (
-									<li key={tea.id}>
-										<TeaCard
-											title={tea.displayName}
+									<li key={tea.id} className="mb-2" onClick={() => props.onSelect(tea)}>
+										<TeaShortCard
 											family={tea.family}
-											type={tea.type?.name}
-											originPath={tea.originPath}
+											type={tea.type}
+											path={tea.originPath}
 											cultivar={tea.cultivar}
-											onClick={() => props.onSelect(tea)}
-											selected={props.value?.id === tea.id}
-											className="mb-2"
+											className={clsx(
+												"border",
+												props.value?.id === tea.id
+													? "bg-primary/10 border-primary"
+													: "bg-slate-100 border-transparent",
+											)}
 										/>
 									</li>
 								)),
