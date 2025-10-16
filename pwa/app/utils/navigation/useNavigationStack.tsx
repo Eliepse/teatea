@@ -1,4 +1,4 @@
-import { createContext, type PropsWithChildren, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { throwNotImplemented } from "~/utils/function";
 
 interface StackFrame {
@@ -10,7 +10,6 @@ type ContextType = { stack: StackFrame[]; next: (frame: StackFrame) => void; bac
 
 type StackConfig<TFrame> = {
 	defaultFrame: TFrame;
-	onOverBack?: () => void;
 };
 
 const StackContext = createContext<ContextType>({
@@ -55,18 +54,10 @@ export function useNavigationStack(config: StackConfig<StackFrame>) {
 			next: (frame: StackFrame) => {
 				setStack((st) => [...st, frame]);
 			},
-			back: () =>
-				setStack((st) => {
-					if (1 === st.length) {
-						config.onOverBack && config.onOverBack();
-						return st;
-					}
-
-					return st.slice(0, -1);
-				}),
+			back: () => setStack((st) => (1 === st.length ? st : st.slice(0, -1))),
 			reset: () => setStack([config.defaultFrame]),
 		}),
-		[stack, config.onOverBack],
+		[stack],
 	);
 
 	useEffect(() => {
@@ -79,10 +70,15 @@ export function useNavigationStack(config: StackConfig<StackFrame>) {
 		}
 	}, []);
 
-	return {
-		NavigationStack: (props: PropsWithChildren) => (
+	const component = useCallback(
+		(props: PropsWithChildren) => (
 			<StackContext.Provider value={contextValue}>{props.children}</StackContext.Provider>
 		),
+		[contextValue],
+	);
+
+	return {
+		NavigationStack: component,
 		...contextValue,
 	};
 }

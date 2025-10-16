@@ -32,8 +32,17 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 	const [form, setForm] = useState<SessionForm>({ drankAt: new Date(), tea: props.tea });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({
 		defaultFrame: { key: props.tea?.id ? "parameters:input" : "tea:select" },
-		onOverBack: props.onBack,
 	});
+
+	function goBack() {
+		if(1 === stackNavigator.stack.length) {
+			props.onBack();
+			return;
+		}
+
+		stackNavigator.back();
+		return;
+	}
 
 	const mutation = useMutation({
 		mutationFn: async (data: SessionForm & Required<Pick<SessionForm, "tea">>) => {
@@ -79,24 +88,12 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 						setForm((st) => ({ ...st, tea }));
 						stackNavigator.next({ key: "parameters:input" });
 					}}
-					onBack={stackNavigator.back}
+					onBack={goBack}
 				/>
 			</StackFrame>
-			{/*<StackFrame frameKey="technic:select">*/}
-			{/*	<FrameSelect*/}
-			{/*		items={technicItems}*/}
-			{/*		defaultValue={form.technic ?? undefined}*/}
-			{/*		onBack={stackNavigator.back}*/}
-			{/*		buttonText="Next"*/}
-			{/*		onConfirm={(technic) => {*/}
-			{/*			setForm((st) => ({ ...st, technic }));*/}
-			{/*			stackNavigator.next({ key: "parameters:input" });*/}
-			{/*		}}*/}
-			{/*	/>*/}
-			{/*</StackFrame>*/}
 			<StackFrame frameKey="parameters:input">
 				<ParametersInput
-					onBack={stackNavigator.back}
+					onBack={goBack}
 					defaultTea={form.teaQuantity}
 					defaultWater={form.waterVolume}
 					onConfirm={(tea, water) => {
@@ -107,7 +104,7 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 			</StackFrame>
 			<StackFrame frameKey="date:select">
 				<FrameDatePicker
-					onBack={stackNavigator.back}
+					onBack={goBack}
 					defaultValue={form.drankAt}
 					buttonText="Save this session"
 					onConfirm={(date) => {

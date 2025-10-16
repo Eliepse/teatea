@@ -3,7 +3,7 @@ import { SelectFamily } from "../family/SelectFamily";
 import type { Cultivar, Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { warnNotImplemented } from "~/utils/function";
-import { fetchApi } from "~/utils/api";
+import { postApi } from "~/utils/api";
 import { Confirmation } from "./create/Confirmation";
 import { useMutation } from "@tanstack/react-query";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
@@ -24,8 +24,7 @@ type FormValue = {
 	type?: TeaType | { name: string; isPDO: boolean };
 	origin?: Origin;
 	cultivar?: Cultivar;
-	altitude?: number;
-	appellation?: boolean;
+	year?: number;
 };
 
 export function useTeaFormContext() {
@@ -35,16 +34,11 @@ export function useTeaFormContext() {
 async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" | "origin">>) {
 	const path = data.type && "id" in data.type ? `/tea_types/${data.type.id}/teas` : "/teas";
 
-	const response = await fetchApi<Tea>(path, {
-		method: "POST",
-		payload: {
-			family: data.family,
-			origin: data.origin ? data.origin["@id"] : undefined,
-			type: !data.type || "id" in data.type ? undefined : data.type,
-			altitude: data.altitude,
-			isAppellation: data.appellation,
-			cultivar: data.cultivar?.["@id"],
-		},
+	const response = await postApi<Tea>(path, {
+		...data,
+		origin: data.origin ? data.origin["@id"] : undefined,
+		type: !data.type || "id" in data.type ? undefined : data.type,
+		cultivar: data.cultivar?.["@id"],
 	});
 
 	return await response.json();
@@ -55,10 +49,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 	const [formValue, setFormValue] = useState<FormValue>({});
 	const [createdTea, setCreatedTea] = useState<Tea | undefined>();
 	const alert = useAlert();
-	const { NavigationStack, ...navStack } = useNavigationStack({
-		defaultFrame: { key: "origin:select" },
-		onOverBack: closeFlow,
-	});
+	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: { key: "origin:select" } });
 
 	function closeFlow() {
 		mutation.reset();
@@ -74,6 +65,15 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 
 		props.onSelect(createdTea);
 		closeFlow();
+	}
+
+	function goBack() {
+		if (1 === navStack.stack.length) {
+			closeFlow();
+			return;
+		}
+
+		navStack.back();
 	}
 
 	const mutation = useMutation({
@@ -111,7 +111,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 			<CONTEXT.Provider value={contextValue}>
 				<StackFrame frameKey="origin:select">
 					<SelectOrigin
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onSelect={(origin) => {
 							contextValue.patchForm({ origin });
 							navStack.next({ key: "family:select" });
@@ -123,7 +123,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 				</StackFrame>
 				<StackFrame frameKey="family:select">
 					<SelectFamily
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onSelect={(family) => {
 							contextValue.patchForm({ family });
 							navStack.next({ key: "select:type" });
@@ -133,7 +133,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 				</StackFrame>
 				<StackFrame frameKey="select:type">
 					<SelectType
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onSkip={() => {
 							contextValue.patchForm({ type: undefined });
 							navStack.next({ key: "select:cultivar" });
@@ -163,7 +163,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 				</StackFrame>
 				<StackFrame frameKey="select:cultivar">
 					<SelectCultivar
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onSkip={() => {
 							contextValue.patchForm({ cultivar: undefined });
 							navStack.next({ key: "recap" });
@@ -178,7 +178,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 				</StackFrame>
 				<StackFrame frameKey="name:ask">
 					<AskName
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onConfirm={(name) => {
 							if (undefined === name) {
 								setFormValue((st) => ({ ...st, type: undefined }));
@@ -193,7 +193,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 					/>
 				</StackFrame>
 				<StackFrame frameKey="recap">
-					<TeaFormConfirmation onBack={() => navStack.back()} values={formValue} onConfirm={submit} />
+					<TeaFormConfirmation onBack={goBack} values={formValue} onConfirm={submit} />
 				</StackFrame>
 				<StackFrame frameKey="confirmation">
 					<Confirmation

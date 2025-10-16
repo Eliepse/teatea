@@ -6,7 +6,6 @@ import { handleUIEvent, throwNotImplemented, warnNotImplemented } from "~/utils/
 import { fetchApi } from "~/utils/api";
 import { useMutation } from "@tanstack/react-query";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
-import { IsProtectedOrigin } from "~/components/tea_type/create/IsProtectedOrigin";
 import { AskName } from "~/components/tea_type/create/AskName";
 import { ConfirmNewTeaType } from "~/components/tea_type/create/ConfirmNewTeaType";
 import { useAlert } from "~/components/shared/modal/AlertManager";
@@ -48,10 +47,7 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 	const alert = useAlert();
 	const [formValue, setFormValue] = useState<FormValue>({});
 
-	const { NavigationStack, ...navStack } = useNavigationStack({
-		defaultFrame: { key: "origin:select" },
-		onOverBack: close,
-	});
+	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: { key: "origin:select" } });
 
 	const mutation = useMutation({
 		mutationFn: submitNewTeaType,
@@ -76,6 +72,15 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 		props.onClose();
 	}
 
+	function goBack() {
+		if (1 === navStack.stack.length) {
+			close();
+			return;
+		}
+
+		navStack.back();
+	}
+
 	const contextValue = useMemo(
 		() => ({
 			formValue,
@@ -98,7 +103,7 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 			<NavigationStack>
 				<StackFrame frameKey="origin:select">
 					<SelectOrigin
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onSelect={(origin) => {
 							contextValue.patchForm({ origin });
 							navStack.next({ key: "family:select" });
@@ -118,7 +123,7 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 				{/*</StackFrame>*/}
 				<StackFrame frameKey="family:select">
 					<SelectFamily
-						onBack={() => navStack.back()}
+						onBack={goBack}
 						onSelect={(family) => {
 							contextValue.patchForm({ family });
 							navStack.next({ key: "name:ask" });
