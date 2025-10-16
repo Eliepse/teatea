@@ -28,7 +28,7 @@ export const links: Route.LinksFunction = () => [
 
 const queryClient = new QueryClient();
 
-if ('serviceWorker' in navigator) {
+if ("serviceWorker" in navigator) {
 	navigator.serviceWorker.register("/sw.js");
 }
 
@@ -45,23 +45,25 @@ if (!import.meta.env.SSR) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
-			<head>
-				<meta charSet="utf-8" />
-				<meta name="viewport" content="width=device-width, initial-scale=1" />
-				<Meta />
-				<link rel="manifest" href="/manifest.json" />
-				<link rel="icon" href="/favicon.ico" sizes="any" />
-				<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
-				<meta name="theme-color" content="#ffffff" />
-				<Links />
-			</head>
-			<body>
-				<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-				<ScrollRestoration />
-				<Scripts />
-			</body>
-		</html>
+		<StrictMode>
+			<html lang="en">
+				<head>
+					<meta charSet="utf-8" />
+					<meta name="viewport" content="width=device-width, initial-scale=1" />
+					<Meta />
+					<link rel="manifest" href="/manifest.json" />
+					<link rel="icon" href="/favicon.ico" sizes="any" />
+					<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+					<meta name="theme-color" content="#ffffff" />
+					<Links />
+				</head>
+				<body>
+					<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+					<ScrollRestoration />
+					<Scripts />
+				</body>
+			</html>
+		</StrictMode>
 	);
 }
 
@@ -74,15 +76,13 @@ export default function App() {
 
 	if (options.api_host && import.meta.env.PUBLIC_POSTHOG_KEY) {
 		return (
-			<StrictMode>
-				<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
-					{children}
-				</PostHogProvider>
-			</StrictMode>
+			<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
+				{children}
+			</PostHogProvider>
 		);
 	}
 
-	return <StrictMode>{children}</StrictMode>;
+	return children;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
