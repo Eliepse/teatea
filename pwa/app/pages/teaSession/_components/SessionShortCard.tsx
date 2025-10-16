@@ -17,7 +17,7 @@ export function SessionShortCard(props: {
 	return (
 		<article
 			className={clsx(
-				"bg-slate-50 rounded-md px-3 py-2 flex items-center text-base-content/80",
+				"bg-slate-50 min-h-14 rounded-md px-3 py-2 flex items-center text-base-content/80",
 				props.className,
 			)}
 		>

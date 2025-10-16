@@ -1,43 +1,18 @@
 import { Link, useSearchParams } from "react-router";
-import { fetchApi, getApi } from "~/utils/api";
-import type { ApiCollection, ApiPaginatedCollection, OriginPath, TeaFamily, TeaSession, TeaType } from "~t/types";
-import { formatDate, formatDistanceToNow, formatISO, isToday, isYesterday, subDays } from "date-fns";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { getApi } from "~/utils/api";
+import type { ApiPaginatedCollection, TeaSession } from "~t/types";
+import { formatDate, formatISO, isToday, isYesterday } from "date-fns";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
-import { limit } from "~/utils/text";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { f, handleUIEvent } from "~/utils/function";
-import clsx from "clsx";
+import { handleUIEvent } from "~/utils/function";
 import { useUser } from "~/auth/hooks/useUser";
 import { useState } from "react";
-import Leaf from "~/components/icons/leaf";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 import { SessionShortCard } from "~/pages/teaSession/_components/SessionShortCard";
 import { SessionRichCard } from "~/pages/teaSession/_components/SessionRichCard";
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSessions";
-
-const PAGE_SIZE = 14;
-
-async function fetchSessions(username?: string) {
-	const response = await fetchApi<ApiCollection<TeaSessionRaw>>(`/tea_sessions`);
-	const data = await response.json();
-	return { ...data, member: data.member.map(denormalizeTeaSession) };
-}
-
-function getNextCursorFromSession(session?: TeaSession) {
-	return session ? formatISO(subDays(session.drankAt, 1), { representation: "date" }) : null;
-}
-
-const TEA_FAMILY_BORDER_CLS = {
-	yellow: "border-lime-200",
-	white: "border-cyan-200",
-	green: "border-green-300",
-	wulong: "border-indigo-300",
-	black: "border-orange-300",
-	fermented: "border-stone-500",
-} as const;
 
 const TEA_FAMILY_COLOR_CLS = {
 	yellow: "text-lime-200",
@@ -183,52 +158,5 @@ export default function ListTeaSessions(props: Route.ComponentProps) {
 				<PlusIcon className="size-4" />
 			</Link>
 		</AuthLayout>
-	);
-}
-
-function Item(props: {
-	family: TeaFamily;
-	type?: TeaType;
-	path?: OriginPath;
-	note?: string;
-	grams?: number;
-	ml?: number;
-	username?: string;
-	drankAt?: Date;
-	onAuthorClick?: () => void;
-}) {
-	return (
-		<article className="bg-base-200 rounded h-min-16 pb-1">
-			<div className="py-2 px-3 mb-3 flex justify-between text-xs text-base-content/60 leading-tight border-b border-gray-200">
-				{!!props.username && (
-					<span className="mr-auto" onClick={handleUIEvent(f(props.onAuthorClick))}>
-						@{props.username}
-					</span>
-				)}
-				{!!props.drankAt && <span>{formatDistanceToNow(props.drankAt)} ago</span>}
-			</div>
-
-			<div className="px-3 flex justify-between text-xs text-base-content/60 leading-tight">
-				<span className="uppercase text-base-content/40">
-					<Leaf className={clsx("size-3 inline-block mr-1 mb-0.5", TEA_FAMILY_COLOR_CLS[props.family])} />
-					{props.family}
-				</span>
-				{props.path && <FormatOriginPath originPath={props.path} />}
-			</div>
-
-			<div className="px-3 pb-2 flex">
-				<span className="capitalize">{props.type?.name ?? `${props.family} tea`}</span>
-				<span className="ml-auto">
-					{[props.grams ? `${props.grams} g` : null, props.ml ? `${props.ml} ml` : null]
-						.filter((v) => v)
-						.join(" · ")}
-				</span>
-			</div>
-			{!!props.note && (
-				<div className="border-t border-base-300 pt-2 pb-2 px-3 text-base-content/60 text-sm">
-					{limit(props.note, 126)}
-				</div>
-			)}
-		</article>
 	);
 }
