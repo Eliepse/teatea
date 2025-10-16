@@ -30,7 +30,7 @@ export function AlertContext(props: PropsWithChildren) {
 			alert: (alert: ReactElement) => setAlertsQueue((st) => [...st, alert]),
 			close: (alert: ReactElement) => setAlertsQueue((st) => st.filter((v) => v !== alert)),
 		}),
-		[alertsQueue],
+		[],
 	);
 
 	function onBackdropClick(e: MouseEvent) {
