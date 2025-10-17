@@ -32,7 +32,7 @@ export function ConfirmNewTeaType() {
 		>
 			<button
 				className="my-4 btn btn-block text-left h-16"
-				onClick={handleUIEvent(() => navigationStack.next({ key: "origin:select" }))}
+				onClick={handleUIEvent(() => navigationStack.next("origin:select"))}
 			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Origin</div>
@@ -46,7 +46,7 @@ export function ConfirmNewTeaType() {
 
 			<button
 				className="mb-4 btn btn-block text-left h-16"
-				onClick={handleUIEvent(() => navigationStack.next({ key: "family:select" }))}
+				onClick={handleUIEvent(() => navigationStack.next("family:select"))}
 			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Family</div>
@@ -57,7 +57,7 @@ export function ConfirmNewTeaType() {
 
 			<button
 				className="btn btn-block text-left h-16"
-				onClick={() => navigationStack.next({ key: "name:ask" })}
+				onClick={() => navigationStack.next("name:ask")}
 			>
 				<div>
 					<div className="text-xs text-base-content/60 mb-1">Name</div>

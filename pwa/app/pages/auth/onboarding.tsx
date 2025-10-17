@@ -27,7 +27,7 @@ export default function OnboardingPage() {
 	const user = useUser();
 	const navigate = useNavigate();
 	const { installable, installed } = usePWAInstall();
-	const { NavigationStack, ...stack } = useNavigationStack({ defaultFrame: { key: "welcome" } });
+	const { NavigationStack, ...stack } = useNavigationStack({ defaultFrame: "welcome" });
 
 	const mutation = useMutation({
 		mutationFn: async (username: string) => {
@@ -37,7 +37,7 @@ export default function OnboardingPage() {
 			}
 
 			await patchApi(`/members/${user.data.id}/onboarding`, { username });
-			stack.next({ key: "cta:session" });
+			stack.next("cta:session");
 		},
 	});
 
@@ -66,7 +66,7 @@ export default function OnboardingPage() {
 						<ProgressDots steps={installable ? 4 : 3} active={1} className="mr-auto" />
 						<button
 							className="btn btn-primary"
-							onClick={handleUIEvent(() => stack.next({ key: installable ? "ask:pwa" : "ask:username" }))}
+							onClick={handleUIEvent(() => stack.next(installable ? "ask:pwa" : "ask:username"))}
 						>
 							Next <ArrowRightIcon className="size-4" />
 						</button>
@@ -75,7 +75,7 @@ export default function OnboardingPage() {
 			</StackFrame>
 
 			<StackFrame frameKey="ask:pwa">
-				<ProposePWA onNext={() => stack.next({ key: "ask:username" })} />
+				<ProposePWA onNext={() => stack.next("ask:username")} />
 			</StackFrame>
 
 			<StackFrame frameKey="ask:username">

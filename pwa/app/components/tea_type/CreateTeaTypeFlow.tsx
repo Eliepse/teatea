@@ -47,11 +47,11 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 	const alert = useAlert();
 	const [formValue, setFormValue] = useState<FormValue>({});
 
-	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: { key: "origin:select" } });
+	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: "origin:select" });
 
 	const mutation = useMutation({
 		mutationFn: submitNewTeaType,
-		onSuccess: () => navStack.next({ key: "confirmation" }),
+		onSuccess: () => navStack.next("confirmation"),
 		onError: (e) => {
 			if (e instanceof ApiError) {
 				alert({
@@ -106,27 +106,17 @@ export function CreateTeaTypeFlow(props: { onClose: () => void }) {
 						onBack={goBack}
 						onSelect={(origin) => {
 							contextValue.patchForm({ origin });
-							navStack.next({ key: "family:select" });
+							navStack.next("family:select");
 						}}
 						defaultOriginPath={formValue.origin?.path}
 					/>
 				</StackFrame>
-				{/*<StackFrame frameKey="pdo:ask">*/}
-				{/*	<IsProtectedOrigin*/}
-				{/*		onConfirm={(value) => {*/}
-				{/*			contextValue.patchForm({ isPDO: value });*/}
-				{/*			navStack.next({ key: "family:select" });*/}
-				{/*		}}*/}
-				{/*		defaultValue={formValue.isPDO}*/}
-				{/*		onBack={navStack.back}*/}
-				{/*	/>*/}
-				{/*</StackFrame>*/}
 				<StackFrame frameKey="family:select">
 					<SelectFamily
 						onBack={goBack}
 						onSelect={(family) => {
 							contextValue.patchForm({ family });
-							navStack.next({ key: "name:ask" });
+							navStack.next("name:ask");
 						}}
 						defaultValue={formValue.family}
 					/>

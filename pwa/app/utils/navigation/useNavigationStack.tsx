@@ -1,10 +1,7 @@
-import { createContext, type PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, type PropsWithChildren, useCallback, useContext, useMemo, useState } from "react";
 import { throwNotImplemented } from "~/utils/function";
 
-interface StackFrame {
-	key: string;
-	data?: unknown;
-}
+type StackFrame = string;
 
 type ContextType = { stack: StackFrame[]; next: (frame: StackFrame) => void; back: () => void; reset: () => void };
 
@@ -27,7 +24,7 @@ export function NavigationStack<TFrame extends StackFrame>(props: PropsWithChild
 export function StackFrame(props: PropsWithChildren<{ frameKey: string }>) {
 	const navigationStack = useStackNavigator();
 
-	if (navigationStack.current.key !== props.frameKey) {
+	if (navigationStack.current !== props.frameKey) {
 		return null;
 	}
 
@@ -59,16 +56,6 @@ export function useNavigationStack(config: StackConfig<StackFrame>) {
 		}),
 		[stack],
 	);
-
-	useEffect(() => {
-		if (!import.meta.env.DEV) {
-			return;
-		}
-
-		function forceFrame(key: StackFrame["key"]) {
-			setStack((st) => [...st, { key }]);
-		}
-	}, []);
 
 	const component = useCallback(
 		(props: PropsWithChildren) => (

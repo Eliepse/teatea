@@ -20,7 +20,7 @@ export function AskName() {
 		}
 
 		context.patchForm({ name: name.trim() });
-		navigationStack.next({ key: "recap:confirm" });
+		navigationStack.next("recap:confirm");
 	}
 
 	function handleInputChange(e: ChangeEvent<HTMLInputElement>) {

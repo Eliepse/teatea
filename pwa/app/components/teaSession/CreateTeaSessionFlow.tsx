@@ -31,7 +31,7 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 	const alert = useAlert();
 	const [form, setForm] = useState<SessionForm>({ drankAt: new Date(), tea: props.tea });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({
-		defaultFrame: { key: props.tea?.id ? "parameters:input" : "tea:select" },
+		defaultFrame: props.tea?.id ? "parameters:input" : "tea:select",
 	});
 
 	function goBack() {
@@ -86,7 +86,7 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 				<SelectTeaFrame
 					onConfirm={(tea) => {
 						setForm((st) => ({ ...st, tea }));
-						stackNavigator.next({ key: "parameters:input" });
+						stackNavigator.next("parameters:input");
 					}}
 					onBack={goBack}
 				/>
@@ -98,7 +98,7 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 					defaultWater={form.waterVolume}
 					onConfirm={(tea, water) => {
 						setForm((st) => ({ ...st, teaQuantity: tea, waterVolume: water }));
-						stackNavigator.next({ key: "date:select" });
+						stackNavigator.next("date:select");
 					}}
 				/>
 			</StackFrame>

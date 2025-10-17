@@ -1,5 +1,4 @@
 import { PageLayout } from "~/components/shared/paged/PageLayout";
-import { useTeas } from "~/utils/api/useTeas";
 import { type OriginPath, type Tea, teaFamilies, type TeaFamily } from "~t/types";
 import clsx from "clsx";
 import Arrow from "~/components/icons/arrow";

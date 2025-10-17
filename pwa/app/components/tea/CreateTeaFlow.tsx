@@ -49,7 +49,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 	const [formValue, setFormValue] = useState<FormValue>({});
 	const [createdTea, setCreatedTea] = useState<Tea | undefined>();
 	const alert = useAlert();
-	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: { key: "origin:select" } });
+	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: "origin:select" });
 
 	function closeFlow() {
 		mutation.reset();
@@ -80,7 +80,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 		mutationFn: submitNewTea,
 		onSuccess: (data: Tea) => {
 			setCreatedTea(data);
-			navStack.next({ key: "confirmation" });
+			navStack.next("confirmation");
 		},
 		onError: (e) => {
 			alert({ title: "Couldn't add this tea", body: e.message });
@@ -114,7 +114,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onBack={goBack}
 						onSelect={(origin) => {
 							contextValue.patchForm({ origin });
-							navStack.next({ key: "family:select" });
+							navStack.next("family:select");
 						}}
 						defaultOriginPath={formValue.origin?.path}
 						allowCreation
@@ -126,7 +126,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onBack={goBack}
 						onSelect={(family) => {
 							contextValue.patchForm({ family });
-							navStack.next({ key: "select:type" });
+							navStack.next("select:type");
 						}}
 						defaultValue={formValue.family}
 					/>
@@ -136,14 +136,14 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onBack={goBack}
 						onSkip={() => {
 							contextValue.patchForm({ type: undefined });
-							navStack.next({ key: "select:cultivar" });
+							navStack.next("select:cultivar");
 						}}
 						onCreate={() => {
 							if (formValue.type && "@id" in formValue.type) {
 								contextValue.patchForm({ type: undefined });
 							}
 
-							navStack.next({ key: "name:ask" });
+							navStack.next("name:ask");
 						}}
 						onSelect={(type) => {
 							if (undefined === type) {
@@ -151,10 +151,10 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 									contextValue.patchForm({ type: undefined });
 								}
 
-								navStack.next({ key: "select:cultivar" });
+								navStack.next("select:cultivar");
 							} else {
 								contextValue.patchForm({ type });
-								navStack.next({ key: "select:cultivar" });
+								navStack.next("select:cultivar");
 							}
 						}}
 						defaultValue={formValue.type && "id" in formValue.type ? formValue.type : undefined}
@@ -166,11 +166,11 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onBack={goBack}
 						onSkip={() => {
 							contextValue.patchForm({ cultivar: undefined });
-							navStack.next({ key: "recap" });
+							navStack.next("recap");
 						}}
 						onSelect={(cultivar) => {
 							contextValue.patchForm({ cultivar });
-							navStack.next({ key: "recap" });
+							navStack.next("recap");
 						}}
 						defaultValue={formValue.cultivar && "id" in formValue.cultivar ? formValue.cultivar : undefined}
 						allowCreate
@@ -182,12 +182,12 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						onConfirm={(name) => {
 							if (undefined === name) {
 								setFormValue((st) => ({ ...st, type: undefined }));
-								navStack.next({ key: "select:cultivar" });
+								navStack.next("select:cultivar");
 								return;
 							}
 
 							setFormValue((st) => ({ ...st, type: { name, isPDO: st.type?.isPDO ?? false } }));
-							navStack.next({ key: "select:cultivar" });
+							navStack.next("select:cultivar");
 						}}
 						defaultValue={formValue.type?.name}
 					/>
