@@ -3,7 +3,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
-import { StrictMode } from "react";
+import { type ReactNode, StrictMode } from "react";
 import { PostHogProvider } from "posthog-js/react";
 import type { PostHogConfig } from "posthog-js";
 
@@ -43,7 +43,7 @@ if (!import.meta.env.SSR) {
 	});
 }
 
-export function Layout({ children }: { children: React.ReactNode }) {
+export function Layout({ children }: { children: ReactNode }) {
 	return (
 		<StrictMode>
 			<html lang="en">
@@ -58,7 +58,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 					<Links />
 				</head>
 				<body>
-					<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+					<AlertContext>
+						<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+					</AlertContext>
 					<ScrollRestoration />
 					<Scripts />
 				</body>
@@ -68,21 +70,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-	const children = (
-		<AlertContext>
-			<Outlet />
-		</AlertContext>
-	);
-
 	if (options.api_host && import.meta.env.PUBLIC_POSTHOG_KEY) {
 		return (
 			<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
-				{children}
+				<Outlet />
 			</PostHogProvider>
 		);
 	}
 
-	return children;
+	return <Outlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
