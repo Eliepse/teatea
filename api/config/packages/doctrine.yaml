@@ -24,6 +24,7 @@ doctrine:
             ltree: App\Doctrine\DBAL\Types\LTreeType
             volume: App\Doctrine\DBAL\Types\VolumeType
             weight: App\Doctrine\DBAL\Types\WeightType
+            RoastLevel: App\Doctrine\DBAL\Types\RoastLevelType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

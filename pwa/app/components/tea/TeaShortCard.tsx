@@ -1,9 +1,10 @@
 import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import Leaf from "~/components/icons/leaf";
-import type { Cultivar, OriginPath, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, OriginPath, RoastLevel, TeaFamily, TeaType } from "~t/types";
 import clsx from "clsx";
 import { type ReactNode, useMemo } from "react";
+import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 
 export function TeaShortCard(props: {
 	family: TeaFamily;
@@ -11,6 +12,7 @@ export function TeaShortCard(props: {
 	path?: OriginPath;
 	cultivar?: Cultivar;
 	year?: number;
+	roast?: RoastLevel;
 	className?: string;
 	noStyle?: boolean;
 }) {
@@ -19,15 +21,27 @@ export function TeaShortCard(props: {
 
 		if (props.cultivar) {
 			components.push(
-				<span className="inline-flex items-center justify-end ml-1">
+				<span key="cultivar" className="inline-flex items-center justify-end ml-1">
 					<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
 					{props.cultivar.name}
 				</span>,
 			);
 		}
 
+		if (!!props.roast && "no" !== props.roast) {
+			components.push(
+				<span key="roast" className="ml-1">
+					<RoastLevelLabel roast={props.roast} />
+				</span>,
+			);
+		}
+
 		if (props.year) {
-			components.push(<span className="ml-1">{props.year}</span>);
+			components.push(
+				<span key="year" className="ml-1">
+					{props.year}
+				</span>,
+			);
 		}
 
 		if (1 >= components.length) {
@@ -38,7 +52,11 @@ export function TeaShortCard(props: {
 
 		for (let i = 0; i < components.length; i++) {
 			children.push(components[i]);
-			children.push(<span className="ml-1">&middot;</span>);
+			children.push(
+				<span key={`puce-${i}`} className="ml-1">
+					&middot;
+				</span>,
+			);
 		}
 
 		return children.slice(0, -1);

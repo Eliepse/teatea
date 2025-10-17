@@ -36,6 +36,7 @@ export default function TeaListPage(props: Route.ComponentProps) {
 							path={teaLink.tea.originPath}
 							cultivar={teaLink.tea.cultivar}
 							year={teaLink.tea.year}
+							roast={teaLink.tea.roast}
 							className="bg-slate-100"
 						/>
 					</Link>

@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\DTO\OriginPath;
+use App\Enum\RoastLevel;
 use App\Enum\TeaFamily;
 use App\State\Tea\ListedTeaCollectionProvider;
 use App\State\Tea\TeaCollectionProvider;
@@ -106,6 +107,9 @@ class Tea
 	#[Assert\GreaterThanOrEqual(1800)]
 	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
 	public ?int $year = null;
+
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
+	public ?RoastLevel $roast = null;
 
 	#[Groups(["tea:read"])]
 	public \DateTimeImmutable $addedAt;

@@ -9,6 +9,7 @@ export function YearInput(props: {
 	onChange: (value: number | undefined) => void;
 	min: number;
 	defaultValue?: number;
+	placeholder?: string;
 	max?: number;
 	allowClear?: boolean;
 }) {
@@ -42,7 +43,14 @@ export function YearInput(props: {
 				className="input input-lg flex items-stretch pr-0 w-auto"
 				onClick={handleUIEvent(() => setModalOpen(true))}
 			>
-				<input type="text" className="grow" inputMode="numeric" value={props.value?.toFixed() ?? ""} readOnly />
+				<input
+					type="text"
+					className="grow"
+					inputMode="numeric"
+					value={props.value?.toFixed() ?? ""}
+					placeholder={props.placeholder}
+					readOnly
+				/>
 				<button
 					className="flex-none px-4 cursor-pointer text-zinc-400 hover:text-zinc-800"
 					onClick={handleUIEvent(clearValue)}

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Doctrine\DBAL\Types\RoastLevelType;
 use App\Doctrine\ORM\TimestampedEntity;
 use App\Enum\RoastLevel;
 use App\Enum\TeaFamily;
@@ -48,7 +49,7 @@ class Tea
 	#[ORM\Column(type: "jsonb", nullable: true)]
 	public ?array $harvest = null;
 
-	#[ORM\Column(nullable: true)]
+	#[ORM\Column(type: RoastLevelType::TYPE, nullable: true)]
 	public ?RoastLevel $roast = null;
 
 	#[Assert\GreaterThan(0)]

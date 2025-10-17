@@ -1,4 +1,4 @@
-import type { Cultivar, Member, OriginPath, Tea, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Member, OriginPath, RoastLevel, Tea, TeaFamily, TeaType } from "~t/types";
 import { nl2br } from "~/utils/content";
 import { f, handleUIEvent } from "~/utils/function";
 import { CoffeeCup } from "iconoir-react";
@@ -14,6 +14,7 @@ export function SessionRichCard(props: {
 	path?: OriginPath;
 	cultivar?: Cultivar;
 	year?: number;
+	roast?: RoastLevel;
 	onAuthorClick?: () => void;
 	className?: string;
 }) {
@@ -32,6 +33,7 @@ export function SessionRichCard(props: {
 				path={props.path}
 				type={props.type}
 				year={props.year}
+				roast={props.roast}
 				className="mx-2 bg-white/80"
 				noStyle
 			/>

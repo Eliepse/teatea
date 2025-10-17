@@ -128,6 +128,7 @@ export default function ListTeaSessions(props: Route.ComponentProps) {
 															author={author}
 															cultivar={session.tea.cultivar}
 															year={session.tea.year}
+															roast={session.tea.roast}
 															onAuthorClick={() => filterUser(author.username)}
 														/>
 													</Link>

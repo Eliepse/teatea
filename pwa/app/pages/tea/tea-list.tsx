@@ -78,6 +78,7 @@ export default function TeaListPage() {
 											path={tea.originPath}
 											cultivar={tea.cultivar}
 											year={tea.year}
+											roast={tea.roast}
 											className="bg-slate-100"
 										/>
 									</Link>

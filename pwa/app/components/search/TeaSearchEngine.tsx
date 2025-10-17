@@ -142,6 +142,7 @@ export function TeaSearchEngine(props: {
 											path={tea.originPath}
 											cultivar={tea.cultivar}
 											year={tea.year}
+											roast={tea.roast}
 											className={clsx(
 												"border",
 												props.value?.id === tea.id

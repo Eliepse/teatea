@@ -6,6 +6,7 @@ import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
 import { YearInput } from "~/components/shared/inputs/YearInput";
+import { RoastField } from "~/components/tea/create/RoastField";
 
 export function TeaFormConfirmation(props: {
 	values: ReturnType<typeof useTeaFormContext>["formValue"];
@@ -68,10 +69,22 @@ export function TeaFormConfirmation(props: {
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
 
-			<fieldset className="fieldset">
+			<fieldset className="fieldset mb-4">
 				<legend className="fieldset-legend">Harvest year</legend>
-				<YearInput value={props.values.year} onChange={(year) => props.onChange({ ...props.values, year })} min={1850} allowClear />
+				<YearInput
+					value={props.values.year}
+					placeholder="Not set"
+					onChange={(year) => props.onChange({ ...props.values, year })}
+					min={1850}
+					allowClear
+				/>
 			</fieldset>
+
+			<RoastField
+				value={props.values.roast}
+				onChange={(roast) => props.onChange({ ...props.values, roast })}
+				className="mb-4"
+			/>
 		</PageLayout>
 	);
 }

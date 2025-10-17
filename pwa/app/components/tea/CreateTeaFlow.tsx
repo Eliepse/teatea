@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { SelectFamily } from "../family/SelectFamily";
-import type { Cultivar, Origin, Tea, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Origin, RoastLevel, Tea, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { warnNotImplemented } from "~/utils/function";
 import { postApi } from "~/utils/api";
@@ -25,6 +25,7 @@ type FormValue = {
 	origin?: Origin;
 	cultivar?: Cultivar;
 	year?: number;
+	roast?: RoastLevel;
 };
 
 export function useTeaFormContext() {
@@ -193,7 +194,12 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 					/>
 				</StackFrame>
 				<StackFrame frameKey="recap">
-					<TeaFormConfirmation onBack={goBack} values={formValue} onConfirm={submit} onChange={setFormValue} />
+					<TeaFormConfirmation
+						onBack={goBack}
+						values={formValue}
+						onConfirm={submit}
+						onChange={setFormValue}
+					/>
 				</StackFrame>
 				<StackFrame frameKey="confirmation">
 					<Confirmation

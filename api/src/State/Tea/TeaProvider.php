@@ -104,6 +104,7 @@ readonly class TeaProvider implements ProviderInterface
 		$tea->originPath = $originPath;
 		$tea->cultivar = CultivarProvider::fromEntity($entity->cultivar);
 		$tea->year = $entity->year;
+		$tea->roast = $entity->roast;
 		$tea->addedAt = $entity->createdAt;
 
 		return $tea;

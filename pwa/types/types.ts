@@ -54,6 +54,7 @@ export type Tea = Resource & {
 	originPath?: OriginPath;
 	cultivar?: Cultivar;
 	year?: number;
+	roast?: RoastLevel;
 	addedAt: Date;
 };
 
@@ -172,3 +173,13 @@ export type MemberTea = Resource & {
 	author: Iri;
 	createdAt: Date;
 };
+
+export const RoastLevelEnum = {
+	No: "no",
+	Yes: "yes",
+	Light: "light",
+	Mild: "mild",
+	Strong: "strong",
+} as const;
+
+export type RoastLevel = (typeof RoastLevelEnum)[keyof typeof RoastLevelEnum];
