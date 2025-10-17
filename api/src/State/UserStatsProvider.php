@@ -80,7 +80,7 @@ readonly class UserStatsProvider implements ProviderInterface
 			WHERE o.id IS NOT NULL
 			DQL
 		)
-		->setParameter("ids", Arr::pluck($topTeas, fn($t) => $t->origin->id, true), ArrayParameterType::INTEGER)
+		->setParameter("ids", Arr::pluck($topTeas, fn($t) => $t->origin?->id, true), ArrayParameterType::INTEGER)
 		->getResult();
 
 		$resource = MemberProvider::hydrate($user);
