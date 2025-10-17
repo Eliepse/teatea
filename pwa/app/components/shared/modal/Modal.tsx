@@ -3,7 +3,7 @@ import clsx from "clsx";
 
 type ModalType = React.PropsWithChildren & {
   open: boolean;
-  backdrop?: boolean;
+  noBackdrop?: boolean;
   position?: "top" | "bottom" | "middle" | "start" | "end";
   className?: string;
 };
@@ -26,7 +26,7 @@ function ModalContent(props: ModalType) {
     "modal-bottom sm:modal-middle": "bottom" === props.position,
   });
 
-  const { backdrop, ...dialogProps } = props;
+  const { noBackdrop, ...dialogProps } = props;
 
   return (
     <dialog
@@ -38,7 +38,7 @@ function ModalContent(props: ModalType) {
       className={clsx("modal z-40", positionCls)}
     >
       <div className={clsx("modal-box", props.className)}>{props.children}</div>
-      {true === backdrop && (
+      {true !== noBackdrop && (
         <form method="dialog" className="modal-backdrop">
           <button>close</button>
         </form>

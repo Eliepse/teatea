@@ -212,7 +212,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				onClose={() => setShowNodeEditor(false)}
 				open={editMode && showNodeEditor}
 				position="bottom"
-				backdrop
 			>
 				<div className="flex mb-2">
 					<button className="btn" onClick={handleUIEvent(() => setShowNodeEditor(false))}>

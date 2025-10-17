@@ -34,7 +34,6 @@ export function AlertContext(props: PropsWithChildren) {
 	);
 
 	function onBackdropClick(e: MouseEvent) {
-		console.debug("click")
 		e.stopPropagation();
 		ctxValue.close(currentAlert);
 	}
