@@ -1,5 +1,11 @@
 @import "tailwindcss";
 @import "./styles/react-day-picker.css";
+@import "@ncdai/react-wheel-picker/style.css";
+
+[data-rwp-option],
+[data-rwp-highlight-wrapper] {
+	font-size: 1.125rem;
+}
 
 @plugin "daisyui";
 

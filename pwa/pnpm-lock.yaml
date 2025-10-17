@@ -11,6 +11,9 @@ dependencies:
   '@heroicons/react':
     specifier: ^2.2.0
     version: 2.2.0(react@19.1.1)
+  '@ncdai/react-wheel-picker':
+    specifier: ^1.0.17
+    version: 1.0.17(react@19.1.1)
   '@react-router/node':
     specifier: ^7.8.2
     version: 7.8.2(react-router@7.8.2)(typescript@5.9.2)
@@ -792,6 +795,14 @@ packages:
   /@mjackson/node-fetch-server@0.7.0:
     resolution: {integrity: sha512-un8diyEBKU3BTVj3GzlTPA1kIjCkGdD+AMYQy31Gf9JCkfoZzwgJ79GUtHrF2BN3XPNMLpubbzPcxys+a3uZEw==}
     dev: true
+
+  /@ncdai/react-wheel-picker@1.0.17(react@19.1.1):
+    resolution: {integrity: sha512-fnKwMDla0yAnBA5tRq9GRLl6+wiyuzkGKfaN6pn1VM2o6aElB4HWRwITRMBmdTfZOYdPE0BAf6ZYbmMeaogucQ==}
+    peerDependencies:
+      react: ^16.8 || ^17.0 || ^18.0 || ^19.0.0 || ^19.0.0-rc
+    dependencies:
+      react: 19.1.1
+    dev: false
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
