@@ -38,6 +38,10 @@ class Tea
 	#[ORM\JoinColumn("origin_id")]
 	public ?Origin $origin = null;
 
+	#[Assert\GreaterThan(0)]
+	#[ORM\Column(nullable: true)]
+	public ?int $year = null;
+
 	#[ORM\Column(nullable: true)]
 	public ?bool $isBlend = null;
 

@@ -3,15 +3,47 @@ import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import Leaf from "~/components/icons/leaf";
 import type { Cultivar, OriginPath, TeaFamily, TeaType } from "~t/types";
 import clsx from "clsx";
+import { type ReactNode, useMemo } from "react";
 
 export function TeaShortCard(props: {
 	family: TeaFamily;
 	type?: TeaType;
 	path?: OriginPath;
 	cultivar?: Cultivar;
+	year?: number;
 	className?: string;
 	noStyle?: boolean;
 }) {
+	const specs = useMemo(() => {
+		const components: ReactNode[] = [];
+
+		if (props.cultivar) {
+			components.push(
+				<span className="inline-flex items-center justify-end ml-1">
+					<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
+					{props.cultivar.name}
+				</span>,
+			);
+		}
+
+		if (props.year) {
+			components.push(<span className="ml-1">{props.year}</span>);
+		}
+
+		if (1 >= components.length) {
+			return components;
+		}
+
+		const children: ReactNode[] = [];
+
+		for (let i = 0; i < components.length; i++) {
+			children.push(components[i]);
+			children.push(<span className="ml-1">&middot;</span>);
+		}
+
+		return children.slice(0, -1);
+	}, [props.cultivar, props.year]);
+
 	return (
 		<div
 			className={clsx(
@@ -26,17 +58,8 @@ export function TeaShortCard(props: {
 			</div>
 
 			<div className="text-xs text-base-content/60 leading-tight text-right">
-				{props.path && (
-					<div>
-						<FormatOriginPath originPath={props.path} />
-					</div>
-				)}
-				{props.cultivar && (
-					<div className="flex items-center justify-end">
-						<Leaf className="size-2.5 mr-0.5 text-base-content/60" />
-						{props.cultivar.name}
-					</div>
-				)}
+				<div>{props.path && <FormatOriginPath originPath={props.path} />}</div>
+				<div>{specs}</div>
 			</div>
 		</div>
 	);

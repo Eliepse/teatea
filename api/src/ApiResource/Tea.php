@@ -18,6 +18,7 @@ use App\State\Tea\TeaCreateFromTypeProcessor;
 use App\State\Tea\TeaCreateProcess;
 use App\State\Tea\TeaProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
@@ -101,6 +102,10 @@ class Tea
 	#[ApiProperty(readableLink: true)]
 	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
 	public ?Cultivar $cultivar = null;
+
+	#[Assert\GreaterThanOrEqual(1800)]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
+	public ?int $year = null;
 
 	#[Groups(["tea:read"])]
 	public \DateTimeImmutable $addedAt;

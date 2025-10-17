@@ -53,6 +53,7 @@ export type Tea = Resource & {
 	origin?: Origin;
 	originPath?: OriginPath;
 	cultivar?: Cultivar;
+	year?: number;
 	addedAt: Date;
 };
 

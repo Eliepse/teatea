@@ -5,9 +5,11 @@ import Chevron from "~/components/icons/chevron";
 import { teaFamilies } from "~t/types";
 import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
+import { YearInput } from "~/components/shared/inputs/YearInput";
 
 export function TeaFormConfirmation(props: {
 	values: ReturnType<typeof useTeaFormContext>["formValue"];
+	onChange: (values: ReturnType<typeof useTeaFormContext>["formValue"]) => void;
 	onConfirm: () => void;
 	onBack: () => void;
 }) {
@@ -65,6 +67,11 @@ export function TeaFormConfirmation(props: {
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
+
+			<fieldset className="fieldset">
+				<legend className="fieldset-legend">Harvest year</legend>
+				<YearInput value={props.values.year} onChange={(year) => props.onChange({ ...props.values, year })} min={1850} allowClear />
+			</fieldset>
 		</PageLayout>
 	);
 }

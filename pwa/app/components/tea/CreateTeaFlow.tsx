@@ -193,7 +193,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 					/>
 				</StackFrame>
 				<StackFrame frameKey="recap">
-					<TeaFormConfirmation onBack={goBack} values={formValue} onConfirm={submit} />
+					<TeaFormConfirmation onBack={goBack} values={formValue} onConfirm={submit} onChange={setFormValue} />
 				</StackFrame>
 				<StackFrame frameKey="confirmation">
 					<Confirmation

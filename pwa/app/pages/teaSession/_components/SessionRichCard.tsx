@@ -13,6 +13,7 @@ export function SessionRichCard(props: {
 	type?: TeaType;
 	path?: OriginPath;
 	cultivar?: Cultivar;
+	year?: number;
 	onAuthorClick?: () => void;
 	className?: string;
 }) {
@@ -30,6 +31,7 @@ export function SessionRichCard(props: {
 				cultivar={props.cultivar}
 				path={props.path}
 				type={props.type}
+				year={props.year}
 				className="mx-2 bg-white/80"
 				noStyle
 			/>

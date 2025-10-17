@@ -72,6 +72,7 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		$entity->family = $typeEntity->family;
 		$entity->type = $typeEntity;
 		$entity->origin = $teaOrigin;
+		$entity->year = $data->year;
 		$entity->createdBy = $user;
 		$entity->cultivar = $data->cultivar ? $this->em->getReference(Cultivar::class, $data->cultivar->id) : null;
 

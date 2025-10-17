@@ -76,6 +76,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 										type={tea.type}
 										path={tea.originPath}
 										cultivar={tea.cultivar}
+										year={tea.year}
 										className="bg-slate-100"
 									/>
 								</Link>

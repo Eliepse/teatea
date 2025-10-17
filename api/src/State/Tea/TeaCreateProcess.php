@@ -49,6 +49,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		$teaEntity = new \App\Entity\Tea();
 		$teaEntity->family = $data->family;
 		$teaEntity->origin = $origin;
+		$teaEntity->year = $data->year;
 		$teaEntity->createdBy = $user;
 
 		// Create the new type if needed
