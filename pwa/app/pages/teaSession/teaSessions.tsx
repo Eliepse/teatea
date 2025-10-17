@@ -7,24 +7,12 @@ import { AuthLayout } from "~/layouts/AuthLayout";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { handleUIEvent } from "~/utils/function";
-import { useUser } from "~/auth/hooks/useUser";
 import { useState } from "react";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 import { SessionShortCard } from "~/pages/teaSession/_components/SessionShortCard";
 import { SessionRichCard } from "~/pages/teaSession/_components/SessionRichCard";
-import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSessions";
 
-const TEA_FAMILY_COLOR_CLS = {
-	yellow: "text-lime-200",
-	white: "text-cyan-200",
-	green: "text-green-300",
-	wulong: "text-indigo-300",
-	black: "text-orange-300",
-	fermented: "text-stone-500",
-} as const;
-
-export default function ListTeaSessions(props: Route.ComponentProps) {
-	const user = useUser();
+export default function ListTeaSessions() {
 	const [params] = useSearchParams();
 	const [filters, setFilters] = useState<{ username?: string }>({ username: params.get("username") ?? undefined });
 
