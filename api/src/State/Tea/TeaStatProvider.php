@@ -16,7 +16,7 @@ readonly class TeaStatProvider implements ProviderInterface
 	) {
 	}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaStats|null
 	{
 		assert(false === ($operation instanceof CollectionOperationInterface), "Collection operation not supported");
 
