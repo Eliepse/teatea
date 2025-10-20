@@ -183,3 +183,7 @@ export const RoastLevelEnum = {
 } as const;
 
 export type RoastLevel = (typeof RoastLevelEnum)[keyof typeof RoastLevelEnum];
+
+export type Business = Resource<"Business"> & {
+	name: string;
+};

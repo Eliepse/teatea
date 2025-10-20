@@ -34,17 +34,6 @@ class TrgmSimilarityFunction extends FunctionNode
 		$this->first = $parser->ArithmeticPrimary();
 		$parser->match(TokenType::T_COMMA);
 
-//		$lexer = $parser->getLexer();
-//
-//		$this->operator = $lexer->lookahead->value;
-//		$lexer->moveNext();
-//
-//		if("," !== $token = $lexer->lookahead->value) {
-//			$this->operator .= $token;
-//		}
-//
-//		$parser->match(TokenType::T_COMMA);
-
 		$this->second = $parser->ArithmeticPrimary();
 		$parser->match(TokenType::T_CLOSE_PARENTHESIS);
 	}
