@@ -15,17 +15,19 @@ import { Plus, ShopFourTilesWindow, XmarkCircleSolid } from "iconoir-react";
 export function BusinessSelect(props: {
 	placeholder?: string;
 	value: Iri | undefined;
-	onSelect: (value: Iri | undefined) => void;
+	onSelect: (value: Iri | undefined) => void | Promise<void>;
 	allowCreate?: boolean;
 	allowClear?: boolean;
 	disabled?: boolean;
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const [pendingSelect, setPendingSelect] = useState(false);
 	const [searchText, setSearchText] = useState<string | undefined>();
 	const [addBusiness, setAddBusiness] = useState(false);
 	const [focused, setFocused] = useState(false);
-	const showSearch = focused && true !== props.disabled;
+	const showSearch = focused && true !== props.disabled && false === pendingSelect;
 	const showClear = !showSearch && !!props.value && props.allowClear;
+	const isDisabled = props.disabled || pendingSelect;
 
 	const searchQuery = useQuery({
 		queryFn: async ({ queryKey }) => {
@@ -45,7 +47,7 @@ export function BusinessSelect(props: {
 	const selectedBusiness = useResourceQuery<Business>(props.value);
 
 	function activateSearch() {
-		if (true === props.disabled) {
+		if (true === isDisabled) {
 			return;
 		}
 
@@ -53,15 +55,18 @@ export function BusinessSelect(props: {
 		setFocused(true);
 	}
 
-	function selectItem(business: Business) {
-		if (true === props.disabled) {
+	function selectItem(value: Business | null) {
+		if (true === isDisabled) {
 			return;
 		}
 
 		setFocused(false);
-		props.onSelect(business["@id"]);
-		void searchQuery.refetch();
+		const clb = props.onSelect(value ? value["@id"] : undefined) ?? Promise.resolve();
 
+		setPendingSelect(true);
+		clb.finally(() => setPendingSelect(false));
+
+		void searchQuery.refetch();
 		if (document.activeElement) {
 			(document.activeElement as HTMLElement).blur();
 		}
@@ -69,20 +74,20 @@ export function BusinessSelect(props: {
 
 	return (
 		<div className={clsx("dropdown w-full", showSearch && "dropdown-open")}>
-			<fieldset className="input w-full pr-0" onClick={activateSearch} disabled={props.disabled}>
+			<fieldset className="input w-full pr-0" onClick={activateSearch} disabled={isDisabled}>
 				{selectedBusiness.isLoading ? (
-					<div className="skeleton h-4 w-24" />
+					<div className="mr-auto skeleton h-4 w-24" />
 				) : (
 					<>
 						{!showSearch && selectedBusiness.data?.name && (
-							<span className="flex items-center">
+							<span className="flex flex-1 items-center">
 								<ShopFourTilesWindow className="size-4 mr-2 inline-block" />{" "}
 								{selectedBusiness.data.name}
 							</span>
 						)}
 
 						{!showSearch && !selectedBusiness.data?.name && (
-							<span className="text-base-content/60">{props.placeholder}</span>
+							<span className="text-base-content/60 flex-1">{props.placeholder}</span>
 						)}
 					</>
 				)}
@@ -98,11 +103,14 @@ export function BusinessSelect(props: {
 					onBlur={() => setFocused(false)}
 				/>
 
-				{showSearch && searchQuery.isLoading && <span className="loading loading-spinner loading-xs mr-2" />}
+				{((showSearch && searchQuery.isLoading) || pendingSelect) && (
+					<span className="loading loading-spinner loading-xs mr-2 flex-none" />
+				)}
+
 				{showClear && (
 					<button
 						className="flex-none h-full px-4 cursor-pointer"
-						onClick={handleUIEvent(() => props.onSelect(undefined))}
+						onClick={handleUIEvent(() => selectItem(null))}
 					>
 						<XmarkCircleSolid className="size-4" />
 					</button>
