@@ -5,7 +5,7 @@ namespace App\State\TeaSession;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Steep;
+use App\ApiResource\Business;
 use App\ApiResource\Member;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaSession;
@@ -42,7 +42,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {
-			if(empty($username)) {
+			if (empty($username)) {
 				throw new NotFoundHttpException();
 			}
 
@@ -130,10 +130,14 @@ readonly class TeaSessionProvider implements ProviderInterface
 			$resource->tea = $tea;
 		}
 
-		if($entity->author) {
-			$author = new Member();
-			$author->username = $entity->author->username;
-			$resource->author = $author;
+		if ($entity->author) {
+			$resource->author = new Member();
+			$resource->author->username = $entity->author->username;
+		}
+
+		if ($entity->place) {
+			$resource->place = new Business();
+			$resource->place->id = $entity->place->id;
 		}
 
 		return $resource;

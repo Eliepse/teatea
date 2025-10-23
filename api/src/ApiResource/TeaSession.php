@@ -120,6 +120,9 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?\DateTimeImmutable $drankAt;
 
+	#[Groups(["teaSession:read", "teaSession:edit"])]
+	public ?Business $place = null;
+
 	public function __construct()
 	{
 		$this->drankAt = new \DateTimeImmutable();

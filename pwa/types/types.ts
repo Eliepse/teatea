@@ -67,6 +67,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	drankAt: Date;
 	author?: Iri | Member;
 	steeps?: Steep[];
+	place?: Business["@id"];
 };
 
 export type TeaTypeTreeNode = TeaType & LTreeNode;

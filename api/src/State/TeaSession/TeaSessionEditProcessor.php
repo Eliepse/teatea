@@ -36,6 +36,7 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
 		$entity->quality = $data->quality;
+		$entity->place = $data->place ? $this->em->getReference(\App\Entity\Business::class, $data->place->id) : null;
 		$this->em->persist($entity);
 		$this->em->flush();
 

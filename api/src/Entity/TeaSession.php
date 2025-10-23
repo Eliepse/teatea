@@ -39,6 +39,10 @@ class TeaSession
 	#[ORM\Column(nullable: true)]
 	public ?BrewingQuality $quality = null;
 
+	#[ORM\ManyToOne]
+	#[ORM\JoinColumn]
+	public ?Business $place = null;
+
 	public function __construct(
 		#[ORM\ManyToOne(inversedBy: 'sessions')]
 		#[ORM\JoinColumn(nullable: false)]

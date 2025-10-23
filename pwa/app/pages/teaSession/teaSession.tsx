@@ -4,7 +4,7 @@ import type { TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import Arrow from "~/components/icons/arrow";
 import { Modal } from "~/components/shared/modal/Modal";
 import { type ChangeEvent, useState } from "react";
@@ -24,6 +24,8 @@ import { Check, Edit } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
 import { IfNotAuthor } from "~/auth/components/voters/IfNotAuthor";
+import { BusinessSelect } from "~/components/shared/inputs/BusinessSelect";
+import { useAlert } from "~/components/shared/modal/AlertManager";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -32,6 +34,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
+	const pageRevalidate = useRevalidator();
 	const [searchParams] = useSearchParams();
 	const [session, setSession] = useState(props.loaderData);
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
@@ -208,11 +211,23 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</IfAuthor>
 			)}
 
-			<Modal
-				onClose={() => setShowNodeEditor(false)}
-				open={editMode && showNodeEditor}
-				position="bottom"
-			>
+			{editMode && (
+				<IfAuthor author={session.author}>
+					<h2 className="uppercase text-xs text-base-content/60 mt-8 mb-2">Location</h2>
+					<BusinessSelect
+						value={props.loaderData.place}
+						onSelect={async (place) => {
+							await sessionMutations.edit.mutateAsync({ place: place ?? null });
+							await pageRevalidate.revalidate();
+						}}
+						allowClear
+						allowCreate
+						placeholder="Search for a place"
+					/>
+				</IfAuthor>
+			)}
+
+			<Modal onClose={() => setShowNodeEditor(false)} open={editMode && showNodeEditor} position="bottom">
 				<div className="flex mb-2">
 					<button className="btn" onClick={handleUIEvent(() => setShowNodeEditor(false))}>
 						Cancel
@@ -237,17 +252,20 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 function useSessionMutations(sessionId: number) {
 	const navigate = useNavigate();
+	const alert = useAlert();
 
 	const editMutation = useMutation({
-		mutationFn: async (args: Partial<Pick<TeaSession, "note" | "quality">>) => {
+		mutationFn: async (args: Partial<Pick<TeaSession, "note" | "quality" | "place">>) => {
 			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, args);
 			return denormalizeTeaSession(await response.json());
 		},
+		onError: (e) => alert({ title: "Failed to change this session", body: e.message }),
 	});
 
 	const deleteMutation = useMutation({
 		mutationFn: async () => await deleteApi(`/tea_sessions/${sessionId}`),
 		onSuccess: () => navigate("/sessions"),
+		onError: (e) => alert({ title: "Failed to delete this session", body: e.message }),
 	});
 
 	return { edit: editMutation, delete: deleteMutation };
