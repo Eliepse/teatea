@@ -1,6 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
-import type { TeaSession } from "~t/types";
+import type { Business, TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
@@ -20,12 +20,13 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityIcon, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import { Check, Edit } from "iconoir-react";
+import { Check, Edit, ShopFourTilesWindow } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
 import { IfNotAuthor } from "~/auth/components/voters/IfNotAuthor";
 import { BusinessSelect } from "~/components/shared/inputs/BusinessSelect";
 import { useAlert } from "~/components/shared/modal/AlertManager";
+import { useResourceQuery } from "~/utils/api/useResourceQuery";
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -146,11 +147,17 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						</div>
 					)}
 
-					{!editMode && undefined !== session.quality && (
-						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-							{QualityIcon[session.quality]}
-							<span>{QualityLabel[session.quality]} brew</span>
-						</div>
+					{!editMode && (
+						<>
+							{undefined !== session.quality && (
+								<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+									{QualityIcon[session.quality]}
+									<span>{QualityLabel[session.quality]} brew</span>
+								</div>
+							)}
+
+							<PlaceBadge place={props.loaderData.place} />
+						</>
 					)}
 				</div>
 			</header>
@@ -269,4 +276,19 @@ function useSessionMutations(sessionId: number) {
 	});
 
 	return { edit: editMutation, delete: deleteMutation };
+}
+
+function PlaceBadge(props: { place?: Business["@id"] | null }) {
+	const { data: place, isLoading } = useResourceQuery<Business>(props.place);
+
+	if (!props.place) {
+		return null;
+	}
+
+	return (
+		<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
+			<ShopFourTilesWindow className="size-4 mr-2 inline-block" />
+			{isLoading ? <div className="skeleton h-4 w-20" /> : <span>{place?.name}</span>}
+		</div>
+	);
 }
