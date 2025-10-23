@@ -1,5 +1,5 @@
 # Base FrankenPHP image
-FROM dunglas/frankenphp:1-php8.4  AS base
+FROM dunglas/frankenphp:1.9-php8.4  AS base
 
 WORKDIR /app
 VOLUME /data

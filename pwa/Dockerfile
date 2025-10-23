@@ -1,6 +1,6 @@
 FROM node:24-alpine AS base
 
-env COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 WORKDIR /app
 RUN addgroup -S www && adduser -S www -G www && \
