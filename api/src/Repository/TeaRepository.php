@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Tea;
+use App\Enum\RoastLevel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -33,6 +34,18 @@ class TeaRepository extends ServiceEntityRepository
 			$qb->andWhere("tea.cultivar = :cultivar")->setParameter("cultivar", $tea->cultivar);
 		} else {
 			$qb->andWhere("tea.cultivar IS NULL");
+		}
+
+		if (null !== $tea->year) {
+			$qb->andWhere("tea.year = :year")->setParameter("year", $tea->year);
+		} else {
+			$qb->andWhere("tea.year IS NULL");
+		}
+
+		if (null !== $tea->roast && RoastLevel::No === $tea->roast) {
+			$qb->andWhere("tea.roast = :roast")->setParameter("roast", $tea->roast);
+		} else {
+			$qb->andWhere("tea.roast IS NULL OR tea.roast = :roast")->setParameter("roast", RoastLevel::No);
 		}
 
 		return 0 !== $qb->getQuery()->getSingleScalarResult();
