@@ -18,11 +18,14 @@ export function BusinessSelect(props: {
 	onSelect: (value: Iri | undefined) => void;
 	allowCreate?: boolean;
 	allowClear?: boolean;
+	disabled?: boolean;
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [searchText, setSearchText] = useState<string | undefined>();
 	const [addBusiness, setAddBusiness] = useState(false);
 	const [focused, setFocused] = useState(false);
+	const showSearch = focused && true !== props.disabled;
+	const showClear = !showSearch && !!props.value && props.allowClear;
 
 	const searchQuery = useQuery({
 		queryFn: async ({ queryKey }) => {
@@ -42,11 +45,19 @@ export function BusinessSelect(props: {
 	const selectedBusiness = useResourceQuery<Business>(props.value);
 
 	function activateSearch() {
+		if (true === props.disabled) {
+			return;
+		}
+
 		inputRef.current?.focus();
 		setFocused(true);
 	}
 
 	function selectItem(business: Business) {
+		if (true === props.disabled) {
+			return;
+		}
+
 		setFocused(false);
 		props.onSelect(business["@id"]);
 		void searchQuery.refetch();
@@ -57,20 +68,20 @@ export function BusinessSelect(props: {
 	}
 
 	return (
-		<div className={clsx("dropdown w-full", focused && "dropdown-open")}>
-			<div className="input w-full pr-0" onClick={activateSearch}>
+		<div className={clsx("dropdown w-full", showSearch && "dropdown-open")}>
+			<fieldset className="input w-full pr-0" onClick={activateSearch} disabled={props.disabled}>
 				{selectedBusiness.isLoading ? (
 					<div className="skeleton h-4 w-24" />
 				) : (
 					<>
-						{!focused && selectedBusiness.data?.name && (
+						{!showSearch && selectedBusiness.data?.name && (
 							<span className="flex items-center">
 								<ShopFourTilesWindow className="size-4 mr-2 inline-block" />{" "}
 								{selectedBusiness.data.name}
 							</span>
 						)}
 
-						{!focused && !selectedBusiness.data?.name && (
+						{!showSearch && !selectedBusiness.data?.name && (
 							<span className="text-base-content/60">{props.placeholder}</span>
 						)}
 					</>
@@ -78,14 +89,17 @@ export function BusinessSelect(props: {
 
 				<DelayedInput
 					ref={inputRef}
-					className={clsx("h-full flex-1 focus:outline-0 focus:border-none", !focused && "w-0 opacity-0 m-0")}
+					className={clsx(
+						"h-full focus:outline-0 focus:border-none",
+						!showSearch ? "w-0 opacity-0 m-0" : "flex-1",
+					)}
 					value={searchText}
 					onChange={setSearchText}
 					onBlur={() => setFocused(false)}
 				/>
 
-				{focused && searchQuery.isLoading && <span className="loading loading-spinner loading-xs mr-2" />}
-				{!focused && !!props.value && props.allowClear && (
+				{showSearch && searchQuery.isLoading && <span className="loading loading-spinner loading-xs mr-2" />}
+				{showClear && (
 					<button
 						className="flex-none h-full px-4 cursor-pointer"
 						onClick={handleUIEvent(() => props.onSelect(undefined))}
@@ -93,7 +107,7 @@ export function BusinessSelect(props: {
 						<XmarkCircleSolid className="size-4" />
 					</button>
 				)}
-			</div>
+			</fieldset>
 
 			<ul className="dropdown-content menu bg-base-100 rounded-box z-1 w-64 p-2 shadow-sm">
 				{searchQuery.isLoading && (
