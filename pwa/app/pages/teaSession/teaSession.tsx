@@ -215,7 +215,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				<IfAuthor author={session.author}>
 					<h2 className="uppercase text-xs text-base-content/60 mt-8 mb-2">Location</h2>
 					<BusinessSelect
-						value={props.loaderData.place}
+						value={props.loaderData.place ?? undefined}
 						onSelect={async (place) => {
 							await sessionMutations.edit.mutateAsync({ place: place ?? null });
 							await pageRevalidate.revalidate();
