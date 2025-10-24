@@ -96,6 +96,7 @@ class OTPAuthController extends AbstractController
 		$this->em->persist($OTPChallengeToken->token);
 		$this->em->flush();
 
+		$link = "$this->baseUrl/login/verify/$OTPChallengeToken->challenge";
 		$this->mailer->send(
 			new Email()
 				->from("elie.meignan@eliepse.fr")
@@ -104,7 +105,7 @@ class OTPAuthController extends AbstractController
 				->html(
 					<<<HTML
 					To login, please follow this link:<br/>
-					<a href="$this->baseUrl/login/$OTPChallengeToken->challenge">$this->baseUrl/login/$OTPChallengeToken->challenge</a>
+					<a href="$link">$link</a>
 					HTML,
 				),
 		);

@@ -1,5 +1,6 @@
-import type { Route } from "../../../.react-router/types/app/pages/auth/+types/login";
+import type { Route } from "../../../.react-router/types/app/pages/auth/+types/verify";
 import axios from "axios";
+import { KeyXmark, SecurityPass } from "iconoir-react";
 
 type OTPResponse =
 	| {
@@ -27,11 +28,31 @@ export async function clientLoader(args: Route.ComponentProps) {
 	}
 }
 
-export default function Login(args: Route.ComponentProps) {
+export default function Verify(args: Route.ComponentProps) {
+	const success = !args.loaderData.success;
 	return (
 		<div className="p-6 h-screen flex flex-col justify-center items-center">
-			{true === args.loaderData.success && <div>Success !</div>}
-			{false === args.loaderData.success && <div>Failure...</div>}
+			{success && (
+				<div className="text-emerald-600 text-center">
+					<SecurityPass className="size-14 mx-auto mb-12" />
+					<p>
+						Verification successful!
+						<br />
+						Go back to the app to enter your tea journal.
+					</p>
+				</div>
+			)}
+
+			{!success && (
+				<div className="text-red-500 text-center">
+					<KeyXmark className="size-14 mx-auto mb-12" />
+					<p>
+						Oops... Looks like this verification link is invalid.
+						<br />
+						Request a new verification link or try login again.
+					</p>
+				</div>
+			)}
 		</div>
 	);
 }
