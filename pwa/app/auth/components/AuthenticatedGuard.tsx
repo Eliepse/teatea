@@ -9,14 +9,14 @@ export async function clientLoader() {
 			await refreshToken();
 		} catch (e) {
 			console.error(e);
-			throw redirect("/login");
+			throw redirect("/");
 		}
 	}
 
 	const token = TokenUtils.get();
 
 	if(!token) {
-		throw redirect("/login");
+		throw redirect("/");
 	}
 
 	if(false === token.roles.includes("ROLE_USER") || token.roles.includes("ROLE_ONBOARDING")) {
@@ -29,7 +29,7 @@ export default function AuthenticatedGuard() {
 	const navigate = useNavigate();
 
 	if (null === token) {
-		navigate("/login");
+		navigate("/");
 		return null;
 	}
 

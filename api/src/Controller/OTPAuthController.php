@@ -6,11 +6,13 @@ use App\Entity\Token;
 use App\Entity\User;
 use App\Exception\Auth\ExpiredTokenException;
 use App\Exception\Auth\InvalidTokenException;
+use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\TokenManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +24,10 @@ use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-readonly class OTPAuthController
+class OTPAuthController extends AbstractController
 {
 	private \DateInterval $otpTtl;
+	private \DateInterval $otpChallengeTtl;
 
 	public function __construct(
 		private UserRepository $userRepository,
@@ -32,16 +35,18 @@ readonly class OTPAuthController
 		private RefreshTokenGeneratorInterface $refreshTokenGenerator,
 		private EntityManagerInterface $em,
 		private TokenManager $tokenManager,
+		private TokenRepository $tokenRepo,
 		#[Autowire("%gesdinet_jwt_refresh_token.ttl%")]
 		private int $ttl,
 		private MailerInterface $mailer,
 		#[Autowire("%app.base_url%")]
 		private string $baseUrl,
 	) {
-		$this->otpTtl = new \DateInterval("PT10M");
+		$this->otpTtl = new \DateInterval("PT15M");
+		$this->otpChallengeTtl = new \DateInterval("PT5M");
 	}
 
-	#[Route("/auth/login", methods: ["POST"])]
+	#[Route("/auth/login", name: "login.check", methods: ["POST"])]
 	public function requestToken(Request $request): Response
 	{
 		$payload = json_decode($request->getContent(), true);
@@ -55,46 +60,78 @@ readonly class OTPAuthController
 
 		$this->tokenManager->collectGarbage();
 
-		if (null !== $user) {
-			$token = $this->tokenManager->createToken(
-				Token::TYPE_OTP,
-				$user,
-				new \DateTimeImmutable()->add($this->otpTtl),
-			);
-
-			$this->mailer->send(
-				new Email()->from("elie.meignan@eliepse.fr")->to($email)->subject("Login to your account")->html(
-					<<<HTML
-						To login, please follow this link:<br/>
-						<a href="$this->baseUrl/login/$token->challenge">$this->baseUrl/login/$token->challenge</a>
-						HTML,
-
-				),
-			);
-		} else {
+		// No user
+		if (null === $user) {
 			// Pretend creation to reduce timing attack
 			$fakeUser = $this->em->getReference(User::class, 0);
 			usleep(rand(5, 20) * 1_000);
-			$this->tokenManager->generateTokenWithSalt("nop", $fakeUser, new \DateTimeImmutable(), "not-a-salt");
+
+			// Do not persist! (only to mitigate timing attacks)
+			$fakeOTP = $this->tokenManager->makeToken("do_not_persist_this_token", $fakeUser, new \DateTimeImmutable());
+			$this->tokenManager->makeToken("do_not_persist_this_token_2", $fakeUser, new \DateTimeImmutable());
+
+			// Pretend it worked to mislead attacker
+			return $this->json([
+				"token" => $fakeOTP->challenge,
+				"expiredAt" => $fakeOTP->token->expiredAt,
+			]);
 		}
 
-		return new Response(status: 204);
+		// Inactive OTP token
+		$OTPToken = $this->tokenManager->createToken(
+			Token::TYPE_OTP,
+			$user,
+			new \DateTimeImmutable()->add($this->otpTtl),
+			null,
+		);
+
+		// Used to activate the OTP token
+		$OTPChallengeToken = $this->tokenManager->makeToken(
+			Token::TYPE_OTP_CHALLENGE,
+			$user,
+			new \DateTimeImmutable()->add($this->otpChallengeTtl),
+			new \DateTimeImmutable(),
+		);
+		$OTPChallengeToken->token->challengeFor = $OTPToken->token;
+		$this->em->persist($OTPChallengeToken->token);
+		$this->em->flush();
+
+		$this->mailer->send(
+			new Email()
+				->from("elie.meignan@eliepse.fr")
+				->to($email)
+				->subject("Login to your account")
+				->html(
+					<<<HTML
+					To login, please follow this link:<br/>
+					<a href="$this->baseUrl/login/$OTPChallengeToken->challenge">$this->baseUrl/login/$OTPChallengeToken->challenge</a>
+					HTML,
+				),
+		);
+
+		return $this->json([
+			"token" => $OTPToken->challenge,
+			"expiredAt" => $OTPToken->token->expiredAt,
+		]);
 	}
 
-	#[Route("/auth/otp/{challenge}", requirements: ["challenge" => "[0-9a-zA-Z]{42}"], methods: ["POST"], format: "application/json",)]
-	public function validate(string $challenge): JsonResponse
+	#[Route("/auth/otp", name: "login.otp", methods: ["POST"], format: "application/json")]
+	public function login(Request $request): JsonResponse
 	{
+		$challenge = $request->toArray()["challenge"] ?? null;
+
+		if (empty($challenge) || 1 !== preg_match("/^[0-9a-z]{50}$/i", $challenge)) {
+			return $this->json(["message" => "Token invalid or expired"], 404);
+		}
+
 		try {
 			$token = $this->tokenManager->validateChallenge($challenge, Token::TYPE_OTP);
-		} catch (InvalidTokenException|ExpiredTokenException $e) {
+		} catch (InvalidTokenException|ExpiredTokenException) {
 			$token = null;
 		}
 
 		if (null === $token) {
-			return new JsonResponse(
-				["action" => ["redirect" => "/login"], "message" => "Token invalid or expired"],
-				404,
-			);
+			return $this->json(["message" => "Token invalid or expired"], 404);
 		}
 
 		$jwt = $this->JWTManager->create($token->owner);
@@ -104,12 +141,41 @@ readonly class OTPAuthController
 		$this->em->remove($token);
 		$this->em->flush();
 
-		return new JsonResponse(
-			[
-				"token" => $jwt,
-				"refresh_token" => $refreshToken->getRefreshToken(),
-				"refresh_token_expiration" => $refreshToken->getValid()->getTimestamp(),
-			],
-		);
+		return $this->json([
+			"token" => $jwt,
+			"refresh_token" => $refreshToken->getRefreshToken(),
+			"refresh_token_expiration" => $refreshToken->getValid()->getTimestamp(),
+		]);
+	}
+
+	#[Route("/auth/otp/verify", name: "login.verify", methods: ["POST"], format: "application/json")]
+	public function verify(Request $request): Response
+	{
+		$challenge = $request->toArray()["challenge"] ?? null;
+
+		if (empty($challenge) || 1 !== preg_match("/^[0-9a-z]{50}$/i", $challenge)) {
+			return $this->json(["message" => "Token invalid or expired"], 404);
+		}
+
+		try {
+			$challengeToken = $this->tokenManager->validateChallenge($challenge, Token::TYPE_OTP_CHALLENGE);
+		} catch (InvalidTokenException|ExpiredTokenException) {
+			$challengeToken = null;
+		}
+
+		if (null === $challengeToken) {
+			return $this->json(["message" => "Token invalid or expired"], 404);
+		}
+
+		$OTPToken = $challengeToken->challengeFor;
+
+		if (null === $OTPToken || $OTPToken->isExpired()) {
+			$this->tokenRepo->removeExpiredTokens();
+			return $this->json(["message" => "Token invalid or expired"], 404);
+		}
+
+		$this->tokenRepo->validateToken($OTPToken);
+
+		return new Response(status: 204);
 	}
 }

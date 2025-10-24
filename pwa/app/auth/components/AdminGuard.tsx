@@ -12,7 +12,7 @@ export async function clientLoader() {
 			token = TokenUtils.get();
 		} catch (e) {
 			console.error(e);
-			throw redirect("/login");
+			throw redirect("/");
 		}
 	}
 
@@ -20,7 +20,7 @@ export async function clientLoader() {
 		return;
 	}
 
-	throw redirect("/login");
+	throw redirect("/");
 }
 
 export default function AdminGuard() {
@@ -28,7 +28,7 @@ export default function AdminGuard() {
 	const navigate = useNavigate();
 
 	if (null === token || false === token.roles.includes("ROLE_ADMIN")) {
-		navigate("/login");
+		navigate("/");
 		return null;
 	}
 

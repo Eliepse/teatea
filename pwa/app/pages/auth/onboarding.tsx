@@ -15,7 +15,7 @@ export async function clientLoader() {
 	const token = TokenUtils.get();
 
 	if (null === token) {
-		return redirect("/login");
+		return redirect("/");
 	}
 
 	if (token.roles?.includes("ROLE_USER")) {
