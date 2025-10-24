@@ -24,6 +24,22 @@ class TokenRepository extends ServiceEntityRepository
 			->getQuery()->getOneOrNullResult();
 	}
 
+	public function validateToken(Token $token): void
+	{
+		$token->validFrom = new \DateTimeImmutable();
+
+		// Delete all associated challenge tokens
+		$this->createQueryBuilder("T")
+			->delete()
+			->where("T.challengeFor = :parent")
+			->setParameter("parent", $token)
+			->getQuery()
+			->execute();
+
+		$this->getEntityManager()->persist($token);
+		$this->getEntityManager()->flush();
+	}
+
 	public function removeExpiredTokens(): void
 	{
 		$this->createQueryBuilder("T")

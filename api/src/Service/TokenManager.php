@@ -5,7 +5,6 @@ namespace App\Service;
 use App\DTO\Auth\GeneratedToken;
 use App\Entity\Token;
 use App\Entity\User;
-use App\Exception\Auth\ExpiredTokenException;
 use App\Exception\Auth\InvalidTokenException;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,6 +13,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 final readonly class TokenManager
 {
 	private const int KEY_LENGTH = 32;
+	private const int SALT_LENGTH = 18;
 
 	public function __construct(
 		#[Autowire("%env(string:JWT_SECRET_KEY)%")]
@@ -23,23 +23,54 @@ final readonly class TokenManager
 	) {
 	}
 
-	public function generateTokenWithSalt(
+	private function generateTokenWithSalt(
 		string $type,
 		User $owner,
 		\DateTimeImmutable $expiredAt,
+		?\DateTimeImmutable $validFrom,
+		// The salt is unique to the token and is used to create a unique signature
 		string $salt,
 	): GeneratedToken {
+		// The key is used to retrieve the token from the database
 		$key = $this->generateRandomString(self::KEY_LENGTH);
 		$payload = [$salt, $type, $owner->id, $expiredAt->getTimestamp()];
 		$encodedPayload = base64_encode(serialize($payload));
 
-		$token = new Token($key, $owner, $this->sign($encodedPayload), $expiredAt);
-		return new GeneratedToken("$key$salt", $token);
+
+		$token = new Token($key, $owner, $this->sign($encodedPayload), $validFrom, $expiredAt);
+
+		// The challenge is composed of the key and salt. Both parts can be
+		// extracted because we know the exact size of the key (first part).
+		// Once the token is found from the database using the key, the salt
+		// is used to generate the signature (see the payload generation above)
+		// and check if it matches with the signature stored in the database
+		$challenge = "$key$salt";
+		return new GeneratedToken($challenge, $token);
 	}
 
-	public function createToken(string $type, User $owner, \DateTimeImmutable $expiredAt): GeneratedToken
-	{
-		$tokenDTO = $this->generateTokenWithSalt($type, $owner, $expiredAt, $this->generateRandomString(18));
+	/**
+	 * Generate a token without persisting it
+	 */
+	public function makeToken(
+		string $type,
+		User $owner,
+		\DateTimeImmutable $expiredAt,
+		?\DateTimeImmutable $validFrom = new \DateTimeImmutable(),
+	): GeneratedToken {
+		$salt = $this->generateRandomString(self::SALT_LENGTH);
+		return $this->generateTokenWithSalt($type, $owner, $expiredAt, $validFrom, $salt);
+	}
+
+	/**
+	 * Generate a token and persist it
+	 */
+	public function createToken(
+		string $type,
+		User $owner,
+		\DateTimeImmutable $expiredAt,
+		?\DateTimeImmutable $validFrom,
+	): GeneratedToken {
+		$tokenDTO = $this->makeToken($type, $owner, $expiredAt, $validFrom);
 
 		$this->em->persist($tokenDTO->token);
 		$this->em->flush();
@@ -61,8 +92,8 @@ final readonly class TokenManager
 			throw new InvalidTokenException();
 		}
 
-		if ($token->isExpired()) {
-			throw new ExpiredTokenException();
+		if (false === $token->isValid()) {
+			throw new InvalidTokenException();
 		}
 
 		return $this->verifySignature($token, $type, $salt) ? $token : null;
@@ -75,7 +106,13 @@ final readonly class TokenManager
 
 	private function verifySignature(Token $token, string $type, string $salt): bool
 	{
-		$generatedTokenDTO = $this->generateTokenWithSalt($type, $token->owner, $token->expiredAt, $salt);
+		$generatedTokenDTO = $this->generateTokenWithSalt(
+			$type,
+			$token->owner,
+			$token->expiredAt,
+			$token->validFrom,
+			$salt,
+		);
 		return hash_equals($token->signature, $generatedTokenDTO->token->signature);
 	}
 

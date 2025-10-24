@@ -13,6 +13,9 @@ class Token
 	// Passwordless sign-in
 	const string TYPE_OTP = "otp";
 
+	// Used to activate an inactive OTP token
+	const string TYPE_OTP_CHALLENGE = "otp_challenge";
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
@@ -21,6 +24,10 @@ class Token
 	#[ORM\Column]
 	public readonly \DateTimeImmutable $createdAt;
 
+	#[ORM\ManyToOne(cascade: ["ALL"])]
+	#[ORM\JoinColumn(nullable: true, onDelete: "CASCADE")]
+	public ?Token $challengeFor = null;
+
 	public function __construct(
 		#[Assert\Unique]
 		#[ORM\Column(type: Types::TEXT, nullable: false)]
@@ -28,16 +35,23 @@ class Token
 
 		#[ORM\ManyToOne]
 		#[ORM\JoinColumn(nullable: false)]
-		public readonly ?User $owner = null,
+		public readonly User $owner,
 
 		#[ORM\Column(type: Types::TEXT)]
 		public readonly ?string $signature = null,
 
+		// Define when the validity of the token will start
+		#[ORM\Column(nullable: true)]
+		public ?\DateTimeImmutable $validFrom = null,
+
 		#[ORM\Column(nullable: true)]
 		public readonly ?\DateTimeImmutable $expiredAt = null,
-	)
-	{
+	) {
 		$this->createdAt = new \DateTimeImmutable();
+
+		if ($this->expiredAt && $this->validFrom && $this->expiredAt <= $this->validFrom) {
+			throw new \RuntimeException("Inverted expiration and validity dates");
+		}
 	}
 
 	public function isExpired(): bool
@@ -47,5 +61,14 @@ class Token
 		}
 
 		return $this->expiredAt <= new \DateTimeImmutable();
+	}
+
+	public function isValid(): bool
+	{
+		if (null === $this->validFrom) {
+			return false;
+		}
+
+		return false === $this->isExpired() && $this->validFrom <= new \DateTimeImmutable();
 	}
 }
