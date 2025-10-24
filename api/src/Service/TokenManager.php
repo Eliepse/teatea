@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 final readonly class TokenManager
 {
-	private const int KEY_LENGTH = 24;
+	private const int KEY_LENGTH = 32;
 
 	public function __construct(
 		#[Autowire("%env(string:JWT_SECRET_KEY)%")]
