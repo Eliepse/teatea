@@ -118,9 +118,21 @@ function SuccessView() {
 }
 
 function WaitView(props: { onCancel: () => void }) {
+	// const { isPending, mutate } = useMutation({
+	// 	mutationFn: async (email: string) => {
+	// 		const response = await axios.post<{ token: string; expiredAt: string }>("/auth/otp/resend", { challenge: token });
+	// 		return response.data;
+	// 	},
+	// 	onSuccess: (payload) => {
+	// 		const token: OTPToken = { value: payload.token, expiredAt: new Date(payload.expiredAt) };
+	// 		props.onLoggedIn(token);
+	// 	},
+	// 	onError: (e) => alert({ body: e.message }),
+	// });
+
 	return (
 		<div className="text-center pt-2">
-			<span className="loading loading-ring w-24" />
+			<span className="loading loading-ring text-success w-24" />
 
 			<h2 className="text-center text-lg my-6">
 				Waiting for email verification,
@@ -134,13 +146,15 @@ function WaitView(props: { onCancel: () => void }) {
 
 			<hr className="my-4 text-teal-100" />
 
-			<p className="text-teal-700 text-sm">
-				Didn't receive any email? Look at your spam or try to
-				<br />
-				<span onClick={props.onCancel} className="link link-primary">
-					login with another email
-				</span>
-			</p>
+			<h3 className="mb-4">Still haven't received the verification email?</h3>
+
+			{/*<button onClick={props.onCancel} className="btn btn-soft btn-wide mb-2">*/}
+			{/*	Send a new verification email*/}
+			{/*</button>*/}
+
+			<button onClick={props.onCancel} className="btn btn-soft btn-wide">
+				Try with another email
+			</button>
 		</div>
 	);
 }
