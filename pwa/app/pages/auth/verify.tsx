@@ -29,7 +29,7 @@ export async function clientLoader(args: Route.ComponentProps) {
 }
 
 export default function Verify(args: Route.ComponentProps) {
-	const success = !args.loaderData.success;
+	const success = args.loaderData.success;
 	return (
 		<div className="p-6 h-screen flex flex-col justify-center items-center">
 			{success && (
