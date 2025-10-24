@@ -2,7 +2,7 @@ import { layout, prefix, route, type RouteConfig } from "@react-router/dev/route
 
 export default [
 	route("/", "pages/homepage.tsx"),
-	route("/login/:token?", "pages/auth/login-page.tsx"),
+	route("/login/:token?", "pages/auth/login.tsx"),
 
 	route("/onboarding", "pages/auth/onboarding.tsx"),
 

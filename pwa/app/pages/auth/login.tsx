@@ -1,5 +1,5 @@
 import { redirect, useFetcher } from "react-router";
-import type { Route } from "../../../.react-router/types/app/pages/auth/+types/login-page";
+import type { Route } from "../../../.react-router/types/app/pages/auth/+types/login";
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { handleUIEvent } from "~/utils/function";
 
@@ -61,7 +61,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs) {
 	throw new Error("Invalid auth response");
 }
 
-export default function LoginPage(args: Route.ComponentProps) {
+export default function Login(args: Route.ComponentProps) {
 	const fetcher = useFetcher();
 
 	if (true === fetcher.data?.success) {
