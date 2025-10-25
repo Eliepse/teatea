@@ -2,17 +2,6 @@ import type { Route } from "../../../.react-router/types/app/pages/auth/+types/v
 import axios from "axios";
 import { KeyXmark, SecurityPass } from "iconoir-react";
 
-type OTPResponse =
-	| {
-			token: string;
-			refresh_token: string;
-			refresh_token_expiration: number;
-	  }
-	| {
-			action: { redirect: string };
-			message?: string;
-	  };
-
 export async function clientLoader(args: Route.ComponentProps) {
 	const token = args.params.token;
 

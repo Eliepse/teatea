@@ -25,7 +25,7 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 	const alert = useAlert();
 	const [token, setToken] = useState<OTPToken | boolean | null>(LocalStorageUtils.get<OTPToken>("otp_token"));
 
-	const pollingValidator = useQuery({
+	useQuery({
 		queryFn: async (ctx) => {
 			const token = ctx.queryKey[0];
 
