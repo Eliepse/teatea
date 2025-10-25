@@ -60,7 +60,7 @@ readonly class UserStatsProvider implements ProviderInterface
 				WHERE tea.id IN (
 					SELECT searchTea.id
 					FROM App\Entity\Tea searchTea
-						LEFT JOIN searchTea.sessions session WITH session.drankAt >= :before AND session.author = :user
+						INNER JOIN searchTea.sessions session WITH session.drankAt >= :before AND session.author = :user
 					GROUP BY searchTea.id
 					ORDER BY COUNT(session) DESC
 				)
