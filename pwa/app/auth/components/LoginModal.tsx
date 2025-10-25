@@ -9,7 +9,7 @@ import { Link } from "react-router";
 import axios from "axios";
 import { TokenUtils } from "~/auth/hooks/useToken";
 
-type OTPToken = { value: string; expiredAt: Date };
+export type OTPToken = { value: string; expiredAt: Date };
 type OTPResponse =
 	| {
 			token: string;

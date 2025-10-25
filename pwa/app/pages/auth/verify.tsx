@@ -1,9 +1,14 @@
 import type { Route } from "../../../.react-router/types/app/pages/auth/+types/verify";
 import axios from "axios";
 import { KeyXmark, SecurityPass } from "iconoir-react";
+import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
+import { type OTPToken } from "~/auth/components/LoginModal";
+import { isFuture, isPast } from "date-fns";
+import { Link } from "react-router";
 
 export async function clientLoader(args: Route.ComponentProps) {
 	const token = args.params.token;
+	const OTPToken = LocalStorageUtils.get<OTPToken>("otp_token");
 
 	if (!token) {
 		throw new Error("Token missing");
@@ -11,9 +16,14 @@ export async function clientLoader(args: Route.ComponentProps) {
 
 	try {
 		await axios.post("/auth/otp/verify", { challenge: token });
-		return { success: true };
+
+		if (null !== OTPToken && isFuture(new Date(OTPToken.expiredAt))) {
+			return { success: true, localOtp: true };
+		}
+
+		return { success: true, localOtp: false };
 	} catch (_e) {
-		return { success: false };
+		return { success: false, localOtp: false };
 	}
 }
 
@@ -29,6 +39,12 @@ export default function Verify(args: Route.ComponentProps) {
 						<br />
 						Go back to the app to enter your tea journal.
 					</p>
+
+					{true === args.loaderData.localOtp && (
+						<Link to="/" className="btn btn-outline btn-primary mt-8">
+							Go back home
+						</Link>
+					)}
 				</div>
 			)}
 
