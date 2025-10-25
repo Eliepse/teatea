@@ -42,7 +42,10 @@ export const TokenUtils = {
 		return token;
 	},
 
-	clear: () => LocalStorageUtils.remove(tokenKey),
+	clear: () => {
+		LocalStorageUtils.remove(tokenKey);
+		LocalStorageUtils.remove(refreshTokenKey);
+	},
 
 	setRefreshToken: (rawToken: string, expiredAt: Date) => {
 		LocalStorageUtils.store(refreshTokenKey, {
