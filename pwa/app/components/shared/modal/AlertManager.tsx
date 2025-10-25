@@ -14,6 +14,7 @@ import {
 import { throwNotImplemented } from "~/utils/function";
 import { Alert } from "~/components/shared/modal/Alert";
 import { AnimatePresence, motion } from "motion/react";
+import { ConfirmPopup } from "~/components/shared/modal/ConfirmPopup";
 
 const CONTEXT = createContext<{
 	alert: (alert: ReactElement) => void;
@@ -90,4 +91,48 @@ export function useAlert() {
 		},
 		[alert],
 	);
+}
+
+export function usePopup() {
+	const { alert, close } = useContext(CONTEXT);
+
+	const alertFn = useCallback(
+		(params: { title?: string; body?: ReactNode }) => {
+			const popup = (
+				<Alert onClose={() => close(popup)} title={params.title}>
+					{params.body}
+				</Alert>
+			);
+
+			alert(popup);
+		},
+		[alert],
+	);
+
+	const confirm = useCallback(
+		async (params: { title?: string; body?: ReactNode }) => {
+			return new Promise<void>((res, rej) => {
+				const popup = (
+					<ConfirmPopup
+						onCancel={() => {
+							close(popup);
+							rej();
+						}}
+						onConfirm={() => {
+							close(popup);
+							res();
+						}}
+						title={params.title}
+					>
+						{params.body}
+					</ConfirmPopup>
+				);
+
+				alert(popup);
+			});
+		},
+		[alert],
+	);
+
+	return { confirm, alert: alertFn };
 }
