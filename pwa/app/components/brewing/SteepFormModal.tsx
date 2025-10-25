@@ -64,7 +64,7 @@ export function SteepFormModal(props: {
 	}
 
 	return (
-		<Modal onClose={props.onClose} open={props.open} className="h-full flex flex-col" position="bottom">
+		<Modal onClose={props.onClose} open={props.open} className="flex flex-col" position="bottom">
 			<div className="flex justify-between">
 				<button
 					className="btn btn-outline"
@@ -96,7 +96,7 @@ export function SteepFormModal(props: {
 						<>
 							<QuickAction onClick={() => setDuration(30)}>00:30</QuickAction>
 							<QuickAction onClick={() => setDuration(60)}>01:00</QuickAction>
-							<QuickAction onClick={() => setDuration(60)}>01:30</QuickAction>
+							<QuickAction onClick={() => setDuration(120)}>02:00</QuickAction>
 						</>
 					) : (
 						<>
@@ -108,11 +108,11 @@ export function SteepFormModal(props: {
 							</QuickAction>
 							<QuickAction
 								disabled={values.duration.totalSeconds <= 0}
-								onClick={() => offsetDuration(-15)}
+								onClick={() => offsetDuration(-5)}
 							>
-								-15
+								-5
 							</QuickAction>
-							<QuickAction onClick={() => offsetDuration(15)}>+15</QuickAction>
+							<QuickAction onClick={() => offsetDuration(5)}>+5</QuickAction>
 							<QuickAction onClick={() => offsetDuration(30)}>+30</QuickAction>
 						</>
 					)}
