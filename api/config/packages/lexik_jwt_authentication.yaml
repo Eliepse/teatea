@@ -5,3 +5,7 @@ lexik_jwt_authentication:
     # Short TTL for security (we have a refresh token)
     token_ttl: 3600 # 60 min as seconds
     user_id_claim: email
+    
+    blocklist_token:
+        enabled: true
+        cache: cache.app

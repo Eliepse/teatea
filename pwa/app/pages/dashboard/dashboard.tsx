@@ -1,17 +1,18 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { useToken } from "~/auth/hooks/useToken";
+import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { usePWAInstall } from "~/utils/browser/usePWAInstall";
 import { handleUIEvent } from "~/utils/function";
 import { ArrowDownCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import type { Route } from "../../../.react-router/types/app/pages/dashboard/+types/dashboard";
-import { getApi } from "~/utils/api";
+import { getApi, postApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
-import { CoffeeCup, Plus } from "iconoir-react";
+import { CoffeeCup, LogOut, Plus } from "iconoir-react";
 import { IfAdmin } from "~/auth/components/voters/IfAdmin";
 import { TeaLists } from "~/pages/dashboard/_components/TeaLists";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
+import { usePopup } from "~/components/shared/modal/AlertManager";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -26,10 +27,29 @@ export default function Dashboard(props: Route.ComponentProps) {
 	const [token] = useToken();
 	const userQuery = useUser();
 	const pwaInstall = usePWAInstall();
+	const popup = usePopup();
+	const navigate = useNavigate();
+
+	function promptLogout() {
+		popup.confirm({ body: "Do you want to logout?" }).then(() => {
+			postApi("/logout", { refresh_token: TokenUtils.getRefreshToken() })
+				.then(() => {
+					TokenUtils.clear();
+					navigate("/");
+				})
+				.catch((e) => popup.alert({ title: "Failed to logout", body: e.message }));
+		});
+	}
 
 	return (
 		<AuthLayout className="px-4" activeKey="home">
-			<h1 className="my-6 text-xl">Hi, {userQuery?.data?.username}!</h1>
+			<div className="flex items-center">
+				<h1 className="my-6 text-xl flex-1">Hi, {userQuery?.data?.username}!</h1>
+
+				<button className="btn btn-circle" onClick={promptLogout}>
+					<LogOut className="size-3" />
+				</button>
+			</div>
 
 			{0 < props.loaderData.statsSessionsTotal && (
 				<div className="grid grid-cols-2 gap-4">
