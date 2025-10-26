@@ -4,7 +4,7 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 
 WORKDIR /app
 RUN addgroup -S www && adduser -S www -G www && \
-	corepack enable && corepack prepare pnpm@10.18.3 --activate && \
+	corepack enable && corepack prepare pnpm@10.19.0 --activate && \
     pnpm -v
 CMD ["pnpm", "run", "start"]
 
