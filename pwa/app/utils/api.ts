@@ -64,7 +64,9 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 	}
 
 	if (401 === response.status) {
-		TokenUtils.clear();
+		// Only reset the token. The refresh token is probably still
+		// valid and we want to trigger a refresh, not a logout
+		TokenUtils.clearToken();
 		throw new UnauthenticatedError(response);
 	}
 
