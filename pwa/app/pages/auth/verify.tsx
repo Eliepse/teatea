@@ -3,7 +3,7 @@ import axios from "axios";
 import { KeyXmark, SecurityPass } from "iconoir-react";
 import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
 import { type OTPToken } from "~/auth/components/LoginModal";
-import { isFuture, isPast } from "date-fns";
+import { isFuture } from "date-fns";
 import { Link } from "react-router";
 
 export async function clientLoader(args: Route.ComponentProps) {
@@ -18,6 +18,7 @@ export async function clientLoader(args: Route.ComponentProps) {
 		await axios.post("/auth/otp/verify", { challenge: token });
 
 		if (null !== OTPToken && isFuture(new Date(OTPToken.expiredAt))) {
+			LocalStorageUtils.remove("otp_token");
 			return { success: true, localOtp: true };
 		}
 

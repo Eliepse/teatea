@@ -38,6 +38,7 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 			if ("token" in data) {
 				TokenUtils.set(data.token);
 				TokenUtils.setRefreshToken(data.refresh_token, new Date(data.refresh_token_expiration * 1_000));
+				LocalStorageUtils.remove("otp_token");
 				setToken(true);
 				return null;
 			}
