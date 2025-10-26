@@ -63,12 +63,23 @@ class OTPAuthController extends AbstractController
 		// No user
 		if (null === $user) {
 			// Pretend creation to reduce timing attack
-			$fakeUser = $this->em->getReference(User::class, 0);
+			$fakeUser = new User();
+			$fakeUser->id = 0;
 			usleep(rand(5, 20) * 1_000);
 
 			// Do not persist! (only to mitigate timing attacks)
-			$fakeOTP = $this->tokenManager->makeToken("do_not_persist_this_token", $fakeUser, new \DateTimeImmutable());
-			$this->tokenManager->makeToken("do_not_persist_this_token_2", $fakeUser, new \DateTimeImmutable());
+			$fakeOTP = $this->tokenManager->makeToken(
+				"do_not_persist_this_token",
+				$fakeUser,
+				new \DateTimeImmutable()->add($this->otpTtl),
+				null,
+			);
+			$this->tokenManager->makeToken(
+				"do_not_persist_this_token_2",
+				$fakeUser,
+				new \DateTimeImmutable()->add($this->otpChallengeTtl),
+				null,
+			);
 
 			// Pretend it worked to mislead attacker
 			return $this->json([

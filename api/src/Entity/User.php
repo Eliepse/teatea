@@ -23,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
-	public readonly int $id;
+	public ?int $id = null;
 
 	#[Assert\Email]
 	#[Assert\Unique]

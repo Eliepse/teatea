@@ -49,7 +49,7 @@ class Token
 	) {
 		$this->createdAt = new \DateTimeImmutable();
 
-		if ($this->expiredAt && $this->validFrom && $this->expiredAt <= $this->validFrom) {
+		if (null !== $this->expiredAt && null !== $this->validFrom && $this->expiredAt <= $this->validFrom) {
 			throw new \RuntimeException("Inverted expiration and validity dates");
 		}
 	}
