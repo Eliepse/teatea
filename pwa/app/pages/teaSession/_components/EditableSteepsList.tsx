@@ -1,6 +1,6 @@
 import { SteepCard } from "~/components/brewing/steepCard";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
-import { handleUIEvent } from "~/utils/function";
+import { f, handleUIEvent } from "~/utils/function";
 import type { Id, Iri, Member, Steep } from "~t/types";
 import { SteepFormModal, type SteepValues } from "~/components/brewing/SteepFormModal";
 import { useState } from "react";
@@ -13,7 +13,7 @@ export function EditableSteepsList(props: {
 	sessionId: Id;
 	author?: Iri | Member;
 	steeps: Steep[];
-	onChange: (steeps: Steep[]) => void;
+	onChange?: (steeps: Steep[]) => void;
 	className?: string;
 	readonly?: boolean;
 }) {
@@ -41,13 +41,13 @@ export function EditableSteepsList(props: {
 		if (undefined !== edit && "@id" in edit) {
 			const steep = await steepMutations.edit.mutateAsync({ ...data, "@id": edit["@id"] });
 			// Replace the displayed steep with the updated one
-			props.onChange(props.steeps.map((s) => (s.key === steep.key ? steep : s)));
+			f(props.onChange)(props.steeps.map((s) => (s.key === steep.key ? steep : s)));
 			setEdit(undefined);
 			return;
 		}
 
 		const steep = await steepMutations.add.mutateAsync(data);
-		props.onChange([...props.steeps, steep]);
+		f(props.onChange)([...props.steeps, steep]);
 		setEdit(undefined);
 	}
 

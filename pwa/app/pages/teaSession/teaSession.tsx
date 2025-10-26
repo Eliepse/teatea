@@ -35,14 +35,12 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
-	const pageRevalidate = useRevalidator();
 	const [searchParams] = useSearchParams();
-	const [session, setSession] = useState(props.loaderData);
+	const session = props.loaderData;
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
 	const sessionMutations = useSessionMutations(session.id);
-	const editableData = { ...session, ...sessionMutations.edit.data };
 	const member = useMember({
 		iri: typeof session.author === "string" ? session.author : (session.author ?? {})["@id"],
 	});
@@ -163,7 +161,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			</header>
 
 			<div className="mt-4 mb-12">
-				{!!editableData.note && (
+				{!!session.note && (
 					<>
 						<h2 className="flex text-sm text-base-content/60 mb-1">
 							<span>Tasting note</span>
@@ -179,13 +177,13 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 							)}
 						</h2>
 						<p className="leading-normal text-lg rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
-							{nl2br(editableData.note)}
+							{nl2br(session.note)}
 						</p>
 					</>
 				)}
 
 				<IfAuthor author={session.author}>
-					{!editableData.note && editMode && (
+					{!session.note && editMode && (
 						<button
 							className="btn btn-block btn-dash mt-2"
 							onClick={handleUIEvent(() => setShowNodeEditor(true))}
@@ -201,7 +199,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				sessionId={session.id}
 				author={session.author}
 				steeps={session.steeps ?? []}
-				onChange={(steeps) => setSession((s) => ({ ...s, steeps }))}
 				className="mb-12"
 				readonly={!editMode}
 			/>
@@ -213,7 +210,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						onChange={async (quality) => {
 							await sessionMutations.edit.mutateAsync({ quality });
 						}}
-						value={editableData.quality}
+						value={session.quality}
 					/>
 				</IfAuthor>
 			)}
@@ -223,10 +220,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<h2 className="uppercase text-xs text-base-content/60 mt-8 mb-2">Location</h2>
 					<BusinessSelect
 						value={props.loaderData.place ?? undefined}
-						onSelect={async (place) => {
-							await sessionMutations.edit.mutateAsync({ place: place ?? null });
-							await pageRevalidate.revalidate();
-						}}
+						onSelect={async (place) => await sessionMutations.edit.mutateAsync({ place: place ?? null })}
 						allowClear
 						allowCreate
 						placeholder="Search for a place"
@@ -258,6 +252,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 }
 
 function useSessionMutations(sessionId: number) {
+	const revalidatePage = useRevalidator();
 	const navigate = useNavigate();
 	const alert = useAlert();
 
@@ -267,6 +262,7 @@ function useSessionMutations(sessionId: number) {
 			return denormalizeTeaSession(await response.json());
 		},
 		onError: (e) => alert({ title: "Failed to change this session", body: e.message }),
+		onSuccess: () => revalidatePage.revalidate(),
 	});
 
 	const deleteMutation = useMutation({
