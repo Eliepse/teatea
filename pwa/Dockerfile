@@ -11,6 +11,8 @@ CMD ["pnpm", "run", "start"]
 
 
 FROM base AS dev
+COPY --link --chmod=755 docker/docker-entrypoint.sh /usr/local/bin/custom-docker-entrypoint
+ENTRYPOINT ["custom-docker-entrypoint"]
 CMD ["pnpm", "run", "dev", "--port=3000"]
 
 
