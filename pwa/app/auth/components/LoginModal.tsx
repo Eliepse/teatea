@@ -182,6 +182,13 @@ function LoginForm(props: {
 		onError: (e) => alert({ body: e.message }),
 	});
 
+	function submit() {
+		if(!isEmailValid) {
+			return;
+		}
+		mutate(email);
+	}
+
 	return (
 		<div>
 			<h2 className="text-center text-lg mb-6">Login to your journal</h2>
@@ -196,12 +203,13 @@ function LoginForm(props: {
 					value={email}
 					onChange={(e) => setEmail(e.currentTarget.value)}
 					disabled={isPending}
+					onKeyDown={(e) => e.key === "Enter" && submit()}
 				/>
 			</fieldset>
 
 			<button
 				className="btn btn-lg btn-block btn-primary"
-				onClick={() => mutate(email)}
+				onClick={submit}
 				disabled={!isEmailValid || isPending}
 			>
 				Enter
