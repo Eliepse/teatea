@@ -35,7 +35,7 @@ export const TokenUtils = {
 
 		// Clear the token if invalid
 		if (undefined === token.exp || Date.now() / 1_000 >= token.exp) {
-			TokenUtils.clear();
+			TokenUtils.clearToken();
 			return null;
 		}
 
