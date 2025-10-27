@@ -35,6 +35,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
+	const revalidator = useRevalidator();
 	const [searchParams] = useSearchParams();
 	const session = props.loaderData;
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
@@ -201,6 +202,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				steeps={session.steeps ?? []}
 				className="mb-12"
 				readonly={!editMode}
+				onChange={() => revalidator.revalidate()}
 			/>
 
 			{editMode && (
