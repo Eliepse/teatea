@@ -95,7 +95,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 			<img src="/img/tea-header-placeholder.jpg" className="h-40 w-full object-cover bg-green-300" alt="" />
 
 			<header className="pt-6 pb-0 relative bg-green-50 -mt-6 rounded-t-3xl">
-				<h1 className="mx-6 mb-5 text-4xl font-header font-extrabold text-green-900">{tea.type?.name}</h1>
+				<h1 className="mx-6 mb-5 text-4xl leading-11 font-header font-extrabold text-green-900">{tea.type?.name}</h1>
 
 				<Specs
 					family={tea.family}
