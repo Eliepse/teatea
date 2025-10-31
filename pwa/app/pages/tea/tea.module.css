@@ -1,0 +1,19 @@
+.specs {
+	/*padding: .25rem 0;*/
+	/*border: 1px solid var(--color-green-100);*/
+	/*border-radius: var(--radius-lg);*/
+	/*background: white;*/
+	/*background: var(--color-green-50);*/
+	font-size: var(--text-base);
+}
+
+.specsItem {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: .5rem 0;
+}
+
+.specsItem:not(:first-child) {
+	/*border-top: 1px solid var(--color-teal-200);*/
+}

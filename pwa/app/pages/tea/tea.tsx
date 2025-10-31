@@ -1,21 +1,35 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
+import styles from "./tea.module.css";
 import { deleteApi, getApi, postApi } from "~/utils/api";
-import type { ApiCollection, ApiPaginatedCollection, MemberTea, TeaSession, TeaStats } from "~t/types";
+import {
+	type ApiCollection,
+	type ApiPaginatedCollection,
+	type Cultivar,
+	type MemberTea,
+	type OriginPath,
+	type RoastLevel,
+	RoastLevelEnum,
+	type TeaFamily,
+	type TeaSession,
+	type TeaStats,
+} from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
-import { formatDistanceToNow, intlFormat } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { limit } from "~/utils/text";
-import clsx from "clsx";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { Heart, HeartSolid } from "iconoir-react";
-import { useState } from "react";
+import { CoffeeCup, Heart, HeartSolid, PeopleTag } from "iconoir-react";
+import { type ReactNode, useState } from "react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
+import { Family } from "~/components/tea/Family";
+import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
+import clsx from "clsx";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const tea = denormalizeTea(await (await getApi<TeaRaw>(`/teas/${args.params.id}`)).json());
@@ -27,30 +41,10 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 	return { tea, stats, favoriteTea: favorites.member[0] ?? null };
 }
 
-const TEA_FAMILY_BADGE_CLS = {
-	yellow: "badge-warning",
-	white: "badge-neutral badge-outline bg-white",
-	green: "badge-success",
-	wulong: "badge-info",
-	black: "badge-error text-white",
-	fermented: "badge-neutral",
-} as const;
-
-const TEA_FAMILY_BORDER_CLS = {
-	yellow: "border-lime-200",
-	white: "border-cyan-200",
-	green: "border-green-300",
-	wulong: "border-indigo-300",
-	black: "border-orange-300",
-	fermented: "border-stone-500",
-} as const;
-
 export default function TeaPage(props: Route.ComponentProps) {
 	const { tea, stats } = props.loaderData;
 	const navigate = useNavigate();
 	const [favorite, setFavorite] = useState<MemberTea | null>(props.loaderData.favoriteTea);
-	const familyLabel = tea.family[0].toUpperCase() + tea.family.substring(1) + " tea";
-	const origin = tea.originPath?.locality ?? tea.originPath?.region ?? tea.originPath?.country;
 
 	const sessionsQuery = useQuery({
 		queryFn: async (): Promise<ApiPaginatedCollection<TeaSession>> => {
@@ -76,74 +70,73 @@ export default function TeaPage(props: Route.ComponentProps) {
 	});
 
 	return (
-		<div className="pb-22">
-			<header className={clsx("p-4 bg-stone-50 border-t-3", TEA_FAMILY_BORDER_CLS[tea.family])}>
-				<div className="flex mb-4">
-					<button className="btn btn-ghost p-0 mr-auto" onClick={handleUIEvent(() => navigate(-1))}>
-						<ArrowLeftIcon className="size-4 mr-1" /> Back
+		<div className="pb-22 text-lg bg-green-50 min-h-dvh">
+			<nav className="absolute inset-x-0 top-0 p-5 flex">
+				<button
+					className="btn btn-lg btn-circle bg-white mr-auto"
+					onClick={() => navigate(-1)}
+					aria-label="Go back"
+				>
+					<ArrowLeftIcon className="size-6" />
+				</button>
+
+				<IfAuthenticated>
+					<button
+						className="btn btn-lg bg-white btn-circle text-secondary"
+						onClick={handleUIEvent(() => toggleFavorite.mutate())}
+						disabled={toggleFavorite.isPending}
+						aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+					>
+						{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
 					</button>
+				</IfAuthenticated>
+			</nav>
 
-					<IfAuthenticated>
-						<button
-							className="btn btn-outline btn-secondary btn-circle"
-							onClick={handleUIEvent(() => toggleFavorite.mutate())}
-							disabled={toggleFavorite.isPending}
-						>
-							{!!favorite && <HeartSolid className="size-5" />}
-							{!favorite && <Heart className="size-5" />}
-						</button>
-					</IfAuthenticated>
-				</div>
+			<img src="/img/tea-header-placeholder.jpg" className="h-40 w-full object-cover bg-green-300" alt="" />
 
-				<h1 className="text-3xl mb-2">{tea.type?.name ?? familyLabel}</h1>
+			<header className="pt-6 pb-0 relative bg-green-50 -mt-6 rounded-t-3xl">
+				<h1 className="mx-6 mb-5 text-3xl font-bold tracking-wide text-green-900">{tea.type?.name}</h1>
 
-				<ul className="flex gap-2">
-					{!!tea.type && (
-						<li>
-							<div className={clsx("badge", TEA_FAMILY_BADGE_CLS[tea.family])}>{tea.family} tea</div>
-						</li>
-					)}
+				<Specs
+					family={tea.family}
+					origin={tea.originPath}
+					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
+					cultivar={tea.cultivar}
+					year={tea.year}
+					className="mx-6 py-4 border-t border-green-200"
+				/>
 
-					{!!tea.originPath && (
-						<li>
-							<Link
-								className="badge badge-soft badge-neutral"
-								to={`/tea/search?originPath=${origin?.path}`}
-							>
-								<FormatOriginPath originPath={tea.originPath} />
-							</Link>
-						</li>
-					)}
-
-					{!!tea.cultivar?.name && (
-						<li>
-							<div className="badge badge-outline">
-								<Leaf className="size-3 text-base-content/60" />
-								{tea.cultivar.name}
-							</div>
-						</li>
-					)}
-				</ul>
+				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center">
+					<Link to={`/session/new?tea=${tea.id}`} className="btn btn-lg btn-primary rounded-full">
+						Brew it
+						<CoffeeCup className="ml-1 size-5" />
+					</Link>
+				</nav>
 			</header>
 
 			<main>
 				{0 !== stats.sessionsCount && (
-					<div className="px-4 mt-4">
-						<p>
-							This tea has been brewed{" "}
-							<strong>
-								{stats.sessionsCount}&nbsp;{1 === stats.sessionsCount ? "time" : "times"}
-							</strong>{" "}
-							times by a total of{" "}
-							<strong>
-								{stats.authorsCount}&nbsp;{1 === stats.authorsCount ? "member" : "members"}.
-							</strong>
-						</p>
-					</div>
+					<section className="grid grid-cols-2 gap-2 mx-4 leading-tight">
+						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
+							<div className="inline-flex items-center text-3xl font-bold text-green-900">
+								<PeopleTag className="inline-block mr-2 size-6" />
+								{stats.authorsCount}
+							</div>
+							<div className="text-sm mt-1">People tried it</div>
+						</div>
+
+						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
+							<div className="inline-flex items-center text-3xl font-bold text-green-900">
+								<CoffeeCup className="inline-block mr-2 size-6" />
+								{stats.sessionsCount}
+							</div>
+							<div className="text-sm mt-1">Times prepared</div>
+						</div>
+					</section>
 				)}
 
 				{sessionsQuery.isPending && (
-					<div className="px-4 mt-8">
+					<div className="px-4 mt-8 hidden">
 						<div className="skeleton h-8 mb-2" />
 						<div className="skeleton h-8 mb-2" />
 						<div className="skeleton h-8 mb-2" />
@@ -151,7 +144,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 				)}
 
 				{0 !== (sessionsQuery.data?.member?.length ?? 0) && (
-					<section className="px-4 mt-8">
+					<section className="px-4 mt-8 hidden">
 						<h2 className="text-lg mb-4">How others brewed it?</h2>
 						<ul>
 							{sessionsQuery.data?.member?.map((session) => (
@@ -190,17 +183,48 @@ export default function TeaPage(props: Route.ComponentProps) {
 					</section>
 				)}
 			</main>
-
-			<footer className="px-4 mt-16 text-xs text-base-content/60">
-				Created at {intlFormat(tea.addedAt, { dateStyle: "long" })}
-			</footer>
-
-			<Link
-				to={`/session/new?tea=${tea.id}`}
-				className="fixed bottom-4 right-4 btn btn-primary rounded-full h-12"
-			>
-				Brew it
-			</Link>
 		</div>
+	);
+}
+
+function Specs(props: {
+	family?: TeaFamily;
+	origin?: OriginPath;
+	roast?: RoastLevel;
+	cultivar?: Cultivar;
+	year?: number;
+	className?: string;
+}) {
+	// No specs to display
+	if (false === Object.keys(props).some((k) => "className" !== k)) {
+		return null;
+	}
+
+	return (
+		<ul className={clsx(styles.specs, props.className)}>
+			{!!props.family && (
+				<SpecItem
+					label="Type"
+					value={
+						<span>
+							<Family family={props.family} className="capitalize" /> tea
+						</span>
+					}
+				/>
+			)}
+			{!!props.origin && <SpecItem label="Origin" value={<FormatOriginPath originPath={props.origin} />} />}
+			{!!props.cultivar && <SpecItem label="Cultivar" value={props.cultivar.name} />}
+			{!!props.year && <SpecItem label="Harvest" value={props.year} />}
+			{!!props.roast && <SpecItem label="Roast" value={<RoastLevelLabel roast={props.roast} showNotRoasted />} />}
+		</ul>
+	);
+}
+
+function SpecItem(props: { label: string; value: ReactNode }) {
+	return (
+		<li className={styles.specsItem}>
+			<span className="text-base text-teal-600">{props.label}</span>
+			{props.value}
+		</li>
 	);
 }
