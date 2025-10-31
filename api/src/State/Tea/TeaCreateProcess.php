@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 readonly class TeaCreateProcess implements ProcessorInterface
 {
@@ -60,6 +61,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$typeEntity = new \App\Entity\TeaType();
 			$typeEntity->family = $data->family;
 			$typeEntity->name = trim($data->type->name);
+			$typeEntity->slug = new AsciiSlugger()->slug($typeEntity->name)->lower()->toString();
 			$typeEntity->origin = $origin;
 			$typeEntity->isProtectedOrigin = $data->type->isPDO ?? false;
 			$typeEntity->createdBy = $user;

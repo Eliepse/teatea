@@ -58,7 +58,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 			);
 		}
 
-		$teaQb->where("type.id = :id")->setParameter("id", $uriVariables["id"]);
+		$teaQb->where("type.slug = :slug")->setParameter("slug", $uriVariables["slug"]);
 		$teaQb->setMaxResults(1);
 
 		/** @var \App\Entity\TeaType|null $typeEntities */
@@ -75,6 +75,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$resource = new TeaType();
 		$resource->id = $type->getId();
 		$resource->name = $type->name;
+		$resource->slug = $type->slug;
 		$resource->family = $type->family;
 		if($type->origin) {
 			$resource->origin = OriginProvider::fromEntity($type->origin);

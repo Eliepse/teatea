@@ -38,8 +38,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 class TeaType
 {
 	#[Groups(["read:origin"])]
-	#[ApiProperty(writable: false, identifier: true)]
+	#[ApiProperty(writable: false, identifier: false)]
 	public ?int $id = null;
+
+	#[Groups(["read:origin"])]
+	#[ApiProperty(writable: false, identifier: true)]
+	public ?string $slug = null;
 
 	#[Groups(["read:origin"])]
 	public TeaFamily $family;

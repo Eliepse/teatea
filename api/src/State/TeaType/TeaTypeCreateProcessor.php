@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Repository\OriginRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 readonly class TeaTypeCreateProcessor implements ProcessorInterface
 {
@@ -30,6 +31,7 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$entity = new \App\Entity\TeaType();
 		$entity->family = $data->family;
 		$entity->name = trim($data->name);
+		$entity->slug = new AsciiSlugger()->slug($entity->name)->lower()->toString();
 		$entity->createdBy = $user;
 
 		$origin = $this->originRepo->byPath($data->origin->path);

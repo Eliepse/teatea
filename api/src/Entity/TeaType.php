@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TeaTypeRepository::class)]
+#[ORM\UniqueConstraint(fields: ["family", "slug"])]
 class TeaType
 {
 	use TimestampedEntity;
@@ -25,6 +26,9 @@ class TeaType
 
 	#[ORM\Column(type: Types::TEXT)]
 	public string $name;
+
+	#[ORM\Column(type: Types::TEXT)]
+	public string $slug;
 
 	/**
 	 * @var Collection<int, Tea>
