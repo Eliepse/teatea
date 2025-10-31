@@ -63,14 +63,14 @@ export default function ListTeaSessions() {
 
 							return (
 								<li key={formatISO(date, { representation: "date" })} className="mb-12">
-									<div className="leading-tight mb-4 text-lg">
+									<div className="font-header leading-tight mb-4 text-xl font-bold">
 										{isToday(date) ? (
 											<span>Today</span>
 										) : isYesterday(date) ? (
 											<span>Yesterday</span>
 										) : (
 											<>
-												<span className="text-xs uppercase text-base-content/60">
+												<span className="font-normal text-base uppercase text-base-content/60">
 													{formatDate(date, "yyyy")}
 												</span>
 												<br />

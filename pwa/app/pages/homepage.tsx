@@ -27,7 +27,7 @@ export default function Homepage(props: Route.ComponentProps) {
 	return (
 		<div className="p-8 flex flex-col h-dvh bg-[url(/img/tea-tree-leaves-field.jpg)] bg-cover">
 			<div className="flex-1 flex flex-col justify-center text-center text-green-50">
-				<h1 className="text-8xl font-bold font-serif mb-6" style={{ transform: "translateX(-.06em)" }}>
+				<h1 className="text-8xl font-young-serif font-bold mb-6" style={{ transform: "translateX(-.06em)" }}>
 					teatea
 				</h1>
 				<p className="text-xl mx-auto opacity-80">Your personal tea journal</p>
