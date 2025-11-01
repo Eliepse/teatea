@@ -204,7 +204,7 @@ function Specs(props: {
 		<ul className={clsx(styles.specs, props.className)}>
 			{!!props.family && (
 				<SpecItem
-					label="Type"
+					label="Family"
 					value={
 						<span>
 							<Family family={props.family} className="capitalize" /> tea
