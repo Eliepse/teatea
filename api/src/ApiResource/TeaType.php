@@ -11,13 +11,14 @@ use ApiPlatform\Metadata\QueryParameter;
 use App\Enum\TeaFamily;
 use App\State\TeaType\TeaTypeCreateProcessor;
 use App\State\TeaType\TeaTypeProvider;
+use App\ValueObject\Stats\TeaTypeStats;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["read:origin", "embedded:origin"]],
-	security: "is_granted('ROLE_USER')"),
-]
+	normalizationContext: ["groups" => ["type:read", "read:origin", "embedded:origin"]],
+	security: "is_granted('ROLE_USER')"
+)]
 #[Get(provider: TeaTypeProvider::class)]
 #[GetCollection(
 	paginationEnabled: false,
@@ -60,4 +61,8 @@ class TeaType
 	#[ApiProperty]
 	#[Groups(["read:origin", "tea:create"])]
 	public bool $isPDO = false;
+
+	#[Groups(["type:read"])]
+	#[ApiProperty(genId: false, readable: true, readableLink: true)]
+	public ?TeaTypeStats $stats = null;
 }

@@ -26,6 +26,11 @@ export type TeaType = Resource<"TeaType"> & {
 	name: string;
 	origin: Pick<Origin, "@id" | "@type" | "path">;
 	isPDO: boolean;
+	stats?: {
+		rank: number;
+		teasCount: number;
+		sessionsCount: number;
+	};
 };
 
 export type Cultivar = Resource<"Cultivar"> & {

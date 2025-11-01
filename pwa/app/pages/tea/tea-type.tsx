@@ -9,7 +9,7 @@ import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 import clsx from "clsx";
-import { WarningTriangle } from "iconoir-react";
+import { CoffeeCup, Leaf } from "iconoir-react";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaType = await (await getApi<TeaType>(`/tea_types/${args.params.slug}`)).json();
@@ -18,6 +18,7 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 
 export default function TeaTypePage(props: Route.ComponentProps) {
 	const { teaType } = props.loaderData;
+	const stats = teaType.stats;
 	const navigate = useNavigate();
 
 	return (
@@ -48,16 +49,38 @@ export default function TeaTypePage(props: Route.ComponentProps) {
 				<div className="text-base text-green-700">
 					<Family className="capitalize" family={teaType.family} /> tea
 				</div>
-				<h1 className="mb-4 text-4xl font-header font-extrabold text-green-900">{teaType.name}</h1>
-
-				<p className="text-green-800">Japanese green tea not as popular as Sencha or Matcha, but that is still well appreciated.</p>
+				<h1 className="mb-4 text-4xl font-header font-extrabold text-green-900">
+					{teaType.name}
+					{!!stats?.rank && (
+						<span className="badge border-green-200 text-green-900 font-sans font-normal ml-2">
+							#{stats.rank} popular
+						</span>
+					)}
+				</h1>
 			</header>
 
 			<main>
-				<section className="text-center mx-auto max-w-xs my-16 border border-yellow-400 bg-yellow-50 rounded-lg p-4 text-yellow-800">
-					<WarningTriangle className="size-8 inline-block mb-4" />
-					<p>This page is still under construction</p>
-				</section>
+				<ul className="grid grid-cols-2 gap-2 my-8 mx-6">
+					<li>
+						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
+							<div className="inline-flex items-center text-3xl font-bold text-green-900">
+								<Leaf className="inline-block mr-2 size-6 relative top-0.5" />
+								{stats?.teasCount ?? 0}
+							</div>
+							<div className="text-sm mt-1">teas of this type</div>
+						</div>
+					</li>
+
+					<li>
+						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
+							<div className="inline-flex items-center text-3xl font-bold text-green-900">
+								<CoffeeCup className="inline-block mr-2 size-6 relative top-0.5" />
+								{stats?.sessionsCount ?? 0}
+							</div>
+							<div className="text-sm mt-1">times drank</div>
+						</div>
+					</li>
+				</ul>
 			</main>
 		</div>
 	);
