@@ -1,32 +1,37 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
-import type { Business, TeaSession } from "~t/types";
+import { BrewingQualityEnum, type Business, RoastLevelEnum, type TeaSession, type TeaType } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import Arrow from "~/components/icons/arrow";
 import { Modal } from "~/components/shared/modal/Modal";
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, type PropsWithChildren, type ReactNode, useState } from "react";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
-import { ArrowTopRightOnSquareIcon, TrashIcon } from "@heroicons/react/16/solid";
+import { TrashIcon } from "@heroicons/react/16/solid";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
-import { BrewingQualityInput, QualityIcon, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import { Check, Edit, ShopFourTilesWindow } from "iconoir-react";
+import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
+import { Check, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, ShopFourTilesWindow } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
-import { IfNotAuthor } from "~/auth/components/voters/IfNotAuthor";
 import { BusinessSelect } from "~/components/shared/inputs/BusinessSelect";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
+import { TeaCard } from "~/components/tea/TeaCard";
+
+const QualityIcon = {
+	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
+	[BrewingQualityEnum.Improvable]: <EmojiPuzzled className="size-5" />,
+	[BrewingQualityEnum.Bad]: <EmojiSad className="size-5" />,
+};
 
 export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
 	const id = parseInt(props.params.id);
@@ -38,6 +43,8 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	const revalidator = useRevalidator();
 	const [searchParams] = useSearchParams();
 	const session = props.loaderData;
+	const tea = session.tea;
+	const teaType = useResourceQuery<TeaType>(tea.type);
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
@@ -55,25 +62,16 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="px-4 pb-12" activeKey="activity">
+		<AuthLayout className="px-4 pb-24 bg-green-50" activeKey="activity">
 			<header className="py-4">
 				<div className="flex items-center mb-6">
-					<Link to="/sessions" className="block link mr-auto">
-						<Arrow direction="left" className="inline size-4 mr-2" />
-						Sessions history
+					<Link to="/sessions" className="btn btn-circle btn-lg bg-white mr-auto">
+						<Arrow direction="left" className="size-5" />
 					</Link>
 
 					<IfAuthor author={session.author}>
-						<button
-							className={clsx("ml-2 btn btn-sm rounded-full", editMode ? "btn-primary" : "btn-soft")}
-							onClick={toggleEditMode}
-						>
-							{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
-							{editMode ? "Done" : "Edit"}
-						</button>
-
 						<div className="dropdown dropdown-end ml-2">
-							<button className="btn btn-sm btn-circle btn-soft m-1">
+							<button className="btn btn-lg btn-circle bg-white">
 								<EllipsisVerticalIcon className="size-5" />
 							</button>
 
@@ -92,79 +90,80 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 								</li>
 							</ul>
 						</div>
+
+						<nav className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
+							<button
+								className={clsx(
+									"btn btn-lg rounded-full btn-primary",
+									!editMode && "btn-outline bg-white",
+								)}
+								onClick={toggleEditMode}
+							>
+								{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
+								{editMode ? "Done" : "Edit"}
+							</button>
+						</nav>
 					</IfAuthor>
 				</div>
 
-				<div className="uppercase text-xs text-base-content/60">
-					{intlFormat(session.drankAt, { dateStyle: "long" })}
-					<IfNotAuthor author={session.author}>
-						{member.data && <> &middot; @{member.data.username}</>}
-					</IfNotAuthor>
-				</div>
-				<div className="text-2xl mt-2">
-					<Link to={`/tea/${session.tea.id}`}>
-						{session.tea.displayName}
-						<ArrowTopRightOnSquareIcon className="size-4 text-base-content/60 inline-block ml-2" />
-					</Link>
-				</div>
-				<div className="text-sm mt-1">
-					<span>
-						<span className="capitalize">{session.tea.family}</span> tea
-					</span>
+				<div className="text-center text-green-950 my-8">
+					<div className="text-2xl font-header font-bold">
+						{intlFormat(session.drankAt, { dateStyle: "long" })}
+					</div>
 
-					{session.tea.originPath && (
-						<span>
-							{" "}
-							&middot; <FormatOriginPath originPath={session.tea.originPath} />
-						</span>
-					)}
+					<div className="flex items-center justify-center gap-2 my-2">
+						<PlaceBadge place={session.place} />
 
-					{session.tea.cultivar?.name && (
-						<>
-							{" "}
-							&middot;
-							<span className="ml-1 inline-flex items-center">
-								<Leaf className="size-3 mr-1 text-base-content/60" />
-								{session.tea.cultivar.name}
-							</span>
-						</>
-					)}
+						{!!session.author && (
+							<Badge icon="" loading={member.isLoading}>
+								@{member.data?.username}
+							</Badge>
+						)}
+					</div>
 				</div>
 
-				<div className="mt-4 grid grid-cols-2 gap-4">
-					{!!session.teaQuantity && (
-						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-							<Leaf className="size-3 text-green-300" />
-							<span>{`${session.teaQuantity} g`}</span>
-						</div>
-					)}
+				<TeaCard
+					family={tea.family}
+					type={teaType.data}
+					origin={tea.originPath}
+					cultivar={tea.cultivar}
+					year={tea.year}
+					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
+					loading={teaType.isLoading}
+					className="border border-green-200 bg-white my-2 overflow-hidden"
+				>
+					<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">
+						{!!session.teaQuantity && (
+							<li>
+								<SpecBadge
+									label={<>{session.teaQuantity}&nbsp;g</>}
+									icon={<Leaf className="size-4 text-green-700" />}
+								/>
+							</li>
+						)}
 
-					{!!session.waterMl && (
-						<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-							<WaterDrop className="size-3 text-blue-300" />
-							<span>{`${session.waterMl} ml`}</span>
-						</div>
-					)}
+						{!!session.waterMl && (
+							<li>
+								<SpecBadge
+									label={<>{session.waterMl}&nbsp;ml</>}
+									icon={<WaterDrop className="size-4 text-green-700" />}
+								/>
+							</li>
+						)}
 
-					{!editMode && (
-						<>
-							{undefined !== session.quality && (
-								<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-									{QualityIcon[session.quality]}
-									<span>{QualityLabel[session.quality]} brew</span>
-								</div>
-							)}
-
-							<PlaceBadge place={props.loaderData.place} />
-						</>
-					)}
-				</div>
+						{undefined !== session.quality && (
+							<li>
+								<SpecBadge label={QualityLabel[session.quality]} icon={QualityIcon[session.quality]} />
+							</li>
+						)}
+					</ul>
+				</TeaCard>
 			</header>
 
-			<div className="mt-4 mb-12">
+			<div className="mb-12">
 				{!!session.note && (
-					<>
-						<h2 className="flex text-sm text-base-content/60 mb-1">
+					<div className="my-6">
+						<h2 className="flex text-base-content/60 mb-1">
 							<span>Tasting note</span>
 							{editMode && (
 								<IfAuthor author={session.author}>
@@ -177,10 +176,11 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 								</IfAuthor>
 							)}
 						</h2>
-						<p className="leading-normal text-lg rounded bg-stone-100 text-gray-800 px-4 py-2 pb-3">
+
+						<p className="leading-normal text-lg text-green-900 bg-green-100 rounded-lg p-4 pt-3">
 							{nl2br(session.note)}
 						</p>
-					</>
+					</div>
 				)}
 
 				<IfAuthor author={session.author}>
@@ -222,7 +222,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<h2 className="uppercase text-xs text-base-content/60 mt-8 mb-2">Location</h2>
 					<BusinessSelect
 						value={props.loaderData.place ?? undefined}
-						onSelect={async (place) => await sessionMutations.edit.mutateAsync({ place: place ?? null })}
+						onSelect={async (place) => void sessionMutations.edit.mutateAsync({ place: place ?? null })}
 						allowClear
 						allowCreate
 						placeholder="Search for a place"
@@ -253,6 +253,15 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	);
 }
 
+function SpecBadge(props: { label: ReactNode; icon: ReactNode; className?: string }) {
+	return (
+		<div className={clsx("flex items-center justify-center text-center", props.className)}>
+			<span className="mr-2">{props.icon}</span>
+			<span>{props.label}</span>
+		</div>
+	);
+}
+
 function useSessionMutations(sessionId: number) {
 	const revalidatePage = useRevalidator();
 	const navigate = useNavigate();
@@ -276,6 +285,20 @@ function useSessionMutations(sessionId: number) {
 	return { edit: editMutation, delete: deleteMutation };
 }
 
+function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; loading?: boolean }>) {
+	return (
+		<div
+			className={clsx(
+				"inline-flex items-center bg-white rounded-full px-2.5 h-8 border border-green-100 whitespace-nowrap",
+				props.className,
+			)}
+		>
+			{props.icon && <span className="inline-block mr-2">{props.icon}</span>}
+			{true === props.loading ? <span className="skeleton h-3 w-16" /> : props.children}
+		</div>
+	);
+}
+
 function PlaceBadge(props: { place?: Business["@id"] | null }) {
 	const { data: place, isLoading } = useResourceQuery<Business>(props.place);
 
@@ -284,9 +307,8 @@ function PlaceBadge(props: { place?: Business["@id"] | null }) {
 	}
 
 	return (
-		<div className="flex justify-between items-center rounded-md bg-base-200 px-3 py-1">
-			<ShopFourTilesWindow className="size-4 mr-2 inline-block" />
-			{isLoading ? <div className="skeleton h-4 w-20" /> : <span>{place?.name}</span>}
-		</div>
+		<Badge icon={<ShopFourTilesWindow className="size-4" />} loading={isLoading}>
+			{place?.name}
+		</Badge>
 	);
 }

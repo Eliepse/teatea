@@ -64,7 +64,7 @@ export type Tea = Resource & {
 };
 
 export type TeaSession = Resource<"TeaSession"> & {
-	tea: Tea;
+	tea: Omit<Tea, "type"> & { type: Iri };
 	note?: string;
 	teaQuantity?: number;
 	waterMl?: number;

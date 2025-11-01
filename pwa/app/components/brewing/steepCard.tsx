@@ -17,7 +17,7 @@ export function SteepCard(props: {
 		.join(" ");
 
 	return (
-		<div className="flex bg-base-200 px-2 pl-6 h-12 items-center rounded-md">
+		<div className="flex bg-white border border-green-100 px-2 pl-6 h-12 items-center rounded-lg">
 			<span className="flex-none text-xl text-base-content/60">{props.order}</span>
 			<div className="ml-auto font-mono flex items-center">
 				<span className="inline-block px-3">{duration}</span>
