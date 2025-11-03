@@ -63,8 +63,8 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 	return (
 		<AuthLayout className="px-4 pb-24 bg-green-50" activeKey="activity">
-			<header className="py-4">
-				<div className="flex items-center mb-6">
+			<header className="py-4 relative">
+				<div className="absolute inset-x-0 top-4 flex items-center mb-6">
 					<Link to="/sessions" className="btn btn-circle btn-lg bg-white mr-auto">
 						<Arrow direction="left" className="size-5" />
 					</Link>
@@ -106,12 +106,12 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</IfAuthor>
 				</div>
 
-				<div className="text-center text-green-950 my-8">
-					<div className="text-2xl font-header font-bold">
+				<div className="text-center text-green-900 mt-2.5 mb-8">
+					<div className="text-xl font-header font-bold">
 						{intlFormat(session.drankAt, { dateStyle: "long" })}
 					</div>
 
-					<div className="flex items-center justify-center gap-2 my-2">
+					<div className="flex items-center justify-center gap-2 mt-2">
 						<PlaceBadge place={session.place} />
 
 						{!!session.author && (
@@ -153,7 +153,10 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 						{undefined !== session.quality && (
 							<li>
-								<SpecBadge label={QualityLabel[session.quality]} icon={QualityIcon[session.quality]} />
+								<SpecBadge
+									label={`${QualityLabel[session.quality]} brew`}
+									icon={QualityIcon[session.quality]}
+								/>
 							</li>
 						)}
 					</ul>
@@ -163,7 +166,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			<div className="mb-12">
 				{!!session.note && (
 					<div className="my-6">
-						<h2 className="flex text-base-content/60 mb-1">
+						<h2 className="flex text-green-800/70 mb-3">
 							<span>Tasting note</span>
 							{editMode && (
 								<IfAuthor author={session.author}>
@@ -195,7 +198,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</IfAuthor>
 			</div>
 
-			{!!session.steeps?.length && <h2 className="uppercase text-xs text-base-content/60 mb-2">Steeps</h2>}
+			{!!session.steeps?.length && <h2 className="text-green-800/70 mb-3">Steeps</h2>}
 			<EditableSteepsList
 				sessionId={session.id}
 				author={session.author}
@@ -289,7 +292,7 @@ function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; 
 	return (
 		<div
 			className={clsx(
-				"inline-flex items-center bg-white rounded-full px-2.5 h-8 border border-green-100 whitespace-nowrap",
+				"inline-flex items-center bg-white rounded-full px-2.5 h-8 border border-green-100 whitespace-nowrap text-sm",
 				props.className,
 			)}
 		>

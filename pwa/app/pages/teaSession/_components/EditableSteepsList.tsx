@@ -8,6 +8,7 @@ import { useAlert } from "~/components/shared/modal/AlertManager";
 import { useMutation } from "@tanstack/react-query";
 import { denormalizeSteep, type SteepRaw } from "~/utils/api/normalization/steep";
 import { deleteApi, patchApi, postApi } from "~/utils/api";
+import clsx from "clsx";
 
 export function EditableSteepsList(props: {
 	sessionId: Id;
@@ -62,14 +63,14 @@ export function EditableSteepsList(props: {
 			}
 
 			const steep = await steepMutations.delete.mutateAsync(edit);
-			props.onChange(props.steeps.filter((stp) => steep.key !== stp.key));
+			f(props.onChange)(props.steeps.filter((stp) => steep.key !== stp.key));
 			setEdit(undefined);
 		};
 	}
 
 	return (
-		<>
-			<ul className={props.className}>
+		<div className={clsx(props.className, "bg-white rounded-xl py-1")}>
+			<ul>
 				{props.steeps.map((steep, i) => (
 					<li key={steep.key} className="mb-2">
 						<SteepCard
@@ -83,8 +84,8 @@ export function EditableSteepsList(props: {
 
 				{true !== props.readonly && (
 					<IfAuthor author={props.author}>
-						<li className="mb-2">
-							<button className="btn btn-block btn-dash mt-2" onClick={handleUIEvent(newSteep)}>
+						<li className="px-4 py-2">
+							<button className="btn btn-block btn-dash" onClick={handleUIEvent(newSteep)}>
 								Add a steep
 							</button>
 						</li>
@@ -101,7 +102,7 @@ export function EditableSteepsList(props: {
 					onRemove={makeRemoveHandler()}
 				/>
 			)}
-		</>
+		</div>
 	);
 }
 
