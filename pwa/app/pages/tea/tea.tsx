@@ -95,7 +95,9 @@ export default function TeaPage(props: Route.ComponentProps) {
 			<img src="/img/tea-header-placeholder.jpg" className="h-40 w-full object-cover bg-green-300" alt="" />
 
 			<header className="pt-6 pb-0 relative bg-green-50 -mt-6 rounded-t-3xl">
-				<h1 className="mx-6 mb-5 text-4xl leading-11 font-header font-extrabold text-green-900">{tea.type?.name}</h1>
+				<h1 className="mx-6 mb-5 text-4xl leading-11 font-header font-extrabold text-green-900">
+					{tea.type?.name}
+				</h1>
 
 				<Specs
 					family={tea.family}
@@ -135,22 +137,22 @@ export default function TeaPage(props: Route.ComponentProps) {
 					</section>
 				)}
 
-				{sessionsQuery.isPending && (
-					<div className="px-4 mt-8 hidden">
-						<div className="skeleton h-8 mb-2" />
-						<div className="skeleton h-8 mb-2" />
-						<div className="skeleton h-8 mb-2" />
-					</div>
-				)}
+				<section className="px-4 mt-8">
+					<h2 className="text text-green-800/70 mb-4">Tea sessions with this tea</h2>
+					{sessionsQuery.isPending && (
+						<div className="">
+							<div className="skeleton h-12 mb-2" />
+							<div className="skeleton h-12 mb-2" />
+							<div className="skeleton h-12 mb-2" />
+						</div>
+					)}
 
-				{0 !== (sessionsQuery.data?.member?.length ?? 0) && (
-					<section className="px-4 mt-8 hidden">
-						<h2 className="text-lg mb-4">How others brewed it?</h2>
+					{0 !== (sessionsQuery.data?.member?.length ?? 0) && (
 						<ul>
 							{sessionsQuery.data?.member?.map((session) => (
 								<li className="mb-2" key={session.id}>
 									<Link to={`/sessions/${session.id}`}>
-										<article className="px-2 py-2 bg-base-200 rounded">
+										<article className="px-2 py-2 bg-white rounded-lg">
 											<div className="flex text-xs gap-2 items-center">
 												{!!session.teaQuantity && (
 													<div className="flex justify-between items-center rounded-md border leading-1 border-gray-400 p-1.5">
@@ -170,18 +172,13 @@ export default function TeaPage(props: Route.ComponentProps) {
 													{formatDistanceToNow(session.drankAt)} ago
 												</div>
 											</div>
-											{!!session.note && (
-												<p className="mt-4 pt-2 italic border-t border-gray-300 text-sm text-base-content/70">
-													{limit(session.note, 96)}
-												</p>
-											)}
 										</article>
 									</Link>
 								</li>
 							))}
 						</ul>
-					</section>
-				)}
+					)}
+				</section>
 			</main>
 		</div>
 	);

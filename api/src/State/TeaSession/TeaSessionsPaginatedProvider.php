@@ -10,6 +10,7 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\TeaSession;
+use App\Enum\BrewingQuality;
 use App\Helper\Arr;
 use App\Repository\OriginRepository;
 use App\Repository\UserRepository;
@@ -72,13 +73,10 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		}
 
 		if ($isContentful) {
-			$sessionQb->andWhere(
-				$expr->orX(
-					"session.teaQuantity IS NOT NULL",
-					"session.waterVolume IS NOT NULL",
-					"session.note IS NOT NULL",
-				),
-			);
+			$sessionQb
+				->andWhere("session.quality >= :quality")
+				->andWhere("session.steeps IS NOT NULL AND JSON_ARRAY_LENGTH(session.steeps) > 0")
+				->setParameter("quality", BrewingQuality::Improvable);
 		}
 
 		$total = (clone $sessionQb)
