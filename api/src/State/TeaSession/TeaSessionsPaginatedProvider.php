@@ -56,10 +56,11 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 
 		$expr = $this->em->createQueryBuilder()->expr();
 		$sessionQb = $this->em->createQueryBuilder()
-			->select("session", "tea", "type")
+			->select("session", "tea", "type", "business")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
+			->leftJoin("session.place", "business")
 			->orderBy("session.drankAt", "DESC");
 
 		if (null !== $tea) {

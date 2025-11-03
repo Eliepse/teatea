@@ -64,7 +64,7 @@ export type Tea = Resource & {
 };
 
 export type TeaSession = Resource<"TeaSession"> & {
-	tea: Omit<Tea, "type"> & { type: Iri };
+	tea: Tea;
 	note?: string;
 	teaQuantity?: number;
 	waterMl?: number;
@@ -72,7 +72,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	drankAt: Date;
 	author?: Iri | Member;
 	steeps?: Steep[];
-	place?: Business["@id"] | null;
+	place?: Business;
 };
 
 export type TeaTypeTreeNode = TeaType & LTreeNode;
@@ -193,3 +193,5 @@ export type RoastLevel = (typeof RoastLevelEnum)[keyof typeof RoastLevelEnum];
 export type Business = Resource<"Business"> & {
 	name: string;
 };
+
+export type Embed<R extends Resource, K extends string, E> = Omit<R, K> & { [key in K]: E };

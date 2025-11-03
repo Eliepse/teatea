@@ -14,7 +14,10 @@ use App\State\Business\BusinessProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(denormalizationContext: ["groups" => ["business:write"]], security: "is_granted('ROLE_USER')")]
+#[ApiResource(
+	denormalizationContext: ["groups" => ["business:write"]],
+	security: "is_granted('ROLE_USER')",
+)]
 #[Get(provider: BusinessProvider::class)]
 #[GetCollection(
 	paginationEnabled: true,
@@ -34,6 +37,6 @@ class Business
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 32)]
-	#[Groups(["business:write"])]
+	#[Groups(["business:write", "with:business"])]
 	public string $name;
 }

@@ -29,12 +29,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"embedded:tea",
 			"embedded:teaType",
 			"embedded:origin",
-			"embedded:cultivar"
+			"embedded:cultivar",
+			"with:business",
 		]
 	],
 	security: "is_granted('ROLE_USER')",
 )]
-#[Get(normalizationContext: ["embedded:steep", "embedded:tea", "embedded:cultivar"], provider: TeaSessionProvider::class)]
+#[Get(
+	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:origin", "embedded:cultivar", "with:business"]],
+	provider: TeaSessionProvider::class,
+)]
 #[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
 #[Patch(
 	denormalizationContext: ["groups" => ["teaSession:edit"]],
@@ -55,7 +59,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"embedded:origin",
 			"embedded:member",
 			"embedded:cultivar",
-		]
+			"with:business",
+		],
 	],
 	security: "is_granted('ROLE_USER')",
 	provider: TeaSessionsPaginatedProvider::class,
@@ -120,7 +125,7 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?\DateTimeImmutable $drankAt;
 
-	#[Groups(["teaSession:read", "teaSession:edit"])]
+	#[Groups(["teaSession:read", "teaSession:edit", "with:business"])]
 	public ?Business $place = null;
 
 	public function __construct()

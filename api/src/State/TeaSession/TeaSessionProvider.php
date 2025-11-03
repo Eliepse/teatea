@@ -13,6 +13,7 @@ use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Proxy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class TeaSessionProvider implements ProviderInterface
@@ -33,12 +34,13 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$limit = is_numeric($limit) ? max(1, min(31, intval($limit))) : null;
 
 		$sessionQb = $this->em->createQueryBuilder()
-			->select("session", "tea", "type", "origin", "cultivar")
+			->select("session", "tea", "type", "origin", "cultivar", "business")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.cultivar", "cultivar")
+			->leftJoin("session.place", "business")
 			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {
@@ -138,6 +140,10 @@ readonly class TeaSessionProvider implements ProviderInterface
 		if ($entity->place) {
 			$resource->place = new Business();
 			$resource->place->id = $entity->place->id;
+
+			if(!$entity->place instanceof Proxy) {
+				$resource->place->name = $entity->place->name;
+			}
 		}
 
 		return $resource;
