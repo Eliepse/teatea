@@ -69,7 +69,7 @@ export function EditableSteepsList(props: {
 	}
 
 	return (
-		<div className={clsx(props.className, "bg-white rounded-xl py-1")}>
+		<div className={clsx(props.className, "bg-white rounded-xl py-1 shadow")}>
 			<ul>
 				{props.steeps.map((steep, i) => (
 					<li key={steep.key} className="mb-2">

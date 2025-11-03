@@ -59,7 +59,9 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 	function toggleEditMode() {
 		if (editMode) {
-			setSearchParams((st) => Object.fromEntries(Object.entries(st).filter(([k]) => "edit" !== k)));
+			setSearchParams((st) => Object.fromEntries(Object.entries(st).filter(([k]) => "edit" !== k)), {
+				replace: true,
+			});
 			setEditMode(false);
 			return;
 		}
@@ -139,7 +141,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					year={tea.year}
 					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
 					loading={teaType.isLoading}
-					className="border border-green-200 bg-white my-2 overflow-hidden"
+					className="shadow bg-white my-2 overflow-hidden"
 				>
 					<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">
 						{!!session.teaQuantity && (
@@ -208,14 +210,16 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			</div>
 
 			{!!session.steeps?.length && <h2 className="text-green-800/70 mb-3">Steeps</h2>}
-			<EditableSteepsList
-				sessionId={session.id}
-				author={session.author}
-				steeps={session.steeps ?? []}
-				className="mb-12"
-				readonly={!editMode}
-				onChange={() => revalidator.revalidate()}
-			/>
+			{(!!session.steeps?.length || editMode) && (
+				<EditableSteepsList
+					sessionId={session.id}
+					author={session.author}
+					steeps={session.steeps ?? []}
+					className="mb-12"
+					readonly={!editMode}
+					onChange={() => revalidator.revalidate()}
+				/>
+			)}
 
 			{editMode && (
 				<IfAuthor author={session.author}>
