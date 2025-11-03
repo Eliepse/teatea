@@ -13,6 +13,7 @@ use App\State\TeaSession\SteepDeleteProcessor;
 use App\State\TeaSession\SteepPatchProcessor;
 use App\State\TeaSession\SteepProvider;
 use App\State\TeaSession\SteepCreateProcessor;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 
@@ -48,6 +49,7 @@ use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
 	provider: SteepProvider::class,
 	processor: SteepDeleteProcessor::class,
 )]
+#[Groups(["embedded:steep"])]
 class Steep
 {
 	#[ApiProperty(writable: false, identifier: true)]

@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	security: "is_granted('ROLE_USER')",
 )]
 #[Get(
-	normalizationContext: ["groups" => ["teaSession:read", "embedded:tea", "embedded:origin", "embedded:cultivar", "with:business"]],
+	normalizationContext: ["groups" => ["embedded:steep", "teaSession:read", "embedded:tea", "embedded:origin", "embedded:cultivar", "with:business"]],
 	provider: TeaSessionProvider::class,
 )]
 #[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
