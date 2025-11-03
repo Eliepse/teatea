@@ -1,6 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
-import { BrewingQualityEnum, type Business, RoastLevelEnum, type TeaSession, type TeaType } from "~t/types";
+import { BrewingQualityEnum, type Iri, RoastLevelEnum, type TeaSession, type TeaType } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
@@ -118,7 +118,9 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</div>
 
 					<div className="flex items-center justify-center gap-2 mt-2">
-						<PlaceBadge place={session.place} />
+						{!!session.place && (
+							<Badge icon={<ShopFourTilesWindow className="size-4" />}>{session.place.name}</Badge>
+						)}
 
 						{!!session.author && (
 							<Badge icon="" loading={member.isLoading}>
@@ -231,7 +233,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				<IfAuthor author={session.author}>
 					<h2 className="uppercase text-xs text-base-content/60 mt-8 mb-2">Location</h2>
 					<BusinessSelect
-						value={props.loaderData.place ?? undefined}
+						value={props.loaderData.place ? props.loaderData.place["@id"] : undefined}
 						onSelect={async (place) => void sessionMutations.edit.mutateAsync({ place: place ?? null })}
 						allowClear
 						allowCreate
@@ -278,7 +280,7 @@ function useSessionMutations(sessionId: number) {
 	const alert = useAlert();
 
 	const editMutation = useMutation({
-		mutationFn: async (args: Partial<Pick<TeaSession, "note" | "quality" | "place">>) => {
+		mutationFn: async (args: Partial<Pick<TeaSession, "note" | "quality"> & { place: Iri | null }>) => {
 			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, args);
 			return denormalizeTeaSession(await response.json());
 		},
@@ -306,19 +308,5 @@ function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; 
 			{props.icon && <span className="inline-block mr-2">{props.icon}</span>}
 			{true === props.loading ? <span className="skeleton h-3 w-16" /> : props.children}
 		</div>
-	);
-}
-
-function PlaceBadge(props: { place?: Business["@id"] | null }) {
-	const { data: place, isLoading } = useResourceQuery<Business>(props.place);
-
-	if (!props.place) {
-		return null;
-	}
-
-	return (
-		<Badge icon={<ShopFourTilesWindow className="size-4" />} loading={isLoading}>
-			{place?.name}
-		</Badge>
 	);
 }

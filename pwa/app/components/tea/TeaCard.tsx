@@ -1,4 +1,4 @@
-import type { Cultivar, Iri, OriginPath, RoastLevel, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Id, OriginPath, RoastLevel, TeaFamily, TeaType } from "~t/types";
 import clsx from "clsx";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import type { PropsWithChildren, ReactNode } from "react";
@@ -8,7 +8,7 @@ import { ArrowRight } from "iconoir-react";
 
 export function TeaCard(
 	props: PropsWithChildren<{
-		teaId: Iri;
+		teaId: Id;
 		family: TeaFamily;
 		type?: TeaType;
 		origin?: OriginPath;

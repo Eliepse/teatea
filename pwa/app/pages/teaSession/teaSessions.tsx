@@ -1,16 +1,19 @@
 import { Link, useSearchParams } from "react-router";
 import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection, TeaSession } from "~t/types";
+import type { ApiPaginatedCollection, Embed, Member, TeaSession } from "~t/types";
 import { formatDate, formatISO, isToday, isYesterday } from "date-fns";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { PlusIcon } from "@heroicons/react/24/outline";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { handleUIEvent } from "~/utils/function";
+import { f, handleUIEvent } from "~/utils/function";
 import { useState } from "react";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
-import { SessionShortCard } from "~/pages/teaSession/_components/SessionShortCard";
-import { SessionRichCard } from "~/pages/teaSession/_components/SessionRichCard";
+import { Family } from "~/components/tea/Family";
+import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { CoffeeCup, Shop } from "iconoir-react";
+
+type Session = Embed<TeaSession, "author", Member>;
+type SessionDay = { [key: Member["username"]]: Session[] };
 
 export default function ListTeaSessions() {
 	const [params] = useSearchParams();
@@ -19,12 +22,12 @@ export default function ListTeaSessions() {
 	const sessionsQuery = useInfiniteQuery({
 		queryFn: async (context) => {
 			const filters = typeof context.queryKey[1] === "string" ? {} : context.queryKey[1];
-			const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(
+			const response = await getApi<ApiPaginatedCollection<Embed<TeaSessionRaw, "author", Member>>>(
 				`/tea_sessions?${context.pageParam}`,
 				context.pageParam ? undefined : filters,
 			);
 			const data = await response.json();
-			return { ...data, member: data.member.map(denormalizeTeaSession) };
+			return { ...data, member: data.member.map(denormalizeTeaSession) as Session[] };
 		},
 		queryKey: ["sessions", filters],
 		getPreviousPageParam: () => undefined,
@@ -40,94 +43,60 @@ export default function ListTeaSessions() {
 		sessionsQuery.data?.pages?.reduce((carr, p) => {
 			carr.push(...p.member);
 			return carr;
-		}, [] as TeaSession[]) ?? [];
+		}, [] as Session[]) ?? [];
 
 	const sessionsByDay = items.reduce(
 		(days, session) => {
 			const date = formatISO(session.drankAt, { representation: "date" });
-			days[date] = [...(days[date] ?? []), session];
+			const username = session.author.username;
+			const day = days[date] ?? {};
+			days[date] = { ...day, [username]: [...(day[username] ?? []), session] };
 			return days;
 		},
-		{} as { [key: string]: TeaSession[] },
+		{} as { [key: string]: SessionDay },
 	);
 
 	return (
-		<AuthLayout className="p-4 pb-18" activeKey="activity">
-			<SessionsUserFilter username={filters.username} onChange={filterUser} className="mb-8" />
+		<AuthLayout className="px-4 pb-18 bg-green-50" activeKey="activity">
+			<SessionsUserFilter username={filters.username} onChange={filterUser} className="my-8" />
 
 			{0 !== items.length && (
 				<>
-					<ul className="mt-4">
-						{Object.values(sessionsByDay).map((sessions) => {
-							const date = sessions[0].drankAt;
+					<div className="mt-4">
+						{Object.values(sessionsByDay).map((sessionsByMember) => {
+							const date = Object.values(sessionsByMember)[0][0].drankAt;
 
 							return (
-								<li key={formatISO(date, { representation: "date" })} className="mb-12">
-									<div className="font-header leading-tight mb-4 text-xl font-bold">
+								<div key={formatISO(date, { representation: "date" })} className="mb-16">
+									<h2 className="font-header leading-tight -mx-4 py-4 text-xl font-bold text-center sticky top-0 bg-green-50 text-green-900">
 										{isToday(date) ? (
 											<span>Today</span>
 										) : isYesterday(date) ? (
 											<span>Yesterday</span>
 										) : (
-											<>
-												<span className="font-normal text-base uppercase text-base-content/60">
-													{formatDate(date, "yyyy")}
-												</span>
-												<br />
-												<span>{formatDate(date, "d MMMM")}</span>
-											</>
+											<span>{formatDate(date, "d MMMM yyyy")}</span>
 										)}
-									</div>
+									</h2>
 
 									<ul>
-										{sessions.map((session) => {
-											const author = session.author;
-
-											if (!author || typeof author === "string") {
-												return null;
-											}
-
-											if (!session.note?.trim()?.length) {
-												return (
-													<li key={session.id} className="mb-4">
-														<Link to={`/sessions/${session.id}`}>
-															<SessionShortCard
-																family={session.tea.family}
-																type={session.tea.type}
-																path={session.tea.originPath}
-																author={author}
-																cultivar={session.tea.cultivar}
-																onAuthorClick={() => filterUser(author.username)}
-															/>
-														</Link>
-													</li>
-												);
-											}
+										{Object.values(sessionsByMember).map((sessions) => {
+											const author = sessions[0].author;
 
 											return (
-												<li key={session.id} className="mb-4">
-													<Link to={`/sessions/${session.id}`}>
-														<SessionRichCard
-															teaId={session.tea.id}
-															family={session.tea.family}
-															type={session.tea.type}
-															path={session.tea.originPath}
-															note={session.note}
-															author={author}
-															cultivar={session.tea.cultivar}
-															year={session.tea.year}
-															roast={session.tea.roast}
-															onAuthorClick={() => filterUser(author.username)}
-														/>
-													</Link>
+												<li key={author.username} className="mb-4">
+													<MemberSessionsGroup
+														member={author}
+														sessions={sessions}
+														onMemberClick={(u) => filterUser(u)}
+													/>
 												</li>
 											);
 										})}
 									</ul>
-								</li>
+								</div>
 							);
 						})}
-					</ul>
+					</div>
 
 					{sessionsQuery.hasNextPage && (
 						<button
@@ -141,12 +110,64 @@ export default function ListTeaSessions() {
 				</>
 			)}
 
-			<Link
-				to="/session/new"
-				className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 w-12 shadow-md"
-			>
-				<PlusIcon className="size-4" />
+			<Link to="/session/new" className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 shadow-md">
+				<CoffeeCup className="size-4" /> Start brewing
 			</Link>
 		</AuthLayout>
+	);
+}
+
+function MemberSessionsGroup(props: {
+	member: Member;
+	sessions: Session[];
+	onMemberClick?: (username: string) => void;
+}) {
+	return (
+		<div className="mb-8">
+			<h3
+				className="text-green-800/80 mb-2 ml-1 cursor-pointer"
+				onClick={() => f(props.onMemberClick)(props.member.username)}
+			>
+				@{props.member.username}
+			</h3>
+			<ul className="bg-white rounded-xl shadow">
+				{props.sessions.map((session) => (
+					<li key={session.id} className="nth-[1]:border-0 border-t border-green-100">
+						<Link to={`/sessions/${session.id}`}>
+							<SessionListItem tea={session.tea} place={session.place} />
+						</Link>
+					</li>
+				))}
+			</ul>
+		</div>
+	);
+}
+
+function SessionListItem(props: { tea: Session["tea"]; place?: Session["place"] }) {
+	return (
+		<article className="px-4 py-3 flex items-center">
+			<div className="flex-1">
+				<div>
+					<Family family={props.tea.family} iconOnly className="mr-1" />
+					<span className="capitalize">{props.tea.type?.name ?? `${props.tea.family} tea`}</span>
+				</div>
+				<div className="text-sm text-teal-600">
+					{props.tea.cultivar && <span className="text-teal-600 text-sm">{props.tea.cultivar.name}</span>}
+					{props.tea.cultivar && props.tea.originPath && <span className="mx-1">&middot;</span>}
+					{props.tea.originPath && (
+						<span>
+							<FormatOriginPath originPath={props.tea.originPath} maxLevel="region" />
+						</span>
+					)}
+				</div>
+			</div>
+			<div className="text-sm">
+				{!!props.place && (
+					<span className="flex items-center text-teal-800">
+						<Shop className="inline size-4 mr-1" /> {props.place.name}
+					</span>
+				)}
+			</div>
+		</article>
 	);
 }
