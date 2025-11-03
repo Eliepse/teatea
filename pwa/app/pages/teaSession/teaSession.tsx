@@ -123,6 +123,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</div>
 
 				<TeaCard
+					teaId={session.tea.id}
 					family={tea.family}
 					type={teaType.data}
 					origin={tea.originPath}
