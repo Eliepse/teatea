@@ -40,8 +40,8 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
+	const [searchParams, setSearchParams] = useSearchParams();
 	const revalidator = useRevalidator();
-	const [searchParams] = useSearchParams();
 	const session = props.loaderData;
 	const tea = session.tea;
 	const teaType = useResourceQuery<TeaType>(tea.type);
@@ -58,7 +58,13 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	function toggleEditMode() {
-		setEditMode((st) => !st);
+		if (editMode) {
+			setSearchParams((st) => Object.fromEntries(Object.entries(st).filter(([k]) => "edit" !== k)));
+			setEditMode(false);
+			return;
+		}
+
+		setEditMode(true);
 	}
 
 	return (
