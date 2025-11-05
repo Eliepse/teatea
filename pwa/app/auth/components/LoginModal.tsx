@@ -6,8 +6,8 @@ import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SecurityPass, TimerOff } from "iconoir-react";
 import { Link } from "react-router";
-import axios from "axios";
-import { TokenUtils } from "~/auth/hooks/useToken";
+import axios, { AxiosError } from "axios";
+import { attemptOTPLogin } from "~/auth/requests";
 
 export type OTPToken = { value: string; expiredAt: Date };
 type OTPResponse =
@@ -33,19 +33,19 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 				return null;
 			}
 
-			const data = (await axios.post<OTPResponse>("/auth/otp", { challenge: token.value })).data;
+			try {
+				if (await attemptOTPLogin(token)) {
+					setToken(true);
+				} else {
+					setToken(false);
+				}
+			} catch (e) {
+				if (e instanceof AxiosError && e.status === 404) {
+					return null;
+				}
 
-			if ("token" in data) {
-				TokenUtils.set(data.token);
-				TokenUtils.setRefreshToken(data.refresh_token, new Date(data.refresh_token_expiration * 1_000));
-				LocalStorageUtils.remove("otp_token");
-				setToken(true);
-				return null;
-			}
-
-			if ("message" in data) {
-				alert({ title: "Verification failed", body: data.message });
-				LocalStorageUtils.remove("otp_token");
+				const message = e instanceof Error ? e.message : undefined;
+				alert({ title: "Verification failed", body: message });
 				setToken(false);
 				throw new Error("Validation failed");
 			}
@@ -54,7 +54,7 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 		},
 		queryKey: [token],
 		enabled: null !== token && typeof token === "object" && props.open,
-		retryDelay: 6_000,
+		retryDelay: 3_000,
 		retry: true,
 		refetchOnWindowFocus: true,
 	});
@@ -100,7 +100,7 @@ function ExpiredView(props: { onCancel: () => void }) {
 			<TimerOff className="mx-auto size-12 text-red-500" />
 			<h2 className="text-lg my-6 text-red-500">Oops, verification expired!</h2>
 			<button className="btn btn-lg btn-block" onClick={props.onCancel}>
-				Retry with another email
+				Retry
 			</button>
 		</div>
 	);
@@ -183,7 +183,7 @@ function LoginForm(props: {
 	});
 
 	function submit() {
-		if(!isEmailValid) {
+		if (!isEmailValid) {
 			return;
 		}
 		mutate(email);
@@ -198,6 +198,8 @@ function LoginForm(props: {
 				<input
 					type="email"
 					inputMode="email"
+					name="email"
+					autoComplete="email"
 					className="input input-lg w-auto"
 					placeholder="tealover@mailer.com"
 					value={email}
@@ -207,11 +209,7 @@ function LoginForm(props: {
 				/>
 			</fieldset>
 
-			<button
-				className="btn btn-lg btn-block btn-primary"
-				onClick={submit}
-				disabled={!isEmailValid || isPending}
-			>
+			<button className="btn btn-lg btn-block btn-primary" onClick={submit} disabled={!isEmailValid || isPending}>
 				Enter
 			</button>
 

@@ -5,6 +5,7 @@ import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
 import { type OTPToken } from "~/auth/components/LoginModal";
 import { isFuture } from "date-fns";
 import { Link } from "react-router";
+import { attemptOTPLogin, verifyOTPToken } from "~/auth/requests";
 
 export async function clientLoader(args: Route.ComponentProps) {
 	const token = args.params.token;
@@ -15,10 +16,10 @@ export async function clientLoader(args: Route.ComponentProps) {
 	}
 
 	try {
-		await axios.post("/auth/otp/verify", { challenge: token });
+		await verifyOTPToken(token);
 
 		if (null !== OTPToken && isFuture(new Date(OTPToken.expiredAt))) {
-			LocalStorageUtils.remove("otp_token");
+			await attemptOTPLogin(OTPToken);
 			return { success: true, localOtp: true };
 		}
 
