@@ -19,9 +19,11 @@ export type MemberStats = Resource & {
 	statsSessionsTotal: number;
 	statsConsumedTeasTotal: number;
 	statsTopTeas: Tea[];
+	statsTopTeaTypes: TeaType[];
 };
 
 export type TeaType = Resource<"TeaType"> & {
+	slug: string;
 	family: TeaFamily;
 	name: string;
 	origin: Pick<Origin, "@id" | "@type" | "path">;

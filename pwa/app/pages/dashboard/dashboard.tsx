@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { TokenUtils, useToken } from "~/auth/hooks/useToken";
+import { TokenUtils } from "~/auth/hooks/useToken";
 import { usePWAInstall } from "~/utils/browser/usePWAInstall";
 import { handleUIEvent } from "~/utils/function";
 import { ArrowDownCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
@@ -24,7 +24,6 @@ export async function clientLoader(): Promise<MemberStats> {
 }
 
 export default function Dashboard(props: Route.ComponentProps) {
-	const [token] = useToken();
 	const userQuery = useUser();
 	const pwaInstall = usePWAInstall();
 	const popup = usePopup();
@@ -84,20 +83,16 @@ export default function Dashboard(props: Route.ComponentProps) {
 				<Plus className="ml-auto size-7" />
 			</Link>
 
-			{0 < props.loaderData.statsTopTeas.length && (
+			{0 < props.loaderData.statsTopTeaTypes.length && (
 				<>
-					<div className="mt-6 mb-2 text-xs uppercase text-base-content/60">What you drank the most</div>
+					<div className="mt-6 mb-2 text-xs uppercase text-base-content/60">Your tea types of choice</div>
 					<ul>
-						{props.loaderData.statsTopTeas.map((tea) => (
-							<li key={tea.id} className="mb-2">
-								<Link to={`/tea/${tea.id}`}>
+						{props.loaderData.statsTopTeaTypes.map((type) => (
+							<li key={type.id} className="mb-2">
+								<Link to={`/tea_types/${type.slug}`}>
 									<TeaShortCard
-										family={tea.family}
-										type={tea.type}
-										path={tea.originPath}
-										cultivar={tea.cultivar}
-										year={tea.year}
-										roast={tea.roast}
+										family={type.family}
+										type={type}
 										className="bg-slate-100"
 									/>
 								</Link>

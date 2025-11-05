@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Helper\Arr;
 use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
+use App\State\TeaType\TeaTypeProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
@@ -71,6 +72,26 @@ readonly class UserStatsProvider implements ProviderInterface
 			->setMaxResults(3)
 			->getResult();
 
+		$topTeaTypes = $this->em
+			->createQuery(
+				<<<DQL
+				SELECT type
+				FROM App\Entity\TeaType type
+				WHERE type.id IN (
+					SELECT searchType.id
+					FROM App\Entity\TeaType searchType
+						INNER JOIN searchType.teas teas
+						INNER JOIN teas.sessions sessions WITH sessions.drankAt >= :before AND sessions.author = :user
+					GROUP BY searchType.id
+					ORDER BY COUNT(sessions) DESC
+				)
+				DQL,
+			)
+			->setParameter("user", $user)
+			->setParameter("before", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
+			->setMaxResults(3)
+			->getResult();
+
 
 		$teasOrigins = $this->em->createQuery(
 			<<<DQL
@@ -98,6 +119,7 @@ readonly class UserStatsProvider implements ProviderInterface
 		}
 
 		$resource->statsTopTeas = $teas;
+		$resource->statsTopTeaTypes = array_map(fn($t) => TeaTypeProvider::fromEntity($t), $topTeaTypes);
 
 		return $resource;
 	}

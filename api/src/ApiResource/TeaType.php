@@ -42,16 +42,16 @@ class TeaType
 	#[ApiProperty(writable: false, identifier: false)]
 	public ?int $id = null;
 
-	#[Groups(["read:origin"])]
+	#[Groups(["read:origin", "with:teatype"])]
 	#[ApiProperty(writable: false, identifier: true)]
 	public ?string $slug = null;
 
-	#[Groups(["read:origin"])]
+	#[Groups(["read:origin", "with:teatype"])]
 	public TeaFamily $family;
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 16)]
-	#[Groups(["embedded:teaType", "read:origin", "tea:create"])]
+	#[Groups(["embedded:teaType", "with:teatype", "read:origin", "tea:create"])]
 	public string $name;
 
 	#[Assert\NotNull]
@@ -63,6 +63,6 @@ class TeaType
 	public bool $isPDO = false;
 
 	#[Groups(["type:read"])]
-	#[ApiProperty(genId: false, readable: true, readableLink: true)]
+	#[ApiProperty(readable: true, readableLink: true, genId: false)]
 	public ?TeaTypeStats $stats = null;
 }

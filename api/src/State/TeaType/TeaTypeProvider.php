@@ -12,6 +12,7 @@ use App\ValueObject\Stats\TeaTypeStats;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
+use Doctrine\Persistence\Proxy;
 
 /**
  * @implements ProviderInterface<TeaType|null>
@@ -114,9 +115,11 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$resource->name = $type->name;
 		$resource->slug = $type->slug;
 		$resource->family = $type->family;
-		if ($type->origin) {
+
+		if ($type->origin && !$type->origin instanceof Proxy) {
 			$resource->origin = OriginProvider::fromEntity($type->origin);
 		}
+
 		$resource->isPDO = $type->isProtectedOrigin;
 
 		return $resource;
