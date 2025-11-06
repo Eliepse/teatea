@@ -1,4 +1,12 @@
-import type { Cultivar, Id, OriginPath, RoastLevel, TeaFamily, TeaType } from "~t/types";
+import {
+	type Cultivar,
+	type Id,
+	type OriginPath,
+	type RoastLevel,
+	RoastLevelEnum,
+	type TeaFamily,
+	type TeaType,
+} from "~t/types";
 import clsx from "clsx";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import type { PropsWithChildren, ReactNode } from "react";
@@ -16,11 +24,13 @@ export function TeaCard(
 		year?: number;
 		roast?: RoastLevel;
 		className?: string;
+		showNoRoast?: boolean;
 		loading?: boolean;
 	}>,
 ) {
 	const navigate = useNavigate();
 	const hasSpecs = Object.keys(props).some((key) => ["path", "cultivar", "year", "roast"].includes(key));
+	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null
 
 	return (
 		<article className={clsx("rounded-2xl", props.className)}>
@@ -42,7 +52,7 @@ export function TeaCard(
 						)}
 						{!!props.cultivar && <Spec label="Cultivar" value={props.cultivar?.name} />}
 						{!!props.year && <Spec label="Year" value={props.year} />}
-						{!!props.roast && <Spec label="Roast" value={props.roast} />}
+						{!!roast && <Spec label="Roast" value={roast} />}
 					</ul>
 				</div>
 			)}
