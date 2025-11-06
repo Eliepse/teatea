@@ -38,7 +38,7 @@ export default function TeaListPage() {
 		<AuthLayout className="p-4 pb-8 bg-green-50">
 			<header className="mb-8 pt-2 relative">
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
-				<h1 className="text-3xl font-bold font-header text-center">Tasted teas</h1>
+				<h1 className="text-3xl font-bold font-header text-center text-green-900">Tasted teas</h1>
 			</header>
 
 			{!teasQuery.isPending && !hasTeas && (
@@ -76,7 +76,7 @@ export default function TeaListPage() {
 											year={tea.year}
 											cultivar={tea.cultivar}
 											origin={tea.originPath}
-											className="bg-white"
+											className="bg-white shadow-sm"
 										/>
 									</Link>
 								</li>
