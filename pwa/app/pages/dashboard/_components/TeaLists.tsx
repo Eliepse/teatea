@@ -1,11 +1,11 @@
 import { Link } from "react-router";
 import type { PropsWithChildren } from "react";
 import clsx from "clsx";
-import { Heart, Star } from "iconoir-react";
+import { Heart } from "iconoir-react";
 
-export function TeaLists(props: {}) {
+export function TeaLists() {
 	return (
-		<ul className="grid grid-cols-2 gap-4">
+		<ul className="grid grid-cols-1 gap-4 text-green-900">
 			<li>
 				<ListButton list="favorites">
 					Favorites <Heart />
@@ -20,7 +20,7 @@ function ListButton(props: PropsWithChildren<{ list: string; className?: string 
 		<Link
 			to={`/lists/${props.list}`}
 			className={clsx(
-				"flex bg-primary/10 p-6 h-20 mt-4 items-center justify-between rounded-md text-lg text-primary",
+				"flex bg-white p-6 h-16 items-center justify-between rounded-xl text-lg shadow-sm",
 				props.className,
 			)}
 		>
