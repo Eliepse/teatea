@@ -3,6 +3,7 @@ import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import type { Route } from "../../.react-router/types/app/pages/+types/homepage";
 import { LoginModal } from "~/auth/components/LoginModal";
 import { useState } from "react";
+import { Logo } from "~/components/icons/Logo";
 
 export async function clientLoader() {
 	return {
@@ -27,9 +28,7 @@ export default function Homepage(props: Route.ComponentProps) {
 	return (
 		<div className="p-8 flex flex-col h-dvh bg-[url(/img/tea-tree-leaves-field.jpg)] bg-cover">
 			<div className="flex-1 flex flex-col justify-center text-center text-green-50">
-				<h1 className="text-8xl font-young-serif font-bold mb-6" style={{ transform: "translateX(-.06em)" }}>
-					teatea
-				</h1>
+				<Logo className="w-76 mx-auto text-white mb-8" style={{ transform: "translateX(-1%)" }} />
 				<p className="text-xl mx-auto opacity-80">Your personal tea journal</p>
 			</div>
 
