@@ -3,13 +3,13 @@ import styles from "./tea.module.css";
 import { getApi } from "~/utils/api";
 import { type Cultivar, type OriginPath, type RoastLevel, type TeaFamily, type TeaType } from "~t/types";
 import { useNavigate } from "react-router";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { type ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 import clsx from "clsx";
 import { CoffeeCup, Leaf } from "iconoir-react";
+import { BackButton } from "~/components/shared/navigation/BackButton";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaType = await (await getApi<TeaType>(`/tea_types/${args.params.slug}`)).json();
@@ -24,13 +24,7 @@ export default function TeaTypePage(props: Route.ComponentProps) {
 	return (
 		<div className="pb-22 text-lg bg-green-50 min-h-dvh">
 			<nav className="absolute inset-x-0 top-0 z-10 p-5 flex">
-				<button
-					className="btn btn-lg btn-circle bg-white mr-auto"
-					onClick={() => navigate(-1)}
-					aria-label="Go back"
-				>
-					<ArrowLeftIcon className="size-6" />
-				</button>
+				<BackButton className="mr-auto" />
 			</nav>
 
 			<div className="px-2 pt-2 relative z-0">
