@@ -65,7 +65,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	function toggleEditMode() {
-		if (editMode) {
+		if (editMode && "1" === searchParams.get("edit")) {
 			setSearchParams((st) => Object.fromEntries(Object.entries(st).filter(([k]) => "edit" !== k)), {
 				replace: true,
 			});
@@ -73,7 +73,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			return;
 		}
 
-		setEditMode(true);
+		setEditMode((st) => !st);
 	}
 
 	return (
