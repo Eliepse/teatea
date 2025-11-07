@@ -1,12 +1,12 @@
 import { type BrewingQuality, BrewingQualityEnum } from "~t/types";
 import clsx from "clsx";
 import { useState } from "react";
-import { RefreshDouble } from "iconoir-react";
+import { EmojiPuzzled, EmojiSad, EmojiSatisfied, RefreshDouble } from "iconoir-react";
 
 export const QualityIcon = {
-	[BrewingQualityEnum.Bad]: "☹️",
-	[BrewingQualityEnum.Improvable]: "😐",
-	[BrewingQualityEnum.Good]: "😀",
+	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-4 mb-1" />,
+	[BrewingQualityEnum.Improvable]: <EmojiPuzzled className="size-4 mb-1" />,
+	[BrewingQualityEnum.Bad]: <EmojiSad className="size-4 mb-1" />,
 } as const;
 
 export const QualityLabel = {
@@ -17,7 +17,7 @@ export const QualityLabel = {
 
 export function BrewingQualityInput(props: {
 	value?: BrewingQuality;
-	onChange: (value: BrewingQuality) => void|Promise<void>;
+	onChange: (value: BrewingQuality) => void | Promise<void>;
 	readonly?: boolean;
 }) {
 	const [saving, setSaving] = useState<BrewingQuality>();
@@ -29,14 +29,14 @@ export function BrewingQualityInput(props: {
 
 		const promise = props.onChange(value);
 
-		if(promise) {
+		if (promise) {
 			setSaving(value);
 			promise.finally(() => setSaving(undefined));
 		}
 	}
 
 	return (
-		<div className="flex rounded-md bg-base-200 overflow-hidden">
+		<div className="flex rounded-md bg-white rounded-xl overflow-hidden">
 			<OptionBtn
 				value={BrewingQualityEnum.Bad}
 				active={BrewingQualityEnum.Bad === props.value}
@@ -74,8 +74,10 @@ function OptionBtn(props: {
 		<button
 			className={clsx(
 				"flex-1 h-14 flex flex-col justify-center items-center leading-snug cursor-pointer",
-				true !== props.readonly && !props.active && "hover:bg-base-300",
-				props.active && "bg-primary",
+				"font-medium",
+				props.active ? "text-white" : "text-base-content/80",
+				true !== props.readonly && !props.active && "hover:bg-green-200",
+				props.active && "bg-green-700",
 			)}
 			onClick={() => props.onSelect()}
 		>
@@ -83,7 +85,7 @@ function OptionBtn(props: {
 			{true !== props.loading && (
 				<>
 					{QualityIcon[props.value]}
-					<span className={clsx("my-0 text-xs", textColor)}>{QualityLabel[props.value]}</span>
+					<span className="my-0 text-xs">{QualityLabel[props.value]}</span>
 				</>
 			)}
 		</button>

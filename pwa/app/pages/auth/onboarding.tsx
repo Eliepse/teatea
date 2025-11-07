@@ -95,7 +95,7 @@ export default function OnboardingPage() {
 							Start your journey by adding your first tea session in your journal.
 						</p>
 
-						<button className="btn btn-primary mt-6" onClick={handleUIEvent(() => start("/session/new"))}>
+						<button className="btn btn-primary mt-6" onClick={handleUIEvent(() => start("/tea/search"))}>
 							Add my first tea session <ArrowRightIcon className="size-4" />
 						</button>
 					</div>

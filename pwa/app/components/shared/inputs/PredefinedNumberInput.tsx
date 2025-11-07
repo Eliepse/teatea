@@ -11,6 +11,7 @@ export function PredefinedNumberInput<TPredefined extends number>(props: {
 	onChange: (value: number | undefined) => void;
 	suffix?: string;
 	noCustom?: boolean;
+	className?: string;
 }) {
 	const canCustom = true !== props.noCustom;
 	const [isCustom, setIsCustom] = useState(
@@ -34,7 +35,7 @@ export function PredefinedNumberInput<TPredefined extends number>(props: {
 
 	if (canCustom && isCustom) {
 		return (
-			<label className="input w-full pr-0">
+			<label className="input input-lg pl-4 w-full rounded-xl pr-0">
 				<input type="number" min={1} step={1} value={props.value ?? ""} onChange={handleCustomChange} />
 				{!!props.suffix && <span className="label">{props.suffix}</span>}
 				<button
@@ -48,11 +49,14 @@ export function PredefinedNumberInput<TPredefined extends number>(props: {
 	}
 
 	return (
-		<div className="join">
+		<div className={clsx("join rounded-xl overflow-hidden", props.className)}>
 			{props.predefined.map((item) => (
 				<input
 					key={item.value}
-					className={clsx("join-item btn flex-1", item.value === props.value && "btn-primary")}
+					className={clsx(
+						"join-item btn btn-lg flex-1",
+						item.value === props.value && "bg-green-700 text-white",
+					)}
 					type="radio"
 					name="predefined"
 					aria-label={item.label}
@@ -62,7 +66,7 @@ export function PredefinedNumberInput<TPredefined extends number>(props: {
 			))}
 
 			{!props.noCustom && (
-				<button className="join-item btn" onClick={() => setIsCustom(true)}>
+				<button className="join-item btn btn-lg" onClick={() => setIsCustom(true)}>
 					Custom
 				</button>
 			)}

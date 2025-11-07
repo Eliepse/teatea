@@ -19,5 +19,5 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 
 export default function LogTeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
-	return <CreateTeaSessionFlow tea={props.loaderData.tea} onBack={() => navigate(-1)} />;
+	return <CreateTeaSessionFlow tea={props.loaderData.tea["@id"]} onBack={() => navigate(-1)} />;
 }

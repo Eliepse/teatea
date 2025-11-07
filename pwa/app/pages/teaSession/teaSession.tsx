@@ -22,7 +22,6 @@ import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/Br
 import { Check, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, ShopFourTilesWindow } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
-import { BusinessSelect } from "~/components/shared/inputs/BusinessSelect";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
@@ -229,19 +228,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 							await sessionMutations.edit.mutateAsync({ quality });
 						}}
 						value={session.quality}
-					/>
-				</IfAuthor>
-			)}
-
-			{editMode && (
-				<IfAuthor author={session.author}>
-					<h2 className="uppercase text-xs text-base-content/60 mt-8 mb-2">Location</h2>
-					<BusinessSelect
-						value={props.loaderData.place ? props.loaderData.place["@id"] : undefined}
-						onSelect={async (place) => void sessionMutations.edit.mutateAsync({ place: place ?? null })}
-						allowClear
-						allowCreate
-						placeholder="Search for a place"
 					/>
 				</IfAuthor>
 			)}

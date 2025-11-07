@@ -74,7 +74,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 				</div>
 			)}
 
-			<Link to="/session/new" className="flex items-center bg-green-600 text-white rounded-xl px-6 h-16 text-lg">
+			<Link to="/tea/search" className="flex items-center bg-green-600 text-white rounded-xl px-6 h-16 text-lg">
 				Let&apos;s brew tea!
 				<CoffeeCup className="ml-auto size-6" />
 			</Link>

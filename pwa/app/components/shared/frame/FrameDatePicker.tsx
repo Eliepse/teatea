@@ -1,4 +1,3 @@
-import { PageLayout } from "~/components/shared/paged/PageLayout";
 import {
 	eachDayOfInterval,
 	eachWeekOfInterval,
@@ -13,15 +12,16 @@ import {
 } from "date-fns";
 import clsx from "clsx";
 import { DayPicker } from "react-day-picker";
-import Arrow from "~/components/icons/arrow";
-import { handleUIEvent } from "~/utils/function";
-import { useState } from "react";
+import { type ReactNode, useState } from "react";
+import { FrameActions } from "~/components/teaSession/CreateTeaSessionFlow";
 
 export function FrameDatePicker(props: {
 	onConfirm: (date: Date) => void;
 	defaultValue?: Date;
 	onBack?: () => void;
 	buttonText?: string;
+	header?: ReactNode;
+	className?: string;
 }) {
 	const [selectedDay, setSelectedDay] = useState(props.defaultValue);
 
@@ -34,22 +34,11 @@ export function FrameDatePicker(props: {
 	}
 
 	return (
-		<PageLayout
-			title="Select a date"
-			onBack={props.onBack}
-			action={
-				<button
-					className="btn btn-primary flex ml-auto"
-					onClick={handleUIEvent(confirm)}
-					disabled={!selectedDay}
-				>
-					{props.buttonText ?? "Confirm"} <Arrow direction="right" />
-				</button>
-			}
-			withoutPadding
-		>
+		<div className={clsx("flex flex-col", props.className)}>
+			{props.header}
+
 			<DayPicker
-				className="react-day-picker full"
+				className="react-day-picker bg-transparent full flex-1"
 				mode="single"
 				selected={selectedDay}
 				onSelect={setSelectedDay}
@@ -58,7 +47,9 @@ export function FrameDatePicker(props: {
 				showOutsideDays
 				required
 			/>
-		</PageLayout>
+
+			<FrameActions onBack={props.onBack} onNext={confirm} className="p-4 flex-none" disableNext={!selectedDay} />
+		</div>
 	);
 }
 

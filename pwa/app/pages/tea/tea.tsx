@@ -21,7 +21,6 @@ import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normaliza
 import { formatDistanceToNow } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
-import { limit } from "~/utils/text";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
 import { CoffeeCup, Heart, HeartSolid, PeopleTag } from "iconoir-react";
 import { type ReactNode, useState } from "react";
@@ -30,14 +29,13 @@ import { Family } from "~/components/tea/Family";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 import clsx from "clsx";
+import { BrewButton } from "~/components/teaSession/BrewButton";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
-	const tea = denormalizeTea(await (await getApi<TeaRaw>(`/teas/${args.params.id}`)).json());
-	const favorites = await (
-		await getApi<ApiCollection<MemberTea>>(`/lists/favorites/teas`, { tea: args.params.id })
-	).json();
-	const stats = await (await getApi<TeaStats>(`/teas/${args.params.id}/stats`)).json();
-
+	const teaId = args.params.id;
+	const tea = denormalizeTea(await (await getApi<TeaRaw>(`/teas/${teaId}`)).json());
+	const favorites = await (await getApi<ApiCollection<MemberTea>>(`/lists/favorites/teas`, { tea: teaId })).json();
+	const stats = await (await getApi<TeaStats>(`/teas/${teaId}/stats`)).json();
 	return { tea, stats, favoriteTea: favorites.member[0] ?? null };
 }
 
@@ -109,10 +107,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 				/>
 
 				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center">
-					<Link to={`/session/new?tea=${tea.id}`} className="btn btn-lg btn-primary rounded-full">
-						Brew it
-						<CoffeeCup className="ml-1 size-5" />
-					</Link>
+					<BrewButton tea={props.loaderData.tea["@id"]} />
 				</nav>
 			</header>
 

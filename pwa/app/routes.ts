@@ -14,7 +14,6 @@ export default [
 		route("/tea/:id", "pages/tea/tea.tsx"),
 		route("/tea_types/:slug", "pages/tea/tea-type.tsx"),
 
-		route("/session/new", "pages/teaSession/add-session.tsx"),
 		route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
 		route("/sessions", "pages/teaSession/teaSessions.tsx"),
 

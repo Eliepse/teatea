@@ -1,42 +1,44 @@
 import { useState } from "react";
-import type { Tea } from "~t/types";
-import { brewingTechnic, type TechnicType } from "~/components/shared/BrewingTechnic";
+import type { Business, Iri, Tea } from "~t/types";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
-import { SelectTeaFrame } from "~/components/stackFrames/SelectTeaFrame";
 import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 import { FrameDatePicker } from "~/components/shared/frame/FrameDatePicker";
 import { useMutation } from "@tanstack/react-query";
-import Leaf from "~/components/icons/leaf";
-import { fetchApi } from "~/utils/api";
+import { postApi } from "~/utils/api";
 import type { TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { formatISO } from "date-fns";
 import { useNavigate } from "react-router";
 import { useAlert } from "~/components/shared/modal/AlertManager";
+import { handleUIEvent } from "~/utils/function";
+import Arrow from "~/components/icons/arrow";
+import clsx from "clsx";
+import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
+import { CoffeeCup } from "iconoir-react";
 
 export type SessionForm = {
-	tea?: Tea;
+	tea: Tea["@id"];
 	teaQuantity?: number;
 	waterVolume?: number;
 	drankAt: Date;
-	technic?: TechnicType | null;
+	place?: Business["@id"];
 };
 
-const technicItems = Object.entries(brewingTechnic).map(([k, l]) => ({ value: k, label: l })) as {
-	value: TechnicType;
-	label: string;
-}[];
+const FRAME_INFO_MAPPER = {
+	"parameters:input": { step: 1, title: "How will you brew it?" },
+	"date:select": { step: 2, title: "Is it a past session?" },
+	"place:select": { step: 3, title: "Is it in a special place?" },
+} as const;
 
-export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
+export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) {
 	const navigate = useNavigate();
 	const alert = useAlert();
 	const [form, setForm] = useState<SessionForm>({ drankAt: new Date(), tea: props.tea });
-	const { NavigationStack, ...stackNavigator } = useNavigationStack({
-		defaultFrame: props.tea?.id ? "parameters:input" : "tea:select",
-	});
+	const { NavigationStack, ...stackNavigator } = useNavigationStack({ defaultFrame: "parameters:input" });
+	const currentFrameKey = stackNavigator.stack.slice(-1)[0] as keyof typeof FRAME_INFO_MAPPER;
 
 	function goBack() {
-		if(1 === stackNavigator.stack.length) {
-			props.onBack();
+		if (1 === stackNavigator.stack.length) {
+			props.onCancel();
 			return;
 		}
 
@@ -46,17 +48,8 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 
 	const mutation = useMutation({
 		mutationFn: async (data: SessionForm & Required<Pick<SessionForm, "tea">>) => {
-			const response = await fetchApi<TeaSessionRaw>("/tea_sessions", {
-				method: "POST",
-				payload: {
-					drankAt: formatISO(data.drankAt),
-					tea: data.tea?.["@id"],
-					technic: data.technic,
-					teaQuantity: data.teaQuantity,
-					waterMl: data.waterVolume,
-				},
-			});
-
+			const drankAt = formatISO(data.drankAt);
+			const response = await postApi<TeaSessionRaw>("/tea_sessions", { ...data, drankAt });
 			return await response.json();
 		},
 		onError: (e) => {
@@ -69,30 +62,30 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 
 	if (mutation.isPending || mutation.isSuccess) {
 		return (
-			<div className="flex items-center justify-center h-screen">
-				<div className="flex justify-center text-gray-500">
-					<span className="inline-block animate-pulse">
-						<Leaf className="size-6 rotate-90" />
-					</span>
-					<span className="ml-2">Saving...</span>
+			<div className="flex items-center justify-center h-full text-lg text-green-700">
+				<div className="">
+					<CoffeeCup className="mx-auto mb-4 size-14 animate-bounce text-green-600" />
+					<span className="ml-2 font-medium">Starting the session...</span>
 				</div>
 			</div>
 		);
 	}
 
+	const header = (
+		<HeaderWithSteps
+			key="header"
+			title={FRAME_INFO_MAPPER[currentFrameKey].title}
+			steps={Object.values(FRAME_INFO_MAPPER).length}
+			current={FRAME_INFO_MAPPER[currentFrameKey].step}
+		/>
+	);
+
 	return (
 		<NavigationStack>
-			<StackFrame frameKey="tea:select">
-				<SelectTeaFrame
-					onConfirm={(tea) => {
-						setForm((st) => ({ ...st, tea }));
-						stackNavigator.next("parameters:input");
-					}}
-					onBack={goBack}
-				/>
-			</StackFrame>
 			<StackFrame frameKey="parameters:input">
 				<ParametersInput
+					header={header}
+					className="h-full"
 					onBack={goBack}
 					defaultTea={form.teaQuantity}
 					defaultWater={form.waterVolume}
@@ -104,20 +97,77 @@ export function CreateTeaSessionFlow(props: { tea?: Tea; onBack: () => void }) {
 			</StackFrame>
 			<StackFrame frameKey="date:select">
 				<FrameDatePicker
+					header={header}
+					className="h-full"
 					onBack={goBack}
 					defaultValue={form.drankAt}
 					buttonText="Save this session"
 					onConfirm={(date) => {
 						setForm({ ...form, drankAt: date });
-
-						if (undefined === form.tea) {
-							return;
-						}
-
-						mutation.mutate({ ...form, tea: form.tea, drankAt: date });
+						stackNavigator.next("place:select");
+					}}
+				/>
+			</StackFrame>
+			<StackFrame frameKey="place:select">
+				<SelectBusinessFrame
+					header={header}
+					className="h-full"
+					onBack={goBack}
+					defaultValue={form.place}
+					buttonText="Save this session"
+					onConfirm={(place) => {
+						setForm({ ...form, place });
+						mutation.mutate({ ...form, place });
 					}}
 				/>
 			</StackFrame>
 		</NavigationStack>
+	);
+}
+
+function HeaderWithSteps(props: { title?: string; onBack?: () => void; steps: number; current: number }) {
+	const progression = ((props.current / props.steps) * 100).toFixed(0);
+	return (
+		<div className="text-green-900 flex-none">
+			{!!props.title && (
+				<h1 className="py-4 font-header font-medium text-center text-xl border-b border-green-100">
+					{props.title}
+				</h1>
+			)}
+
+			<div className="relative flex justify-around -translate-y-1">
+				<div
+					className="absolute transition-all left-0 top-1 h-0.5 bg-green-700"
+					style={{ width: `${progression}%` }}
+				/>
+			</div>
+		</div>
+	);
+}
+
+export function FrameActions(props: {
+	onBack?: () => void;
+	onNext: () => void;
+	disableNext?: boolean;
+	className?: string;
+}) {
+	return (
+		<div className={clsx("flex", props.className)}>
+			{props.onBack && (
+				<button className="btn btn-lg bg-green-100 rounded-xl" onClick={handleUIEvent(props.onBack)}>
+					<Arrow direction="left" className="size-4 mr-1" />
+					Back
+				</button>
+			)}
+
+			<button
+				className="ml-auto btn btn-lg bg-green-700 text-white rounded-xl disabled:bg-teal-100 disabled:text-teal-500"
+				onClick={handleUIEvent(props.onNext)}
+				disabled={props.disableNext}
+			>
+				Next
+				<Arrow direction="right" className="size-4 ml-1" />
+			</button>
+		</div>
 	);
 }

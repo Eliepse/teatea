@@ -44,7 +44,7 @@ export default function TeaListPage() {
 			{!teasQuery.isPending && !hasTeas && (
 				<p className="px-4 mt-8 text-center text-base-content/80">
 					You haven't tasted any tea yet. Ready to{" "}
-					<Link className="link link-primary" to="/session/new">
+					<Link className="link link-primary" to="/tea/search">
 						record your first session?
 					</Link>
 				</p>

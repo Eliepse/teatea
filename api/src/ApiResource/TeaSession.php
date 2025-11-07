@@ -125,7 +125,7 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?\DateTimeImmutable $drankAt;
 
-	#[Groups(["teaSession:read", "teaSession:edit", "with:business"])]
+	#[Groups(["teaSession:create", "teaSession:read", "teaSession:edit", "with:business"])]
 	public ?Business $place = null;
 
 	public function __construct()

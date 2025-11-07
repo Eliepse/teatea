@@ -110,7 +110,7 @@ export default function ListTeaSessions() {
 				</>
 			)}
 
-			<Link to="/session/new" className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 shadow-md">
+			<Link to="/tea/search" className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 shadow-md">
 				<CoffeeCup className="size-4" /> Start brewing
 			</Link>
 		</AuthLayout>
