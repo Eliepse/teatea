@@ -3,7 +3,7 @@ import clsx from "clsx";
 import styles from "./AuthLayout.module.css";
 import { CalendarDaysIcon, HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigation } from "react-router";
-import Leaf from "~/components/icons/leaf";
+import { Leaf } from "iconoir-react";
 
 export function AuthLayout(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
 	const navigation = useNavigation();
@@ -13,17 +13,14 @@ export function AuthLayout(props: PropsWithChildren<{ className?: string; active
 		<div className={styles.root}>
 			<div className="relative overflow-hidden">
 				{isNavigating && (
-					<div className="flex items-center justify-center h-full">
-						<div className="flex justify-center text-gray-500">
-							<span className="inline-block animate-pulse">
-								<Leaf className="size-6 rotate-90" />
-							</span>
-							<span className="ml-2">Loading...</span>
-						</div>
+					<div className="h-full flex items-center justify-center bg-green-50">
+						<Leaf className="size-8 animate-spin text-green-700" />
 					</div>
 				)}
 
-				{false === isNavigating && <div className={clsx("h-full overflow-auto", props.className)}>{props.children}</div>}
+				{false === isNavigating && (
+					<div className={clsx("h-full overflow-auto", props.className)}>{props.children}</div>
+				)}
 			</div>
 
 			<nav className="border-t border-gray-200">
