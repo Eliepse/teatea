@@ -18,7 +18,7 @@ import { CoffeeCup } from "iconoir-react";
 export type SessionForm = {
 	tea: Tea["@id"];
 	teaQuantity?: number;
-	waterVolume?: number;
+	waterMl?: number;
 	drankAt: Date;
 	place?: Business["@id"];
 };
@@ -88,9 +88,9 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 					className="h-full"
 					onBack={goBack}
 					defaultTea={form.teaQuantity}
-					defaultWater={form.waterVolume}
+					defaultWater={form.waterMl}
 					onConfirm={(tea, water) => {
-						setForm((st) => ({ ...st, teaQuantity: tea, waterVolume: water }));
+						setForm((st) => ({ ...st, teaQuantity: tea, waterMl: water }));
 						stackNavigator.next("date:select");
 					}}
 				/>

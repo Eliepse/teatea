@@ -130,6 +130,9 @@ readonly class TeaSessionProvider implements ProviderInterface
 
 		if ($tea) {
 			$resource->tea = $tea;
+		} elseif ($entity->tea) {
+			$resource->tea = new Tea();
+			$resource->tea->id = $entity->tea->id;
 		}
 
 		if ($entity->author) {

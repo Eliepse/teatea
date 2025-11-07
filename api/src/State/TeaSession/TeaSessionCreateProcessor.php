@@ -43,12 +43,7 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
 		}
 
-		$entity = new \App\Entity\TeaSession(
-			tea: $tea,
-			author: $user,
-			technic: $data->technic,
-			drankAt: $data->drankAt,
-		);
+		$entity = new \App\Entity\TeaSession($tea, $user, $data->drankAt);
 		$entity->note = trim($data->note ?? "") ?: null;
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
@@ -57,19 +52,6 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-
-		$session = new TeaSession();
-		$session->id = $entity->id;
-		$session->note = $entity->note;
-		$session->teaQuantity = $entity->teaQuantity?->toGrams();
-		$session->waterMl = $entity->waterVolume?->toMl();
-		$session->drankAt = $entity->drankAt;
-		$session->technic = $entity->technic;
-
-		// No need to fully load the Tea resource as it will only be serialized as IRI
-		$session->tea = new \App\ApiResource\Tea();
-		$session->tea->id = $entity->tea->id;
-
-		return $session;
+		return TeaSessionProvider::hydrate($entity);
 	}
 }

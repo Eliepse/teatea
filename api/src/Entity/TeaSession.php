@@ -43,6 +43,9 @@ class TeaSession
 	#[ORM\JoinColumn]
 	public ?Business $place = null;
 
+	#[ORM\Column(nullable: true)]
+	public ?BrewingTechnic $technic = null;
+
 	public function __construct(
 		#[ORM\ManyToOne(inversedBy: 'sessions')]
 		#[ORM\JoinColumn(nullable: false)]
@@ -51,9 +54,6 @@ class TeaSession
 		#[ORM\ManyToOne(inversedBy: "sessions")]
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly User $author,
-
-		#[ORM\Column(nullable: true)]
-		public ?BrewingTechnic $technic = null,
 
 		#[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
 		public readonly ?DateTimeImmutable $drankAt = null,
