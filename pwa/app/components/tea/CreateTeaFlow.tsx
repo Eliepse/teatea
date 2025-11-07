@@ -4,7 +4,6 @@ import type { Cultivar, Origin, RoastLevel, Tea, TeaFamily, TeaType } from "~t/t
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { warnNotImplemented } from "~/utils/function";
 import { postApi } from "~/utils/api";
-import { Confirmation } from "./create/Confirmation";
 import { useMutation } from "@tanstack/react-query";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { TeaFormConfirmation } from "~/components/tea/create/TeaFormConfirmation";
@@ -12,6 +11,7 @@ import { SelectType } from "~/components/tea_type/SelectType";
 import { AskName } from "~/components/tea/create/AskName";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SelectCultivar } from "~/components/cultivar/SelectCultivar";
+import { useNavigate } from "react-router";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -45,10 +45,9 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 	return await response.json();
 }
 
-export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect?: (tea: Tea) => void }) {
-	const asSelector = undefined !== props.onSelect;
+export function CreateTeaFlow(props: { onClose: () => void }) {
 	const [formValue, setFormValue] = useState<FormValue>({});
-	const [createdTea, setCreatedTea] = useState<Tea | undefined>();
+	const navigate = useNavigate();
 	const alert = useAlert();
 	const { NavigationStack, ...navStack } = useNavigationStack({ defaultFrame: "origin:select" });
 
@@ -57,15 +56,6 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 		navStack.reset();
 		setFormValue({});
 		props.onClose();
-	}
-
-	function selectTea() {
-		if (undefined === props.onSelect || undefined === createdTea) {
-			return;
-		}
-
-		props.onSelect(createdTea);
-		closeFlow();
 	}
 
 	function goBack() {
@@ -80,8 +70,7 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 	const mutation = useMutation({
 		mutationFn: submitNewTea,
 		onSuccess: (data: Tea) => {
-			setCreatedTea(data);
-			navStack.next("confirmation");
+			navigate(`/tea/${data.id}`);
 		},
 		onError: (e) => {
 			alert({ title: "Couldn't add this tea", body: e.message });
@@ -199,15 +188,6 @@ export function CreateTeaFlow(props: { onClose: (newTea?: Tea) => void; onSelect
 						values={formValue}
 						onConfirm={submit}
 						onChange={setFormValue}
-					/>
-				</StackFrame>
-				<StackFrame frameKey="confirmation">
-					<Confirmation
-						state={mutation.status}
-						onBack={props.onClose}
-						onOk={asSelector ? selectTea : undefined}
-						okText={asSelector ? "Select this tea" : undefined}
-						error={mutation.error?.message}
 					/>
 				</StackFrame>
 			</CONTEXT.Provider>
