@@ -32,8 +32,9 @@ export default function TeaSearchPage(props: Route.ComponentProps) {
 				onSearch={updateSearchParam}
 				defaultFilters={{
 					q: 0 !== queryText.length ? queryText : undefined,
-					originPath:  0 !== originPath.length ? originPath : undefined,
-			}}
+					originPath: 0 !== originPath.length ? originPath : undefined,
+				}}
+				allowCreation
 			/>
 		</AuthLayout>
 	);
