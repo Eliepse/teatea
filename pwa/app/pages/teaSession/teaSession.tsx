@@ -88,7 +88,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						<nav className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
 							<button
 								className={clsx(
-									"btn btn-lg rounded-full btn-primary",
+									"btn btn-lg rounded-full btn-primary shadow-lg",
 									!editMode && "btn-outline bg-white",
 								)}
 								onClick={toggleEditMode}

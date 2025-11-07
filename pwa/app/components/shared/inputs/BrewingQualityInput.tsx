@@ -36,7 +36,7 @@ export function BrewingQualityInput(props: {
 	}
 
 	return (
-		<div className="flex rounded-md bg-white rounded-xl overflow-hidden">
+		<div className="flex bg-white rounded-xl overflow-hidden shadow-sm">
 			<OptionBtn
 				value={BrewingQualityEnum.Bad}
 				active={BrewingQualityEnum.Bad === props.value}

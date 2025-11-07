@@ -69,10 +69,10 @@ export function EditableSteepsList(props: {
 	}
 
 	return (
-		<div className={clsx(props.className, "bg-white rounded-xl py-1 shadow")}>
+		<div className={clsx(props.className, "bg-white rounded-xl py-1 gap-2 shadow")}>
 			<ul>
 				{props.steeps.map((steep, i) => (
-					<li key={steep.key} className="mb-2">
+					<li key={steep.key}>
 						<SteepCard
 							duration={steep.duration}
 							temperature={steep.temperature}
