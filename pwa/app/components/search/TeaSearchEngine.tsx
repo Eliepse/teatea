@@ -6,7 +6,7 @@ import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { SearchTextInput } from "~/components/search/SearchTextInput";
 import { Paged } from "~/components/shared/paged/Paged";
 import { SelectOrigin } from "~/components/origin/SelectOrigin";
-import { handleUIEvent } from "~/utils/function";
+import { f, handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
 import { XCircleIcon } from "@heroicons/react/16/solid";
 import { SelectFamily } from "~/components/family/SelectFamily";
@@ -59,7 +59,7 @@ export function TeaSearchEngine(props: {
 	const originFilter = filters?.origin ?? originQuery.data;
 
 	function handleSearchUpdate(text?: string) {
-		props.onSearch && props.onSearch(text);
+		f(props.onSearch)(text);
 		setFilters((st) => ({ ...st, q: text }));
 	}
 
