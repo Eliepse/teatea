@@ -3,28 +3,36 @@ import { deleteApi, fetchApi, patchApi } from "~/utils/api";
 import { BrewingQualityEnum, type Iri, RoastLevelEnum, type TeaSession, type TeaType } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
-import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
-import Arrow from "~/components/icons/arrow";
+import { useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { Modal } from "~/components/shared/modal/Modal";
 import { type ChangeEvent, type PropsWithChildren, type ReactNode, useState } from "react";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/solid";
-import { TrashIcon } from "@heroicons/react/16/solid";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import { Check, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, ShopFourTilesWindow } from "iconoir-react";
+import {
+	Check,
+	Edit,
+	EmojiPuzzled,
+	EmojiSad,
+	EmojiSatisfied,
+	MoreVert,
+	ShopFourTilesWindow,
+	Trash,
+	Xmark,
+} from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
-import { useAlert } from "~/components/shared/modal/AlertManager";
+import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
+import { BackButton } from "~/components/shared/navigation/BackButton";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -72,31 +80,10 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 		<AuthLayout className="px-4 pb-24 bg-green-50" activeKey="activity">
 			<header className="py-4 relative">
 				<div className="absolute inset-x-0 top-4 flex items-center mb-6">
-					<Link to="/sessions" className="btn btn-circle btn-lg bg-white mr-auto">
-						<Arrow direction="left" className="size-5" />
-					</Link>
+					<BackButton className="mr-auto shadow-xs" />
 
 					<IfAuthor author={session.author}>
-						<div className="dropdown dropdown-end ml-2">
-							<button className="btn btn-lg btn-circle bg-white">
-								<EllipsisVerticalIcon className="size-5" />
-							</button>
-
-							<ul
-								tabIndex={0}
-								className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-							>
-								<li
-									className="text-error"
-									onClick={handleUIEvent(() => sessionMutations.delete.mutate())}
-								>
-									<span>
-										<TrashIcon className="size-3 inline mr-1" />
-										Delete
-									</span>
-								</li>
-							</ul>
-						</div>
+						<Options sessionId={props.loaderData.id} />
 
 						<nav className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
 							<button
@@ -298,5 +285,47 @@ function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; 
 			{props.icon && <span className="inline-block mr-2">{props.icon}</span>}
 			{true === props.loading ? <span className="skeleton h-3 w-16" /> : props.children}
 		</div>
+	);
+}
+
+function Options(props: { sessionId: number }) {
+	const [open, setOpen] = useState(false);
+	const popup = usePopup();
+	const mutation = useSessionMutations(props.sessionId);
+
+	function deleteSession() {
+		popup.confirm({ body: "Are you sure you want to delete this session?" }).then(() => mutation.delete.mutate());
+	}
+
+	return (
+		<>
+			<button
+				className="btn btn-lg bg-white btn-circle shadow-xs"
+				aria-label="Options"
+				onClick={() => setOpen(true)}
+			>
+				<MoreVert className="size-6" />
+			</button>
+			<Modal onClose={() => setOpen(false)} open={open} position="bottom" className="p-0 pb-0">
+				<ul className="border-green-200">
+					<li className="">
+						<button
+							className="flex items-center justify-between px-6 pb-4 pt-5 text-lg text-red-500 w-full"
+							onClick={handleUIEvent(deleteSession)}
+						>
+							Delete <Trash className="size-5" />
+						</button>
+					</li>
+					<li className="border-t border-green-200">
+						<button
+							className="flex items-center justify-between px-6 py-4 text-lg text-green-900 w-full"
+							onClick={handleUIEvent(() => setOpen(false))}
+						>
+							Close <Xmark className="size-5" />
+						</button>
+					</li>
+				</ul>
+			</Modal>
+		</>
 	);
 }
