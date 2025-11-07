@@ -51,6 +51,11 @@
 	"Noto Color Emoji";
 }
 
+.modal-bottom .modal-box {
+	--modal-tl: 1.75rem;
+	--modal-tr: 1.75rem;
+}
+
 .font-header {
 	font-family: "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif,
 	"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
