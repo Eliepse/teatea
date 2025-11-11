@@ -18,10 +18,12 @@ import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteep
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
 import {
 	Check,
+	Droplet,
 	Edit,
 	EmojiPuzzled,
 	EmojiSad,
 	EmojiSatisfied,
+	Leaf as LeafIconoir,
 	MoreVert,
 	ShopFourTilesWindow,
 	Trash,
@@ -33,6 +35,7 @@ import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
+import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -83,19 +86,21 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<BackButton className="mr-auto shadow-xs" />
 
 					<IfAuthor author={session.author}>
-						<Options sessionId={props.loaderData.id} />
+						<nav>
+							<Options sessionId={props.loaderData.id} />
 
-						<nav className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
-							<button
-								className={clsx(
-									"btn btn-lg rounded-full btn-primary shadow-lg",
-									!editMode && "btn-outline bg-white",
-								)}
-								onClick={toggleEditMode}
-							>
-								{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
-								{editMode ? "Done" : "Edit"}
-							</button>
+							<div className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
+								<button
+									className={clsx(
+										"btn btn-lg rounded-full btn-primary shadow-lg",
+										!editMode && "btn-outline bg-white",
+									)}
+									onClick={toggleEditMode}
+								>
+									{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
+									{editMode ? "Done" : "Edit"}
+								</button>
+							</div>
 						</nav>
 					</IfAuthor>
 				</div>
@@ -306,26 +311,19 @@ function Options(props: { sessionId: number }) {
 			>
 				<MoreVert className="size-6" />
 			</button>
-			<Modal onClose={() => setOpen(false)} open={open} position="bottom" className="p-0 pb-0">
-				<ul className="border-green-200">
-					<li className="">
-						<button
-							className="flex items-center justify-between px-6 pb-4 pt-5 text-lg text-red-500 w-full"
-							onClick={handleUIEvent(deleteSession)}
-						>
-							Delete <Trash className="size-5" />
-						</button>
-					</li>
-					<li className="border-t border-green-200">
-						<button
-							className="flex items-center justify-between px-6 py-4 text-lg text-green-900 w-full"
-							onClick={handleUIEvent(() => setOpen(false))}
-						>
-							Close <Xmark className="size-5" />
-						</button>
-					</li>
-				</ul>
-			</Modal>
+			<MenuModal onClose={() => setOpen(false)} open={open}>
+				<MenuItem
+					label="Delete this session"
+					onClick={deleteSession}
+					icon={<Trash className="size-5" />}
+					danger
+				/>
+				<MenuItem
+					label="Close"
+					onClick={() => setOpen(false)}
+					icon={<Xmark className="size-5" />}
+				/>
+			</MenuModal>
 		</>
 	);
 }
