@@ -4,6 +4,10 @@ import type { TeawareType } from "./teawareType";
 export type Id = number;
 export type Iri = string;
 
+export type NullablePartial<T> = {
+	[P in keyof T]?: T[P] | null;
+};
+
 export interface Resource<TType extends string = string> {
 	id: Id;
 	"@id": Iri;

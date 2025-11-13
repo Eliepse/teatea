@@ -5,18 +5,19 @@ import clsx from "clsx";
 import { FrameActions } from "~/components/teaSession/CreateTeaSessionFlow";
 
 export function ParametersInput(props: {
-	onConfirm: (tea: number | undefined, water: number | undefined) => void;
+	onConfirm: (tea: number | undefined, water: number | undefined) => void | Promise<void>;
 	defaultTea?: number;
 	defaultWater?: number;
 	onBack?: () => void;
 	header?: ReactNode;
 	className?: string;
+	confirmLabel?: string;
 }) {
 	const [tea, setTea] = useState(props.defaultTea);
 	const [water, setWater] = useState(props.defaultWater);
 
-	function confirm() {
-		props.onConfirm(tea, water);
+	async function confirm() {
+		return props.onConfirm(tea, water);
 	}
 
 	return (
@@ -35,7 +36,12 @@ export function ParametersInput(props: {
 				</fieldset>
 			</div>
 
-			<FrameActions onBack={props.onBack} onNext={confirm} className="p-4 flex-none" />
+			<FrameActions
+				onBack={props.onBack}
+				onNext={confirm}
+				nextLabel={props.confirmLabel}
+				className="p-4 flex-none"
+			/>
 		</div>
 	);
 }

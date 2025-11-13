@@ -1,6 +1,13 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, fetchApi, patchApi } from "~/utils/api";
-import { BrewingQualityEnum, type Iri, RoastLevelEnum, type TeaSession, type TeaType } from "~t/types";
+import {
+	BrewingQualityEnum,
+	type Iri,
+	type NullablePartial,
+	RoastLevelEnum,
+	type TeaSession,
+	type TeaType,
+} from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { useNavigate, useRevalidator, useSearchParams } from "react-router";
@@ -18,6 +25,7 @@ import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteep
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
 import {
 	Check,
+	CoffeeCup,
 	Edit,
 	EmojiPuzzled,
 	EmojiSad,
@@ -36,6 +44,7 @@ import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
+import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -262,7 +271,11 @@ function useSessionMutations(sessionId: number) {
 	const alert = useAlert();
 
 	const editMutation = useMutation({
-		mutationFn: async (args: Partial<Pick<TeaSession, "note" | "quality"> & { place: Iri | null }>) => {
+		mutationFn: async (
+			args: NullablePartial<
+				Pick<TeaSession, "note" | "quality" | "teaQuantity" | "waterMl"> & { place: Iri | null }
+			>,
+		) => {
 			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, args);
 			return denormalizeTeaSession(await response.json());
 		},
@@ -294,7 +307,7 @@ function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; 
 }
 
 function Options(props: { session: TeaSession }) {
-	const [modalKey, setModalKey] = useState<"menu" | "place" | null>(null);
+	const [modalKey, setModalKey] = useState<"menu" | "place" | "params" | null>(null);
 	const popup = usePopup();
 	const mutation = useSessionMutations(props.session.id);
 
@@ -304,6 +317,11 @@ function Options(props: { session: TeaSession }) {
 
 	async function changePlace(iri: Iri | undefined) {
 		await mutation.edit.mutateAsync({ place: iri ? iri : null });
+		setModalKey(null);
+	}
+
+	async function updateBrewParams(tea: number | undefined, water: number | undefined) {
+		await mutation.edit.mutateAsync({ teaQuantity: tea ? tea : null, waterMl: water ? water : null });
 		setModalKey(null);
 	}
 
@@ -328,12 +346,27 @@ function Options(props: { session: TeaSession }) {
 					onClick={() => setModalKey("place")}
 					icon={<Shop className="size-5" />}
 				/>
+				<MenuItem
+					label="Change brew parameters"
+					onClick={() => setModalKey("params")}
+					icon={<CoffeeCup className="size-5" />}
+				/>
 				<MenuItem label="Close" onClick={() => setModalKey(null)} icon={<Xmark className="size-5" />} />
 			</MenuModal>
+
 			<Modal open={"place" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
 				<SelectBusinessFrame
 					onConfirm={changePlace}
 					defaultValue={props.session.place?.["@id"]}
+					confirmLabel="Confirm"
+				/>
+			</Modal>
+
+			<Modal open={"params" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
+				<ParametersInput
+					onConfirm={updateBrewParams}
+					defaultWater={props.session.waterMl}
+					defaultTea={props.session.teaQuantity}
 					confirmLabel="Confirm"
 				/>
 			</Modal>
