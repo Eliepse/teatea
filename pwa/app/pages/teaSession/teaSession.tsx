@@ -18,13 +18,12 @@ import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteep
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
 import {
 	Check,
-	Droplet,
 	Edit,
 	EmojiPuzzled,
 	EmojiSad,
 	EmojiSatisfied,
-	Leaf as LeafIconoir,
 	MoreVert,
+	Shop,
 	ShopFourTilesWindow,
 	Trash,
 	Xmark,
@@ -36,6 +35,7 @@ import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
+import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -87,7 +87,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 					<IfAuthor author={session.author}>
 						<nav>
-							<Options sessionId={props.loaderData.id} />
+							<Options session={props.loaderData} />
 
 							<div className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
 								<button
@@ -293,13 +293,18 @@ function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; 
 	);
 }
 
-function Options(props: { sessionId: number }) {
-	const [open, setOpen] = useState(false);
+function Options(props: { session: TeaSession }) {
+	const [modalKey, setModalKey] = useState<"menu" | "place" | null>(null);
 	const popup = usePopup();
-	const mutation = useSessionMutations(props.sessionId);
+	const mutation = useSessionMutations(props.session.id);
 
 	function deleteSession() {
 		popup.confirm({ body: "Are you sure you want to delete this session?" }).then(() => mutation.delete.mutate());
+	}
+
+	async function changePlace(iri: Iri | undefined) {
+		await mutation.edit.mutateAsync({ place: iri ? iri : null });
+		setModalKey(null);
 	}
 
 	return (
@@ -307,11 +312,11 @@ function Options(props: { sessionId: number }) {
 			<button
 				className="btn btn-lg bg-white btn-circle shadow-xs"
 				aria-label="Options"
-				onClick={() => setOpen(true)}
+				onClick={() => setModalKey("menu")}
 			>
 				<MoreVert className="size-6" />
 			</button>
-			<MenuModal onClose={() => setOpen(false)} open={open}>
+			<MenuModal onClose={() => setModalKey(null)} open={"menu" === modalKey}>
 				<MenuItem
 					label="Delete this session"
 					onClick={deleteSession}
@@ -319,11 +324,19 @@ function Options(props: { sessionId: number }) {
 					danger
 				/>
 				<MenuItem
-					label="Close"
-					onClick={() => setOpen(false)}
-					icon={<Xmark className="size-5" />}
+					label="Change place"
+					onClick={() => setModalKey("place")}
+					icon={<Shop className="size-5" />}
 				/>
+				<MenuItem label="Close" onClick={() => setModalKey(null)} icon={<Xmark className="size-5" />} />
 			</MenuModal>
+			<Modal open={"place" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
+				<SelectBusinessFrame
+					onConfirm={changePlace}
+					defaultValue={props.session.place?.["@id"]}
+					confirmLabel="Confirm"
+				/>
+			</Modal>
 		</>
 	);
 }

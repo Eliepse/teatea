@@ -13,7 +13,7 @@ import { handleUIEvent } from "~/utils/function";
 import Arrow from "~/components/icons/arrow";
 import clsx from "clsx";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
-import { CoffeeCup } from "iconoir-react";
+import { CoffeeCup, RefreshDouble } from "iconoir-react";
 
 export type SessionForm = {
 	tea: Tea["@id"];
@@ -147,10 +147,19 @@ function HeaderWithSteps(props: { title?: string; onBack?: () => void; steps: nu
 
 export function FrameActions(props: {
 	onBack?: () => void;
-	onNext: () => void;
+	onNext: () => void | Promise<void>;
 	disableNext?: boolean;
 	className?: string;
+	nextLabel?: string;
 }) {
+	const [pending, setPending] = useState(false);
+
+	async function handleConfirm() {
+		setPending(true);
+		await props.onNext();
+		setPending(false);
+	}
+
 	return (
 		<div className={clsx("flex", props.className)}>
 			{props.onBack && (
@@ -162,11 +171,15 @@ export function FrameActions(props: {
 
 			<button
 				className="ml-auto btn btn-lg bg-green-700 text-white rounded-xl disabled:bg-teal-100 disabled:text-teal-500"
-				onClick={handleUIEvent(props.onNext)}
-				disabled={props.disableNext}
+				onClick={handleUIEvent(handleConfirm)}
+				disabled={props.disableNext || pending}
 			>
-				Next
-				<Arrow direction="right" className="size-4 ml-1" />
+				{props.nextLabel ?? "Next"}
+				{pending ? (
+					<RefreshDouble className="size-4 animate-spin" />
+				) : (
+					<Arrow direction="right" className="size-4 ml-1" />
+				)}
 			</button>
 		</div>
 	);

@@ -8,12 +8,13 @@ import { Plus, RefreshDouble, Search } from "iconoir-react";
 import { handleUIEvent } from "~/utils/function";
 
 export function SelectBusinessFrame(props: {
-	onConfirm: (value?: Iri) => void;
+	onConfirm: (value?: Iri) => void | Promise<void>;
 	defaultValue?: Iri;
 	onBack?: () => void;
 	buttonText?: string;
 	header?: ReactNode;
 	className?: string;
+	confirmLabel?: string;
 }) {
 	const [value, setValue] = useState(props.defaultValue);
 	const [search, setSearch] = useState("");
@@ -34,8 +35,8 @@ export function SelectBusinessFrame(props: {
 		setValue((iri) => (iri === business["@id"] ? undefined : business["@id"]));
 	}
 
-	function confirm() {
-		props.onConfirm(value);
+	async function confirm() {
+		return props.onConfirm(value);
 	}
 
 	return (
@@ -92,7 +93,12 @@ export function SelectBusinessFrame(props: {
 				</ul>
 			</div>
 
-			<FrameActions onBack={props.onBack} onNext={confirm} className="p-4 flex-none" />
+			<FrameActions
+				onBack={props.onBack}
+				onNext={confirm}
+				nextLabel={props.confirmLabel}
+				className="p-4 flex-none"
+			/>
 		</div>
 	);
 }
