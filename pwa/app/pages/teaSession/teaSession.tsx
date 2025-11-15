@@ -335,12 +335,7 @@ function Options(props: { session: TeaSession }) {
 				<MoreVert className="size-6" />
 			</button>
 			<MenuModal onClose={() => setModalKey(null)} open={"menu" === modalKey}>
-				<MenuItem
-					label="Delete this session"
-					onClick={deleteSession}
-					icon={<Trash className="size-5" />}
-					danger
-				/>
+				<MenuItem label="Close" onClick={() => setModalKey(null)} icon={<Xmark className="size-5" />} />
 				<MenuItem
 					label="Change place"
 					onClick={() => setModalKey("place")}
@@ -351,7 +346,12 @@ function Options(props: { session: TeaSession }) {
 					onClick={() => setModalKey("params")}
 					icon={<CoffeeCup className="size-5" />}
 				/>
-				<MenuItem label="Close" onClick={() => setModalKey(null)} icon={<Xmark className="size-5" />} />
+				<MenuItem
+					label="Delete this session"
+					onClick={deleteSession}
+					icon={<Trash className="size-5" />}
+					danger
+				/>
 			</MenuModal>
 
 			<Modal open={"place" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
