@@ -8,6 +8,7 @@ import { SecurityPass, TimerOff } from "iconoir-react";
 import { Link } from "react-router";
 import axios, { AxiosError } from "axios";
 import { attemptOTPLogin } from "~/auth/requests";
+import { useToken } from "~/auth/hooks/useToken";
 
 export type OTPToken = { value: string; expiredAt: Date };
 type OTPResponse =
@@ -23,7 +24,8 @@ type OTPResponse =
 export function LoginModal(props: { open: boolean; onClose: () => void }) {
 	const defaultEmail = useRef("");
 	const alert = useAlert();
-	const [token, setToken] = useState<OTPToken | boolean | null>(LocalStorageUtils.get<OTPToken>("otp_token"));
+	const [token] = useToken();
+	const [OTPToken, setOTPToken] = useState<OTPToken | boolean | null>(LocalStorageUtils.get<OTPToken>("otp_token"));
 
 	useQuery({
 		queryFn: async (ctx) => {
@@ -35,9 +37,9 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 
 			try {
 				if (await attemptOTPLogin(token)) {
-					setToken(true);
+					setOTPToken(true);
 				} else {
-					setToken(false);
+					setOTPToken(false);
 				}
 			} catch (e) {
 				if (e instanceof AxiosError && e.status === 404) {
@@ -46,50 +48,52 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 
 				const message = e instanceof Error ? e.message : undefined;
 				alert({ title: "Verification failed", body: message });
-				setToken(false);
+				setOTPToken(false);
 				throw new Error("Validation failed");
 			}
 
 			return null;
 		},
-		queryKey: [token],
-		enabled: null !== token && typeof token === "object" && props.open,
+		queryKey: [OTPToken],
+		enabled: null !== OTPToken && typeof OTPToken === "object" && props.open,
 		retryDelay: 3_000,
 		retry: true,
 		refetchOnWindowFocus: true,
 	});
 
 	useEffect(() => {
-		if (null === token || typeof token !== "object") {
+		if (null === OTPToken || typeof OTPToken !== "object") {
 			return;
 		}
 
 		// Refresh the view to display the "token expired" screen
-		const ttl = differenceInMilliseconds(token.expiredAt, new Date());
+		const ttl = differenceInMilliseconds(OTPToken.expiredAt, new Date());
 		const to = setTimeout(() => {
 			LocalStorageUtils.remove("otp_token");
-			setToken(false); // Force rerender
+			setOTPToken(false); // Force rerender
 		}, ttl);
 		return () => clearTimeout(to);
-	}, [token]);
+	}, [OTPToken]);
 
 	function handleLoggedInToken(token: OTPToken) {
 		LocalStorageUtils.store("otp_token", token);
-		setToken(token);
+		setOTPToken(token);
 	}
 
 	return (
 		<Modal onClose={props.onClose} open={props.open} position="bottom">
-			{null === token && (
+			{null === token && null === OTPToken && (
 				<LoginForm
 					defaultEmail={defaultEmail.current}
 					onEmailChange={(v) => (defaultEmail.current = v)}
 					onLoggedIn={handleLoggedInToken}
 				/>
 			)}
-			{null !== token && typeof token === "object" && <WaitView onCancel={() => setToken(null)} />}
-			{false === token && <ExpiredView onCancel={() => setToken(null)} />}
-			{true === token && <SuccessView />}
+			{null === token && null !== OTPToken && typeof OTPToken === "object" && (
+				<WaitView onCancel={() => setOTPToken(null)} />
+			)}
+			{null === token && false === OTPToken && <ExpiredView onCancel={() => setOTPToken(null)} />}
+			{(!!token || true === OTPToken) && <SuccessView />}
 		</Modal>
 	);
 }

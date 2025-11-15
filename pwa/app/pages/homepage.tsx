@@ -1,17 +1,13 @@
 import { useNavigate } from "react-router";
-import { TokenUtils, useToken } from "~/auth/hooks/useToken";
-import type { Route } from "../../.react-router/types/app/pages/+types/homepage";
+import { useToken } from "~/auth/hooks/useToken";
 import { LoginModal } from "~/auth/components/LoginModal";
 import { useState } from "react";
 import { Logo } from "~/components/icons/Logo";
 
-export async function clientLoader() {
-	return {
-		isAuth: null !== TokenUtils.getRefreshToken(),
-	};
-}
+// Force the page to be client side rendered
+export async function clientLoader() {}
 
-export default function Homepage(props: Route.ComponentProps) {
+export default function Homepage() {
 	const [token] = useToken();
 	const navigate = useNavigate();
 	const [loginModal, setLoginModal] = useState(false);
