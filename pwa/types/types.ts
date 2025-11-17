@@ -108,16 +108,16 @@ export type Member = Resource<"Member"> & {
 	email: string;
 };
 
-export const teaFamilies = {
+export type TeaFamily = "white" | "yellow" | "green" | "wulong" | "black" | "fermented";
+
+export const teaFamilies: Record<TeaFamily, string> = {
 	white: "White tea",
 	yellow: "Yellow tea",
 	green: "Green tea",
 	wulong: "Wulong tea",
 	black: "Black tea",
 	fermented: "Fermented tea",
-} as const;
-
-export type TeaFamily = keyof typeof teaFamilies;
+};
 
 export interface ApiCollection<T> {
 	"@context": string;

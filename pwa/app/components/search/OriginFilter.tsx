@@ -1,6 +1,5 @@
 import { type MouseEvent, useState } from "react";
 import { Modal } from "~/components/shared/modal/Modal";
-import clsx from "clsx";
 import { MultilevelSelect } from "~/components/search/MultilevelSelect";
 import type { OriginTreeNode } from "~t/types";
 

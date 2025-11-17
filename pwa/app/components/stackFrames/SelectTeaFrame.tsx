@@ -5,7 +5,7 @@ import Arrow from "~/components/icons/arrow";
 import { handleUIEvent } from "~/utils/function";
 import { useMemo, useState } from "react";
 import { FormatOriginPath } from "../shared/FormatOriginPath";
-import { TeaSearchEngine } from "~/components/search/TeaSearchEngine";
+import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
 
 export function SelectTeaFrame(props: { onConfirm: (tea: Tea) => void; defaultValue?: Tea; onBack: () => void }) {
 	const [selected, setSelected] = useState(props.defaultValue);

@@ -1,4 +1,4 @@
-import { TeaSearchEngine } from "~/components/search/TeaSearchEngine";
+import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import type { Tea } from "~t/types";
 import { useNavigate, useSearchParams } from "react-router";
