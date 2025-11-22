@@ -8,7 +8,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Enum\TeaFamily;
+use App\State\TeaType\TeaTypeCollectionProvider;
 use App\State\TeaType\TeaTypeCreateProcessor;
 use App\State\TeaType\TeaTypeProvider;
 use App\ValueObject\Stats\TeaTypeStats;
@@ -16,22 +18,28 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["type:read", "read:origin", "embedded:origin"]],
+	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "embedded:origin"]],
 	security: "is_granted('ROLE_USER')"
 )]
 #[Get(provider: TeaTypeProvider::class)]
 #[GetCollection(
-	paginationEnabled: false,
-	provider: TeaTypeProvider::class,
+	paginationEnabled: true,
+	paginationItemsPerPage: 15,
+	paginationMaximumItemsPerPage: 50,
+	paginationClientItemsPerPage: true,
+	provider: TeaTypeCollectionProvider::class,
 	parameters: [
-		"family" => new QueryParameter(
-			schema: ["enum" => ["white", "yellow", "green", "wulong", "black", "fermented"]],
-			property: "family",
-		),
+		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
+		"family" => new QueryParameter(schema: ["enum" => TeaFamily::QUERY_PARAMS], property: "family"),
 		"originPath" => new QueryParameter(
 			schema: ["type" => "string", "example" => "Japan, China.Yunnan, ..."],
 			property: "origin",
 			description: "Filter by origin path, to get only the given branch",
+		),
+		"sort" => new QueryParameter(
+			schema: ["enum" => ["popularity"]],
+			openApi: new OpenApiParameter(name: "enum", in: "query"),
+			description: "Sorting method",
 		),
 	]
 )]

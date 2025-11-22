@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
-import { type ApiPaginatedCollection, type Tea, type TeaFamily } from "~t/types";
+import type { ApiPaginatedCollection, Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { SearchTextInput } from "~/search/components/SearchTextInput";
 import { f, throwNotImplemented } from "~/utils/function";
@@ -9,6 +9,8 @@ import clsx from "clsx";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
 import { TeaFamilyFilter } from "~/search/components/TeaFamilyFilter";
 import { SEFiltersBar } from "~/search/components/search-engine/SEFiltersBar";
+import { Family } from "~/components/tea/Family";
+import { Link } from "react-router";
 
 export type SearchFilters = {
 	q?: string;
@@ -22,7 +24,7 @@ const SE_CONTEXT = createContext<{ filters: SearchFilters; patchFilters: (patch:
 });
 
 export function TeaSearchEngine(props: {
-	onSelect: (tea: Tea) => void;
+	onSelect: (tea: Tea | TeaType) => void;
 	defaultFilters?: { q?: string; originPath?: string; family?: TeaFamily };
 	value?: Tea;
 	allowCreation?: boolean;
@@ -37,21 +39,16 @@ export function TeaSearchEngine(props: {
 			if (typeof filters === "string") {
 				throw new Error("Invalid search");
 			}
-			const queryParams = {
-				...filters,
-				origin: undefined, // Remove original filter
-				originPath: filters.originPath,
-			};
 
-			const response = await getApi<ApiPaginatedCollection<Tea>>(
-				pageParam ? `/teas?${pageParam}` : `/teas`,
-				pageParam ? {} : queryParams,
+			const response = await getApi<ApiPaginatedCollection<Tea | TeaType>>(
+				pageParam ? pageParam : `/tea_types`,
+				pageParam ? {} : filters,
 			);
 			return await response.json();
 		},
-		queryKey: ["search", { ...filters, itemsPerPage: 10, sort: "popularity" }],
-		getPreviousPageParam: (lastPage) => lastPage.view.previous?.split("?")[1],
-		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
+		queryKey: ["tea_types", { ...filters, itemsPerPage: 10, sort: "popularity" }],
+		getPreviousPageParam: (lastPage) => lastPage.view.previous,
+		getNextPageParam: (lastPage) => lastPage.view.next,
 		initialPageParam: "",
 	});
 
@@ -78,7 +75,6 @@ export function TeaSearchEngine(props: {
 
 	return (
 		<SE_CONTEXT.Provider value={seContext}>
-			{" "}
 			<div className="bg-green-50 min-h-dvh">
 				<div className="sticky top-0 py-4 bg-green-50 border-b border-base-300">
 					<div className="px-4">
@@ -106,7 +102,7 @@ export function TeaSearchEngine(props: {
 						</ul>
 					)}
 
-					{teasQuery.isError && <div className="text-error">Something went wrong...</div>}
+					{teasQuery.isError && <div className="text-error px-4">Something went wrong...</div>}
 
 					{teasQuery.isSuccess && teasQuery.data && (
 						<div className="px-4">
@@ -117,22 +113,29 @@ export function TeaSearchEngine(props: {
 
 							<ul>
 								{teasQuery.data.pages.map((page) =>
-									page.member?.map((tea) => (
-										<li key={tea.id} className="mb-2" onClick={() => props.onSelect(tea)}>
-											<TeaShortCard
-												family={tea.family}
-												type={tea.type}
-												path={tea.originPath}
-												cultivar={tea.cultivar}
-												year={tea.year}
-												roast={tea.roast}
-												className={clsx(
-													"border",
-													props.value?.id === tea.id
-														? "bg-primary/10 border-primary"
-														: "bg-slate-100 border-transparent",
-												)}
-											/>
+									page.member?.map((item) => (
+										<li key={item.id} className="mb-2">
+											{"name" in item && (
+												<Link to={`/tea_types/${item.slug}`}>
+													<Item label={item.name} family={item.family} origin={item.origin} />
+												</Link>
+											)}
+											{"type" in item && (
+												<TeaShortCard
+													family={item.family}
+													type={item.type}
+													path={item.originPath}
+													cultivar={item.cultivar}
+													year={item.year}
+													roast={item.roast}
+													className={clsx(
+														"border",
+														props.value?.id === item.id
+															? "bg-primary/10 border-primary"
+															: "bg-slate-100 border-transparent",
+													)}
+												/>
+											)}
 										</li>
 									)),
 								)}
@@ -157,6 +160,26 @@ export function TeaSearchEngine(props: {
 				</div>
 			</div>
 		</SE_CONTEXT.Provider>
+	);
+}
+
+function Item(props: { label?: string; family: TeaFamily; origin?: Origin }) {
+	return (
+		<div className="bg-white rounded-2xl min-h-16 px-4 py-3 flex items-center text-green-900 text-lg">
+			<div className="flex-1">
+				{props.label ? (
+					<div className="text-xs font-medium tracking-wide uppercase text-green-800/60">
+						<Family family={props.family} iconOnly className="mr-1" />
+						{props.family}
+					</div>
+				) : (
+					<Family family={props.family} iconOnly className="mr-2" />
+				)}
+				<span className="capitalize">{props.label ?? `${props.family} tea`}</span>
+			</div>
+
+			<div className="text-sm text-green-800/60">{props.origin && <div>{props.origin.namePath[0]}</div>}</div>
+		</div>
 	);
 }
 

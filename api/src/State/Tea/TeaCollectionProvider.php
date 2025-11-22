@@ -7,7 +7,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
-use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Origin;
 use App\Helper\Arr;
@@ -38,19 +37,11 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$page = $this->pagination->getPage($context);
 		$offset = $this->pagination->getOffset($operation, $context);
 		$limit = $this->pagination->getLimit($operation, $context);
-		$params = $operation->getParameters();
 
-		$searchText = $params->get("q")->getValue();
-		$searchText = $searchText instanceof ParameterNotFound ? null : trim($searchText);
-		$searchText = empty($searchText) ? null : $searchText;
-		$originPath = $params->get("originPath")->getValue();
-		$originPath = $originPath instanceof ParameterNotFound ? null : $originPath;
+		$searchText = OperationHelper::getParameter($operation, "q");
+		$originPath = OperationHelper::getParameter($operation, "originPath");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
-
-		$sortParam = $params->get("sort")->getValue();
-		if ($sortParam instanceof ParameterNotFound) {
-			$sortParam = "popularity";
-		}
+		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		/*
 		| --------------------------------
