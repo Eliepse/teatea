@@ -1,0 +1,50 @@
+.btn {
+	display: flex;
+	align-items: stretch;
+	height: 4rem;
+	font-size: var(--text-lg);
+	line-height: var(--leading-normal);
+	color: var(--color-green-950);
+	background: var(--color-green-50);
+	border: 1px solid var(--color-green-100);
+	border-radius: 1rem;
+	overflow: hidden;
+}
+
+button.btn,
+.btn button {
+	outline: none;
+}
+
+.btn .inner {
+	display: flex;
+	align-items: center;
+	padding: .5rem 1.5rem;
+	cursor: pointer;
+	text-align: left;
+}
+
+.btn .inner:hover,
+.btn .inner:focus {
+	background: var(--color-green-100);
+}
+
+.btn .inner:active {
+	background: var(--color-green-200);
+}
+
+/* Selected */
+
+.btn.selected {
+	color: white;
+	background: var(--color-green-600);
+}
+
+.btn.selected .inner:hover,
+.btn.selected .inner:focus {
+	background: var(--color-green-700);
+}
+
+.btn.selected .inner:active {
+	background: var(--color-green-800);
+}
