@@ -47,6 +47,7 @@ export type TreePath = string;
 
 export type Origin = Omit<Resource, "id"> & {
 	name: string;
+	namePath: string[];
 	path: TreePath;
 	isLeaf?: boolean;
 	proposal?: boolean;

@@ -76,15 +76,18 @@ readonly class OriginCollectionProvider implements ProviderInterface
 
 		$originQb = $this->em->createQueryBuilder()
 			->select("origin")
+			->addSelect("JSON_AGG(ancestors.name ORDER BY ancestors.path) as name_path")
 			->from(\App\Entity\Origin::class, "origin")
+			->leftJoin(\App\Entity\Origin::class, "ancestors", "WITH", "CONTAINS(ancestors.path, origin.path) = TRUE")
 			->where("origin.id IN (:ids)")
-			->setParameter("ids", Arr::pluck($originResults, "id", true), ArrayParameterType::INTEGER);
+			->setParameter("ids", Arr::pluck($originResults, "id", true), ArrayParameterType::INTEGER)
+			->groupBy("origin");
 
-		$originById = Arr::keyBy($originQb->getQuery()->getResult(), "id");
+		$originById = Arr::keyBy($originQb->getQuery()->getResult(), fn($row) => $row[0]->id);
 
 		return array_map(
 			function ($row) use ($originById) {
-				$entity = $originById[$row["id"]] ?? null;
+				$entity = $originById[$row["id"]][0] ?? null;
 
 				if (null === $entity) {
 					return null;
@@ -92,6 +95,7 @@ readonly class OriginCollectionProvider implements ProviderInterface
 
 				$resource = OriginProvider::fromEntity($entity);
 				$resource->isLeaf = empty($row["children"]);
+				$resource->namePath = json_decode($originById[$row["id"]]["name_path"]);
 				return $resource;
 			},
 			$originResults, // Map with the search results to keep the order
