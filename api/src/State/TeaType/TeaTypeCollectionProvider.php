@@ -76,6 +76,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 				->leftJoin("type.teas", "teas")
 				->leftJoin("teas.sessions", "session", Join::WITH, ":popularSince <= session.drankAt")
 				->addOrderBy("count(DISTINCT session.id)", "DESC")
+				->addOrderBy("count(DISTINCT teas.id)", "DESC")
 				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
 		}
 
@@ -91,7 +92,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		}
 
 		$searchResults = $searchQuery
-			->addOrderBy("MAX(type.createdBy)", "DESC")
+			->addOrderBy("MAX(type.createdAt)", "DESC")
 			->setFirstResult($offset)
 			->setMaxResults($limit)
 			->getQuery()

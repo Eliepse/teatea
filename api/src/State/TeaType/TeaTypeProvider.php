@@ -52,7 +52,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 				SELECT type.id as id,
 				       count(DISTINCT teas.id) as teasCount,
 				       count(DISTINCT sessions.id) as sessionsCount,
-				       ROW_NUMBER() OVER (ORDER BY count(DISTINCT sessions.id) DESC) as rank
+				       ROW_NUMBER() OVER (ORDER BY count(DISTINCT sessions.id) DESC, COUNT(DISTINCT teas.id) DESC, MAX(type.created_at) DESC) as rank
 				FROM tea_type type
 					LEFT JOIN tea as teas ON teas.type_id = type.id
 					LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince

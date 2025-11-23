@@ -99,7 +99,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		}
 
 		$searchResults = $searchQb
-			->addOrderBy("tea.createdBy", "DESC")
+			->addOrderBy("tea.createdAt", "DESC")
 			->setFirstResult($offset)
 			->setMaxResults($limit)
 			->getQuery()
