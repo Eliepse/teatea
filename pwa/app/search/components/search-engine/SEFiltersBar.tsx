@@ -1,12 +1,15 @@
 import { FilterButton } from "~/search/components/FilterButton";
 import clsx from "clsx";
 import { type Origin, teaFamilies, type TeaFamily } from "~t/types";
-import { useState } from "react";
-import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
+import { type ReactNode, useState } from "react";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { OriginSelectModal } from "~/components/origin/OriginSelectModal";
 import { extractId } from "~/utils/resource";
 import { useSEContext } from "~/search/hooks/useSearchQuery";
+import { Modal } from "~/components/shared/modal/Modal";
+import { handleUIEvent } from "~/utils/function";
+import styles from "~/components/origin/OriginSelect.module.css";
+import { Family } from "~/components/tea/Family";
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters } = useSEContext();
@@ -41,18 +44,27 @@ export function SEFiltersBar(props: { className?: string }) {
 					</FilterButton>
 				</li>
 			</ul>
-			<MenuModal open={"family" === popup} onClose={() => setPopup(undefined)}>
-				{Object.keys(teaFamilies).map((key) => (
-					<MenuItem
-						key={key}
-						label={`${key} tea`}
-						onClick={() => {
-							patchFilters({ family: key as TeaFamily });
-							setPopup(undefined);
-						}}
-					/>
-				))}
-			</MenuModal>
+			<Modal open={"family" === popup} onClose={() => setPopup(undefined)} position="bottom">
+				<ul className="flex flex-col gap-2">
+					{Object.keys(teaFamilies).map((key) => (
+						<li key={key}>
+							<Item
+								label={
+									<>
+										<Family family={key as TeaFamily} className="capitalize mr-1" />
+										tea
+									</>
+								}
+								onSelect={() => {
+									patchFilters({ family: key as TeaFamily });
+									setPopup(undefined);
+								}}
+								selected={key === filters.family}
+							/>
+						</li>
+					))}
+				</ul>
+			</Modal>
 			<OriginSelectModal
 				open={"origin" === popup}
 				onClose={() => setPopup(undefined)}
@@ -63,5 +75,15 @@ export function SEFiltersBar(props: { className?: string }) {
 				allowToggle
 			/>
 		</>
+	);
+}
+
+export function Item(props: { label: ReactNode; onSelect: () => void; selected?: boolean }) {
+	return (
+		<div className={clsx(styles.btn, props.selected && styles.selected, "w-full")}>
+			<button className={clsx(styles.inner, "flex-1")} onClick={handleUIEvent(props.onSelect)}>
+				{props.label}
+			</button>
+		</div>
 	);
 }

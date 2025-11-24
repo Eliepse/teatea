@@ -1,6 +1,7 @@
 import { teaFamilies, type TeaFamily } from "~t/types";
 import styles from "./TeaFamilyFilter.module.css";
 import { FilterButton } from "~/search/components/FilterButton";
+import { Family } from "~/components/tea/Family";
 
 export function TeaFamilyFilter(props: { className?: string; onSelect: (value: TeaFamily) => void }) {
 	return (
@@ -9,7 +10,9 @@ export function TeaFamilyFilter(props: { className?: string; onSelect: (value: T
 			<ul className={styles.list}>
 				{Object.keys(teaFamilies).map((key) => (
 					<li key={key}>
-						<FilterButton onClick={() => props.onSelect(key as TeaFamily)} noIcon>{key}</FilterButton>
+						<FilterButton onClick={() => props.onSelect(key as TeaFamily)} noIcon>
+							<Family family={key as TeaFamily} className="capitalize" />
+						</FilterButton>
 					</li>
 				))}
 			</ul>
