@@ -20,7 +20,7 @@ export function TeaSearchEngine(props: {
 }) {
 	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
-	const query = useSearchQuery(filters);
+	const { query, isTeas } = useSearchQuery(filters);
 
 	const SEContext = useMemo(
 		() => ({
@@ -66,7 +66,7 @@ export function TeaSearchEngine(props: {
 	return (
 		<SE_CONTEXT.Provider value={SEContext}>
 			<div className="bg-green-50 min-h-dvh">
-				<div className="sticky top-0 py-4 bg-green-50 border-b border-base-300">
+				<div className="sticky top-0 z-10 py-4 bg-green-50 border-b border-base-300">
 					<div className="px-4">
 						<SearchTextInput onChange={handleSearchUpdate} defaultValue={props.defaultFilters?.q} />
 					</div>
@@ -84,7 +84,9 @@ export function TeaSearchEngine(props: {
 					{query.isSuccess && query.data && (
 						<div className="px-4">
 							<div className="uppercase text-xs text-base-content/60 flex justify-between mb-4">
-								<span>{query.data.pages[0].totalItems} results</span>
+								<span>
+									{query.data.pages[0].totalItems} {isTeas ? "teas" : "tea types"}
+								</span>
 								<span>Sorted by popularity</span>
 							</div>
 
@@ -98,6 +100,7 @@ export function TeaSearchEngine(props: {
 													family={item.family}
 													origin={item.origin}
 													onClick={() => handleItemClicked(item)}
+													className={"bg-white shadow-xs"}
 												/>
 											)}
 
@@ -109,7 +112,7 @@ export function TeaSearchEngine(props: {
 													cultivar={item.cultivar}
 													year={item.year}
 													roast={item.roast}
-													className={clsx("bg-white shadow-sm")}
+													className={clsx("bg-white shadow-xs")}
 													onClick={() => handleItemClicked(item)}
 												/>
 											)}
@@ -152,10 +155,14 @@ export function TeaSearchEngine(props: {
 	);
 }
 
-function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void }) {
+function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void; className?: string }) {
 	return (
 		<div
-			className="bg-white rounded-2xl min-h-16 px-4 py-3 flex items-center text-green-900 text-lg"
+			className={clsx(
+				"rounded-2xl min-h-16 px-4 py-3 flex items-center",
+				"bg-white text-green-900 text-lg",
+				props.className,
+			)}
 			onClick={props.onClick}
 		>
 			<div className="flex-1">

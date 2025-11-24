@@ -16,7 +16,7 @@ export const SE_CONTEXT = createContext<{ filters: SearchFilters; patchFilters: 
 });
 
 export function useSearchQuery(filters?: SearchFilters) {
-	return useInfiniteQuery({
+	const query = useInfiniteQuery({
 		queryFn: async ({ queryKey, pageParam }) => {
 			const filters = queryKey[1];
 			if (typeof filters === "string") {
@@ -36,6 +36,9 @@ export function useSearchQuery(filters?: SearchFilters) {
 		getNextPageParam: (lastPage) => lastPage.view.next,
 		initialPageParam: "",
 	});
+
+	const typeOrTea = searchTypeOrTea(filters);
+	return { query, isTeaTypes: "tea_types" === typeOrTea, isTeas: "teas" === typeOrTea };
 }
 
 function searchTypeOrTea(filters?: SearchFilters): "teas" | "tea_types" {
