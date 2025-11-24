@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { SearchTextInput } from "~/search/components/SearchTextInput";
@@ -16,7 +16,6 @@ export function TeaSearchEngine(props: {
 	defaultFilters?: SearchFilters;
 	value?: Tea;
 	allowCreation?: boolean;
-	onSearch?: (text: string | undefined) => void;
 	onFiltersChange?: (filters?: SearchFilters) => void;
 }) {
 	const navigate = useNavigate();
@@ -26,15 +25,16 @@ export function TeaSearchEngine(props: {
 	const SEContext = useMemo(
 		() => ({
 			filters: filters ?? {},
-			patchFilters: (patch: SearchFilters) => setFilters((s) => ({ ...s, ...patch })),
+			patchFilters: (patch: SearchFilters) => {
+				const patched = { ...filters, ...patch };
+				setFilters(patched);
+				f(props.onFiltersChange)(patched);
+			},
 		}),
-		[filters],
+		[filters, props.onFiltersChange],
 	);
 
-	useEffect(() => f(props.onFiltersChange)(filters), [filters, props.onFiltersChange]);
-
 	function handleSearchUpdate(text?: string) {
-		f(props.onSearch)(text);
 		SEContext.patchFilters({ q: text });
 	}
 
@@ -75,7 +75,7 @@ export function TeaSearchEngine(props: {
 				</div>
 
 				{undefined === filters?.family && !filters?.q && (
-					<TeaFamilyFilter className="px-4 my-4" onSelect={(f) => setFilters((s) => ({ ...s, family: f }))} />
+					<TeaFamilyFilter className="px-4 my-4" onSelect={(family) => SEContext.patchFilters({ family })} />
 				)}
 
 				<div className="py-4 flex-1 overflow-y-auto">

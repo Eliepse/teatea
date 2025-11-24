@@ -1,31 +1,36 @@
 import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { useSearchParams } from "react-router";
+import type { SearchFilters } from "~/search/hooks/useSearchQuery";
+import { safeEmpty } from "~/utils/general";
+import type { TeaFamily } from "~t/types";
 
 export default function TeaSearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const queryText = (searchParams.get("q") ?? "").trim();
-	const originPath = (searchParams.get("originPath") ?? "").trim();
 
-	function updateSearchParam(text?: string) {
+	function handleFiltersChanged(filters?: SearchFilters): void {
 		setSearchParams((params) => {
-			if (!text) {
-				// Remove "q" param
-				return Object.fromEntries(Object.entries(params).filter(([key]) => "q" !== key));
-			}
+			const original = Object.fromEntries(params.entries());
 
-			return { ...params, q: text };
+			const patched = Object.fromEntries(
+				Object.entries({ ...original, ...filters }).filter(([_, v]) =>
+					typeof v === "string" ? !!v.trim() : !!v,
+				),
+			);
+
+			return new URLSearchParams(patched);
 		});
 	}
 
 	return (
 		<AuthLayout activeKey="search">
 			<TeaSearchEngine
-				onSearch={updateSearchParam}
 				defaultFilters={{
-					q: 0 !== queryText.length ? queryText : undefined,
-					originPath: 0 !== originPath.length ? originPath : undefined,
+					q: safeEmpty((searchParams.get("q") ?? "").trim()),
+					originPath: safeEmpty((searchParams.get("originPath") ?? "").trim()),
+					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
 				}}
+				onFiltersChange={handleFiltersChanged}
 				allowCreation
 			/>
 		</AuthLayout>
