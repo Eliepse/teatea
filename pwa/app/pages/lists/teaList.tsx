@@ -37,7 +37,6 @@ export default function TeaListPage(props: Route.ComponentProps) {
 					<li key={teaLink.id} className="mb-2">
 						<Link to={`/tea/${teaLink.tea.id}`}>
 							<TeaCard
-								teaId={teaLink.tea.id}
 								family={teaLink.tea.family}
 								roast={teaLink.tea.roast}
 								type={teaLink.tea.type}

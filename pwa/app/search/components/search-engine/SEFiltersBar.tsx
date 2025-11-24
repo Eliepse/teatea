@@ -1,4 +1,3 @@
-import { useSEContext } from "~/search/components/TeaSearchEngine";
 import { FilterButton } from "~/search/components/FilterButton";
 import clsx from "clsx";
 import { type Origin, teaFamilies, type TeaFamily } from "~t/types";
@@ -7,6 +6,7 @@ import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { OriginSelectModal } from "~/components/origin/OriginSelectModal";
 import { extractId } from "~/utils/resource";
+import { useSEContext } from "~/search/hooks/useSearchQuery";
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters } = useSEContext();

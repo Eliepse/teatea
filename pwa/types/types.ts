@@ -30,7 +30,7 @@ export type TeaType = Resource<"TeaType"> & {
 	slug: string;
 	family: TeaFamily;
 	name: string;
-	origin: Pick<Origin, "@id" | "@type" | "path">;
+	origin: Origin;
 	isPDO: boolean;
 	stats?: {
 		rank: number;

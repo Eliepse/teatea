@@ -1,63 +1,29 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection, Origin, Tea, TeaFamily, TeaType } from "~t/types";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { SearchTextInput } from "~/search/components/SearchTextInput";
-import { f, throwNotImplemented } from "~/utils/function";
+import { f } from "~/utils/function";
 import clsx from "clsx";
-import { TeaShortCard } from "~/components/tea/TeaShortCard";
 import { TeaFamilyFilter } from "~/search/components/TeaFamilyFilter";
 import { SEFiltersBar } from "~/search/components/search-engine/SEFiltersBar";
 import { Family } from "~/components/tea/Family";
-import { Link } from "react-router";
-
-export type SearchFilters = {
-	q?: string;
-	originPath?: string;
-	family?: TeaFamily;
-};
-
-const SE_CONTEXT = createContext<{ filters: SearchFilters; patchFilters: (patch: SearchFilters) => void }>({
-	filters: {},
-	patchFilters: throwNotImplemented,
-});
+import { useNavigate } from "react-router";
+import { SE_CONTEXT, type SearchFilters, useSearchQuery } from "~/search/hooks/useSearchQuery";
+import { TeaCard } from "~/components/tea/TeaCard";
 
 export function TeaSearchEngine(props: {
-	onSelect: (tea: Tea | TeaType) => void;
-	defaultFilters?: { q?: string; originPath?: string; family?: TeaFamily };
+	onSelect?: (tea: Tea | TeaType) => void;
+	defaultFilters?: SearchFilters;
 	value?: Tea;
 	allowCreation?: boolean;
 	onSearch?: (text: string | undefined) => void;
+	onFiltersChange?: (filters?: SearchFilters) => void;
 }) {
+	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
+	const query = useSearchQuery(filters);
 
-	const teasQuery = useInfiniteQuery({
-		queryFn: async ({ queryKey, pageParam }) => {
-			const filters = queryKey[1];
-
-			if (typeof filters === "string") {
-				throw new Error("Invalid search");
-			}
-
-			const response = await getApi<ApiPaginatedCollection<Tea | TeaType>>(
-				pageParam ? pageParam : `/tea_types`,
-				pageParam ? {} : filters,
-			);
-			return await response.json();
-		},
-		queryKey: ["tea_types", { ...filters, itemsPerPage: 10, sort: "popularity" }],
-		getPreviousPageParam: (lastPage) => lastPage.view.previous,
-		getNextPageParam: (lastPage) => lastPage.view.next,
-		initialPageParam: "",
-	});
-
-	function handleSearchUpdate(text?: string) {
-		f(props.onSearch)(text);
-		setFilters((st) => ({ ...st, q: text }));
-	}
-
-	const seContext = useMemo(
+	const SEContext = useMemo(
 		() => ({
 			filters: filters ?? {},
 			patchFilters: (patch: SearchFilters) => setFilters((s) => ({ ...s, ...patch })),
@@ -65,16 +31,40 @@ export function TeaSearchEngine(props: {
 		[filters],
 	);
 
+	useEffect(() => f(props.onFiltersChange)(filters), [filters, props.onFiltersChange]);
+
+	function handleSearchUpdate(text?: string) {
+		f(props.onSearch)(text);
+		SEContext.patchFilters({ q: text });
+	}
+
+	function handleItemClicked(item: Tea | TeaType): void {
+		if (props.onSelect) {
+			props.onSelect(item);
+			return;
+		}
+
+		if ("type" in item) {
+			navigate(`/tea/${item.id}`);
+			return;
+		}
+
+		if ("name" in item) {
+			navigate(`/tea_types/${item.slug}`);
+			return;
+		}
+	}
+
 	const onTeaCreated = useCallback(
 		async (tea: Tea) => {
-			void teasQuery.refetch();
-			props.onSelect(tea);
+			void query.refetch();
+			f(props.onSelect)(tea);
 		},
-		[props.onSelect],
+		[props.onSelect, query],
 	);
 
 	return (
-		<SE_CONTEXT.Provider value={seContext}>
+		<SE_CONTEXT.Provider value={SEContext}>
 			<div className="bg-green-50 min-h-dvh">
 				<div className="sticky top-0 py-4 bg-green-50 border-b border-base-300">
 					<div className="px-4">
@@ -89,70 +79,69 @@ export function TeaSearchEngine(props: {
 				)}
 
 				<div className="py-4 flex-1 overflow-y-auto">
-					{teasQuery.isLoading && undefined === teasQuery.data && (
-						<ul className="px-4">
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-							<li className="skeleton h-16 mb-2 block"></li>
-						</ul>
-					)}
+					{query.isError && <div className="text-error px-4">Something went wrong...</div>}
 
-					{teasQuery.isError && <div className="text-error px-4">Something went wrong...</div>}
-
-					{teasQuery.isSuccess && teasQuery.data && (
+					{query.isSuccess && query.data && (
 						<div className="px-4">
 							<div className="uppercase text-xs text-base-content/60 flex justify-between mb-4">
-								<span>{teasQuery.data.pages[0].totalItems} results</span>
+								<span>{query.data.pages[0].totalItems} results</span>
 								<span>Sorted by popularity</span>
 							</div>
 
 							<ul>
-								{teasQuery.data.pages.map((page) =>
+								{query.data.pages.map((page) =>
 									page.member?.map((item) => (
-										<li key={item.id} className="mb-2">
+										<li key={item["@id"]} className={clsx("type" in item ? "mb-3" : "mb-2")}>
 											{"name" in item && (
-												<Link to={`/tea_types/${item.slug}`}>
-													<Item label={item.name} family={item.family} origin={item.origin} />
-												</Link>
-											)}
-											{"type" in item && (
-												<TeaShortCard
+												<Item
+													label={item.name}
 													family={item.family}
+													origin={item.origin}
+													onClick={() => handleItemClicked(item)}
+												/>
+											)}
+
+											{"type" in item && (
+												<TeaCard
 													type={item.type}
-													path={item.originPath}
+													family={item.family}
+													origin={item.originPath}
 													cultivar={item.cultivar}
 													year={item.year}
 													roast={item.roast}
-													className={clsx(
-														"border",
-														props.value?.id === item.id
-															? "bg-primary/10 border-primary"
-															: "bg-slate-100 border-transparent",
-													)}
+													className={clsx("bg-white shadow-sm")}
+													onClick={() => handleItemClicked(item)}
 												/>
 											)}
 										</li>
 									)),
 								)}
 							</ul>
-
-							{!!teasQuery.hasNextPage && (
-								<button
-									className="btn btn-outline btn-secondary btn-block h-14 mt-4"
-									onClick={() => teasQuery.fetchNextPage()}
-								>
-									Load more
-								</button>
-							)}
 						</div>
 					)}
 
-					{teasQuery.isSuccess && true === props.allowCreation && (
+					{query.isFetching && (
+						<ul className="px-4">
+							<li className="skeleton h-16 mb-2 block" />
+							<li className="skeleton h-16 mb-2 block" />
+							<li className="skeleton h-16 mb-2 block" />
+							<li className="skeleton h-16 mb-2 block" />
+							<li className="skeleton h-16 mb-2 block" />
+						</ul>
+					)}
+
+					{!!query.hasNextPage && (
+						<div className="px-4">
+							<button
+								className="btn btn-outline btn-secondary btn-block h-14 mt-4"
+								onClick={() => query.fetchNextPage()}
+							>
+								Load more
+							</button>
+						</div>
+					)}
+
+					{query.isSuccess && true === props.allowCreation && (
 						<div className="px-4 mt-4">
 							<CreateTeaButton className="btn-dash btn-block h-14 mt-8" onCreated={onTeaCreated} />
 						</div>
@@ -163,9 +152,12 @@ export function TeaSearchEngine(props: {
 	);
 }
 
-function Item(props: { label?: string; family: TeaFamily; origin?: Origin }) {
+function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void }) {
 	return (
-		<div className="bg-white rounded-2xl min-h-16 px-4 py-3 flex items-center text-green-900 text-lg">
+		<div
+			className="bg-white rounded-2xl min-h-16 px-4 py-3 flex items-center text-green-900 text-lg"
+			onClick={props.onClick}
+		>
 			<div className="flex-1">
 				{props.label ? (
 					<div className="text-xs font-medium tracking-wide uppercase text-green-800/60">
@@ -181,8 +173,4 @@ function Item(props: { label?: string; family: TeaFamily; origin?: Origin }) {
 			<div className="text-sm text-green-800/60">{props.origin && <div>{props.origin.namePath[0]}</div>}</div>
 		</div>
 	);
-}
-
-export function useSEContext() {
-	return useContext(SE_CONTEXT);
 }

@@ -1,18 +1,11 @@
 import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import type { Tea } from "~t/types";
-import { useNavigate, useSearchParams } from "react-router";
-import type { Route } from "../../../.react-router/types/app/pages/tea/+types/search";
+import { useSearchParams } from "react-router";
 
-export default function TeaSearchPage(props: Route.ComponentProps) {
-	const navigate = useNavigate();
+export default function TeaSearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const queryText = (searchParams.get("q") ?? "").trim();
 	const originPath = (searchParams.get("originPath") ?? "").trim();
-
-	function openTea(tea: Tea) {
-		navigate(`/tea/${tea.id}`);
-	}
 
 	function updateSearchParam(text?: string) {
 		setSearchParams((params) => {
@@ -28,7 +21,6 @@ export default function TeaSearchPage(props: Route.ComponentProps) {
 	return (
 		<AuthLayout activeKey="search">
 			<TeaSearchEngine
-				onSelect={openTea}
 				onSearch={updateSearchParam}
 				defaultFilters={{
 					q: 0 !== queryText.length ? queryText : undefined,
