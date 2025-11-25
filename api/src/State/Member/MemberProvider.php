@@ -9,7 +9,6 @@ use App\ApiResource\ActivityGraph;
 use App\ApiResource\Member;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 /**
@@ -31,16 +30,18 @@ readonly class MemberProvider implements ProviderInterface
 		}
 
 		$username = $uriVariables["username"] ?? null;
-		if (empty($username)) {
-			throw new NotFoundHttpException();
+		$id = $uriVariables["id"] ?? null;
+
+		if (false === empty($username)) {
+			$query->where("user.username = :username")->setParameter("username", $username);
+		} elseif (false === empty($id)) {
+			// Some endpoints requires the ID (ex: onboarding patch)
+			$query->where("user.id = :id")->setParameter("id", $id);
+		} else {
+			return null;
 		}
 
-		$user = $query->where("user.username = :username")
-			->setParameter("username", $username)
-			->getQuery()
-			->getOneOrNullResult();
-
-		return self::hydrate($user);
+		return self::hydrate($query->getQuery()->getOneOrNullResult());
 	}
 
 	public static function hydrate(?User $user): ?Member
