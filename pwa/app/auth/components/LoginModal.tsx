@@ -42,14 +42,13 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 					setOTPToken(false);
 				}
 			} catch (e) {
-				if (e instanceof AxiosError && e.status === 404) {
-					return null;
+				if (e instanceof AxiosError && e.status === 403) {
+					throw new Error();
 				}
 
-				const message = e instanceof Error ? e.message : undefined;
-				alert({ title: "Verification failed", body: message });
+				alert({ title: "Verification failed" });
 				setOTPToken(false);
-				throw new Error("Validation failed");
+				return null;
 			}
 
 			return null;

@@ -138,8 +138,10 @@ class OTPAuthController extends AbstractController
 
 		try {
 			$token = $this->tokenManager->validateChallenge($challenge, Token::TYPE_OTP);
-		} catch (InvalidTokenException|ExpiredTokenException) {
-			$token = null;
+		} catch (ExpiredTokenException) {
+			return $this->json(["message" => "Token expired"], 404);
+		} catch (InvalidTokenException) {
+			return $this->json(["message" => "Token invalid"], 403);
 		}
 
 		if (null === $token) {

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\DTO\Auth\GeneratedToken;
 use App\Entity\Token;
 use App\Entity\User;
+use App\Exception\Auth\ExpiredTokenException;
 use App\Exception\Auth\InvalidTokenException;
 use App\Repository\TokenRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -90,6 +91,10 @@ final readonly class TokenManager
 
 		if (null === $token) {
 			throw new InvalidTokenException();
+		}
+
+		if($token->isExpired()) {
+			throw new ExpiredTokenException();
 		}
 
 		if (false === $token->isValid()) {
