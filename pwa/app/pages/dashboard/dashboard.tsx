@@ -43,7 +43,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="px-4 bg-green-50 grid gap-4 text-green-900" activeKey="home">
+		<AuthLayout className="px-4 bg-green-50 grid auto-rows-min gap-4 text-green-900" activeKey="home">
 			<div className="flex items-center pt-4">
 				<Logo className="w-24 flex-none mr-auto text-green-700" />
 				<button className="btn btn-lg btn-circle bg-white" onClick={promptLogout}>
@@ -115,25 +115,32 @@ function UserPresentation(props: { username?: string; teaSessions: number; taste
 				<PeopleTag className="size-5 mr-2" /> Hi, {displayedName}!
 			</div>
 
-			{!!props.teaSessions && (
-				<div className="grid grid-cols-2 pb-2 pt-4 mt-1 border-t border-green-100">
-					<Link to={`/sessions?username=${props.username}`}>
-						<UserStat
-							title="tea sessions"
-							value={props.teaSessions}
-							icon={<CoffeeCup className="size-5 inline mx-1" />}
-						/>
-					</Link>
+			<div className="grid grid-cols-2 pb-2 pt-4 mt-1 border-t border-green-100">
+				{!props.teaSessions && (
+					<span className="text-green-800/60 col-span-2">
+						Looks like you haven&apos;t drink tea yet <Leaf className="size-5 inline" />
+					</span>
+				)}
+				{!!props.teaSessions && (
+					<>
+						<Link to={`/sessions?username=${props.username}`}>
+							<UserStat
+								title="tea sessions"
+								value={props.teaSessions}
+								icon={<CoffeeCup className="size-5 inline mx-1" />}
+							/>
+						</Link>
 
-					<Link to="/me/teas">
-						<UserStat
-							title="tasted teas"
-							value={props.tastedTeas}
-							icon={<Leaf className="size-5 inline mx-1" />}
-						/>
-					</Link>
-				</div>
-			)}
+						<Link to="/me/teas">
+							<UserStat
+								title="tasted teas"
+								value={props.tastedTeas}
+								icon={<Leaf className="size-5 inline mx-1" />}
+							/>
+						</Link>
+					</>
+				)}
+			</div>
 		</div>
 	);
 }
