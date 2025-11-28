@@ -41,7 +41,16 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$searchText = OperationHelper::getParameter($operation, "q");
 		$originPath = OperationHelper::getParameter($operation, "originPath");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
+		$typeFilter = OperationHelper::getParameter($operation, "type");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
+
+		// Ignore some filters when using tea type filter
+		// as a type already have some predefined constraints
+		if (null !== $typeFilter) {
+			$searchText = null;
+			$originPath = null;
+			$familyFilter = null;
+		}
 
 		/*
 		| --------------------------------
@@ -71,10 +80,15 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		}
 
 		// Origin
-		if (false === empty($originPath)) {
+		if (null !== $originPath) {
 			$searchQb
 				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:originPath, origin.path) = TRUE")
 				->setParameter("originPath", $originPath);
+		}
+
+		// Family
+		if (null !== $typeFilter) {
+			$searchQb->andWhere("type.slug = :typeSlug")->setParameter("typeSlug", $typeFilter);
 		}
 
 		// Sorting
