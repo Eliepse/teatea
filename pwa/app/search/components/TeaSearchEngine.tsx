@@ -20,8 +20,6 @@ export function TeaSearchEngine(props: {
 }) {
 	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
-	const { query, isTeas } = useSearchQuery(filters);
-
 	const SEContext = useMemo(
 		() => ({
 			filters: filters ?? {},
@@ -30,9 +28,12 @@ export function TeaSearchEngine(props: {
 				setFilters(patched);
 				f(props.onFiltersChange)(patched);
 			},
+			searchType: computeSearchType(filters),
 		}),
 		[filters, props.onFiltersChange],
 	);
+
+	const { query, isTeas } = useSearchQuery(SEContext.searchType, filters);
 
 	function handleSearchUpdate(text?: string) {
 		SEContext.patchFilters({ q: text });
@@ -153,6 +154,18 @@ export function TeaSearchEngine(props: {
 			</div>
 		</SE_CONTEXT.Provider>
 	);
+}
+
+function computeSearchType(filters?: SearchFilters): "teas" | "tea_types" {
+	if (undefined === filters) {
+		return "tea_types";
+	}
+
+	if (1 < (filters.originPath?.split(".")?.length ?? 0)) {
+		return "teas";
+	}
+
+	return "tea_types";
 }
 
 function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void; className?: string }) {

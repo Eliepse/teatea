@@ -10,43 +10,38 @@ export type SearchFilters = {
 	family?: TeaFamily;
 };
 
-export const SE_CONTEXT = createContext<{ filters: SearchFilters; patchFilters: (patch: SearchFilters) => void }>({
+export const SE_CONTEXT = createContext<{
+	filters: SearchFilters;
+	patchFilters: (patch: SearchFilters) => void;
+	searchType: ItemType;
+}>({
 	filters: {},
 	patchFilters: throwNotImplemented,
+	searchType: "tea_types",
 });
 
-export function useSearchQuery(filters?: SearchFilters) {
+type ItemType = "teas" | "tea_types";
+
+export function useSearchQuery(type: ItemType, filters?: SearchFilters) {
 	const query = useInfiniteQuery({
 		queryFn: async ({ queryKey, pageParam }) => {
-			const filters = queryKey[1];
-			if (typeof filters === "string") {
-				throw new Error("Invalid search");
-			}
+			const filters = queryKey[2] as SearchFilters;
+			const type = queryKey[1] as ItemType;
 
-			const resourceType = searchTypeOrTea(filters);
 			const response = await getApi<ApiPaginatedCollection<Tea | TeaType>>(
-				pageParam ? pageParam : `/${resourceType}`,
+				pageParam ? pageParam : `/${type}`,
 				pageParam ? {} : filters,
 			);
 
 			return await response.json();
 		},
-		queryKey: ["search", { ...filters, itemsPerPage: 10, sort: "popularity" }],
+		queryKey: ["search", type, { ...filters, itemsPerPage: 10, sort: "popularity" }],
 		getPreviousPageParam: (lastPage) => lastPage.view.previous,
 		getNextPageParam: (lastPage) => lastPage.view.next,
 		initialPageParam: "",
 	});
 
-	const typeOrTea = searchTypeOrTea(filters);
-	return { query, isTeaTypes: "tea_types" === typeOrTea, isTeas: "teas" === typeOrTea };
-}
-
-function searchTypeOrTea(filters?: SearchFilters): "teas" | "tea_types" {
-	if (filters?.originPath) {
-		return "teas";
-	}
-
-	return "tea_types";
+	return { query, isTeaTypes: "tea_types" === type, isTeas: "teas" === type };
 }
 
 export function useSEContext() {
