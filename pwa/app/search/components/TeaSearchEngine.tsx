@@ -157,13 +157,16 @@ export function TeaSearchEngine(props: {
 
 function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void; className?: string }) {
 	return (
-		<div
+		<article
 			className={clsx(
 				"rounded-2xl min-h-16 px-4 py-3 flex items-center",
-				"bg-white text-green-900 text-lg",
+				"bg-white text-green-900 text-lg cursor-pointer",
+				"hover:outline-1 active:bg-green-200 outline-green-400",
+				"focus:outline-2 focus:outline-green-600",
 				props.className,
 			)}
 			onClick={props.onClick}
+			tabIndex={0}
 		>
 			<div className="flex-1">
 				{props.label ? (
@@ -178,6 +181,6 @@ function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onCli
 			</div>
 
 			<div className="text-sm text-green-800/60">{props.origin && <div>{props.origin.namePath[0]}</div>}</div>
-		</div>
+		</article>
 	);
 }
