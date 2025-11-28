@@ -53,8 +53,7 @@ export function TeaSearchEngine(props: {
 		}
 
 		if ("name" in item) {
-			SEContext.patchFilters({ type: item.slug });
-			// navigate(`/tea_types/${item.slug}`);
+			navigate(`/tea_types/${item.slug}`);
 			return;
 		}
 	}
