@@ -1,6 +1,5 @@
 import {
 	type Cultivar,
-	type Id,
 	type OriginPath,
 	type RoastLevel,
 	RoastLevelEnum,
@@ -11,12 +10,10 @@ import clsx from "clsx";
 import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import type { PropsWithChildren, ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
-import { useNavigate } from "react-router";
 import { ArrowRight } from "iconoir-react";
 
 export function TeaCard(
 	props: PropsWithChildren<{
-		teaId: Id;
 		family: TeaFamily;
 		type?: TeaType;
 		origin?: OriginPath;
@@ -26,15 +23,15 @@ export function TeaCard(
 		className?: string;
 		showNoRoast?: boolean;
 		loading?: boolean;
+		onClick?: () => void;
 	}>,
 ) {
-	const navigate = useNavigate();
 	const hasSpecs = Object.keys(props).some((key) => ["path", "cultivar", "year", "roast"].includes(key));
-	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null
+	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null;
 
 	return (
 		<article className={clsx("rounded-2xl", props.className)}>
-			<div className="py-2 px-4 cursor-pointer" onClick={() => navigate(`/tea/${props.teaId}`)}>
+			<div className="py-2 px-4 cursor-pointer" onClick={props.onClick}>
 				<Family family={props.family} className="capitalize text-teal-800 text-sm mb-1" />
 				<div className="flex justify-between items-center">
 					<h1 className="font-header font-bold text-2xl text-green-800">

@@ -7,8 +7,20 @@ use ApiPlatform\State\ParameterNotFound;
 
 final class OperationHelper
 {
-	public static function getParameter(Operation $operation, string $key): string|int|array|float|null
-	{
+	/**
+	 * Return the operation parameters, or null if it's missing (or empty)
+	 *
+	 * @param Operation $operation
+	 * @param string $key
+	 * @param bool $castEmptyToNull
+	 *
+	 * @return string|int|array|float|null
+	 */
+	public static function getParameter(
+		Operation $operation,
+		string $key,
+		bool $castEmptyToNull = true,
+	): string|int|array|float|null {
 		$parameter = $operation->getParameters()?->get($key);
 
 		if (null === $parameter) {
@@ -16,6 +28,11 @@ final class OperationHelper
 		}
 
 		$value = $parameter->getValue();
-		return $value instanceof ParameterNotFound ? null : $value;
+
+		if ($value instanceof ParameterNotFound) {
+			return null;
+		}
+
+		return $castEmptyToNull && empty($value) ? null : $value;
 	}
 }

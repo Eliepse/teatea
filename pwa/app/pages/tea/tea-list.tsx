@@ -69,7 +69,6 @@ export default function TeaListPage() {
 								<li key={tea.id} className="mb-2">
 									<Link to={`/tea/${tea.id}`}>
 										<TeaCard
-											teaId={tea.id}
 											family={tea.family}
 											roast={tea.roast}
 											type={tea.type}

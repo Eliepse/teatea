@@ -59,6 +59,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSe
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
+	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const revalidator = useRevalidator();
 	const session = props.loaderData;
@@ -133,7 +134,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</div>
 
 				<TeaCard
-					teaId={session.tea.id}
 					family={tea.family}
 					type={teaType.data}
 					origin={tea.originPath}
@@ -141,6 +141,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					year={tea.year}
 					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
 					loading={teaType.isLoading}
+					onClick={() => navigate(`/tea/${tea.id}`)}
 					className="shadow bg-white my-2 overflow-hidden"
 				>
 					<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">

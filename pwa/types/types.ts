@@ -30,7 +30,7 @@ export type TeaType = Resource<"TeaType"> & {
 	slug: string;
 	family: TeaFamily;
 	name: string;
-	origin: Pick<Origin, "@id" | "@type" | "path">;
+	origin: Origin;
 	isPDO: boolean;
 	stats?: {
 		rank: number;
@@ -47,6 +47,7 @@ export type TreePath = string;
 
 export type Origin = Omit<Resource, "id"> & {
 	name: string;
+	namePath: string[];
 	path: TreePath;
 	isLeaf?: boolean;
 	proposal?: boolean;
@@ -108,16 +109,16 @@ export type Member = Resource<"Member"> & {
 	email: string;
 };
 
-export const teaFamilies = {
+export type TeaFamily = "white" | "yellow" | "green" | "wulong" | "black" | "fermented";
+
+export const teaFamilies: Record<TeaFamily, string> = {
 	white: "White tea",
 	yellow: "Yellow tea",
 	green: "Green tea",
 	wulong: "Wulong tea",
 	black: "Black tea",
 	fermented: "Fermented tea",
-} as const;
-
-export type TeaFamily = keyof typeof teaFamilies;
+};
 
 export interface ApiCollection<T> {
 	"@context": string;

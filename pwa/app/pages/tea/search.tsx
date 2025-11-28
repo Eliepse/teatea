@@ -1,39 +1,37 @@
-import { TeaSearchEngine } from "~/components/search/TeaSearchEngine";
+import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import type { Tea } from "~t/types";
-import { useNavigate, useSearchParams } from "react-router";
-import type { Route } from "../../../.react-router/types/app/pages/tea/+types/search";
+import { useSearchParams } from "react-router";
+import type { SearchFilters } from "~/search/hooks/useSearchQuery";
+import { safeEmpty } from "~/utils/general";
+import type { TeaFamily } from "~t/types";
 
-export default function TeaSearchPage(props: Route.ComponentProps) {
-	const navigate = useNavigate();
+export default function TeaSearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const queryText = (searchParams.get("q") ?? "").trim();
-	const originPath = (searchParams.get("originPath") ?? "").trim();
 
-	function openTea(tea: Tea) {
-		navigate(`/tea/${tea.id}`);
-	}
-
-	function updateSearchParam(text?: string) {
+	function handleFiltersChanged(filters?: SearchFilters): void {
 		setSearchParams((params) => {
-			if (!text) {
-				// Remove "q" param
-				return Object.fromEntries(Object.entries(params).filter(([key]) => "q" !== key));
-			}
+			const original = Object.fromEntries(params.entries());
 
-			return { ...params, q: text };
+			const patched = Object.fromEntries(
+				Object.entries({ ...original, ...filters }).filter(([_, v]) =>
+					typeof v === "string" ? !!v.trim() : !!v,
+				),
+			);
+
+			return new URLSearchParams(patched);
 		});
 	}
 
 	return (
 		<AuthLayout activeKey="search">
 			<TeaSearchEngine
-				onSelect={openTea}
-				onSearch={updateSearchParam}
 				defaultFilters={{
-					q: 0 !== queryText.length ? queryText : undefined,
-					originPath: 0 !== originPath.length ? originPath : undefined,
+					q: safeEmpty((searchParams.get("q") ?? "").trim()),
+					originPath: safeEmpty((searchParams.get("originPath") ?? "").trim()),
+					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
+					type: safeEmpty((searchParams.get("type") ?? "").trim()),
 				}}
+				onFiltersChange={handleFiltersChanged}
 				allowCreation
 			/>
 		</AuthLayout>

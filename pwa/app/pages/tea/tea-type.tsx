@@ -1,25 +1,22 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea-type";
-import styles from "./tea.module.css";
 import { getApi } from "~/utils/api";
-import { type Cultivar, type OriginPath, type RoastLevel, type TeaFamily, type TeaType } from "~t/types";
-import { useNavigate } from "react-router";
+import { type TeaType } from "~t/types";
 import { type ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
-import clsx from "clsx";
-import { CoffeeCup, Leaf } from "iconoir-react";
+import { CoffeeCup, Leaderboard, LeaderboardStar, Leaf, NavArrowRight } from "iconoir-react";
 import { BackButton } from "~/components/shared/navigation/BackButton";
+import { Link, type LinkProps } from "react-router";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
-	const teaType = await (await getApi<TeaType>(`/tea_types/${args.params.slug}`)).json();
+	const teaType = await (
+		await getApi<Omit<TeaType, "stats"> & { stats: Required<TeaType>["stats"] }>(`/tea_types/${args.params.slug}`)
+	).json();
 	return { teaType };
 }
 
 export default function TeaTypePage(props: Route.ComponentProps) {
 	const { teaType } = props.loaderData;
 	const stats = teaType.stats;
-	const navigate = useNavigate();
 
 	return (
 		<div className="pb-22 text-lg bg-green-50 min-h-dvh">
@@ -43,36 +40,46 @@ export default function TeaTypePage(props: Route.ComponentProps) {
 				<div className="text-base text-green-700">
 					<Family className="capitalize" family={teaType.family} /> tea
 				</div>
-				<h1 className="mb-4 text-4xl font-header font-extrabold text-green-900">
-					{teaType.name}
-					{!!stats?.rank && (
-						<span className="badge border-green-200 text-green-900 font-sans font-normal ml-2">
-							#{stats.rank} popular
-						</span>
-					)}
-				</h1>
+				<h1 className="mb-4 text-4xl font-header font-extrabold text-green-900">{teaType.name}</h1>
 			</header>
 
 			<main>
 				<ul className="grid grid-cols-2 gap-2 my-8 mx-6">
 					<li>
-						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
-							<div className="inline-flex items-center text-3xl font-bold text-green-900">
-								<Leaf className="inline-block mr-2 size-6 relative top-0.5" />
-								{stats?.teasCount ?? 0}
-							</div>
-							<div className="text-sm mt-1">teas of this type</div>
-						</div>
+						<Stat
+							value={
+								<>
+									<span className="text-base">#</span>
+									{stats.rank}
+								</>
+							}
+							icon={
+								3 >= stats.rank ? (
+									<LeaderboardStar className="inline-block size-6 relative top-0.5" />
+								) : (
+									<Leaderboard className="inline-block size-6 relative top-0.5" />
+								)
+							}
+							label="popularity"
+						/>
 					</li>
 
 					<li>
-						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
-							<div className="inline-flex items-center text-3xl font-bold text-green-900">
-								<CoffeeCup className="inline-block mr-2 size-6 relative top-0.5" />
-								{stats?.sessionsCount ?? 0}
-							</div>
-							<div className="text-sm mt-1">times drank</div>
-						</div>
+						<Stat
+							value={stats.sessionsCount}
+							icon={<CoffeeCup className="inline-block size-6 relative top-0.5" />}
+							label="drink sessions"
+						/>
+					</li>
+
+					<li className="col-span-2">
+						<StatButton
+							to={{ pathname: "/tea/search", search: `?type=${props.loaderData.teaType.slug}` }}
+							value={stats.teasCount}
+							unit={1 < stats.teasCount ? "teas" : "tea"}
+							icon={<Leaf className="size-6" />}
+							label="of this type"
+						/>
 					</li>
 				</ul>
 			</main>
@@ -80,44 +87,31 @@ export default function TeaTypePage(props: Route.ComponentProps) {
 	);
 }
 
-function Specs(props: {
-	family?: TeaFamily;
-	origin?: OriginPath;
-	roast?: RoastLevel;
-	cultivar?: Cultivar;
-	year?: number;
-	className?: string;
-}) {
-	// No specs to display
-	if (false === Object.keys(props).some((k) => "className" !== k)) {
-		return null;
-	}
-
+function Stat(props: { value: ReactNode; icon: ReactNode; label?: string }) {
 	return (
-		<ul className={clsx(styles.specs, props.className)}>
-			{!!props.family && (
-				<SpecItem
-					label="Type"
-					value={
-						<span>
-							<Family family={props.family} className="capitalize" /> tea
-						</span>
-					}
-				/>
-			)}
-			{!!props.origin && <SpecItem label="Origin" value={<FormatOriginPath originPath={props.origin} />} />}
-			{!!props.cultivar && <SpecItem label="Cultivar" value={props.cultivar.name} />}
-			{!!props.year && <SpecItem label="Harvest" value={props.year} />}
-			{!!props.roast && <SpecItem label="Roast" value={<RoastLevelLabel roast={props.roast} showNotRoasted />} />}
-		</ul>
+		<div className="border-green-200 text-teal-600 rounded-lg px-3 py-3 bg-green-100 text-center">
+			<div className="inline-flex items-center text-3xl font-bold text-green-900">
+				{props.icon}
+				<span className="ml-2">{props.value}</span>
+			</div>
+			{!!props.label && <div className="text-sm mt-1">{props.label}</div>}
+		</div>
 	);
 }
 
-function SpecItem(props: { label: string; value: ReactNode }) {
+function StatButton(props: { to: LinkProps["to"]; value: ReactNode; unit?: string; icon: ReactNode; label?: string }) {
 	return (
-		<li className={styles.specsItem}>
-			<span className="text-base text-teal-600">{props.label}</span>
-			{props.value}
-		</li>
+		<Link to={props.to} className="flex items-center gap-5 px-5 h-20 bg-white rounded-lg shadow-sm">
+			{props.icon}
+
+			<span className="flex-1 leading-none">
+				<span className="flex-1 font-header text-2xl font-bold text-green-900 block leading-none">
+					{props.value} {props.unit}
+				</span>
+				<span className="leading-none text-sm">{props.label}</span>
+			</span>
+
+			<NavArrowRight className="size-6" />
+		</Link>
 	);
 }

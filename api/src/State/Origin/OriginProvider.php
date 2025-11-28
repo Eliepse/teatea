@@ -19,7 +19,7 @@ readonly class OriginProvider implements ProviderInterface
 	) {
 	}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Origin|array|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Origin|null
 	{
 		assert(false === ($operation instanceof CollectionOperationInterface));
 		$path = $uriVariables["path"] ?? null;
@@ -29,8 +29,9 @@ readonly class OriginProvider implements ProviderInterface
 		}
 
 		$originQb = $this->em->createQueryBuilder()
-			->select("origin", "COUNT(child) as children")
+			->select("origin", "COUNT(child) as children", "JSON_AGG(ancestors.name) as namePath")
 			->from(\App\Entity\Origin::class, "origin")
+			->leftJoin(\App\Entity\Origin::class, "ancestors", "WITH", "CONTAINS(ancestors.path, origin.path) = TRUE")
 			->leftJoin(
 				\App\Entity\Origin::class,
 				"child",
@@ -50,7 +51,8 @@ readonly class OriginProvider implements ProviderInterface
 		}
 
 		$resource = static::fromEntity($result[0]);
-		$resource->isLeaf = 0 !== $result["children"];
+		$resource->isLeaf = 0 === $result["children"];
+		$resource->namePath = array_values(array_unique(json_decode($result["namePath"])));
 		return $resource;
 	}
 
@@ -62,6 +64,7 @@ readonly class OriginProvider implements ProviderInterface
 
 		$resource = new Origin();
 		$resource->name = $entity->name;
+		$resource->namePath = [$entity->name];
 		$resource->path = $entity->path->getPath();
 		$resource->proposal = null === $entity->validatedAt;
 		return $resource;

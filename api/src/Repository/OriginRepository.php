@@ -7,6 +7,9 @@ use App\Entity\Origin;
 use App\Entity\Tea;
 use App\Entity\TeaSession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\ParameterType;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -65,5 +68,36 @@ class OriginRepository extends ServiceEntityRepository
 	{
 		$search = $path instanceof LTreePath ? $path : LTreePath::fromString($path);
 		return $this->findOneBy(["path" => $search]);
+	}
+
+	/**
+	 * Return the names of ancestors for each given origin
+	 *
+	 * @param int[] $ids
+	 *
+	 * @return array<string, string[]>
+	 */
+	public function getAncestorsNamesByPath(array $ids): array
+	{
+		if (empty($ids)) {
+			return [];
+		}
+
+		$rows = $this->createQueryBuilder("origin")
+			->select("origin.path as path", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
+			->leftJoin("App\Entity\Origin", "ancestors", Join::WITH, "CONTAINS(ancestors.path, origin.path) = TRUE")
+			->where("origin.id IN (:ids)")
+			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
+			->groupBy("origin.path")
+			->getQuery()
+			->getResult();
+
+		$map = [];
+
+		foreach ($rows as $row) {
+			$map[$row["path"]->getPath()] = json_decode($row["names"]);
+		}
+
+		return $map;
 	}
 }

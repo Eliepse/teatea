@@ -58,6 +58,9 @@ class Origin
 	public string $name;
 
 	#[Groups(["origin:read"])]
+	public array $namePath = [];
+
+	#[Groups(["origin:read"])]
 	public bool $isLeaf = true;
 
 	#[Groups(["origin:read"])]

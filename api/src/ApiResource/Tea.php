@@ -18,6 +18,7 @@ use App\State\Tea\TeaCollectionProvider;
 use App\State\Tea\TeaCreateFromTypeProcessor;
 use App\State\Tea\TeaCreateProcess;
 use App\State\Tea\TeaProvider;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -40,7 +41,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 			description: "Filter by family",
 			castToNativeType: true,
 		),
-//		"type" => new QueryParameter(description: "Filter by type"),
+		"type" => new QueryParameter(
+			schema: ["type" => Requirement::ASCII_SLUG, "example" => "kamairicha, sencha-mature, ..."],
+			property: "type",
+			description: "Filter by tea type. Ignore `family`, `q` and `originPath` filters when applied.",
+		),
 		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
 		"originPath" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
 		"sort" => new QueryParameter(

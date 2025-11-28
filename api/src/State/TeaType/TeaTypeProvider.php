@@ -2,11 +2,9 @@
 
 namespace App\State\TeaType;
 
-use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TeaType;
-use App\Enum\TeaFamily;
 use App\State\Origin\OriginProvider;
 use App\ValueObject\Stats\TeaTypeStats;
 use Doctrine\DBAL\Types\Types;
@@ -26,80 +24,49 @@ readonly class TeaTypeProvider implements ProviderInterface
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaType|array|null
 	{
-		$filters = $context["filters"] ?? [];
-		$isCollection = $operation instanceof CollectionOperationInterface;
-
-		$expr = $this->em->getExpressionBuilder();
-		$teaQb = $this->em->createQueryBuilder()
+		$typeQb = $this->em->createQueryBuilder()
 			->select("type", "origin")
 			->from(\App\Entity\TeaType::class, "type")
-			->leftJoin("type.origin", "origin");
-
-		if (false === empty($originPathFilter = $filters["originPath"] ?? null)) {
-			// We must get all types with PDO that are included in the given origin
-			// + we must get all other types that are not PDO at the country level
-			$teaQb->innerJoin("type.origin", "originFilter")
-				->andWhere(
-					$expr->orX(
-					// Match protected origin types if their origin is a descendants
-						"CONTAINS(:originPath, originFilter.path) = TRUE AND type.isProtectedOrigin = TRUE",
-						// Match all non protected types in the same country
-						"CONTAINS(:countryPath, originFilter.path) = TRUE AND type.isProtectedOrigin = FALSE",
-					),
-				)
-				->setParameter("originPath", $originPathFilter)
-				->setParameter("countryPath", array_slice(explode(".", $originPathFilter), 0, 1));
-		}
-
-		if (false === empty($familyFilter = $filters["family"] ?? null)) {
-			$family = TeaFamily::tryFrom($familyFilter);
-			$teaQb->andWhere("type.family = :family")
-				->setParameter("family", $family);
-		}
-
-		if ($isCollection) {
-			return array_map(
-				fn(\App\Entity\TeaType $type) => static::fromEntity($type),
-				$teaQb->getQuery()->getResult(),
-			);
-		}
-
-		$teaQb->where("type.slug = :slug")->setParameter("slug", $uriVariables["slug"]);
-		$teaQb->setMaxResults(1);
+			->leftJoin("type.origin", "origin")
+			->where("type.slug = :slug")->setParameter("slug", $uriVariables["slug"])
+			->setMaxResults(1);
 
 		/** @var \App\Entity\TeaType|null $typeEntity */
-		$typeEntity = $teaQb->getQuery()->getOneOrNullResult();
+		$typeEntity = $typeQb->getQuery()->getOneOrNullResult();
 
 		$resource = static::fromEntity($typeEntity);
 
-		if (null !== $resource) {
-			$rsm = new ResultSetMappingBuilder($this->em)
-				->addScalarResult("rank", "rank", Types::INTEGER)
-				->addScalarResult("teas", "teas", Types::INTEGER)
-				->addScalarResult("sessions", "sessions", Types::INTEGER);
-
-			$statsQuery = $this->em->createNativeQuery(
-				<<<SQL
-				SELECT ranked.rank, ranked.teasCount as teas, ranked.sessionsCount as sessions
-				FROM (
-					SELECT type.id as id,
-					       count(DISTINCT teas.id) as teasCount,
-					       count(DISTINCT sessions.id) as sessionsCount,
-					       ROW_NUMBER() OVER (ORDER BY count(sessions.*) DESC) as rank
-					FROM tea_type type
-						LEFT JOIN tea as teas ON teas.type_id = type.id
-						LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id
-					GROUP BY type.id
-				) as ranked
-				WHERE ranked.id = :typeId
-				SQL,
-				$rsm,
-			)
-				->setParameter("typeId", $typeEntity->id)
-				->getSingleResult();
-
-			$resource->stats = new TeaTypeStats($statsQuery["rank"], $statsQuery["teas"], $statsQuery["sessions"]);
+		if (null === $resource) {
+			return null;
 		}
+
+		$rsm = new ResultSetMappingBuilder($this->em)
+			->addScalarResult("rank", "rank", Types::INTEGER)
+			->addScalarResult("teas", "teas", Types::INTEGER)
+			->addScalarResult("sessions", "sessions", Types::INTEGER);
+
+		$statsQuery = $this->em->createNativeQuery(
+			<<<SQL
+			SELECT ranked.rank, ranked.teasCount as teas, ranked.sessionsCount as sessions
+			FROM (
+				SELECT type.id as id,
+				       count(DISTINCT teas.id) as teasCount,
+				       count(DISTINCT sessions.id) as sessionsCount,
+				       ROW_NUMBER() OVER (ORDER BY count(DISTINCT sessions.id) DESC, COUNT(DISTINCT teas.id) DESC, MAX(type.created_at) DESC) as rank
+				FROM tea_type type
+					LEFT JOIN tea as teas ON teas.type_id = type.id
+					LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince
+				GROUP BY type.id
+			) as ranked
+			WHERE ranked.id = :typeId
+			SQL,
+			$rsm,
+		)
+			->setParameter("typeId", $typeEntity->id)
+			->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")))
+			->getSingleResult();
+
+		$resource->stats = new TeaTypeStats($statsQuery["rank"], $statsQuery["teas"], $statsQuery["sessions"]);
 
 		return $resource;
 	}
