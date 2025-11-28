@@ -14,9 +14,9 @@ export function OriginSelect(props: {
 	filterPath?: string;
 	onFilterPathChange?: (value?: Iri) => void;
 	allowToggle?: boolean;
+	maxDepth?: number;
 	className?: string;
 }) {
-	const allowNested = undefined !== props.onFilterPathChange;
 	const { data: nodes, ...nodesQuery } = useQuery({
 		queryFn: async (ctx) => {
 			const queryKey = ctx.queryKey[1] ?? null;
@@ -42,6 +42,18 @@ export function OriginSelect(props: {
 		props.onChange(origin["@id"]);
 	}
 
+	function handleItemOpenMaker(origin: Origin) {
+		if (origin.isLeaf || undefined === props.onFilterPathChange) {
+			return undefined;
+		}
+
+		if (props.maxDepth && props.maxDepth <= origin.namePath.length) {
+			return undefined;
+		}
+
+		return () => f(props.onFilterPathChange)(origin.path);
+	}
+
 	return (
 		<ul className={props.className}>
 			{nodesQuery.isPending && (
@@ -60,11 +72,7 @@ export function OriginSelect(props: {
 							validated={false === origin.proposal}
 							onSelect={() => selectOrigin(origin)}
 							selected={props.value === origin["@id"]}
-							onOpen={
-								origin.isLeaf || !allowNested
-									? undefined
-									: () => f(props.onFilterPathChange)(origin.path)
-							}
+							onOpen={handleItemOpenMaker(origin)}
 						/>
 					</li>
 				))}

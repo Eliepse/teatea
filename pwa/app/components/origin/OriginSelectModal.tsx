@@ -13,6 +13,7 @@ export function OriginSelectModal(props: {
 	onSelect: (value?: Iri) => void;
 	defaultValue?: Iri;
 	allowToggle?: boolean;
+	maxDepth?: number;
 }) {
 	const [value, setValue] = useState<Iri | undefined>(props.defaultValue);
 	const [filterPath, setFilterPath] = useState<string | undefined>();
@@ -58,8 +59,9 @@ export function OriginSelectModal(props: {
 				value={value}
 				filterPath={filterPath}
 				onFilterPathChange={handleFilterPathChange}
-				allowToggle
+				maxDepth={props.maxDepth}
 				className="px-6 mb-6"
+				allowToggle
 			/>
 		</Modal>
 	);

@@ -17,34 +17,50 @@ export function SEFiltersBar(props: { className?: string }) {
 
 	const originQuery = useResourceQuery<Origin>(filters.originPath, "/origins/");
 
+	function handleFamilyBtn() {
+		if (filters.type) {
+			return;
+		}
+
+		if (filters.family) {
+			patchFilters({ family: undefined });
+			return;
+		}
+
+		setPopup("family");
+	}
+
+	if (filters.type) {
+		return null;
+	}
+
 	return (
 		<>
 			<ul className={clsx("overflow-y-auto flex gap-x-2", props.className)}>
 				<li>
-					<FilterButton
-						onClick={() => (!filters.family ? setPopup("family") : patchFilters({ family: undefined }))}
-						active={!!filters.family}
-					>
+					<FilterButton onClick={handleFamilyBtn} active={!!filters.family}>
 						{filters.family ?? "Family"}
 					</FilterButton>
 				</li>
 
-				<li>
-					<FilterButton
-						onClick={() =>
-							!filters.originPath ? setPopup("origin") : patchFilters({ originPath: undefined })
-						}
-						active={!!filters.originPath}
-					>
-						{originQuery.isLoading ? (
-							<span className="skeleton w-16 h-4" />
-						) : (
-							<>{originQuery?.data?.name ?? "Origin"}</>
-						)}
-					</FilterButton>
-				</li>
+				{!filters.type && (
+					<li>
+						<FilterButton
+							onClick={() =>
+								!filters.originPath ? setPopup("origin") : patchFilters({ originPath: undefined })
+							}
+							active={!!filters.originPath}
+						>
+							{originQuery.isLoading ? (
+								<span className="skeleton w-16 h-4" />
+							) : (
+								<>{originQuery?.data?.name ?? "Origin"}</>
+							)}
+						</FilterButton>
+					</li>
+				)}
 			</ul>
-			<Modal open={"family" === popup} onClose={() => setPopup(undefined)} position="bottom">
+			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)} position="bottom">
 				<ul className="flex flex-col gap-2">
 					{Object.keys(teaFamilies).map((key) => (
 						<li key={key}>

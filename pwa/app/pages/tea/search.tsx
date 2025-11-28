@@ -29,6 +29,7 @@ export default function TeaSearchPage() {
 					q: safeEmpty((searchParams.get("q") ?? "").trim()),
 					originPath: safeEmpty((searchParams.get("originPath") ?? "").trim()),
 					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
+					type: safeEmpty((searchParams.get("type") ?? "").trim()),
 				}}
 				onFiltersChange={handleFiltersChanged}
 				allowCreation
