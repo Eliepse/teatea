@@ -11,6 +11,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Doctrine\Persistence\Proxy;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @implements ProviderInterface<TeaType|null>
@@ -19,6 +21,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private CacheInterface $cacheAppStats,
 	) {
 	}
 
@@ -40,28 +43,36 @@ readonly class TeaTypeProvider implements ProviderInterface
 			return null;
 		}
 
-		$rank = $this->em->createNativeQuery(
-			<<<SQL
-			SELECT ranked.rank
-			FROM (
-				SELECT type.id as id,
-					ROW_NUMBER() OVER (ORDER BY
-						count(sessions.id) DESC,
-						COUNT(DISTINCT teas.id) DESC,
-						MAX(type.created_at) DESC
-				    ) as rank
-				FROM tea_type type
-					LEFT JOIN tea as teas ON teas.type_id = type.id
-					LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince
-				GROUP BY type.id
-			) as ranked
-			WHERE ranked.id = :typeId
-			SQL,
-			new ResultSetMappingBuilder($this->em)->addScalarResult("rank", "rank", Types::INTEGER),
-		)
-			->setParameter("typeId", $typeEntity->id)
-			->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")))
-			->getSingleScalarResult();
+		$rank = $this->cacheAppStats->get(
+			"tea_types.$typeEntity->id.rank",
+			function (ItemInterface $item) use ($typeEntity) {
+				$item->expiresAt(new \DateTimeImmutable()->add(new \DateInterval("P1D"))->setTime(0, 0));
+
+				$query = $this->em->createNativeQuery(
+					<<<SQL
+					SELECT ranked.rank
+					FROM (
+						SELECT type.id as id,
+							ROW_NUMBER() OVER (ORDER BY
+								count(sessions.id) DESC,
+								COUNT(DISTINCT teas.id) DESC,
+								MAX(type.created_at) DESC
+						    ) as rank
+						FROM tea_type type
+							LEFT JOIN tea as teas ON teas.type_id = type.id
+							LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince
+						GROUP BY type.id
+					) as ranked
+					WHERE ranked.id = :typeId
+					SQL,
+					new ResultSetMappingBuilder($this->em)->addScalarResult("rank", "rank", Types::INTEGER),
+				);
+
+				return $query->setParameter("typeId", $typeEntity->id)
+					->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")))
+					->getSingleScalarResult();
+			},
+		);
 
 		$stats = $this->em->createNativeQuery(
 			<<<SQL

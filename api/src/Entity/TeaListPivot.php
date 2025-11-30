@@ -21,14 +21,14 @@ class TeaListPivot
 	#[ORM\JoinColumn(nullable: false)]
 	public Tea $tea;
 
-	#[ORM\ManyToOne]
+	#[ORM\ManyToOne(inversedBy: "teaListPivots")]
 	#[ORM\JoinColumn(nullable: true)]
 	public ?TeaList $list = null;
 
 	#[ORM\Column]
 	public TeaListPivotType $type = TeaListPivotType::Custom;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    public User $author;
+	#[ORM\ManyToOne]
+	#[ORM\JoinColumn(nullable: false)]
+	public User $author;
 }
