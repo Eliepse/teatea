@@ -57,3 +57,15 @@ export function getOriginLevel(value?: TreePath | Origin | null): number | undef
 	const path = typeof value === "string" ? value : value?.path;
 	return path?.split(".")?.length;
 }
+
+export function getCountry(path?: TreePath | string[]): string | undefined {
+	if (undefined === path) {
+		return undefined;
+	}
+
+	if (path instanceof Array) {
+		return path[0];
+	}
+
+	return path.split(".")[0];
+}

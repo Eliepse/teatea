@@ -12,6 +12,7 @@ import { AskName } from "~/components/tea/create/AskName";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SelectCultivar } from "~/components/cultivar/SelectCultivar";
 import { useNavigate } from "react-router";
+import { getCountry } from "~/utils/api/useOrigins";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -148,7 +149,7 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 							}
 						}}
 						defaultValue={formValue.type && "id" in formValue.type ? formValue.type : undefined}
-						filters={{ family: formValue.family, originPath: formValue.origin?.path }}
+						filters={{ family: formValue.family, originPath: getCountry(formValue.origin?.path) }}
 					/>
 				</StackFrame>
 				<StackFrame frameKey="select:cultivar">
