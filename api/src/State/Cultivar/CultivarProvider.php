@@ -10,7 +10,7 @@ use App\ApiResource\TeaType;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * @implements ProviderInterface<TeaType|null>
+ * @implements ProviderInterface<Cultivar|null>
  */
 readonly class CultivarProvider implements ProviderInterface
 {

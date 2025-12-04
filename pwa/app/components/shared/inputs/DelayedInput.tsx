@@ -6,6 +6,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
+import { f } from "~/utils/function";
 
 const DEFAULT_DELAY_MS = 320;
 
@@ -18,7 +19,7 @@ export function DelayedInput(
 	const [bufferValue, setBufferValue] = useState("");
 
 	useEffect(() => {
-		const to = setTimeout(() => props.onChange(bufferValue), props.delay ?? DEFAULT_DELAY_MS);
+		const to = setTimeout(() => f(props.onChange)(bufferValue), props.delay ?? DEFAULT_DELAY_MS);
 		return () => clearTimeout(to);
 	}, [props.onChange, props.delay, bufferValue]);
 

@@ -10,12 +10,17 @@ import { Modal } from "~/components/shared/modal/Modal";
 import { handleUIEvent } from "~/utils/function";
 import styles from "~/components/origin/OriginSelect.module.css";
 import { Family } from "~/components/tea/Family";
+import { SelectCultivar } from "~/components/tea/SelectCultivar";
+import { Check } from "iconoir-react";
+
+type Filter = "family" | "origin" | "cultivar";
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters } = useSEContext();
-	const [popup, setPopup] = useState<"family" | "origin" | undefined>(undefined);
+	const [popup, setPopup] = useState<Filter | undefined>(undefined);
 
 	const originQuery = useResourceQuery<Origin>(filters.originPath, "/origins/");
+	const cultivarQuery = useResourceQuery<Origin>(filters.cultivar, "/cultivars/");
 
 	function handleFamilyBtn() {
 		if (filters.type) {
@@ -59,6 +64,21 @@ export function SEFiltersBar(props: { className?: string }) {
 						</FilterButton>
 					</li>
 				)}
+
+				<li>
+					<FilterButton
+						onClick={() =>
+							!filters.cultivar ? setPopup("cultivar") : patchFilters({ cultivar: undefined })
+						}
+						active={!!filters.cultivar}
+					>
+						{cultivarQuery.isLoading ? (
+							<span className="skeleton w-16 h-4" />
+						) : (
+							<>{cultivarQuery?.data?.name ?? "Cultivar"}</>
+						)}
+					</FilterButton>
+				</li>
 			</ul>
 			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)} position="bottom">
 				<ul className="flex flex-col gap-2">
@@ -90,6 +110,18 @@ export function SEFiltersBar(props: { className?: string }) {
 				}}
 				allowToggle
 			/>
+			<Modal open={"cultivar" === popup} onClose={() => setPopup(undefined)} position="bottom" className="p-0">
+				<SelectCultivar
+					onConfirm={(v) => {
+						patchFilters({ cultivar: extractId(v) });
+						setPopup(undefined);
+					}}
+					defaultValue={filters.cultivar ? `/cultivars/${filters.cultivar}` : undefined}
+					onBack={() => setPopup(undefined)}
+					confirmLabel="Confirm"
+					confirmIcon={<Check className="size-5 ml-1" />}
+				/>
+			</Modal>
 		</>
 	);
 }

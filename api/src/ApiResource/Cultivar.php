@@ -7,18 +7,30 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use App\Enum\TeaFamily;
+use App\State\Cultivar\CultivarCollectionProvider;
 use App\State\Cultivar\CultivarCreateProcessor;
 use App\State\Cultivar\CultivarProvider;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
 	normalizationContext: ["groups" => ["cultivar:read"]],
 	denormalizationContext: ["groups" => ["cultivar:write"]],
-	security: "is_granted('ROLE_USER')"),
-]
+	security: "is_granted('ROLE_USER')"
+)]
 #[Get(provider: CultivarProvider::class)]
-#[GetCollection(provider: CultivarProvider::class)]
+#[GetCollection(
+	paginationEnabled: true,
+	paginationItemsPerPage: 15,
+	paginationMaximumItemsPerPage: 50,
+	paginationClientItemsPerPage: true,
+	provider: CultivarCollectionProvider::class,
+	parameters: ["q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name")],
+)]
 #[Post(processor: CultivarCreateProcessor::class)]
 class Cultivar
 {

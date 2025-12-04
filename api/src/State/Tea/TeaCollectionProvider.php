@@ -42,6 +42,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$originPath = OperationHelper::getParameter($operation, "originPath");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
 		$typeFilter = OperationHelper::getParameter($operation, "type");
+		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		// Ignore some filters when using tea type filter
@@ -86,9 +87,16 @@ readonly class TeaCollectionProvider implements ProviderInterface
 				->setParameter("originPath", $originPath);
 		}
 
-		// Family
+		// Type
 		if (null !== $typeFilter) {
 			$searchQb->andWhere("type.slug = :typeSlug")->setParameter("typeSlug", $typeFilter);
+		}
+
+		// Cultivar
+		if (null !== $cultivarFilter) {
+			$searchQb
+				->innerJoin("tea.cultivar", "cultivar")
+				->andWhere("cultivar.id = :cultivarId")->setParameter("cultivarId", $cultivarFilter);
 		}
 
 		// Sorting

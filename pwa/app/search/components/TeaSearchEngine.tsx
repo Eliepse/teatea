@@ -178,7 +178,7 @@ function computeSearchType(filters?: SearchFilters): "teas" | "tea_types" {
 		return "tea_types";
 	}
 
-	if (filters.type) {
+	if (filters.type || filters.cultivar) {
 		return "teas";
 	}
 

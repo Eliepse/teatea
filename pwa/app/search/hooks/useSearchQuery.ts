@@ -9,6 +9,7 @@ export type SearchFilters = {
 	originPath?: string;
 	family?: TeaFamily;
 	type?: TeaType["slug"];
+	cultivar?: string | number;
 };
 
 export const SE_CONTEXT = createContext<{
