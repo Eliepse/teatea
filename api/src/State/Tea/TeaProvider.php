@@ -8,13 +8,11 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
-use App\Entity\User;
 use App\State\Cultivar\CultivarProvider;
 use App\State\Origin\OriginProvider;
-use App\State\TeaList\TeaListProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
+use Doctrine\Persistence\Proxy;
 
 /**
  * @implements ProviderInterface<Tea|null>
@@ -42,7 +40,7 @@ readonly class TeaProvider implements ProviderInterface
 		/** @var \App\Entity\Tea|null $teaEntity */
 		$teaEntity = $teaQb->getQuery()->getOneOrNullResult();
 
-		if(null === $teaEntity) {
+		if (null === $teaEntity) {
 			return null;
 		}
 
@@ -95,13 +93,18 @@ readonly class TeaProvider implements ProviderInterface
 		return OriginPath::fromNodes($originNodes);
 	}
 
-	public static function hydrateResource(\App\Entity\Tea $entity, ?OriginPath $originPath): Tea
+	public static function hydrateResource(\App\Entity\Tea $entity, ?OriginPath $originPath = null): Tea
 	{
 		$tea = new Tea();
 		$tea->family = $entity->family;
 		$tea->id = $entity->id;
 		$tea->type = TeaTypeProvider::fromEntity($entity->type);
+
 		$tea->originPath = $originPath;
+		if (null !== $entity->origin && false === ($entity->origin instanceof Proxy)) {
+			$tea->origin = OriginProvider::fromEntity($entity->origin);
+		}
+
 		$tea->cultivar = CultivarProvider::fromEntity($entity->cultivar);
 		$tea->year = $entity->year;
 		$tea->roast = $entity->roast;

@@ -8,12 +8,9 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
-use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
-use App\Enum\TeaFamily;
 use App\State\Cultivar\CultivarCollectionProvider;
 use App\State\Cultivar\CultivarCreateProcessor;
 use App\State\Cultivar\CultivarProvider;
-use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 

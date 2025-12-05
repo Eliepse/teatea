@@ -8,7 +8,6 @@ use App\Entity\Tea;
 use App\Entity\TeaSession;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -99,5 +98,38 @@ class OriginRepository extends ServiceEntityRepository
 		}
 
 		return $map;
+	}
+
+	/**
+	 * @param int[] $ids
+	 *
+	 * @return Origin[]
+	 */
+	public function findManyWithAncestorNames(array $ids): array
+	{
+		if (empty($ids)) {
+			return [];
+		}
+
+		$rows = $this->createQueryBuilder("origin")
+			->select("origin", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
+			->leftJoin("App\Entity\Origin", "ancestors", Join::WITH, "CONTAINS(ancestors.path, origin.path) = TRUE")
+			->where("origin.id IN (:ids)")
+			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
+			->groupBy("origin.path")
+			->getQuery()
+			->getResult();
+
+		return array_map(function ($row) {
+			/** @var Origin $origin */
+			$origin = $row[0];
+			$origin->namePath = array_values(json_decode($row[1]));
+			return $origin;
+		}, $rows);
+	}
+
+	public function findWithAncestorNames(int $id): Origin|null
+	{
+		return $this->findManyWithAncestorNames([$id])[0] ?? null;
 	}
 }
