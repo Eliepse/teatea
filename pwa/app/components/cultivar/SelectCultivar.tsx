@@ -22,7 +22,7 @@ export function SelectCultivar(props: {
 		isPending,
 		...query
 	} = useQuery({
-		queryFn: async () => await (await getApi<ApiCollection<Cultivar>>("/cultivars")).json(),
+		queryFn: async () => await (await getApi<ApiCollection<Cultivar>>("/cultivars", { itemsPerPage: 50 })).json(),
 		queryKey: ["cultivars"],
 	});
 	const [selected, setSelected] = useState(props.defaultValue);
