@@ -17,8 +17,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
-	denormalizationContext: ["groups" => ["create:collectTea"]],
+	normalizationContext: ["groups" => ["read:collectionTea", "with:tea", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
+	denormalizationContext: ["groups" => ["create:collectionTea"]],
 	security: "is_granted('ROLE_USER')",
 )]
 #[Get(
@@ -32,7 +32,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		),
 		"id" => new Link(identifiers: ["id"]),
 	],
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: CollectionTeaProvider::class
 )]
 #[GetCollection(
@@ -44,18 +43,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
 			compositeIdentifier: true,
 			required: true,
 		),
-		"id" => new Link(identifiers: ["id"]),
 	],
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
 	paginationMaximumItemsPerPage: 50,
 	paginationClientItemsPerPage: true,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
 	provider: CollectionTeaCollectionProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
 			schema: ["enum" => TeaFamily::QUERY_PARAMS],
 			description: "Filter by family",
+			required: false,
 			castToNativeType: true,
 		),
 	],
@@ -72,6 +70,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	],
 	processor: CollectionTeaCreateProcessor::class,
 )]
+#[Groups(["read:collectionTea"])]
 class CollectionTea
 {
 	#[ApiProperty(identifier: true)]
@@ -79,7 +78,7 @@ class CollectionTea
 
 	public Member $owner;
 
-	#[Groups(["with:tea", "create:collectTea"])]
+	#[Groups(["create:collectionTea"])]
 	public Tea $tea;
 
 	public ?string $description = null;

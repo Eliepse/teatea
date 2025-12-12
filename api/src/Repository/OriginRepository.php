@@ -116,14 +116,14 @@ class OriginRepository extends ServiceEntityRepository
 			->leftJoin("App\Entity\Origin", "ancestors", Join::WITH, "CONTAINS(ancestors.path, origin.path) = TRUE")
 			->where("origin.id IN (:ids)")
 			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
-			->groupBy("origin.path")
+			->groupBy("origin.id")
 			->getQuery()
 			->getResult();
 
 		return array_map(function ($row) {
 			/** @var Origin $origin */
 			$origin = $row[0];
-			$origin->namePath = array_values(json_decode($row[1]));
+			$origin->namePath = array_values(json_decode($row["names"]));
 			return $origin;
 		}, $rows);
 	}
