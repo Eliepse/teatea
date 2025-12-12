@@ -10,6 +10,7 @@ type RefreshTokenStoragePayload = { token: string; expiredAt: number };
 type JWTokenPayload = {
 	roles: string[];
 	email: string;
+	username: string;
 };
 
 export function useToken() {

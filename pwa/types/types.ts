@@ -4,6 +4,8 @@ import type { TeawareType } from "./teawareType";
 export type Id = number;
 export type Iri = string;
 
+export type Embed<R extends Resource, K extends string, E> = Omit<R, K> & { [key in K]: E };
+
 export type NullablePartial<T> = {
 	[P in keyof T]?: T[P] | null;
 };
@@ -201,4 +203,8 @@ export type Business = Resource<"Business"> & {
 	name: string;
 };
 
-export type Embed<R extends Resource, K extends string, E> = Omit<R, K> & { [key in K]: E };
+export type CollectionTea = Resource<"CollectionTea"> & {
+	tea: Iri;
+	owner: Iri;
+	description?: string;
+};

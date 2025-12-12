@@ -24,20 +24,21 @@ export function TeaCard(
 		showNoRoast?: boolean;
 		loading?: boolean;
 		onClick?: () => void;
+		hideArrow?: boolean;
 	}>,
 ) {
-	const hasSpecs = Object.keys(props).some((key) => ["path", "cultivar", "year", "roast"].includes(key));
+	const hasSpecs = Object.entries(props).some(([k, v]) => ["path", "cultivar", "year", "roast"].includes(k) && !!v);
 	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null;
 
 	return (
 		<article className={clsx("rounded-2xl", props.className)}>
-			<div className="py-2 px-4 cursor-pointer" onClick={props.onClick}>
+			<div className={clsx("py-2 px-4", !props.hideArrow && "cursor-pointer")} onClick={props.onClick}>
 				<Family family={props.family} className="capitalize text-teal-800 text-sm mb-1" />
 				<div className="flex justify-between items-center">
 					<h1 className="font-header font-bold text-2xl text-green-800">
 						{props.loading ? <span className="block w-40 h-6 mt-2 skeleton" /> : props.type?.name}
 					</h1>
-					<ArrowRight className="size-4 inline-block ml-3 flex-none opacity-70" />
+					{!props.hideArrow && <ArrowRight className="size-4 inline-block ml-3 flex-none opacity-70" />}
 				</div>
 			</div>
 
