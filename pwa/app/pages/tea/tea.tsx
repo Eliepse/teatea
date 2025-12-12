@@ -8,7 +8,6 @@ import {
 	type MemberTea,
 	type OriginPath,
 	type RoastLevel,
-	RoastLevelEnum,
 	type TeaFamily,
 	type TeaSession,
 	type TeaStats,
@@ -30,6 +29,7 @@ import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 import clsx from "clsx";
 import { BrewButton } from "~/components/teaSession/BrewButton";
+import { TeaCard } from "~/components/tea/TeaCard";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -92,18 +92,16 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 			<img src="/img/tea-header-placeholder.jpg" className="h-40 w-full object-cover bg-green-300" alt="" />
 
-			<header className="pt-6 pb-0 relative bg-green-50 -mt-6 rounded-t-3xl">
-				<h1 className="mx-6 mb-5 text-4xl leading-11 font-header font-extrabold text-green-900">
-					{tea.type?.name}
-				</h1>
-
-				<Specs
+			<header className=" bg-green-50">
+				<TeaCard
 					family={tea.family}
-					origin={tea.originPath}
-					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
-					cultivar={tea.cultivar}
 					year={tea.year}
-					className="mx-6 py-4 border-t border-green-200"
+					roast={tea.roast}
+					cultivar={tea.cultivar}
+					type={tea.type}
+					origin={tea.originPath}
+					hideArrow
+					className="-mt-12 mb-4 mx-4 relative z-10 bg-white shadow-sm"
 				/>
 
 				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center">
@@ -113,7 +111,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 
 			<main>
 				{0 !== stats.sessionsCount && (
-					<section className="grid grid-cols-2 gap-2 mx-4 leading-tight">
+					<section className="grid grid-cols-2 gap-4 mx-4 leading-tight">
 						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
 							<div className="inline-flex items-center text-3xl font-bold text-green-900">
 								<PeopleTag className="inline-block mr-2 size-6" />
