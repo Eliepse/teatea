@@ -10,10 +10,9 @@ import {
 	type RoastLevel,
 	type TeaFamily,
 	type TeaSession,
-	type TeaStats,
+	type TeaStats
 } from "~t/types";
 import { Link, useNavigate } from "react-router";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
@@ -21,7 +20,7 @@ import { formatDistanceToNow } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { CoffeeCup, Heart, HeartSolid, PeopleTag } from "iconoir-react";
+import { CoffeeCup, EcologyBook, Heart, HeartSolid, PeopleTag } from "iconoir-react";
 import { type ReactNode, useState } from "react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 import { Family } from "~/components/tea/Family";
@@ -30,6 +29,7 @@ import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 import clsx from "clsx";
 import { BrewButton } from "~/components/teaSession/BrewButton";
 import { TeaCard } from "~/components/tea/TeaCard";
+import { BackButton } from "~/components/shared/navigation/BackButton";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -70,23 +70,21 @@ export default function TeaPage(props: Route.ComponentProps) {
 	return (
 		<div className="pb-22 text-lg bg-green-50 min-h-dvh">
 			<nav className="absolute inset-x-0 top-0 p-5 flex">
-				<button
-					className="btn btn-lg btn-circle bg-white mr-auto"
-					onClick={() => navigate(-1)}
-					aria-label="Go back"
-				>
-					<ArrowLeftIcon className="size-6" />
-				</button>
+				<BackButton className="mr-auto" />
 
 				<IfAuthenticated>
-					<button
-						className="btn btn-lg bg-white btn-circle text-secondary"
-						onClick={handleUIEvent(() => toggleFavorite.mutate())}
-						disabled={toggleFavorite.isPending}
-						aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-					>
-						{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
-					</button>
+					<ul className="flex gap-2">
+						<li>
+							<button
+								className="btn btn-lg bg-white btn-circle text-green-700"
+								onClick={handleUIEvent(() => toggleFavorite.mutate())}
+								disabled={toggleFavorite.isPending}
+								aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+							>
+								{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
+							</button>
+						</li>
+					</ul>
 				</IfAuthenticated>
 			</nav>
 
@@ -104,8 +102,8 @@ export default function TeaPage(props: Route.ComponentProps) {
 					className="-mt-12 mb-4 mx-4 relative z-10 bg-white shadow-sm"
 				/>
 
-				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center">
-					<BrewButton tea={props.loaderData.tea["@id"]} />
+				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center gap-2">
+					<BrewButton tea={props.loaderData.tea["@id"]} text="Brew" />
 				</nav>
 			</header>
 
