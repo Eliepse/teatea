@@ -1,11 +1,13 @@
 import type { Route } from "../../../.react-router/types/app/pages/lists/+types/personal-collection";
 import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection, MemberTea } from "~t/types";
+import type { ApiPaginatedCollection } from "~t/types";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { TeaCard } from "~/components/tea/TeaCard";
+import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
+import { limit } from "~/utils/text";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
@@ -21,8 +23,9 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 export default function PersonalCollectionPage(props: Route.ComponentProps) {
 	const itemsQuery = useQuery({
 		queryFn: async (ctx) => {
-			const response = await getApi<ApiPaginatedCollection<MemberTea>>(`/members/${ctx.queryKey[1]}/teas`);
-			return await response.json();
+			const response = await getApi<ApiPaginatedCollection<CollectionTeaRaw>>(`/members/${ctx.queryKey[1]}/teas`);
+			const data = await response.json();
+			return { ...data, member: data.member.map(denormalizeCollectionTea) };
 		},
 		queryKey: ["collectionTeas", props.params.username],
 	});
@@ -44,7 +47,21 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 							year={teaLink.tea.year}
 							className="bg-white"
 							hideArrow
-						/>
+						>
+							{!!teaLink.description && (
+								<p className="px-4 py-2 mb-2 border-b border-dashed border-green-200 text-stone-600">
+									{limit(teaLink.description, 128)}
+								</p>
+							)}
+							<ul className="py-2 px-4 text-stone-500">
+								{!!teaLink.acquiredAt && (
+									<li className="flex justify-between gap-4">
+										<span>Acquired</span>
+										{teaLink.acquiredAt.toLocaleDateString()}
+									</li>
+								)}
+							</ul>
+						</TeaCard>
 					</li>
 				))}
 			</ul>

@@ -69,7 +69,7 @@ export type Tea = Resource & {
 	cultivar?: Cultivar;
 	year?: number;
 	roast?: RoastLevel;
-	addedAt: Date;
+	addedAt?: Date;
 };
 
 export type TeaSession = Resource<"TeaSession"> & {
@@ -204,7 +204,8 @@ export type Business = Resource<"Business"> & {
 };
 
 export type CollectionTea = Resource<"CollectionTea"> & {
-	tea: Iri;
+	tea: Tea;
 	owner: Iri;
 	description?: string;
+	acquiredAt?: Date;
 };

@@ -81,5 +81,9 @@ class CollectionTea
 	#[Groups(["create:collectionTea"])]
 	public Tea $tea;
 
+	#[Groups(["create:collectionTea"])]
 	public ?string $description = null;
+
+	#[Groups(["create:collectionTea"])]
+	public ?\DateTimeImmutable $acquiredAt = null;
 }

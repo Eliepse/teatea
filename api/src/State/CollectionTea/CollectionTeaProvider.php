@@ -63,6 +63,7 @@ readonly class CollectionTeaProvider implements ProviderInterface
 		$tea->tea = TeaProvider::hydrateResource($entity->tea);
 		$tea->owner = MemberProvider::hydrate($entity->owner);
 		$tea->description = $entity->description;
+		$tea->acquiredAt = $entity->acquiredAt;
 		return $tea;
 	}
 }
