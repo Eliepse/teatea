@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CollectionTea;
 use App\Repository\OriginRepository;
+use App\State\Business\BusinessProvider;
 use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
@@ -64,6 +65,7 @@ readonly class CollectionTeaProvider implements ProviderInterface
 		$tea->owner = MemberProvider::hydrate($entity->owner);
 		$tea->description = $entity->description;
 		$tea->acquiredAt = $entity->acquiredAt;
+		$tea->acquiredFrom = BusinessProvider::fromEntity($entity->acquiredFrom);
 		return $tea;
 	}
 }

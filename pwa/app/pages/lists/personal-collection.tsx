@@ -5,9 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { TokenUtils } from "~/auth/hooks/useToken";
-import { TeaCard } from "~/components/tea/TeaCard";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
-import { limit } from "~/utils/text";
+import { CollectionTeaCard } from "~/pages/lists/_components/CollectionTeaCard";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
@@ -31,37 +30,20 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 	});
 
 	return (
-		<AuthLayout activeKey="my-teas" className="p-4 pb-8 bg-green-50 min-h-dvh">
+		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
 			<header className="mb-8 pt-2 relative">
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
 				<h1 className="text-3xl font-bold font-header text-center text-green-900">Personal collection</h1>
 			</header>
 			<ul>
-				{itemsQuery.data?.member?.map((teaLink) => (
-					<li key={teaLink.id} className="mb-2">
-						<TeaCard
-							family={teaLink.tea.family}
-							cultivar={teaLink.tea.cultivar}
-							roast={teaLink.tea.roast}
-							type={teaLink.tea.type}
-							year={teaLink.tea.year}
-							className="bg-white"
-							hideArrow
-						>
-							{!!teaLink.description && (
-								<p className="px-4 py-2 mb-2 border-b border-dashed border-green-200 text-stone-600">
-									{limit(teaLink.description, 128)}
-								</p>
-							)}
-							<ul className="py-2 px-4 text-stone-500">
-								{!!teaLink.acquiredAt && (
-									<li className="flex justify-between gap-4">
-										<span>Acquired</span>
-										{teaLink.acquiredAt.toLocaleDateString()}
-									</li>
-								)}
-							</ul>
-						</TeaCard>
+				{itemsQuery.data?.member?.map((item) => (
+					<li key={item.id} className="mb-2">
+						<CollectionTeaCard
+							tea={item.tea}
+							acquiredFrom={item.acquiredFrom}
+							acquiredAt={item.acquiredAt}
+							description={item.description}
+						/>
 					</li>
 				))}
 			</ul>

@@ -17,12 +17,12 @@ import { BusinessPickerStep } from "~/components/shared/form/modal-multistep/Bus
 type CollectionTeaForm = {
 	tea: Iri;
 	acquiredAt?: Date;
-	business?: Iri;
+	acquiredFrom?: Iri;
 };
 
 const FRAME_INFO_MAPPER = {
-	"date:select": { step: 1, title: "When did you acquired it?" },
-	"business:select": { step: 2, title: "Where did you get it from?" },
+	"date:select": { step: 1, title: "When did you bought it?" },
+	"business:select": { step: 2, title: "Where did you bought it?" },
 } as const;
 
 export function AddPersonalCollectionModal(props: { tea: Iri; onClose: () => void; open: boolean }) {
@@ -99,8 +99,8 @@ export function AddPersonalCollectionModal(props: { tea: Iri; onClose: () => voi
 					<StackFrame frameKey="business:select">
 						<BusinessPickerStep
 							onConfirm={(business) => {
-								setForm((st) => ({ ...st, business }));
-								mutation.mutate({ ...form, business });
+								setForm((st) => ({ ...st, acquiredFrom: business }));
+								mutation.mutate({ ...form, acquiredFrom: business });
 							}}
 							allowEmpty
 						/>

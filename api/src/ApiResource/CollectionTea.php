@@ -17,7 +17,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["read:collectionTea", "with:tea", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
+	normalizationContext: [
+		"groups" => [
+			"read:collectionTea",
+			"with:tea",
+			"with:business",
+			"embedded:teaType",
+			"embedded:origin",
+			"embedded:cultivar"
+		]
+	],
 	denormalizationContext: ["groups" => ["create:collectionTea"]],
 	security: "is_granted('ROLE_USER')",
 )]
@@ -86,4 +95,7 @@ class CollectionTea
 
 	#[Groups(["create:collectionTea"])]
 	public ?\DateTimeImmutable $acquiredAt = null;
+
+	#[Groups(["create:collectionTea"])]
+	public ?Business $acquiredFrom = null;
 }

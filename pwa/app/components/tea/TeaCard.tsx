@@ -46,11 +46,11 @@ export function TeaCard(
 				<div className="py-3 px-4 border-t border-dashed border-green-200 text-teal-800">
 					<ul className="grid grid-cols-1 gap-2 gap-x-8 text-sm">
 						{!!props.origin && (
-							<Spec label="Origin" value={<FormatOriginPath originPath={props.origin} />} />
+							<TeaCardSpec label="Origin" value={<FormatOriginPath originPath={props.origin} />} />
 						)}
-						{!!props.cultivar && <Spec label="Cultivar" value={props.cultivar?.name} />}
-						{!!props.year && <Spec label="Year" value={props.year} />}
-						{!!roast && <Spec label="Roast" value={roast} />}
+						{!!props.cultivar && <TeaCardSpec label="Cultivar" value={props.cultivar?.name} />}
+						{!!props.year && <TeaCardSpec label="Year" value={props.year} />}
+						{!!roast && <TeaCardSpec label="Roast" value={roast} />}
 					</ul>
 				</div>
 			)}
@@ -60,7 +60,7 @@ export function TeaCard(
 	);
 }
 
-function Spec(props: { label: string; value: ReactNode }) {
+export function TeaCardSpec(props: { label: string; value: ReactNode }) {
 	return (
 		<li className="flex justify-between items-center text-green-900">
 			<span className="text-teal-600">{props.label}</span>

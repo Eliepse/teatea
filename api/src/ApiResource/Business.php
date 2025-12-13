@@ -30,6 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	],
 )]
 #[Post(processor: BusinessCreateProcessor::class)]
+#[Groups(["with:business"])]
 class Business
 {
 	#[ApiProperty(identifier: true)]
@@ -37,6 +38,6 @@ class Business
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 32)]
-	#[Groups(["business:write", "with:business"])]
+	#[Groups(["business:write"])]
 	public string $name;
 }
