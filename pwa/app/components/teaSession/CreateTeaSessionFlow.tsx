@@ -101,7 +101,6 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 					className="h-full"
 					onBack={goBack}
 					defaultValue={form.drankAt}
-					buttonText="Save this session"
 					onConfirm={(date) => {
 						setForm({ ...form, drankAt: date });
 						stackNavigator.next("place:select");

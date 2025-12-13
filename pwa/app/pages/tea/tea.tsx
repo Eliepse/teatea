@@ -30,6 +30,7 @@ import clsx from "clsx";
 import { BrewButton } from "~/components/teaSession/BrewButton";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
+import { AddToPersonalCollectionButton } from "~/components/tea/AddToPersonalCollectionButton";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -83,6 +84,16 @@ export default function TeaPage(props: Route.ComponentProps) {
 							>
 								{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
 							</button>
+						</li>
+						<li>
+							<AddToPersonalCollectionButton tea={tea["@id"]}>
+								<button
+									className="btn btn-lg bg-white btn-circle text-green-700"
+									aria-label={"Add this tea to my collection"}
+								>
+									<EcologyBook className="size-6" />
+								</button>
+							</AddToPersonalCollectionButton>
 						</li>
 					</ul>
 				</IfAuthenticated>
