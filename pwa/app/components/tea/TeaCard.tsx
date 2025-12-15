@@ -1,5 +1,6 @@
 import {
 	type Cultivar,
+	type Origin,
 	type OriginPath,
 	type RoastLevel,
 	RoastLevelEnum,
@@ -7,7 +8,7 @@ import {
 	type TeaType,
 } from "~t/types";
 import clsx from "clsx";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { FormatOrigin, FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import type { PropsWithChildren, ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
 import { ArrowRight } from "iconoir-react";
@@ -16,7 +17,7 @@ export function TeaCard(
 	props: PropsWithChildren<{
 		family: TeaFamily;
 		type?: TeaType;
-		origin?: OriginPath;
+		origin?: OriginPath | Origin;
 		cultivar?: Cultivar;
 		year?: number;
 		roast?: RoastLevel;
@@ -46,8 +47,18 @@ export function TeaCard(
 				<div className="py-3 px-4 border-t border-dashed border-green-200 text-teal-800">
 					<ul className="grid grid-cols-1 gap-2 gap-x-8 text-sm">
 						{!!props.origin && (
-							<TeaCardSpec label="Origin" value={<FormatOriginPath originPath={props.origin} />} />
+							<TeaCardSpec
+								label="Origin"
+								value={
+									"namePath" in props.origin ? (
+										<FormatOrigin origin={props.origin} />
+									) : (
+										<FormatOriginPath originPath={props.origin} />
+									)
+								}
+							/>
 						)}
+
 						{!!props.cultivar && <TeaCardSpec label="Cultivar" value={props.cultivar?.name} />}
 						{!!props.year && <TeaCardSpec label="Year" value={props.year} />}
 						{!!roast && <TeaCardSpec label="Roast" value={roast} />}

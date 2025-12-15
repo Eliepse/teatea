@@ -16,6 +16,7 @@ export function CollectionTeaCard(props: {
 				roast={props.tea.roast}
 				type={props.tea.type}
 				year={props.tea.year}
+				origin={props.tea.origin}
 				className="bg-white"
 				hideArrow
 			/>
@@ -29,6 +30,7 @@ export function CollectionTeaCard(props: {
 			roast={props.tea.roast}
 			type={props.tea.type}
 			year={props.tea.year}
+			origin={props.tea.origin}
 			className="bg-white"
 			hideArrow
 		>

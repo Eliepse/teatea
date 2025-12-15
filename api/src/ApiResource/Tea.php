@@ -107,7 +107,7 @@ class Tea
 	#[Groups(["embedded:tea", "with:tea", "embedded:origin"])]
 	public ?OriginPath $originPath = null;
 
-	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:origin"])]
 	public ?Origin $origin = null;
 
 	#[ApiProperty(readableLink: true)]

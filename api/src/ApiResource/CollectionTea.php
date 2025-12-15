@@ -22,8 +22,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
 			"read:collectionTea",
 			"with:tea",
 			"with:business",
+			"with:origin",
 			"embedded:teaType",
-			"embedded:origin",
 			"embedded:cultivar"
 		]
 	],
