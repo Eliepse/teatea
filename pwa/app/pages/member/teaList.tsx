@@ -1,9 +1,8 @@
-import type { Route } from "../../../.react-router/types/app/pages/lists/+types/teaList";
+import type { Route } from "../../../.react-router/types/app/pages/member/+types/teaList";
 import { getApi } from "~/utils/api";
 import type { ApiCollection, MemberTea, TeaList } from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
-import { TeaShortCard } from "~/components/tea/TeaShortCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { TeaCard } from "~/components/tea/TeaCard";
 

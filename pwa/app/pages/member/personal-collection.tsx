@@ -1,4 +1,4 @@
-import type { Route } from "../../../.react-router/types/app/pages/lists/+types/personal-collection";
+import type { Route } from "../../../.react-router/types/app/pages/member/+types/personal-collection";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection } from "~t/types";
 import { useQuery } from "@tanstack/react-query";
@@ -6,7 +6,7 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
-import { CollectionTeaCard } from "~/pages/lists/_components/CollectionTeaCard";
+import { CollectionTeaCard } from "~/pages/member/_components/CollectionTeaCard";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
