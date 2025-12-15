@@ -32,7 +32,7 @@ export function SelectCultivar(props: {
 		queryKey: ["search", { q: search, itemsPerPage: 25 }],
 	});
 
-	function selectBusiness(cultivar: Cultivar) {
+	function selectCultivar(cultivar: Cultivar) {
 		setValue((iri) => (iri === cultivar["@id"] ? undefined : cultivar["@id"]));
 	}
 
@@ -76,7 +76,7 @@ export function SelectCultivar(props: {
 										? "bg-green-700 text-white"
 										: "bg-green-100 text-green-900",
 								)}
-								onClick={handleUIEvent(() => selectBusiness(cultivar))}
+								onClick={handleUIEvent(() => selectCultivar(cultivar))}
 							>
 								{cultivar.name}
 							</button>

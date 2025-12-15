@@ -88,10 +88,13 @@ readonly class CultivarCollectionProvider implements ProviderInterface
 			->where("cultivar.id IN (:ids)")
 			->setParameter("ids", Arr::pluck($searchResults, "id"), ArrayParameterType::INTEGER);
 
-		$resources = array_map(
-			fn(\App\Entity\Cultivar $cultivar) => CultivarProvider::fromEntity($cultivar),
-			$entitiesQuery->getQuery()->getResult(),
-		);
+		$entitesById = Arr::keyBy($entitiesQuery->getQuery()->getResult(), "id");
+
+		$resources = [];
+
+		foreach ($searchResults as $result) {
+			$resources[] = CultivarProvider::fromEntity($entitesById[$result["id"]]);
+		}
 
 		return new TraversablePaginator(new ArrayCollection($resources), $page, $limit, $total);
 	}
