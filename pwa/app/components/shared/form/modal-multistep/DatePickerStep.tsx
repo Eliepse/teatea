@@ -36,6 +36,7 @@ export function DatePickerStep(props: {
 				disabled={{ after: new Date() }}
 				endMonth={new Date()}
 				showOutsideDays
+				defaultMonth={value}
 				required
 			/>
 
