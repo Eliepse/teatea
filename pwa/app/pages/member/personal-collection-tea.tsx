@@ -1,22 +1,24 @@
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/personal-collection-tea";
-import { deleteApi, getApi, patchApi } from "~/utils/api";
+import { getApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { Calendar, Shop, Trash } from "iconoir-react";
-import type { CollectionTea, Iri, NullablePartial } from "~t/types";
+import type { CollectionTea } from "~t/types";
 import { useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { Modal } from "~/components/shared/modal/Modal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { MenuButton } from "~/components/shared/navigation/MenuModalButton";
-import { useMutation } from "@tanstack/react-query";
-import { extractId } from "~/utils/resource";
 import { useNavigate, useRevalidator } from "react-router";
-import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
+import { usePopup } from "~/components/shared/modal/AlertManager";
 import { DatePickerStep } from "~/components/shared/form/modal-multistep/DatePickerStep";
 import { jsonableDate } from "~/utils/time";
+import { TextStep } from "~/components/shared/form/modal-multistep/TextStep";
+import { useCollectionTeaMutations } from "~/hooks/tea/useCollectionTeaMutations";
+import { extractId } from "~/utils/resource";
+import { EditableDescription } from "~/pages/member/_components/EditableDescription";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const response = await getApi<CollectionTeaRaw>(`/members/${args.params.username}/teas/${args.params.teaId}`);
@@ -26,6 +28,7 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 
 export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 	const { tea, ...meta } = props.loaderData.ctea;
+	const [modal, setModal] = useState<"description" | null>(null);
 
 	return (
 		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
@@ -69,38 +72,33 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					)}
 				</ul>
 			</TeaCard>
+
+			<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
+
+			<Modal open={"description" === modal} onClose={() => setModal(null)} position="bottom" className="p-0">
+				<TextStep onConfirm={(text) => console.debug(text)} defaultValue={meta.description} allowEmpty />
+			</Modal>
 		</AuthLayout>
 	);
 }
 
 function OptionsMenu(props: { collectionTea: CollectionTea }) {
 	const revalidatePage = useRevalidator();
-	const alert = useAlert();
 	const popup = usePopup();
 	const navigate = useNavigate();
+	const mutations = useCollectionTeaMutations(props.collectionTea["@id"]);
 	const [modalKey, setModalKey] = useState<"_menu" | "acquiredFrom" | "acquiredAt" | null>(null);
 
-	const mutation = useMutation({
-		mutationFn: async (args: NullablePartial<Pick<CollectionTea, "acquiredAt"> & { acquiredFrom: Iri }>) => {
-			const response = await patchApi<CollectionTeaRaw>(props.collectionTea["@id"], args);
-			return denormalizeCollectionTea(await response.json());
-		},
-		onError: (e) => alert({ title: "Failed to change this tea", body: e.message }),
-		onSuccess: () => revalidatePage.revalidate(),
-	});
-
-	const deleteMutation = useMutation({
-		mutationFn: async () => await deleteApi(props.collectionTea["@id"]),
-		onSuccess: () => navigate(`/members/${extractId(props.collectionTea.owner)}/teas`),
-		onError: (e) => alert({ title: "Failed to delete this tea", body: e.message }),
-	});
-
 	function deleteSession() {
-		popup.confirm({ body: "Are you sure you want to delete this session?" }).then(() => deleteMutation.mutate());
+		popup.confirm({ body: "Are you sure you want to delete this session?" }).then(async () => {
+			await mutations.delete.mutateAsync();
+			navigate(`/members/${extractId(props.collectionTea.owner)}/teas`);
+		});
 	}
 
-	async function patchResource(patch: Parameters<typeof mutation.mutateAsync>[0]) {
-		await mutation.mutateAsync(patch);
+	async function patchResource(patch: Parameters<typeof mutations.patch.mutateAsync>[0]) {
+		await mutations.patch.mutateAsync(patch);
+		await revalidatePage.revalidate();
 		setModalKey(null);
 	}
 

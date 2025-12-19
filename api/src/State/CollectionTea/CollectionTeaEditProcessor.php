@@ -22,6 +22,7 @@ readonly class CollectionTeaEditProcessor implements ProcessorInterface
 		assert($data instanceof CollectionTea);
 
 		$entity = $this->em->find(\App\Entity\CollectionTea::class, $data->id);
+		$entity->description = $data->description;
 		$entity->acquiredAt = $data->acquiredAt;
 		$entity->acquiredFrom = $data->acquiredFrom ? $this->em->getReference(
 			\App\Entity\Business::class,
