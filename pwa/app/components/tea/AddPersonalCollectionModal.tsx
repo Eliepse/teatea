@@ -60,7 +60,7 @@ export function AddPersonalCollectionModal(props: { tea: Iri; onClose: () => voi
 			alert({ title: "Error while updation your collection", body: e.message });
 		},
 		onSuccess: (data) => {
-			setTimeout(() => navigate(`/members/${token?.username}/teas`), 500);
+			setTimeout(() => navigate(`/members/${token?.username}/teas/${data.id}`), 500);
 		},
 	});
 

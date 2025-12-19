@@ -4,33 +4,23 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Enum\TeaFamily;
 use App\State\CollectionTea\CollectionTeaCollectionProvider;
 use App\State\CollectionTea\CollectionTeaCreateProcessor;
+use App\State\CollectionTea\CollectionTeaDeleteProcessor;
+use App\State\CollectionTea\CollectionTeaEditProcessor;
 use App\State\CollectionTea\CollectionTeaProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 
 #[ApiResource(
-	normalizationContext: [
-		"groups" => [
-			"read:collectionTea",
-			"with:tea",
-			"with:business",
-			"with:origin",
-			"embedded:teaType",
-			"embedded:cultivar"
-		]
-	],
-	denormalizationContext: ["groups" => ["create:collectionTea"]],
-	security: "is_granted('ROLE_USER')",
-)]
-#[Get(
 	uriTemplate: "/members/{username}/teas/{id}",
 	uriVariables: [
 		"username" => new Link(
@@ -41,8 +31,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		),
 		"id" => new Link(identifiers: ["id"]),
 	],
-	provider: CollectionTeaProvider::class
+	normalizationContext: [
+		"groups" => [
+			"read:collectionTea",
+			"with:tea",
+			"with:business",
+			"with:origin",
+			"embedded:teaType",
+			"embedded:cultivar"
+		]
+	],
+	security: "is_granted('ROLE_USER') and user.username === request.attributes.get('username')",
 )]
+#[Get(provider: CollectionTeaProvider::class)]
 #[GetCollection(
 	uriTemplate: "/members/{username}/teas",
 	uriVariables: [
@@ -77,8 +78,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
 			required: true,
 		),
 	],
+	denormalizationContext: ["groups" => ["create:collectionTea"]],
 	processor: CollectionTeaCreateProcessor::class,
 )]
+#[Patch(
+	denormalizationContext: ["groups" => ["edit:collectionTea"]],
+	provider: CollectionTeaProvider::class,
+	processor: CollectionTeaEditProcessor::class,
+)]
+#[Delete(provider: CollectionTeaProvider::class, processor: CollectionTeaDeleteProcessor::class)]
 #[Groups(["read:collectionTea"])]
 class CollectionTea
 {
@@ -90,12 +98,12 @@ class CollectionTea
 	#[Groups(["create:collectionTea"])]
 	public Tea $tea;
 
-	#[Groups(["create:collectionTea"])]
+	#[Groups(["create:collectionTea", "edit:collectionTea"])]
 	public ?string $description = null;
 
-	#[Groups(["create:collectionTea"])]
+	#[Groups(["create:collectionTea", "edit:collectionTea"])]
 	public ?\DateTimeImmutable $acquiredAt = null;
 
-	#[Groups(["create:collectionTea"])]
+	#[Groups(["create:collectionTea", "edit:collectionTea"])]
 	public ?Business $acquiredFrom = null;
 }

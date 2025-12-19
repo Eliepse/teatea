@@ -154,9 +154,12 @@ export function FrameActions(props: {
 	const [pending, setPending] = useState(false);
 
 	async function handleConfirm() {
-		setPending(true);
-		await props.onNext();
-		setPending(false);
+		try {
+			setPending(true);
+			await props.onNext();
+		} finally {
+			setPending(false);
+		}
 	}
 
 	return (

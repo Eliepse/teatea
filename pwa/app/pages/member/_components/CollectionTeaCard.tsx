@@ -18,7 +18,6 @@ export function CollectionTeaCard(props: {
 				year={props.tea.year}
 				origin={props.tea.origin}
 				className="bg-white"
-				hideArrow
 			/>
 		);
 	}
@@ -32,7 +31,6 @@ export function CollectionTeaCard(props: {
 			year={props.tea.year}
 			origin={props.tea.origin}
 			className="bg-white"
-			hideArrow
 		>
 			{!!props.description && (
 				<p className="px-4 py-2 mb-2 border-b border-dashed border-green-200 text-stone-600 text-sm">
@@ -41,16 +39,8 @@ export function CollectionTeaCard(props: {
 			)}
 
 			<ul className="flex flex-col py-3 px-4 text-stone-500 gap-2 text-sm">
-				{!!props.acquiredAt && (
-					<li>
-						<TeaCardSpec label="Acquired" value={props.acquiredAt.toLocaleDateString()} />
-					</li>
-				)}
-				{!!props.acquiredFrom && (
-					<li>
-						<TeaCardSpec label="Shop" value={props.acquiredFrom.name} />
-					</li>
-				)}
+				{!!props.acquiredAt && <TeaCardSpec label="Acquired" value={props.acquiredAt.toLocaleDateString()} />}
+				{!!props.acquiredFrom && <TeaCardSpec label="Shop" value={props.acquiredFrom.name} />}
 			</ul>
 		</TeaCard>
 	);

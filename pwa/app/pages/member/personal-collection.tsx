@@ -7,6 +7,7 @@ import { AuthLayout } from "~/layouts/AuthLayout";
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { CollectionTeaCard } from "~/pages/member/_components/CollectionTeaCard";
+import { Link } from "react-router";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
@@ -38,12 +39,14 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 			<ul>
 				{itemsQuery.data?.member?.map((item) => (
 					<li key={item.id} className="mb-2">
-						<CollectionTeaCard
-							tea={item.tea}
-							acquiredFrom={item.acquiredFrom}
-							acquiredAt={item.acquiredAt}
-							description={item.description}
-						/>
+						<Link to={`/members/${props.params.username}/teas/${item.id}`}>
+							<CollectionTeaCard
+								tea={item.tea}
+								acquiredFrom={item.acquiredFrom}
+								acquiredAt={item.acquiredAt}
+								description={item.description}
+							/>
+						</Link>
 					</li>
 				))}
 			</ul>
