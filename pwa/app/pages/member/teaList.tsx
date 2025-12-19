@@ -1,7 +1,7 @@
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/teaList";
 import { getApi } from "~/utils/api";
 import type { ApiCollection, MemberTea, TeaList } from "~t/types";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { TeaCard } from "~/components/tea/TeaCard";
@@ -14,8 +14,6 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 }
 
 export default function TeaListPage(props: Route.ComponentProps) {
-	const navigate = useNavigate();
-
 	const teaLinks = useQuery({
 		queryFn: async (ctx) => {
 			const id = ctx.queryKey[1];
