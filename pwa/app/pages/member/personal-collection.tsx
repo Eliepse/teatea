@@ -8,6 +8,7 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { CollectionTeaCard } from "~/pages/member/_components/CollectionTeaCard";
 import { Link } from "react-router";
+import { EmojiSurprise, Search } from "iconoir-react";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
@@ -36,6 +37,18 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
 				<h1 className="text-3xl font-bold font-header text-center text-green-900">Personal collection</h1>
 			</header>
+
+			{!itemsQuery.isLoading && 0 === itemsQuery.data?.totalItems && (
+				<div className="mt-16 px-4 py-8 text-green-700 bg-white/60 rounded-xl text-center">
+					<EmojiSurprise className="size-6 mx-auto mb-4" />
+					It seems you do not have register any tea yet. Search for a tea and start keeping track of your tea
+					collection&nbsp;!
+					<Link to="/tea/search" className="flex items-center justify-center mt-8 text-green-900 p-2 border border-green-700 rounded-md">
+						<Search className="size-4 mr-2" /> Look for a tea
+					</Link>
+				</div>
+			)}
+
 			<ul>
 				{itemsQuery.data?.member?.map((item) => (
 					<li key={item.id} className="mb-2">
