@@ -21,9 +21,9 @@ export function TextStep(props: {
 
 	return (
 		<>
-			<textarea className="textarea w-full h-96" onChange={handleTextChange} value={value} />
+			<textarea className="textarea w-full h-96 text-lg rounded-xl" onChange={handleTextChange} value={value} />
 
-			<div className="p-4 sticky bottom-0 bg-white">
+			<div className="mt-4 sticky bottom-0 bg-white">
 				<NextButton
 					onClick={handleConfirm}
 					disabled={!props.allowEmpty && !value.trim()}

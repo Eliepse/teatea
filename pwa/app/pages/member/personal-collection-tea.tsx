@@ -5,7 +5,7 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
 import { Calendar, MediaImagePlus, Shop, Trash } from "iconoir-react";
 import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { Modal } from "~/components/shared/modal/Modal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
@@ -21,6 +21,11 @@ import { EditableDescription } from "~/pages/member/_components/EditableDescript
 import clsx from "clsx";
 import { Family } from "~/components/tea/Family";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
+import {
+	type MemberTeaContext,
+	MemberTeaCTX,
+	useCollectionTeaContext,
+} from "~/pages/member/_components/MemberTeaContext";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const response = await getApi<CollectionTeaRaw>(`/members/${args.params.username}/teas/${args.params.teaId}`);
@@ -29,69 +34,117 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 }
 
 export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
+	const revalidatePage = useRevalidator();
 	const { tea, ...meta } = props.loaderData.ctea;
+	const mutations = useCollectionTeaMutations(meta["@id"]);
 	const [modal, setModal] = useState<"description" | null>(null);
+	const [action, setAction] = useState<Parameters<MemberTeaContext["act"]>[0] | undefined>();
+
+	async function patchResource(patch: Parameters<typeof mutations.patch.mutateAsync>[0]) {
+		await mutations.patch.mutateAsync(patch);
+		await revalidatePage.revalidate();
+		setAction(undefined);
+	}
+
+	const context = useMemo<MemberTeaContext>(
+		() => ({
+			item: props.loaderData.ctea,
+			act: (action) => setAction(action),
+		}),
+		[props.loaderData.ctea],
+	);
 
 	return (
 		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
-			<nav className="mb-6 pt-2 relative flex">
-				<BackButton className="mr-auto shadow-sm" />
-				<OptionsMenu collectionTea={props.loaderData.ctea} />
-			</nav>
+			<MemberTeaCTX.Provider value={context}>
+				<nav className="mb-6 pt-2 relative flex">
+					<BackButton className="mr-auto shadow-sm" />
+					<OptionsMenu collectionTea={props.loaderData.ctea} />
+				</nav>
 
-			<header>
-				<div
-					className={clsx(
-						"mb-4 flex items-center justify-center h-32 rounded-xl",
-						"bg-white/40 border-2 border-green-800/60 border-dashed",
-						"cursor-pointer hover:bg-white/70 hover:border-green-800",
-					)}
+				<header>
+					<div
+						className={clsx(
+							"mb-4 flex items-center justify-center h-32 rounded-xl",
+							"bg-white/40 border-2 border-green-800/60 border-dashed",
+							"cursor-pointer hover:bg-white/70 hover:border-green-800",
+						)}
+					>
+						<MediaImagePlus className="size-6 text-green-700" />
+					</div>
+
+					<div className="">
+						{!!tea.type && <Family family={tea.family} className="capitalize text-teal-800 mb-1" />}
+
+						<h1 className="font-header font-bold text-4xl text-green-800">
+							{!tea.type ? `${tea.family} tea` : tea.type.name}
+						</h1>
+					</div>
+
+					<SpecList
+						cultivar={tea.cultivar}
+						roast={tea.roast}
+						year={tea.year}
+						origin={tea.origin}
+						className="text-stone-500"
+					/>
+
+					<div className="my-4 border-t border-green-200" />
+
+					<ul className="my-4 text-green-900">
+						{meta.acquiredFrom && (
+							<li className="flex items-center gap-2 my-2">
+								<Shop className="size-4" />
+								{meta.acquiredFrom.name}
+							</li>
+						)}
+
+						{meta.acquiredAt && (
+							<li className="flex items-center gap-2 my-2">
+								<Calendar className="size-4" />
+								{meta.acquiredAt.toLocaleDateString()}
+							</li>
+						)}
+					</ul>
+
+					<div className="my-4 border-t border-green-200" />
+				</header>
+
+				<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
+
+				<Modal
+					open={undefined !== action}
+					onClose={() => setAction(undefined)}
+					position="bottom"
+					className="p-0"
 				>
-					<MediaImagePlus className="size-6 text-green-700" />
-				</div>
-
-				<div className="">
-					{!!tea.type && <Family family={tea.family} className="capitalize text-teal-800 mb-1" />}
-
-					<h1 className="font-header font-bold text-4xl text-green-800">
-						{!tea.type ? `${tea.family} tea` : tea.type.name}
-					</h1>
-				</div>
-
-				<SpecList
-					cultivar={tea.cultivar}
-					roast={tea.roast}
-					year={tea.year}
-					origin={tea.origin}
-					className="text-stone-500"
-				/>
-
-				<div className="my-4 border-t border-green-200" />
-
-				<ul className="my-4 text-green-900">
-					{meta.acquiredFrom && (
-						<li className="flex items-center gap-2 my-2">
-							<Shop className="size-4" />
-							{meta.acquiredFrom.name}
-						</li>
+					{"edit:acquiredFrom" === action && (
+						<SelectBusinessFrame
+							onConfirm={(iri) => patchResource({ acquiredFrom: iri ?? null })}
+							defaultValue={meta.acquiredFrom?.["@id"]}
+							confirmLabel="Confirm"
+						/>
 					)}
 
-					{meta.acquiredAt && (
-						<li className="flex items-center gap-2 my-2">
-							<Calendar className="size-4" />
-							{meta.acquiredAt.toLocaleDateString()}
-						</li>
+					{"edit:acquiredAt" === action && (
+						<DatePickerStep
+							onNext={(date) => patchResource({ acquiredAt: jsonableDate(date) })}
+							defaultValue={meta.acquiredAt}
+							allowEmpty
+						/>
 					)}
-				</ul>
 
-				<div className="my-4 border-t border-green-200" />
-			</header>
-
-			<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
-
-			<Modal open={"description" === modal} onClose={() => setModal(null)} position="bottom" className="p-0">
-				<TextStep onConfirm={(text) => console.debug(text)} defaultValue={meta.description} allowEmpty />
-			</Modal>
+					{"edit:description" === action && (
+						<div className="p-4">
+							<TextStep
+								onConfirm={(text) => patchResource({ description: text })}
+								defaultValue={meta.description}
+								allowEmpty
+							/>
+						</div>
+					)}
+				</Modal>
+			</MemberTeaCTX.Provider>
 		</AuthLayout>
 	);
 }
@@ -138,11 +191,11 @@ function SpecList(props: {
 }
 
 function OptionsMenu(props: { collectionTea: CollectionTea }) {
-	const revalidatePage = useRevalidator();
+	const context = useCollectionTeaContext();
 	const popup = usePopup();
 	const navigate = useNavigate();
 	const mutations = useCollectionTeaMutations(props.collectionTea["@id"]);
-	const [modalKey, setModalKey] = useState<"_menu" | "acquiredFrom" | "acquiredAt" | null>(null);
+	const [modalKey, setModalKey] = useState<"_menu" | null>(null);
 
 	function deleteSession() {
 		popup.confirm({ body: "Are you sure you want to delete this session?" }).then(async () => {
@@ -151,24 +204,24 @@ function OptionsMenu(props: { collectionTea: CollectionTea }) {
 		});
 	}
 
-	async function patchResource(patch: Parameters<typeof mutations.patch.mutateAsync>[0]) {
-		await mutations.patch.mutateAsync(patch);
-		await revalidatePage.revalidate();
-		setModalKey(null);
-	}
-
 	return (
 		<>
 			<MenuButton onClick={() => setModalKey("_menu")} />
 			<MenuModal onClose={() => setModalKey(null)} open={"_menu" === modalKey}>
 				<MenuItem
 					label="Change shop"
-					onClick={() => setModalKey("acquiredFrom")}
+					onClick={() => {
+						context?.act("edit:acquiredFrom");
+						setModalKey(null);
+					}}
 					icon={<Shop className="size-5" />}
 				/>
 				<MenuItem
 					label="Change acquisition date"
-					onClick={() => setModalKey("acquiredAt")}
+					onClick={() => {
+						context?.act("edit:acquiredAt");
+						setModalKey(null);
+					}}
 					icon={<Calendar className="size-5" />}
 				/>
 				<MenuItem
@@ -178,27 +231,6 @@ function OptionsMenu(props: { collectionTea: CollectionTea }) {
 					danger
 				/>
 			</MenuModal>
-
-			<Modal
-				open={"acquiredFrom" === modalKey}
-				onClose={() => setModalKey(null)}
-				position="bottom"
-				className="p-0"
-			>
-				<SelectBusinessFrame
-					onConfirm={(iri) => patchResource({ acquiredFrom: iri ?? null })}
-					defaultValue={props.collectionTea.acquiredFrom?.["@id"]}
-					confirmLabel="Confirm"
-				/>
-			</Modal>
-
-			<Modal open={"acquiredAt" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
-				<DatePickerStep
-					onNext={(date) => patchResource({ acquiredAt: jsonableDate(date) })}
-					defaultValue={props.collectionTea.acquiredAt}
-					allowEmpty
-				/>
-			</Modal>
 		</>
 	);
 }
