@@ -3,10 +3,9 @@ import { getApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { TeaCard } from "~/components/tea/TeaCard";
-import { Calendar, Shop, Trash } from "iconoir-react";
-import type { CollectionTea } from "~t/types";
-import { useState } from "react";
+import { Calendar, MediaImagePlus, Shop, Trash } from "iconoir-react";
+import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
+import { type ReactNode, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { Modal } from "~/components/shared/modal/Modal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
@@ -19,6 +18,9 @@ import { TextStep } from "~/components/shared/form/modal-multistep/TextStep";
 import { useCollectionTeaMutations } from "~/hooks/tea/useCollectionTeaMutations";
 import { extractId } from "~/utils/resource";
 import { EditableDescription } from "~/pages/member/_components/EditableDescription";
+import clsx from "clsx";
+import { Family } from "~/components/tea/Family";
+import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const response = await getApi<CollectionTeaRaw>(`/members/${args.params.username}/teas/${args.params.teaId}`);
@@ -32,46 +34,58 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 
 	return (
 		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
-			<nav className="mb-4 pt-2 relative flex">
+			<nav className="mb-6 pt-2 relative flex">
 				<BackButton className="mr-auto shadow-sm" />
 				<OptionsMenu collectionTea={props.loaderData.ctea} />
 			</nav>
 
-			{/*<div*/}
-			{/*	className={clsx(*/}
-			{/*		"mb-4 flex items-center justify-center h-32 rounded-xl",*/}
-			{/*		"bg-white/40 border-2 border-green-800/60 border-dashed",*/}
-			{/*		"cursor-pointer hover:bg-white/70 hover:border-green-800",*/}
-			{/*	)}*/}
-			{/*>*/}
-			{/*	<MediaImagePlus className="size-6 text-green-700" />*/}
-			{/*</div>*/}
+			<header>
+				<div
+					className={clsx(
+						"mb-4 flex items-center justify-center h-32 rounded-xl",
+						"bg-white/40 border-2 border-green-800/60 border-dashed",
+						"cursor-pointer hover:bg-white/70 hover:border-green-800",
+					)}
+				>
+					<MediaImagePlus className="size-6 text-green-700" />
+				</div>
 
-			<TeaCard
-				family={tea.family}
-				cultivar={tea.cultivar}
-				roast={tea.roast}
-				type={tea.type}
-				year={tea.year}
-				origin={tea.origin}
-				className="bg-white shadow-xs"
-				hideArrow
-			>
-				<ul className="flex justify-around rounded-xl py-4 text-green-900">
+				<div className="">
+					{!!tea.type && <Family family={tea.family} className="capitalize text-teal-800 mb-1" />}
+
+					<h1 className="font-header font-bold text-4xl text-green-800">
+						{!tea.type ? `${tea.family} tea` : tea.type.name}
+					</h1>
+				</div>
+
+				<SpecList
+					cultivar={tea.cultivar}
+					roast={tea.roast}
+					year={tea.year}
+					origin={tea.origin}
+					className="text-stone-500"
+				/>
+
+				<div className="my-4 border-t border-green-200" />
+
+				<ul className="my-4 text-green-900">
 					{meta.acquiredFrom && (
-						<li className="flex items-center gap-2">
+						<li className="flex items-center gap-2 my-2">
 							<Shop className="size-4" />
 							{meta.acquiredFrom.name}
 						</li>
 					)}
+
 					{meta.acquiredAt && (
-						<li className="flex items-center gap-2">
+						<li className="flex items-center gap-2 my-2">
 							<Calendar className="size-4" />
 							{meta.acquiredAt.toLocaleDateString()}
 						</li>
 					)}
 				</ul>
-			</TeaCard>
+
+				<div className="my-4 border-t border-green-200" />
+			</header>
 
 			<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
 
@@ -79,6 +93,47 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 				<TextStep onConfirm={(text) => console.debug(text)} defaultValue={meta.description} allowEmpty />
 			</Modal>
 		</AuthLayout>
+	);
+}
+
+function SpecList(props: {
+	origin?: Pick<Origin, "namePath">;
+	cultivar?: Pick<Cultivar, "name">;
+	year?: number;
+	roast?: RoastLevel;
+	className?: string;
+}) {
+	const items = new Map<string, ReactNode>();
+
+	if (props.origin) {
+		items.set("origin", <FormatOrigin origin={props.origin} />);
+	}
+
+	if (props.cultivar) {
+		items.set("cultivar", props.cultivar.name);
+	}
+
+	if (props.year) {
+		items.set("year", props.year);
+	}
+
+	if (props.roast) {
+		items.set("roast", props.roast);
+	}
+
+	if (0 === items.size) {
+		return null;
+	}
+
+	return (
+		<ul className={clsx("flex flex-wrap", props.className)}>
+			{Array.from(items.entries()).map(([key, child], i) => (
+				<li key={key}>
+					{child}
+					{i + 1 < items.size && <span className="mx-2">&middot;</span>}
+				</li>
+			))}
+		</ul>
 	);
 }
 

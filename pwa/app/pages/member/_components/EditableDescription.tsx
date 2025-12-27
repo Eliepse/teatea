@@ -5,6 +5,7 @@ import { TextStep } from "~/components/shared/form/modal-multistep/TextStep";
 import { useCollectionTeaMutations } from "~/hooks/tea/useCollectionTeaMutations";
 import { useRevalidator } from "react-router";
 import { AlignLeft, Edit } from "iconoir-react";
+import clsx from "clsx";
 
 export function EditableDescription(props: { collTeaIri: Iri; value?: string; className?: string }) {
 	const [modal, setModal] = useState(false);
@@ -21,21 +22,24 @@ export function EditableDescription(props: { collTeaIri: Iri; value?: string; cl
 		<div className={props.className}>
 			{!props.value && (
 				<button
-					className="mx-auto p-2 flex items-center justify-center text-green-600 cursor-pointer hover:text-green-900"
+					className={clsx(
+						"p-2 px-3 flex items-center justify-center rounded-full text-green-600 cursor-pointer ",
+						"border border-green-700 hover:border-green-900 hover:text-green-900",
+					)}
 					onClick={() => setModal(true)}
 				>
 					Add a description <AlignLeft className="size-4 ml-2" />
 				</button>
 			)}
 			{!!props.value && (
-				<div className="px-4 py-3 bg-white rounded-xl shadow-xs">
+				<div className="px-4 py-3 bg-white rounded-xl shadow-sm">
 					<p className="text-green-900">{props.value}</p>
 					<button
-						className="flex items-center justify-center w-full pt-2 mt-3 border-t border-green-300 text-green-700 text-sm"
+						className="flex items-center w-full pt-2 mt-2 text-green-900/60 text-sm cursor-pointer hover:text-green-900"
 						onClick={() => setModal(true)}
 					>
 						Edit the description
-						<Edit className="size-4 ml-2" />
+						<Edit className="size-4 ml-2 mt-0.5" />
 					</button>
 				</div>
 			)}
