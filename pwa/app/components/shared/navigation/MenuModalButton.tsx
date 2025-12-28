@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useState } from "react";
+import { type PropsWithChildren, type ReactNode, useState } from "react";
 import { MoreVert } from "iconoir-react";
 import { MenuModal } from "~/components/shared/navigation/MenuModal";
 
@@ -14,10 +14,10 @@ export function MenuModalButton(props: PropsWithChildren) {
 	);
 }
 
-export function MenuButton(props: { onClick: () => void }) {
+export function MenuButton(props: { onClick: () => void; icon?: ReactNode }) {
 	return (
 		<button className="btn btn-lg bg-white btn-circle shadow-xs" aria-label="Options" onClick={props.onClick}>
-			<MoreVert className="size-6" />
+			{props.icon ?? <MoreVert className="size-6" />}
 		</button>
 	);
 }
