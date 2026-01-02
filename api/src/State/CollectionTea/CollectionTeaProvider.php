@@ -9,6 +9,7 @@ use App\ApiResource\CollectionTea;
 use App\Repository\MediaObjectRepository;
 use App\Repository\OriginRepository;
 use App\State\Business\BusinessProvider;
+use App\State\Hydration\CollectionTeaHydrator;
 use App\State\MediaObject\MediaObjectProvider;
 use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
@@ -23,6 +24,7 @@ readonly class CollectionTeaProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 		private MediaObjectRepository $mediaRepo,
+		private CollectionTeaHydrator $hydrator,
 	) {
 	}
 
@@ -59,7 +61,7 @@ readonly class CollectionTeaProvider implements ProviderInterface
 
 		$teaEntity->media = $this->mediaRepo->findByHasMedia($teaEntity);
 
-		return self::fromEntity($teaEntity);
+		return $this->hydrator->hydrate($teaEntity);
 	}
 
 	public static function fromEntity(\App\Entity\CollectionTea $entity): CollectionTea
