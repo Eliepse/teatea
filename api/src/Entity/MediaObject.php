@@ -27,11 +27,24 @@ class MediaObject
 	#[Vich\UploadableField(
 		mapping: 'media_object',
 		fileNameProperty: 'filePath',
+		size: "size",
+		mimeType: "mimeType",
+		dimensions: "dimensions",
 	)]
 	public ?File $file = null;
 
 	#[ORM\Column(type: Types::TEXT, nullable: true)]
 	public ?string $filePath = null;
+
+	#[ORM\Column(type: Types::INTEGER, nullable: true)]
+	public ?int $size = null;
+
+	#[ORM\Column(type: Types::TEXT, nullable: true)]
+	public ?string $mimeType = null;
+
+	/** @var int[]|null */
+	#[ORM\Column(type: Types::JSONB, nullable: true)]
+	public ?array $dimensions = null;
 
 	#[ORM\OneToMany(MediaObjectPivot::class, "media", cascade: ["persist", "remove"])]
 	public Collection $pivots;
