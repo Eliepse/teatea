@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 			"with:tea",
 			"with:business",
 			"with:origin",
+			"with:media",
 			"embedded:teaType",
 			"embedded:cultivar"
 		]
@@ -106,4 +107,6 @@ class CollectionTea
 
 	#[Groups(["create:collectionTea", "edit:collectionTea"])]
 	public ?Business $acquiredFrom = null;
+
+	public ?MediaObject $thumbnail = null;
 }

@@ -2,12 +2,15 @@
 
 namespace App\Entity;
 
+use App\Doctrine\HasMedia;
 use App\Doctrine\ORM\TimestampedEntity;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
-class CollectionTea
+class CollectionTea implements HasMedia
 {
 	use TimestampedEntity;
 
@@ -36,4 +39,22 @@ class CollectionTea
 
 //	TODO(elie): allow custom collections
 //	public ?UserCollection $collection = null;
+
+	// Requires manual hydration
+	public Collection $media;
+
+	public function __construct()
+	{
+		$this->media = new ArrayCollection();
+	}
+
+	public function getType(): string
+	{
+		return CollectionTea::class;
+	}
+
+	public function getId(): int
+	{
+		return $this->id;
+	}
 }

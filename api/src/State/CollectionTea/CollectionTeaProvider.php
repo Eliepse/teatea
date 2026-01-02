@@ -6,8 +6,10 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CollectionTea;
+use App\Repository\MediaObjectRepository;
 use App\Repository\OriginRepository;
 use App\State\Business\BusinessProvider;
+use App\State\MediaObject\MediaObjectProvider;
 use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +22,7 @@ readonly class CollectionTeaProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
+		private MediaObjectRepository $mediaRepo,
 	) {
 	}
 
@@ -54,6 +57,8 @@ readonly class CollectionTeaProvider implements ProviderInterface
 			$teaEntity->tea->origin = $this->originRepo->findWithAncestorNames($teaEntity->tea->origin->id);
 		}
 
+		$teaEntity->media = $this->mediaRepo->findByHasMedia($teaEntity);
+
 		return self::fromEntity($teaEntity);
 	}
 
@@ -66,6 +71,8 @@ readonly class CollectionTeaProvider implements ProviderInterface
 		$tea->description = $entity->description;
 		$tea->acquiredAt = $entity->acquiredAt;
 		$tea->acquiredFrom = BusinessProvider::fromEntity($entity->acquiredFrom);
+		$tea->thumbnail = MediaObjectProvider::fromEntity($entity->media->first());
+
 		return $tea;
 	}
 }

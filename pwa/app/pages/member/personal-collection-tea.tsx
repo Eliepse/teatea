@@ -1,11 +1,11 @@
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/personal-collection-tea";
-import { getApi } from "~/utils/api";
+import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { Calendar, Edit, EditPencil, MediaImagePlus, Shop, Trash } from "iconoir-react";
+import { Calendar, EditPencil, MediaImagePlus, Shop, Trash } from "iconoir-react";
 import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
-import { type ReactNode, useMemo, useState } from "react";
+import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { Modal } from "~/components/shared/modal/Modal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
@@ -35,9 +35,9 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 
 export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 	const revalidatePage = useRevalidator();
+	// const imageUpload = useRef<HTMLInputElement>(null);
 	const { tea, ...meta } = props.loaderData.ctea;
 	const mutations = useCollectionTeaMutations(meta["@id"]);
-	const [modal, setModal] = useState<"description" | null>(null);
 	const [action, setAction] = useState<Parameters<MemberTeaContext["act"]>[0] | undefined>();
 
 	async function patchResource(patch: Parameters<typeof mutations.patch.mutateAsync>[0]) {
@@ -54,6 +54,16 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 		[props.loaderData.ctea],
 	);
 
+	function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
+		const file = e.target.files?.item(0);
+
+		if (!file) {
+			return;
+		}
+
+		postApi(`${meta["@id"]}/media`, { file }).finally(console.debug);
+	}
+
 	return (
 		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
 			<MemberTeaCTX.Provider value={context}>
@@ -63,15 +73,17 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 				</nav>
 
 				<header>
-					<div
+					<label
 						className={clsx(
 							"mb-4 flex items-center justify-center h-32 rounded-xl",
 							"bg-white/40 border-2 border-green-800/60 border-dashed",
 							"cursor-pointer hover:bg-white/70 hover:border-green-800",
 						)}
+						// onClick={() => imageUpload.current?.click()}
 					>
+						<input type="file" accept="image/*" onChange={handleFileUpload} hidden />
 						<MediaImagePlus className="size-6 text-green-700" />
-					</div>
+					</label>
 
 					<div className="">
 						{!!tea.type && <Family family={tea.family} className="capitalize text-teal-800 mb-1" />}
