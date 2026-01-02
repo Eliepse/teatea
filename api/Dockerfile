@@ -1,6 +1,8 @@
 # Base FrankenPHP image
 FROM dunglas/frankenphp:1.9-php8.4  AS base
 
+ARG CWEBP_VERSION=1.6.0
+
 WORKDIR /app
 VOLUME /data
 VOLUME /config
@@ -8,8 +10,13 @@ VOLUME /config
 # persistent / runtime deps
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install --no-install-recommends -y \
-	acl file gettext git \
-	&& rm -rf /var/lib/apt/lists/*
+	acl file gettext git && \
+    mkdir webptmp && \
+    curl -fsSL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-${CWEBP_VERSION}-linux-x86-64.tar.gz | tar xzf - -C webptmp --strip-components=1 || { echo "Download or extraction failed"; exit 1; } && \
+    mv webptmp/bin/cwebp /usr/local/bin/cwebp && \
+    chmod 001 /usr/local/bin/cwebp && chown 0:0 /usr/local/bin/cwebp && \
+    rm -r webptmp && \
+	rm -rf /var/lib/apt/lists/*
 
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
