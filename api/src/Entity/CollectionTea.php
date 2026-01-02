@@ -41,7 +41,7 @@ class CollectionTea implements HasMedia
 //	public ?UserCollection $collection = null;
 
 	// Requires manual hydration
-	public Collection $media;
+	public ?Collection $media = null;
 
 	public function __construct()
 	{

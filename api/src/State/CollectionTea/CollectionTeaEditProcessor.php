@@ -5,12 +5,15 @@ namespace App\State\CollectionTea;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\CollectionTea;
+use App\State\Hydration\CollectionTeaHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 
 readonly class CollectionTeaEditProcessor implements ProcessorInterface
 {
-	public function __construct(private EntityManagerInterface $em)
-	{
+	public function __construct(
+		private EntityManagerInterface $em,
+		private CollectionTeaHydrator $hydrator,
+	) {
 	}
 
 	public function process(
@@ -31,6 +34,6 @@ readonly class CollectionTeaEditProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		return CollectionTeaProvider::fromEntity($entity);
+		return $this->hydrator->hydrate($entity);
 	}
 }

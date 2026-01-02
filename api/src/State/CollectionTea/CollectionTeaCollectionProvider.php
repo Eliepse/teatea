@@ -9,11 +9,10 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\CollectionTea;
-use App\Entity\Origin;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
-use App\State\Tea\TeaProvider;
+use App\State\Hydration\CollectionTeaHydrator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -29,6 +28,7 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private LoggerInterface $logger,
 		private Pagination $pagination,
+		private CollectionTeaHydrator $hydrator,
 	) {
 	}
 
@@ -120,7 +120,9 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 
 		/** @var array<integer, \App\Entity\Origin> $entitiesById */
 		$originsById = Arr::keyBy(
-			$this->originRepo->findManyWithAncestorNames(array_filter(Arr::pluck($entities, fn($e) => $e->tea->origin?->id, true))),
+			$this->originRepo->findManyWithAncestorNames(
+				array_filter(Arr::pluck($entities, fn($e) => $e->tea->origin?->id, true)),
+			),
 			"id",
 		);
 
@@ -133,15 +135,16 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 			$collectionTea = $entitiesById[$id] ?? null;
 
 			if (null === $collectionTea) {
-				$this->logger->warning("Couldn't hydrate a collection tea: not found in list", ["collectionTea" => $id]);
+				$this->logger->warning("Couldn't hydrate a collection tea: not found in list", ["collectionTea" => $id],
+				);
 				continue;
 			}
 
-			if(null !== $collectionTea->tea->origin) {
+			if (null !== $collectionTea->tea->origin) {
 				$collectionTea->tea->origin = $originsById[$collectionTea->tea->origin->id];
 			}
 
-			$resources[] = CollectionTeaProvider::fromEntity($collectionTea);
+			$resources[] = $this->hydrator->hydrate($collectionTea);
 		}
 
 		return new TraversablePaginator(new ArrayCollection($resources), $page, $limit, $total);

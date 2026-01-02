@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\CollectionTea;
 use App\Entity\User;
+use App\State\Hydration\CollectionTeaHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -15,6 +16,7 @@ readonly class CollectionTeaCreateProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
+		private CollectionTeaHydrator $hydrator,
 	) {
 	}
 
@@ -41,6 +43,6 @@ readonly class CollectionTeaCreateProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		return CollectionTeaProvider::fromEntity($entity);
+		return $this->hydrator->hydrate($entity);
 	}
 }
