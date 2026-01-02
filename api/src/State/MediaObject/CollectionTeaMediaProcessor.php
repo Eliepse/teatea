@@ -9,6 +9,7 @@ use App\Repository\MediaObjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Process\Process;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
 class CollectionTeaMediaProcessor implements ProcessorInterface
@@ -53,11 +54,14 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 			throw new NotFoundHttpException();
 		}
 
+		$process = $this->makePlaceholderProcess($data->file->getRealPath())->mustRun();
+
 		$mediaObjects = $this->mediaRepo->findByHasMedia($cteaEntity);
 
 		// Create the media and associate the CollectionTea
 		$entity = new \App\Entity\MediaObject();
 		$entity->file = $data->file;
+		$entity->placeholder = base64_encode($process->getOutput());
 		$entity->attach($cteaEntity);
 
 		$this->em->persist($entity);
@@ -72,5 +76,27 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 		$data->id = $entity->id;
 		$data->contentUrl = $this->baseUrl . $this->storage->resolveUri($entity, "file");
 		return $data;
+	}
+
+	private function makePlaceholderProcess(string $filepath): Process
+	{
+		return new Process(
+			[
+				"/usr/local/bin/cwebp",
+				"-resize",
+				3,
+				3,
+				"-noalpha",
+				"-metadata",
+				"none",
+				"-m",
+				6,
+				"-q",
+				25,
+				"-o",
+				"-",
+				$filepath,
+			],
+		);
 	}
 }

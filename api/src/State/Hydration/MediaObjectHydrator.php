@@ -25,6 +25,7 @@ final readonly class MediaObjectHydrator implements ResourceHydrator
 		$resource = new \App\ApiResource\MediaObject();
 		$resource->id = $media->id;
 		$resource->contentUrl = $this->storage->resolveUri($media, "file");
+		$resource->placeholder = $media->placeholder;
 
 		if ($entity instanceof MediaObjectPivot) {
 			$resource->collection = $entity->collection;

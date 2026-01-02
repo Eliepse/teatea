@@ -88,7 +88,8 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					{meta.thumbnail && (
 						<img
 							src={meta.thumbnail.contentUrl}
-							className="mb-4 w-full h-48 rounded-xl object-cover"
+							style={{ backgroundImage: `url(data:image/webp;base64,${meta.thumbnail.placeholder})` }}
+							className="mb-4 w-full h-48 rounded-xl object-cover bg-center bg-cover"
 							alt=""
 						/>
 					)}

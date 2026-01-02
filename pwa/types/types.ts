@@ -206,6 +206,7 @@ export type Business = Resource<"Business"> & {
 export type MediaObject = Resource<"MediaObject"> & {
 	contentUrl: string;
 	collection?: string;
+	placeholder?: string;
 };
 
 export type CollectionTea = Resource<"CollectionTea"> & {

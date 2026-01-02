@@ -46,6 +46,9 @@ class MediaObject
 	#[ORM\Column(type: Types::JSONB, nullable: true)]
 	public ?array $dimensions = null;
 
+	#[ORM\Column(type: Types::TEXT, nullable: true)]
+	public ?string $placeholder = null;
+
 	#[ORM\OneToMany(MediaObjectPivot::class, "media", cascade: ["persist", "remove"])]
 	public Collection $pivots;
 

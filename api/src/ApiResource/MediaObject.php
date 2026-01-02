@@ -69,4 +69,7 @@ class MediaObject
 
 	#[Groups(["read:media", "with:media"])]
 	public ?string $collection = null;
+
+	#[Groups(["read:media", "with:media"])]
+	public ?string $placeholder = null;
 }
