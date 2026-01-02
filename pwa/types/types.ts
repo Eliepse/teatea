@@ -203,10 +203,16 @@ export type Business = Resource<"Business"> & {
 	name: string;
 };
 
+export type MediaObject = Resource<"MediaObject"> & {
+	contentUrl: string;
+	collection?: string;
+};
+
 export type CollectionTea = Resource<"CollectionTea"> & {
 	tea: Tea;
 	owner: Iri;
 	description?: string;
 	acquiredAt?: Date;
 	acquiredFrom?: Business;
+	thumbnail?: MediaObject;
 };

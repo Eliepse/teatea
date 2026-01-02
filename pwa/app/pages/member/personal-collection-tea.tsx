@@ -35,7 +35,6 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 
 export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 	const revalidatePage = useRevalidator();
-	// const imageUpload = useRef<HTMLInputElement>(null);
 	const { tea, ...meta } = props.loaderData.ctea;
 	const mutations = useCollectionTeaMutations(meta["@id"]);
 	const [action, setAction] = useState<Parameters<MemberTeaContext["act"]>[0] | undefined>();
@@ -73,17 +72,26 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 				</nav>
 
 				<header>
-					<label
-						className={clsx(
-							"mb-4 flex items-center justify-center h-32 rounded-xl",
-							"bg-white/40 border-2 border-green-800/60 border-dashed",
-							"cursor-pointer hover:bg-white/70 hover:border-green-800",
-						)}
-						// onClick={() => imageUpload.current?.click()}
-					>
-						<input type="file" accept="image/*" onChange={handleFileUpload} hidden />
-						<MediaImagePlus className="size-6 text-green-700" />
-					</label>
+					{!meta.thumbnail && (
+						<label
+							className={clsx(
+								"mb-4 flex items-center justify-center h-32 rounded-xl",
+								"bg-white/40 border-2 border-green-800/60 border-dashed",
+								"cursor-pointer hover:bg-white/70 hover:border-green-800",
+							)}
+						>
+							<input type="file" accept="image/*" onChange={handleFileUpload} hidden />
+							<MediaImagePlus className="size-6 text-green-700" />
+						</label>
+					)}
+
+					{meta.thumbnail && (
+						<img
+							src={meta.thumbnail.contentUrl}
+							className="mb-4 w-full h-48 rounded-xl object-cover"
+							alt=""
+						/>
+					)}
 
 					<div className="">
 						{!!tea.type && <Family family={tea.family} className="capitalize text-teal-800 mb-1" />}

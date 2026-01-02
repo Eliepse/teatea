@@ -53,7 +53,7 @@
 		    path('/manifest.json')
 		|| !path(
 			'/api*', '/auth*', '/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
-			'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml'
+			'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml', '/media/*'
 		)`
 
 	# Comment the following line if you don't want PWA to catch requests for HTML documents.
