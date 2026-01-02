@@ -49,7 +49,14 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 		]);
 		fetchConfigs.body = undefined;
 	} else if (undefined !== config?.method && undefined !== payload) {
-		fetchConfigs.body = "string" === typeof payload ? payload : JSON.stringify(payload);
+		if (Object.values(payload).some((v) => v instanceof File)) {
+			const form = new FormData();
+			Object.entries(payload).forEach(([k, v]) => form.set(k, v));
+			fetchConfigs.body = form;
+			fetchConfigs.headers.delete("Content-Type");
+		} else {
+			fetchConfigs.body = "string" === typeof payload ? payload : JSON.stringify(payload);
+		}
 	}
 
 	const url = new URL(`${oUrl.origin}${oUrl.pathname}?${searchParams}`);
