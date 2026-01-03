@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\CollectionTea;
+use App\Entity\Pivot\MediaObjectPivot;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
@@ -115,7 +116,7 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 			->getQuery()
 			->getResult();
 
-		/** @var array<integer, \App\Entity\Tea> $entitiesById */
+		/** @var array<integer, \App\Entity\CollectionTea> $entitiesById */
 		$entitiesById = Arr::keyBy($entities, "id");
 
 		/** @var array<integer, \App\Entity\Origin> $entitiesById */
@@ -126,6 +127,28 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 			"id",
 		);
 
+		/** @var MediaObjectPivot[] $mediaPivots */
+		$mediaPivots = $this->em->createQuery(
+			<<<DQL
+			SELECT pivot, media
+			FROM App\Entity\Pivot\MediaObjectPivot pivot
+				LEFT JOIN pivot.media media
+			WHERE pivot.mediableType = :type
+			  AND pivot.mediableId IN (:ids)
+			DQL,
+		)
+			->setParameter("type", CollectionTea::class)
+			->setParameter("ids", array_keys($entitiesById), ArrayParameterType::INTEGER)
+			->getResult();
+
+		foreach ($mediaPivots as $pivot) {
+			$parent = $entitiesById[$pivot->mediableId] ?? null;
+			if (null === $parent) {
+				continue;
+			}
+			$parent->media = new ArrayCollection([$pivot->media]);
+		}
+
 		$resources = [];
 
 		// Iterate over search results to keep the right ordering
@@ -135,7 +158,9 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 			$collectionTea = $entitiesById[$id] ?? null;
 
 			if (null === $collectionTea) {
-				$this->logger->warning("Couldn't hydrate a collection tea: not found in list", ["collectionTea" => $id],
+				$this->logger->warning(
+					"Couldn't hydrate a collection tea: not found in list",
+					["collectionTea" => $id],
 				);
 				continue;
 			}
