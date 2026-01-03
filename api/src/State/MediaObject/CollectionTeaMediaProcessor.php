@@ -5,11 +5,13 @@ namespace App\State\MediaObject;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\MediaObject;
+use App\Media\ResizeType;
+use App\Media\WebpEncoder;
 use App\Repository\MediaObjectRepository;
+use App\ValueObject\Size;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Process\Process;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
 class CollectionTeaMediaProcessor implements ProcessorInterface
@@ -54,14 +56,14 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 			throw new NotFoundHttpException();
 		}
 
-		$process = $this->makePlaceholderProcess($data->file->getRealPath())->mustRun();
+		$this->makeOptimizationEncoder()->toFile($data->file, $data->file);
 
 		$mediaObjects = $this->mediaRepo->findByHasMedia($cteaEntity);
 
 		// Create the media and associate the CollectionTea
 		$entity = new \App\Entity\MediaObject();
 		$entity->file = $data->file;
-		$entity->placeholder = base64_encode($process->getOutput());
+		$entity->placeholder = $this->makePlaceholderEncoder()->toBase64($data->file);
 		$entity->attach($cteaEntity);
 
 		$this->em->persist($entity);
@@ -78,25 +80,27 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 		return $data;
 	}
 
-	private function makePlaceholderProcess(string $filepath): Process
+	private function makeOptimizationEncoder(): WebpEncoder
 	{
-		return new Process(
-			[
-				"/usr/local/bin/cwebp",
-				"-resize",
-				3,
-				3,
-				"-noalpha",
-				"-metadata",
-				"none",
-				"-m",
-				6,
-				"-q",
-				25,
-				"-o",
-				"-",
-				$filepath,
-			],
+		return new WebpEncoder(
+			resize: new Size(2000, 1500),
+			resizeType: ResizeType::Contain,
+			noUpscaling: true,
+			keepAlpha: false,
+			stripMetadata: true,
+			quality: 70,
+			compressionQuality: 4,
+		);
+	}
+
+	private function makePlaceholderEncoder(): WebpEncoder
+	{
+		return new WebpEncoder(
+			resize: new Size(3, 3),
+			keepAlpha: false,
+			stripMetadata: true,
+			quality: 25,
+			compressionQuality: 6,
 		);
 	}
 }
