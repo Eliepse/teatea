@@ -11,7 +11,7 @@ import { Modal } from "~/components/shared/modal/Modal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { MenuButton } from "~/components/shared/navigation/MenuModalButton";
 import { useNavigate, useRevalidator } from "react-router";
-import { usePopup } from "~/components/shared/modal/AlertManager";
+import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
 import { DatePickerStep } from "~/components/shared/form/modal-multistep/DatePickerStep";
 import { jsonableDate } from "~/utils/time";
 import { TextStep } from "~/components/shared/form/modal-multistep/TextStep";
@@ -24,7 +24,7 @@ import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import {
 	type MemberTeaContext,
 	MemberTeaCTX,
-	useCollectionTeaContext,
+	useCollectionTeaContext
 } from "~/pages/member/_components/MemberTeaContext";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
@@ -34,6 +34,7 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 }
 
 export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
+	const alert = useAlert();
 	const revalidatePage = useRevalidator();
 	const { tea, ...meta } = props.loaderData.ctea;
 	const mutations = useCollectionTeaMutations(meta["@id"]);
@@ -60,7 +61,9 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 			return;
 		}
 
-		postApi(`${meta["@id"]}/media`, { file }).finally(console.debug);
+		postApi(`${meta["@id"]}/media`, { file })
+			.then(() => revalidatePage.revalidate())
+			.catch((e) => alert({ title: "Failed to upload the image", body:e.message }));
 	}
 
 	return (
