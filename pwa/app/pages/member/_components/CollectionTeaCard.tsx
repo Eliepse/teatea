@@ -1,47 +1,67 @@
-import type { Business, Tea } from "~t/types";
-import { limit } from "~/utils/text";
-import { TeaCard, TeaCardSpec } from "~/components/tea/TeaCard";
+import type { Business, MediaObject, Tea } from "~t/types";
+import { Family } from "~/components/tea/Family";
+import { FormatOrigin } from "~/components/shared/FormatOriginPath";
+import { Calendar, Shop } from "iconoir-react";
+import { DottedInlineList } from "~/components/shared/DottedInlineList";
+import clsx from "clsx";
 
 export function CollectionTeaCard(props: {
 	tea: Tea;
 	description?: string;
 	acquiredAt?: Date;
 	acquiredFrom?: Business;
+	thumbnail?: MediaObject;
 }) {
-	if (!props.acquiredAt && !props.acquiredFrom && !props.description) {
-		return (
-			<TeaCard
-				family={props.tea.family}
-				cultivar={props.tea.cultivar}
-				roast={props.tea.roast}
-				type={props.tea.type}
-				year={props.tea.year}
-				origin={props.tea.origin}
-				className="bg-white"
-			/>
-		);
-	}
+	const hasMeta = props.acquiredAt || props.acquiredFrom;
 
 	return (
-		<TeaCard
-			family={props.tea.family}
-			cultivar={props.tea.cultivar}
-			roast={props.tea.roast}
-			type={props.tea.type}
-			year={props.tea.year}
-			origin={props.tea.origin}
-			className="bg-white"
-		>
-			{!!props.description && (
-				<p className="px-4 py-2 mb-2 border-b border-dashed border-green-200 text-stone-600 text-sm">
-					{limit(props.description, 128)}
-				</p>
-			)}
+		<article className="bg-white rounded-xl shadow-xs overflow-hidden py-2">
+			<div className="flex items-center pl-4 pr-2 min-h-14">
+				<div className="flex-1">
+					<div>
+						<Family family={props.tea.family} iconOnly className="mr-1" />
+						<span className="capitalize">{props.tea.type?.name ?? `${props.tea.family} tea`}</span>
+					</div>
+					<div className="text-sm text-teal-600">
+						<DottedInlineList dotClassName="mx-1">
+							{props.tea.cultivar && (
+								<span className="text-teal-600 text-sm">{props.tea.cultivar.name}</span>
+							)}
+							{props.tea.origin && <FormatOrigin origin={props.tea.origin} maxLevel="region" />}
+							{props.tea.year && <span className="text-teal-600 text-sm">{props.tea.year}</span>}
+						</DottedInlineList>
+					</div>
+				</div>
 
-			<ul className="flex flex-col py-3 px-4 text-stone-500 gap-2 text-sm">
-				{!!props.acquiredAt && <TeaCardSpec label="Acquired" value={props.acquiredAt.toLocaleDateString()} />}
-				{!!props.acquiredFrom && <TeaCardSpec label="Shop" value={props.acquiredFrom.name} />}
-			</ul>
-		</TeaCard>
+				{props.thumbnail && (
+					<img
+						src={props.thumbnail?.contentUrl}
+						loading="lazy"
+						style={{ backgroundImage: `url(data:image/webp;base64,${props.thumbnail?.placeholder})` }}
+						className="aspect-square h-14 object-cover bg-center bg-cover rounded-lg bg-green-100"
+						alt=""
+					/>
+				)}
+			</div>
+
+			{hasMeta && <hr className={clsx("border-stone-200 mx-4 mt-1 mb-2", props.thumbnail && "mr-20")} />}
+
+			{hasMeta && (
+				<div className="text-sm px-4 text-stone-600 mb-1">
+					{!!props.acquiredFrom && (
+						<span className="mr-4">
+							<Shop className="inline size-4 mr-1 relative bottom-0.5" /> {props.acquiredFrom.name}
+						</span>
+					)}
+
+					{!!props.acquiredAt && (
+						<span>
+							<Calendar className="inline size-4 mr-1 relative bottom-0.5" />{" "}
+							{props.acquiredAt.toLocaleDateString()}
+						</span>
+					)}
+				</div>
+			)}
+		</article>
 	);
 }

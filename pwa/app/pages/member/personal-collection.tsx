@@ -51,13 +51,14 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 
 			<ul>
 				{itemsQuery.data?.member?.map((item) => (
-					<li key={item.id} className="mb-2">
+					<li key={item.id} className="mb-3">
 						<Link to={`/members/${props.params.username}/teas/${item.id}`}>
 							<CollectionTeaCard
 								tea={item.tea}
 								acquiredFrom={item.acquiredFrom}
 								acquiredAt={item.acquiredAt}
 								description={item.description}
+								thumbnail={item.thumbnail}
 							/>
 						</Link>
 					</li>
