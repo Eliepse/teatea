@@ -31,7 +31,7 @@ export default function ListTeaSessions() {
 		},
 		queryKey: ["sessions", filters],
 		getPreviousPageParam: () => undefined,
-		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
+		getNextPageParam: (lastPage) => lastPage.view?.next?.split("?")[1],
 		initialPageParam: "",
 	});
 
