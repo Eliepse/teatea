@@ -3,7 +3,7 @@ import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { Calendar, EditPencil, MediaImagePlus, Shop, Trash } from "iconoir-react";
+import { Calendar, EditPencil, MediaImage, MediaImagePlus, Shop, Trash } from "iconoir-react";
 import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
 import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
@@ -24,7 +24,7 @@ import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import {
 	type MemberTeaContext,
 	MemberTeaCTX,
-	useCollectionTeaContext
+	useCollectionTeaContext,
 } from "~/pages/member/_components/MemberTeaContext";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
@@ -39,6 +39,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 	const { tea, ...meta } = props.loaderData.ctea;
 	const mutations = useCollectionTeaMutations(meta["@id"]);
 	const [action, setAction] = useState<Parameters<MemberTeaContext["act"]>[0] | undefined>();
+	const [uploading, setUploading] = useState(false);
 
 	async function patchResource(patch: Parameters<typeof mutations.patch.mutateAsync>[0]) {
 		await mutations.patch.mutateAsync(patch);
@@ -61,9 +62,12 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 			return;
 		}
 
+		setUploading(true);
+
 		postApi(`${meta["@id"]}/media`, { file })
 			.then(() => revalidatePage.revalidate())
-			.catch((e) => alert({ title: "Failed to upload the image", body:e.message }));
+			.catch((e) => alert({ title: "Failed to upload the image", body: e.message }))
+			.finally(() => setUploading(false));
 	}
 
 	return (
@@ -89,12 +93,24 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					)}
 
 					{meta.thumbnail && (
-						<img
-							src={meta.thumbnail.contentUrl}
-							style={{ backgroundImage: `url(data:image/webp;base64,${meta.thumbnail.placeholder})` }}
-							className="mb-4 w-full h-48 rounded-xl object-cover bg-center bg-cover"
-							alt=""
-						/>
+						<div className="relative">
+							<img
+								src={meta.thumbnail.contentUrl}
+								style={{ backgroundImage: `url(data:image/webp;base64,${meta.thumbnail.placeholder})` }}
+								className="mb-4 w-full h-48 rounded-xl object-cover bg-center bg-cover z-0"
+								alt=""
+							/>
+
+							<label
+								className={clsx(
+									"flex items-center justify-center h-10 w-10 absolute bottom-2 right-2 z-10",
+									"bg-white/60 rounded-full cursor-pointer hover:bg-white",
+								)}
+							>
+								<MediaImagePlus className="size-6 text-green-700" />
+								<input type="file" accept="image/*" onChange={handleFileUpload} hidden />
+							</label>
+						</div>
 					)}
 
 					<div className="">
@@ -167,6 +183,15 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 							/>
 						</div>
 					)}
+				</Modal>
+
+				<Modal open={uploading} position="bottom" className="h-1/3">
+					<div className="flex items-center justify-center h-full text-lg text-green-700">
+						<div>
+							<MediaImage className="mx-auto mb-4 size-10 animate-bounce text-green-600" />
+							<span className="ml-2 font-medium">Uploading the image...</span>
+						</div>
+					</div>
 				</Modal>
 			</MemberTeaCTX.Provider>
 		</AuthLayout>

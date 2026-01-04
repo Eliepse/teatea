@@ -9,7 +9,7 @@ type ModalType = React.PropsWithChildren & {
 	className?: string;
 };
 
-export function Modal(props: { open?: boolean; onClose: () => void } & ModalType) {
+export function Modal(props: { open?: boolean; onClose?: () => void } & ModalType) {
 	return createPortal(
 		<AnimatePresence mode="wait">
 			{true === props.open && <ModalContent key="modal" {...props} open={props.open ?? false} />}
