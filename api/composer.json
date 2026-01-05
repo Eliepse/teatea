@@ -4,6 +4,7 @@
 	"require": {
 		"php": ">=8.4",
 		"ext-ctype": "*",
+		"ext-exif": "*",
 		"ext-iconv": "*",
 		"api-platform/doctrine-orm": "^4.2.0",
 		"api-platform/symfony": "^4.2.0",

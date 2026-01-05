@@ -10,7 +10,7 @@ VOLUME /config
 # persistent / runtime deps
 # hadolint ignore=DL3008
 RUN apt-get update && apt-get install --no-install-recommends -y \
-	acl file gettext git && \
+	acl file gettext git imagemagick && \
     mkdir webptmp && \
     curl -fsSL https://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-${CWEBP_VERSION}-linux-x86-64.tar.gz | tar xzf - -C webptmp --strip-components=1 || { echo "Download or extraction failed"; exit 1; } && \
     mv webptmp/bin/cwebp /usr/local/bin/cwebp && \
@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN set -eux; \
-	install-php-extensions @composer apcu intl opcache zip pdo_pgsql
+	install-php-extensions @composer apcu intl opcache zip pdo_pgsql exif
 
 COPY --link frankenphp/conf.d/app.ini $PHP_INI_DIR/conf.d/
 COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
