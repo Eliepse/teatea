@@ -12,3 +12,36 @@
 .react-day-picker.full .rdp-month {
 	width: 100%;
 }
+
+.react-day-picker.full .rdp-day_button {
+	margin: 0 auto;
+}
+
+.react-day-picker .rdp-day_button {
+	color: var(--color-green-900);
+	font-size: var(--text-lg);
+	width: calc(var(--spacing) * 12);
+	height: calc(var(--spacing) * 12);
+}
+
+.react-day-picker .rdp-today .rdp-day_button {
+	background: transparent;
+	/*border: 1px dashed var(--color-stone-300);*/
+	color: inherit;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.react-day-picker .rdp-outside .rdp-day_button {
+	color: var(--color-stone-500);
+}
+
+.react-day-picker .rdp-disabled .rdp-day_button {
+	color: var(--color-stone-400);
+}
+
+.react-day-picker .rdp-selected .rdp-day_button {
+	color: white;
+	background: var(--color-green-600);
+	font-size: var(--text-base);
+}

@@ -98,16 +98,21 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 			->getResult();
 
 		$items = new \ArrayIterator();
-		$origins = $this->originRepo->getWithAncestors(array_map(fn($s) => $s->tea->originId, $entities));
-		$originsById = Arr::keyBy($origins, "id");
-		$originMap = TeaProvider::originsToMap($origins);
+
+		/** @var array<integer, \App\Entity\Origin> $entitiesById */
+		$originsById = Arr::keyBy(
+			$this->originRepo->findManyWithAncestorNames(
+				Arr::pluck($entities, fn($e) => $e->tea->originId, true),
+			),
+			"id",
+		);
 
 		foreach ($entities as $entity) {
-			$path = $entity->tea->originId ? TeaProvider::getOriginPath(
-				$originMap,
-				$originsById[$entity->tea->originId],
-			) : null;
-			$tea = TeaProvider::hydrateResource($entity->tea, $path);
+			if (null !== $entity->tea->originId) {
+				$entity->tea->origin = $originsById[$entity->tea->originId] ?? null;
+			}
+
+			$tea = TeaProvider::hydrateResource($entity->tea);
 			$items->append(TeaSessionProvider::hydrate($entity, $tea));
 		}
 

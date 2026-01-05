@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -22,4 +23,10 @@ class Business
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(nullable: false)]
 	public ?User $author = null;
+
+	/**
+	 * @var Collection<int, CollectionTea>
+	 */
+	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: 'acquiredFrom')]
+	private Collection $acquiredTeas;
 }

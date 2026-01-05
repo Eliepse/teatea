@@ -41,15 +41,22 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 		fetchConfigs.headers.set("Authorization", `Bearer ${token}`);
 	}
 
-	if ((undefined === config?.method || "GET" === config?.method) && undefined !== config?.payload) {
-		// @ts-ignore
+	const { payload } = config ?? {};
+	if ((undefined === config?.method || "GET" === config?.method) && undefined !== payload) {
 		searchParams = new URLSearchParams([
 			...Array.from(searchParams.entries()),
-			...Object.entries(config.payload).filter(([_, v]) => !!v),
+			...Object.entries(payload).filter(([_, v]) => !!v),
 		]);
 		fetchConfigs.body = undefined;
-	} else if (undefined !== config?.method && undefined !== config?.payload) {
-		fetchConfigs.body = "string" === typeof config.payload ? config.payload : JSON.stringify(config.payload);
+	} else if (undefined !== config?.method && undefined !== payload) {
+		if (Object.values(payload).some((v) => v instanceof File)) {
+			const form = new FormData();
+			Object.entries(payload).forEach(([k, v]) => form.set(k, v));
+			fetchConfigs.body = form;
+			fetchConfigs.headers.delete("Content-Type");
+		} else {
+			fetchConfigs.body = "string" === typeof payload ? payload : JSON.stringify(payload);
+		}
 	}
 
 	const url = new URL(`${oUrl.origin}${oUrl.pathname}?${searchParams}`);
@@ -76,6 +83,12 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 
 	return response;
 }
+
+/*
+| --------------------------------
+| Alias
+| --------------------------------
+*/
 
 export async function getApi<T>(
 	url: string,

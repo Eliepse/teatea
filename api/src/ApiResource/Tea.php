@@ -94,20 +94,20 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Tea
 {
 	#[ApiProperty(identifier: true)]
-	#[Groups(["tea:read", "embedded:tea"])]
+	#[Groups(["tea:read", "embedded:tea", "with:tea"])]
 	public ?int $id;
 
-	#[Groups(["tea:create", "tea:read", "embedded:tea"])]
+	#[Groups(["tea:create", "tea:read", "embedded:tea", "with:tea"])]
 	public TeaFamily $family;
 
-	#[Groups(["tea:create", "tea:read", "embedded:tea"])]
+	#[Groups(["tea:create", "tea:read", "embedded:tea", "with:tea"])]
 	public ?TeaType $type = null;
 
 	#[ApiProperty(genId: false)]
-	#[Groups(["embedded:tea", "embedded:origin"])]
+	#[Groups(["embedded:tea", "with:tea", "embedded:origin"])]
 	public ?OriginPath $originPath = null;
 
-	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:origin"])]
 	public ?Origin $origin = null;
 
 	#[ApiProperty(readableLink: true)]
@@ -129,7 +129,7 @@ class Tea
 		$this->addedAt = new \DateTimeImmutable();
 	}
 
-	#[Groups(["tea:read", "embedded:tea"])]
+	#[Groups(["tea:read", "embedded:tea", "with:tea"])]
 	public function getDisplayName(): string
 	{
 		if (null !== $this->type) {

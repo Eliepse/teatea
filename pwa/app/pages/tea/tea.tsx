@@ -8,13 +8,11 @@ import {
 	type MemberTea,
 	type OriginPath,
 	type RoastLevel,
-	RoastLevelEnum,
 	type TeaFamily,
 	type TeaSession,
-	type TeaStats,
+	type TeaStats
 } from "~t/types";
 import { Link, useNavigate } from "react-router";
-import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
@@ -22,7 +20,7 @@ import { formatDistanceToNow } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { CoffeeCup, Heart, HeartSolid, PeopleTag } from "iconoir-react";
+import { CoffeeCup, EcologyBook, Heart, HeartSolid, PeopleTag } from "iconoir-react";
 import { type ReactNode, useState } from "react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 import { Family } from "~/components/tea/Family";
@@ -30,6 +28,9 @@ import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
 import clsx from "clsx";
 import { BrewButton } from "~/components/teaSession/BrewButton";
+import { TeaCard } from "~/components/tea/TeaCard";
+import { BackButton } from "~/components/shared/navigation/BackButton";
+import { AddToPersonalCollectionButton } from "~/components/tea/AddToPersonalCollectionButton";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -70,50 +71,56 @@ export default function TeaPage(props: Route.ComponentProps) {
 	return (
 		<div className="pb-22 text-lg bg-green-50 min-h-dvh">
 			<nav className="absolute inset-x-0 top-0 p-5 flex">
-				<button
-					className="btn btn-lg btn-circle bg-white mr-auto"
-					onClick={() => navigate(-1)}
-					aria-label="Go back"
-				>
-					<ArrowLeftIcon className="size-6" />
-				</button>
+				<BackButton className="mr-auto" />
 
 				<IfAuthenticated>
-					<button
-						className="btn btn-lg bg-white btn-circle text-secondary"
-						onClick={handleUIEvent(() => toggleFavorite.mutate())}
-						disabled={toggleFavorite.isPending}
-						aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
-					>
-						{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
-					</button>
+					<ul className="flex gap-2">
+						<li>
+							<button
+								className="btn btn-lg bg-white btn-circle text-green-700"
+								onClick={handleUIEvent(() => toggleFavorite.mutate())}
+								disabled={toggleFavorite.isPending}
+								aria-label={favorite ? "Remove from favorites" : "Add to favorites"}
+							>
+								{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
+							</button>
+						</li>
+						<li>
+							<AddToPersonalCollectionButton tea={tea["@id"]}>
+								<button
+									className="btn btn-lg bg-white btn-circle text-green-700"
+									aria-label={"Add this tea to my collection"}
+								>
+									<EcologyBook className="size-6" />
+								</button>
+							</AddToPersonalCollectionButton>
+						</li>
+					</ul>
 				</IfAuthenticated>
 			</nav>
 
 			<img src="/img/tea-header-placeholder.jpg" className="h-40 w-full object-cover bg-green-300" alt="" />
 
-			<header className="pt-6 pb-0 relative bg-green-50 -mt-6 rounded-t-3xl">
-				<h1 className="mx-6 mb-5 text-4xl leading-11 font-header font-extrabold text-green-900">
-					{tea.type?.name}
-				</h1>
-
-				<Specs
+			<header className=" bg-green-50">
+				<TeaCard
 					family={tea.family}
-					origin={tea.originPath}
-					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
-					cultivar={tea.cultivar}
 					year={tea.year}
-					className="mx-6 py-4 border-t border-green-200"
+					roast={tea.roast}
+					cultivar={tea.cultivar}
+					type={tea.type}
+					origin={tea.originPath}
+					hideArrow
+					className="-mt-12 mb-4 mx-4 relative z-10 bg-white shadow-sm"
 				/>
 
-				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center">
-					<BrewButton tea={props.loaderData.tea["@id"]} />
+				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center gap-2">
+					<BrewButton tea={props.loaderData.tea["@id"]} text="Brew" />
 				</nav>
 			</header>
 
 			<main>
 				{0 !== stats.sessionsCount && (
-					<section className="grid grid-cols-2 gap-2 mx-4 leading-tight">
+					<section className="grid grid-cols-2 gap-4 mx-4 leading-tight">
 						<div className="border-green-200 text-teal-600 rounded-lg px-6 py-3 bg-green-100 text-center">
 							<div className="inline-flex items-center text-3xl font-bold text-green-900">
 								<PeopleTag className="inline-block mr-2 size-6" />

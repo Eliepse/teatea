@@ -101,7 +101,6 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 					className="h-full"
 					onBack={goBack}
 					defaultValue={form.drankAt}
-					buttonText="Save this session"
 					onConfirm={(date) => {
 						setForm({ ...form, drankAt: date });
 						stackNavigator.next("place:select");
@@ -155,9 +154,12 @@ export function FrameActions(props: {
 	const [pending, setPending] = useState(false);
 
 	async function handleConfirm() {
-		setPending(true);
-		await props.onNext();
-		setPending(false);
+		try {
+			setPending(true);
+			await props.onNext();
+		} finally {
+			setPending(false);
+		}
 	}
 
 	return (

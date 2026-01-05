@@ -62,6 +62,12 @@ class Tea
 	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'tea')]
 	private Collection $sessions;
 
+	/**
+	 * @var Collection<int, CollectionTea>
+	 */
+	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: 'tea')]
+	private Collection $collectionTeas;
+
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(nullable: false)]
 	public ?User $createdBy = null;

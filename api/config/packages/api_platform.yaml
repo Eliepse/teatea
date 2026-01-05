@@ -5,7 +5,7 @@ api_platform:
     patch_formats:
         json: [ "application/merge-patch+json" ]
     
-    enable_swagger_ui: false
+    enable_swagger_ui: "%kernel.debug%"
     enable_swagger: "%kernel.debug%"
     enable_docs: "%kernel.debug%"
     enable_re_doc: "%kernel.debug%"

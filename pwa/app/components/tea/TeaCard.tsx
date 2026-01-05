@@ -1,5 +1,6 @@
 import {
 	type Cultivar,
+	type Origin,
 	type OriginPath,
 	type RoastLevel,
 	RoastLevelEnum,
@@ -7,7 +8,7 @@ import {
 	type TeaType,
 } from "~t/types";
 import clsx from "clsx";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { FormatOrigin, FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import type { PropsWithChildren, ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
 import { ArrowRight } from "iconoir-react";
@@ -16,7 +17,7 @@ export function TeaCard(
 	props: PropsWithChildren<{
 		family: TeaFamily;
 		type?: TeaType;
-		origin?: OriginPath;
+		origin?: OriginPath | Origin;
 		cultivar?: Cultivar;
 		year?: number;
 		roast?: RoastLevel;
@@ -24,20 +25,21 @@ export function TeaCard(
 		showNoRoast?: boolean;
 		loading?: boolean;
 		onClick?: () => void;
+		hideArrow?: boolean;
 	}>,
 ) {
-	const hasSpecs = Object.keys(props).some((key) => ["path", "cultivar", "year", "roast"].includes(key));
+	const hasSpecs = Object.entries(props).some(([k, v]) => ["path", "cultivar", "year", "roast"].includes(k) && !!v);
 	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null;
 
 	return (
 		<article className={clsx("rounded-2xl", props.className)}>
-			<div className="py-2 px-4 cursor-pointer" onClick={props.onClick}>
+			<div className={clsx("py-2 px-4", !props.hideArrow && "cursor-pointer")} onClick={props.onClick}>
 				<Family family={props.family} className="capitalize text-teal-800 text-sm mb-1" />
 				<div className="flex justify-between items-center">
 					<h1 className="font-header font-bold text-2xl text-green-800">
 						{props.loading ? <span className="block w-40 h-6 mt-2 skeleton" /> : props.type?.name}
 					</h1>
-					<ArrowRight className="size-4 inline-block ml-3 flex-none opacity-70" />
+					{!props.hideArrow && <ArrowRight className="size-4 inline-block ml-3 flex-none opacity-70" />}
 				</div>
 			</div>
 
@@ -45,11 +47,21 @@ export function TeaCard(
 				<div className="py-3 px-4 border-t border-dashed border-green-200 text-teal-800">
 					<ul className="grid grid-cols-1 gap-2 gap-x-8 text-sm">
 						{!!props.origin && (
-							<Spec label="Origin" value={<FormatOriginPath originPath={props.origin} />} />
+							<TeaCardSpec
+								label="Origin"
+								value={
+									"namePath" in props.origin ? (
+										<FormatOrigin origin={props.origin} />
+									) : (
+										<FormatOriginPath originPath={props.origin} />
+									)
+								}
+							/>
 						)}
-						{!!props.cultivar && <Spec label="Cultivar" value={props.cultivar?.name} />}
-						{!!props.year && <Spec label="Year" value={props.year} />}
-						{!!roast && <Spec label="Roast" value={roast} />}
+
+						{!!props.cultivar && <TeaCardSpec label="Cultivar" value={props.cultivar?.name} />}
+						{!!props.year && <TeaCardSpec label="Year" value={props.year} />}
+						{!!roast && <TeaCardSpec label="Roast" value={roast} />}
 					</ul>
 				</div>
 			)}
@@ -59,7 +71,7 @@ export function TeaCard(
 	);
 }
 
-function Spec(props: { label: string; value: ReactNode }) {
+export function TeaCardSpec(props: { label: string; value: ReactNode }) {
 	return (
 		<li className="flex justify-between items-center text-green-900">
 			<span className="text-teal-600">{props.label}</span>

@@ -49,16 +49,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'author')]
 	private Collection $sessions;
 
-    /**
-     * @var Collection<int, TeaList>
-     */
-    #[ORM\OneToMany(targetEntity: TeaList::class, mappedBy: 'owner', orphanRemoval: true)]
-    private Collection $teaLists;
+	/**
+	 * @var Collection<int, TeaList>
+	 */
+	#[ORM\OneToMany(targetEntity: TeaList::class, mappedBy: 'owner', orphanRemoval: true)]
+	private Collection $teaLists;
 
-    public function __construct()
-    {
-        $this->teaLists = new ArrayCollection();
-    }
+	/**
+	 * @var Collection<int, CollectionTea>
+	 */
+	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: 'owner', orphanRemoval: true)]
+	private Collection $collectionTeas;
+
+	public function __construct()
+	{
+		$this->teaLists = new ArrayCollection();
+		$this->collectionTeas = new ArrayCollection();
+	}
 
 	/**
 	 * A visual identifier that represents this user.

@@ -46,6 +46,11 @@ class Origin
 	#[ORM\JoinColumn(onDelete: "SET NULL")]
 	public ?User $author = null;
 
+	/**
+	 * @var string[]
+	 */
+	public array $namePath = [];
+
 	public function __construct()
 	{
 		$this->teas = new ArrayCollection();

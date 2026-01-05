@@ -43,9 +43,16 @@
 #	vulcain
 
 	# Add links to the API docs and to the Mercure Hub if not set explicitly (e.g. the PWA)
-	header ?Link `</docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation", </.well-known/mercure>; rel="mercure"`
+#	header ?Link `</docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation", </.well-known/mercure>; rel="mercure"`
 	# Disable Topics tracking if not enabled explicitly: https://github.com/jkarlin/topics
 	header ?Permissions-Policy "browsing-topics=()"
+
+	# Prevent exposing server engine
+	header -Server
+	header -Via
+
+	# Keep media in cache for 60 days
+	header /media* ?Cache-Control max-age=5184000
 
 	# Matches requests for HTML documents, for static files and for PWA files,
 	# except for known API paths and paths with extensions handled by API Platform
@@ -53,7 +60,7 @@
 		    path('/manifest.json')
 		|| !path(
 			'/api*', '/auth*', '/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
-			'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml'
+			'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml', '/media/*'
 		)`
 
 	# Comment the following line if you don't want PWA to catch requests for HTML documents.

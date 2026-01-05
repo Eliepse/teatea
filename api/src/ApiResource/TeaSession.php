@@ -56,10 +56,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"teaSession:read",
 			"embedded:tea",
 			"embedded:teaType",
-			"embedded:origin",
 			"embedded:member",
 			"embedded:cultivar",
 			"with:business",
+			"with:origin"
 		],
 	],
 	security: "is_granted('ROLE_USER')",

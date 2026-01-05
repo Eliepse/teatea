@@ -9,7 +9,7 @@ import { f, handleUIEvent } from "~/utils/function";
 import { useState } from "react";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 import { Family } from "~/components/tea/Family";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
+import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import { CoffeeCup, Shop } from "iconoir-react";
 
 type Session = Embed<TeaSession, "author", Member>;
@@ -31,7 +31,7 @@ export default function ListTeaSessions() {
 		},
 		queryKey: ["sessions", filters],
 		getPreviousPageParam: () => undefined,
-		getNextPageParam: (lastPage) => lastPage.view.next?.split("?")[1],
+		getNextPageParam: (lastPage) => lastPage.view?.next?.split("?")[1],
 		initialPageParam: "",
 	});
 
@@ -143,7 +143,7 @@ function MemberSessionsGroup(props: {
 	);
 }
 
-function SessionListItem(props: { tea: Session["tea"]; place?: Session["place"] }) {
+export function SessionListItem(props: { tea: Session["tea"]; place?: Session["place"] }) {
 	return (
 		<article className="px-4 py-3 flex items-center">
 			<div className="flex-1">
@@ -153,12 +153,8 @@ function SessionListItem(props: { tea: Session["tea"]; place?: Session["place"] 
 				</div>
 				<div className="text-sm text-teal-600">
 					{props.tea.cultivar && <span className="text-teal-600 text-sm">{props.tea.cultivar.name}</span>}
-					{props.tea.cultivar && props.tea.originPath && <span className="mx-1">&middot;</span>}
-					{props.tea.originPath && (
-						<span>
-							<FormatOriginPath originPath={props.tea.originPath} maxLevel="region" />
-						</span>
-					)}
+					{props.tea.cultivar && props.tea.origin && <span className="mx-1">&middot;</span>}
+					{props.tea.origin && <FormatOrigin origin={props.tea.origin} maxLevel="region" />}
 				</div>
 			</div>
 			<div className="text-sm">

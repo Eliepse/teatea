@@ -48,16 +48,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Origin
 {
 	#[ApiProperty(identifier: true)]
-	#[Groups(["origin:read", "embedded:origin"])]
+	#[Groups(["origin:read", "embedded:origin", "with:origin"])]
 	public string $path;
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 24)]
 	#[Assert\Regex("/^[\p{L}_\-0-9 ]+$/u")]
-	#[Groups(["origin:read", "embedded:origin", "origin:write"])]
+	#[Groups(["origin:read", "embedded:origin", "origin:write", "with:origin"])]
 	public string $name;
 
-	#[Groups(["origin:read"])]
+	#[Groups(["origin:read", "with:origin"])]
 	public array $namePath = [];
 
 	#[Groups(["origin:read"])]

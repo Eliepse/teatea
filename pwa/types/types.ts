@@ -4,6 +4,8 @@ import type { TeawareType } from "./teawareType";
 export type Id = number;
 export type Iri = string;
 
+export type Embed<R extends Resource, K extends string, E> = Omit<R, K> & { [key in K]: E };
+
 export type NullablePartial<T> = {
 	[P in keyof T]?: T[P] | null;
 };
@@ -67,7 +69,7 @@ export type Tea = Resource & {
 	cultivar?: Cultivar;
 	year?: number;
 	roast?: RoastLevel;
-	addedAt: Date;
+	addedAt?: Date;
 };
 
 export type TeaSession = Resource<"TeaSession"> & {
@@ -201,4 +203,17 @@ export type Business = Resource<"Business"> & {
 	name: string;
 };
 
-export type Embed<R extends Resource, K extends string, E> = Omit<R, K> & { [key in K]: E };
+export type MediaObject = Resource<"MediaObject"> & {
+	contentUrl: string;
+	collection?: string;
+	placeholder?: string;
+};
+
+export type CollectionTea = Resource<"CollectionTea"> & {
+	tea: Tea;
+	owner: Iri;
+	description?: string;
+	acquiredAt?: Date;
+	acquiredFrom?: Business;
+	thumbnail?: MediaObject;
+};

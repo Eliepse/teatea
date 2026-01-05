@@ -4,8 +4,8 @@ import clsx from "clsx";
 import { handleUIEvent } from "~/utils/function";
 
 const ItemCls = {
-	default: "text-green-950 active:bg-teal-200 focus:bg-teal-100",
-	danger: "text-red-600 active:bg-red-200 focus:bg-red-100",
+	default: "text-green-950 cursor-pointer hover:bg-green-100 active:bg-green-200 focus:bg-green-100",
+	danger: "text-red-600 cursor-pointer hover:bg-red-100 active:bg-red-200 focus:bg-red-100",
 } as const;
 
 export function MenuModal(props: PropsWithChildren<{ open: boolean; onClose: () => void }>) {
@@ -31,7 +31,7 @@ export function MenuItem(props: {
 		<button
 			className={clsx(
 				"flex items-center w-full pl-6 pr-8 h-16",
-				"disabled:text-teal-500 disabled:bg-teal-50",
+				"disabled:text-stone-500 disabled:bg-stone-50",
 				!props.disabled && ItemCls[props.danger ? "danger" : "default"],
 				// 0 === i && "pt-1 h-17",
 			)}

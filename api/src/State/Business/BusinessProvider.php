@@ -8,6 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Business;
 use App\ApiResource\TeaType;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Proxy;
 
 /**
  * @implements ProviderInterface<Business|null>
@@ -37,6 +38,10 @@ readonly class BusinessProvider implements ProviderInterface
 	public static function fromEntity(?\App\Entity\Business $entity): ?Business
 	{
 		if (null === $entity) {
+			return null;
+		}
+
+		if($entity instanceof Proxy && false === $entity->__isInitialized()) {
 			return null;
 		}
 

@@ -3,10 +3,12 @@ import clsx from "clsx";
 import styles from "./AuthLayout.module.css";
 import { CalendarDaysIcon, HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigation } from "react-router";
-import { Leaf } from "iconoir-react";
+import { EcologyBook, Leaf } from "iconoir-react";
+import { useUser } from "~/auth/hooks/useUser";
 
 export function AuthLayout(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
 	const navigation = useNavigation();
+	const user = useUser();
 	const isNavigating = Boolean(navigation.location);
 
 	return (
@@ -31,6 +33,15 @@ export function AuthLayout(props: PropsWithChildren<{ className?: string; active
 								icon={<HomeIcon className="size-5" />}
 								label="Home"
 								active={"home" === props.activeKey}
+							/>
+						</Link>
+					</li>
+					<li className="flex-1">
+						<Link to={`/members/${user.data?.username}/teas`}>
+							<NavItem
+								icon={<EcologyBook className="size-5" />}
+								label="My teas"
+								active={"my-teas" === props.activeKey}
 							/>
 						</Link>
 					</li>
