@@ -73,7 +73,7 @@ COPY --link --chown=www-data . ./
 
 RUN set -eux; \
 	mkdir -p var/cache var/log && \
-	composer dump-autoload --no-dev --classmap-authoritative --apcu-autoloader && \
+	composer dump-autoload --no-dev --classmap-authoritative --apcu && \
 	composer dump-env prod && \
 	composer run-script --no-dev post-install-cmd && \
 	chmod +x bin/console
