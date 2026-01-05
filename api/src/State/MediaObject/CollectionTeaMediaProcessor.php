@@ -10,8 +10,11 @@ use App\Media\WebpEncoder;
 use App\Repository\MediaObjectRepository;
 use App\ValueObject\Size;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Process\Process;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
 class CollectionTeaMediaProcessor implements ProcessorInterface
@@ -22,6 +25,7 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 		private StorageInterface $storage,
 		#[Autowire("%app.base_url%")]
 		private string $baseUrl,
+		private LoggerInterface $logger,
 	) {
 	}
 
@@ -56,14 +60,33 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 			throw new NotFoundHttpException();
 		}
 
+		/**
+		 * Rotate and optimize image
+		 */
+
+		try {
+			$exif = @exif_read_data($data->file->getPathname()) ?: [];
+
+			if (in_array($exif["Orientation"], [3, 5, 6, 7, 8], true)) {
+				$this->makeAutorotateProcess($data->file)->mustRun();
+			}
+		} catch (\Throwable $e) {
+			$this->logger->error("Failed to autorotate the image: " . $e->getMessage());
+		}
+
 		$this->makeOptimizationEncoder()->toFile($data->file, $data->file);
+		$placeholder = $this->makePlaceholderEncoder()->toBase64($data->file);
+
+		/**
+		 * Persist media
+		 */
 
 		$mediaObjects = $this->mediaRepo->findByHasMedia($cteaEntity);
 
 		// Create the media and associate the CollectionTea
 		$entity = new \App\Entity\MediaObject();
 		$entity->file = $data->file;
-		$entity->placeholder = $this->makePlaceholderEncoder()->toBase64($data->file);
+		$entity->placeholder = $placeholder;
 		$entity->attach($cteaEntity);
 
 		$this->em->persist($entity);
@@ -101,6 +124,26 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 			stripMetadata: true,
 			quality: 25,
 			compressionQuality: 6,
+		);
+	}
+
+	/**
+	 * Autorotate the given image with ImageMagick by reading the Exif "Orientation"
+	 */
+	private function makeAutorotateProcess(File $file): Process
+	{
+		return new Process(
+			[
+				"convert",
+				"-auto-orient",
+				"-limit",
+				"memory",
+				"16MiB",
+				"-format",
+				"jpg",
+				$file->getPathname(),
+				$file->getPathname()
+			],
 		);
 	}
 }
