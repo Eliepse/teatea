@@ -2,7 +2,7 @@
 
 set -e
 
-pnpm install --frozen-lockfile
+bun install --frozen-lockfile
 
 exec /usr/local/bin/docker-entrypoint.sh "$@"
 
