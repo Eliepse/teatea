@@ -97,7 +97,7 @@ readonly class UserStatsProvider implements ProviderInterface
 			<<<DQL
 			SELECT origin
 			FROM App\Entity\Origin origin
-				LEFT JOIN App\Entity\Origin o WITH IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.id IN (:ids)
+				LEFT JOIN App\Entity\Origin o ON IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.id IN (:ids)
 			WHERE o.id IS NOT NULL
 			DQL
 		)
