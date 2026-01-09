@@ -58,7 +58,7 @@ services:
   maildev:
     image: maildev/maildev
     ports:
-      - 1080:1080
+      - "1080:1080"
   
   database:
     image: postgres:17-alpine
