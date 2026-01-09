@@ -22,7 +22,7 @@ class Business
 
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(nullable: false)]
-	public ?User $author = null;
+	public User $author;
 
 	/**
 	 * @var Collection<int, CollectionTea>
