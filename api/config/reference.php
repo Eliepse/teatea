@@ -992,12 +992,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *             always_remember_me?: bool|Param, // Default: false
  *             remember_me_parameter?: scalar|null|Param, // Default: "_remember_me"
  *         },
- *         refresh_jwt?: array{
- *             check_path?: scalar|null|Param, // Default: null
- *             provider?: scalar|null|Param,
- *             success_handler?: scalar|null|Param,
- *             failure_handler?: scalar|null|Param,
- *         },
  *     }>,
  *     access_control?: list<array{ // Default: []
  *         request_matcher?: scalar|null|Param, // Default: null
@@ -1016,8 +1010,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|null|Param, // URL of the hub's publish endpoint
- *         public_url?: scalar|null|Param, // URL of the hub's public endpoint // Default: null
+ *         url?: scalar|null|Param, // URL of the hub's publish endpoint // Default: null
+ *         public_url?: scalar|null|Param, // URL of the hub's public endpoint
  *         jwt?: string|array{ // JSON Web Token configuration.
  *             value?: scalar|null|Param, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|null|Param, // The ID of a service to call to provide the JSON Web Token.
@@ -1807,35 +1801,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         cache?: scalar|null|Param, // Storage to track blocked tokens // Default: "cache.app"
  *     },
  * }
- * @psalm-type GesdinetJwtRefreshTokenConfig = array{
- *     ttl?: int|Param, // The default TTL for all authenticators. // Default: 2592000
- *     ttl_update?: bool|Param, // The default update TTL flag for all authenticators. // Default: false
- *     firewall?: scalar|null|Param, // Deprecated: The "firewall" node is deprecated without replacement. // Default: "api"
- *     user_provider?: scalar|null|Param, // Deprecated: The "user_provider" node is deprecated without replacement. // Default: null
- *     user_identity_field?: scalar|null|Param, // Deprecated: The "user_identity_field" node is deprecated without replacement. // Default: "username"
- *     manager_type?: scalar|null|Param, // Set the type of object manager to use (default: orm) // Default: "orm"
- *     refresh_token_class?: scalar|null|Param, // Set the refresh token class to use (default: Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken) // Default: null
- *     object_manager?: scalar|null|Param, // Set the object manager to use (default: doctrine.orm.entity_manager) // Default: null
- *     user_checker?: scalar|null|Param, // Deprecated: The "user_checker" node is deprecated without replacement. // Default: "security.user_checker"
- *     refresh_token_entity?: scalar|null|Param, // Deprecated: The "refresh_token_entity" node is deprecated, use the "refresh_token_class" node instead. // Set the refresh token class to use (default: Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken) // Default: null
- *     entity_manager?: scalar|null|Param, // Deprecated: The "entity_manager" node is deprecated, use the "object_manager" node instead. // Set the entity manager to use // Default: null
- *     single_use?: scalar|null|Param, // When true, generate a new refresh token on consumption (deleting the old one) // Default: false
- *     token_parameter_name?: scalar|null|Param, // The default request parameter name containing the refresh token for all authenticators. // Default: "refresh_token"
- *     doctrine_mappings?: bool|Param, // Deprecated: The "doctrine_mappings" node is deprecated without replacement. // When true, resolving of Doctrine mapping is done automatically to use either ORM or ODM object manager // Default: true
- *     cookie?: bool|array{
- *         enabled?: bool|Param, // Default: false
- *         same_site?: "none"|"lax"|"strict"|Param, // Default: "lax"
- *         path?: scalar|null|Param, // Default: "/"
- *         domain?: scalar|null|Param, // Default: null
- *         http_only?: scalar|null|Param, // Default: true
- *         secure?: scalar|null|Param, // Default: true
- *         partitioned?: scalar|null|Param, // Default: false
- *         remove_token_from_body?: scalar|null|Param, // Default: true
- *     },
- *     logout_firewall?: scalar|null|Param, // Name of the firewall that triggers the logout event to hook into (default: api) // Default: "api"
- *     return_expiration?: scalar|null|Param, // When true, the response will include the token expiration timestamp // Default: false
- *     return_expiration_parameter_name?: scalar|null|Param, // The default response parameter name containing the refresh token expiration timestamp // Default: "refresh_token_expiration"
- * }
  * @psalm-type StofDoctrineExtensionsConfig = array{
  *     orm?: array<string, array{ // Default: []
  *         translatable?: scalar|null|Param, // Default: false
@@ -1942,7 +1907,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     doctrine_migrations?: DoctrineMigrationsConfig,
  *     monolog?: MonologConfig,
  *     lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
- *     gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
  *     stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *     vich_uploader?: VichUploaderConfig,
  *     "when@dev"?: array{
@@ -1962,7 +1926,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         debug?: DebugConfig,
  *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
- *         gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *         vich_uploader?: VichUploaderConfig,
  *     },
@@ -1980,7 +1943,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         doctrine_migrations?: DoctrineMigrationsConfig,
  *         monolog?: MonologConfig,
  *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
- *         gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *         vich_uploader?: VichUploaderConfig,
  *     },
@@ -2000,7 +1962,6 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         debug?: DebugConfig,
  *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
- *         gesdinet_jwt_refresh_token?: GesdinetJwtRefreshTokenConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *         vich_uploader?: VichUploaderConfig,
  *     },

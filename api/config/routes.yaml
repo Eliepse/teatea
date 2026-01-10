@@ -8,10 +8,6 @@ auth:
     path: /auth
     methods: [ 'POST' ]
 
-gesdinet_jwt_refresh_token:
-    path: /auth/token/refresh
-    methods: [ 'POST' ]
-
 app_logout:
     path: /api/logout
     methods: POST

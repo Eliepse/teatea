@@ -9,6 +9,7 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -20,18 +21,6 @@ security:
             jwt: ~
             logout:
                 path: app_logout
-        main:
-            entry_point: jwt
-#            json_login:
-#                check_path: /auth # The name in routes.yaml is enough for mapping
-#                username_path: email
-#                password_path: password
-#                success_handler: lexik_jwt_authentication.handler.authentication_success
-#                failure_handler: lexik_jwt_authentication.handler.authentication_failure
-            jwt: ~
-            refresh_jwt:
-                check_path: /auth/token/refresh
-                provider: app_user_provider
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
