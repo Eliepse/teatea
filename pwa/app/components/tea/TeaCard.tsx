@@ -28,7 +28,9 @@ export function TeaCard(
 		hideArrow?: boolean;
 	}>,
 ) {
-	const hasSpecs = Object.entries(props).some(([k, v]) => ["path", "cultivar", "year", "roast"].includes(k) && !!v);
+	const hasSpecs = Object.entries(props).some(
+		([k, v]) => ["path", "cultivar", "year", "roast", "origin"].includes(k) && !!v,
+	);
 	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null;
 
 	return (
