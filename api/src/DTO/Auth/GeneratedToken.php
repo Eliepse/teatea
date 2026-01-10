@@ -3,7 +3,7 @@
 namespace App\DTO\Auth;
 
 use App\Entity\Token;
-use App\Service\TokenManager;
+use App\Security\TokenManager;
 
 final readonly class GeneratedToken
 {

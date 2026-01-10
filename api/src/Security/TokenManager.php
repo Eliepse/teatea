@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Security;
 
 use App\DTO\Auth\GeneratedToken;
 use App\Entity\Token;

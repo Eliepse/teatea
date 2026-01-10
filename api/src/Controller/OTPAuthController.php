@@ -8,7 +8,7 @@ use App\Exception\Auth\ExpiredTokenException;
 use App\Exception\Auth\InvalidTokenException;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
-use App\Service\TokenManager;
+use App\Security\TokenManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
