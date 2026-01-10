@@ -3,6 +3,7 @@
 
 parameters:
     app.base_url: "%env(string:BASE_URL)%"
+    auth.refresh_token.ttl: 2592000 # 30 days as seconds
 
 services:
     # default configuration for services in *this* file

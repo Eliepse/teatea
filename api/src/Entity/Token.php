@@ -16,6 +16,9 @@ class Token
 	// Used to activate an inactive OTP token
 	const string TYPE_OTP_CHALLENGE = "otp_challenge";
 
+	// Used to refresh a JWToken
+	const string TYPE_JWT_REFRESH = "jwt_refresh";
+
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]

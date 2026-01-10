@@ -10,7 +10,6 @@ use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Security\TokenManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Gesdinet\JWTRefreshTokenBundle\Generator\RefreshTokenGeneratorInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -32,12 +31,11 @@ class OTPAuthController extends AbstractController
 	public function __construct(
 		private UserRepository $userRepository,
 		private JWTTokenManagerInterface $JWTManager,
-		private RefreshTokenGeneratorInterface $refreshTokenGenerator,
 		private EntityManagerInterface $em,
 		private TokenManager $tokenManager,
 		private TokenRepository $tokenRepo,
-		#[Autowire("%gesdinet_jwt_refresh_token.ttl%")]
-		private int $ttl,
+		#[Autowire("%auth.refresh_token.ttl%")]
+		private int $refreshTokenTtl,
 		private MailerInterface $mailer,
 		#[Autowire("%app.base_url%")]
 		private string $baseUrl,
@@ -89,6 +87,7 @@ class OTPAuthController extends AbstractController
 		}
 
 		// Inactive OTP token
+		// Once valid, allow to retreive authentication tokens
 		$OTPToken = $this->tokenManager->createToken(
 			Token::TYPE_OTP,
 			$user,
@@ -127,6 +126,9 @@ class OTPAuthController extends AbstractController
 		]);
 	}
 
+	/**
+	 * Use the OTP token to authenticate and return the authentication tokens
+	 */
 	#[Route("/auth/otp", name: "login.otp", methods: ["POST"], format: "application/json")]
 	public function login(Request $request): JsonResponse
 	{
@@ -149,19 +151,26 @@ class OTPAuthController extends AbstractController
 		}
 
 		$jwt = $this->JWTManager->create($token->owner);
-		$refreshToken = $this->refreshTokenGenerator->createForUserWithTtl($token->owner, $this->ttl);
+		$refreshToken = $this->tokenManager->createToken(
+			Token::TYPE_JWT_REFRESH,
+			$token->owner,
+			new \DateTimeImmutable()->add(new \DateInterval("PT{$this->refreshTokenTtl}S")),
+			new \DateTimeImmutable(),
+		);
 
-		$this->em->persist($refreshToken);
 		$this->em->remove($token);
 		$this->em->flush();
 
 		return $this->json([
 			"token" => $jwt,
-			"refresh_token" => $refreshToken->getRefreshToken(),
-			"refresh_token_expiration" => $refreshToken->getValid()->getTimestamp(),
+			"refresh_token" => $refreshToken->challenge,
+			"refresh_token_expiration" => $refreshToken->token->expiredAt?->getTimestamp(),
 		]);
 	}
 
+	/**
+	 * Verify a OTP Challenge token to activate the actual OTP token
+	 */
 	#[Route("/auth/otp/verify", name: "login.verify", methods: ["POST"], format: "application/json")]
 	public function verify(Request $request): Response
 	{
