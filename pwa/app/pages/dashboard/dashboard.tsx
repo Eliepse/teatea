@@ -1,56 +1,48 @@
 import { Link, useNavigate } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { TokenUtils } from "~/auth/hooks/useToken";
+import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { usePWAInstall } from "~/utils/browser/usePWAInstall";
 import { handleUIEvent } from "~/utils/function";
 import { ArrowDownCircleIcon } from "@heroicons/react/24/outline";
 import type { Route } from "../../../.react-router/types/app/pages/dashboard/+types/dashboard";
-import { getApi, postApi } from "~/utils/api";
+import { getApi } from "~/utils/api";
 import type { MemberStats } from "~t/types";
-import { ArrowRightCircle, CoffeeCup, Leaf, LogOut, PeopleTag } from "iconoir-react";
+import { CoffeeCup, Leaf, PeopleTag } from "iconoir-react";
 import { IfAdmin } from "~/auth/components/voters/IfAdmin";
 import { TeaLists } from "~/pages/dashboard/_components/TeaLists";
 import { TeaShortCard } from "~/components/tea/TeaShortCard";
-import { usePopup } from "~/components/shared/modal/AlertManager";
 import { Logo } from "~/components/icons/Logo";
-import type { ReactNode } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { UserStat } from "~/components/stats/UserStat";
 
 export function meta() {
 	return [{ title: "Teatea" }];
 }
 
-export async function clientLoader(): Promise<MemberStats> {
-	const response = await getApi<MemberStats>("/me/stats");
+export async function clientLoader() {
+	const token = TokenUtils.get();
+
+	if (!token) {
+		throw new Error("Token missing");
+	}
+
+	const response = await getApi<MemberStats>(`/members/${token.username}/stats`);
 	return await response.json();
 }
 
 export default function Dashboard(props: Route.ComponentProps) {
+	const [token] = useToken();
 	const userQuery = useUser();
 	const pwaInstall = usePWAInstall();
-	const popup = usePopup();
 	const navigate = useNavigate();
-
-	function promptLogout() {
-		popup.confirm({ body: "Do you want to logout?" }).then(() => {
-			postApi("/logout", { refresh_token: TokenUtils.getRefreshToken() })
-				.then(() => {
-					TokenUtils.clear();
-					navigate("/");
-				})
-				.catch((e) => popup.alert({ title: "Failed to logout", body: e.message }));
-		});
-	}
 
 	return (
 		<AuthLayout className="px-4 bg-green-50 grid auto-rows-min gap-4 text-green-900" activeKey="home">
 			<div className="flex items-center pt-4">
 				<Logo className="w-24 flex-none mr-auto text-green-700" />
-				<button className="btn btn-lg btn-circle bg-white" onClick={promptLogout}>
-					<LogOut className="size-4" />
-				</button>
+				<Link className="btn btn-lg btn-circle bg-white shadow-xs" to={`/members/${token?.username}`}>
+					<PeopleTag className="size-6" />
+				</Link>
 			</div>
 
 			<UserPresentation
