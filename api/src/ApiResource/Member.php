@@ -29,7 +29,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 	provider: UserProvider::class,
 )]
 #[Get(
-	uriTemplate: "/me/stats",
+	uriTemplate: "/members/{username}/stats",
+	uriVariables: ["username" => new Link(fromProperty: "username")],
 	normalizationContext: ["groups" => ["member:stats", "embedded:tea", "embedded:origin", "embedded:teaType", "with:teatype"]],
 	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
 	provider: UserStatsProvider::class

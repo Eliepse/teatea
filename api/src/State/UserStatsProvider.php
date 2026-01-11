@@ -5,6 +5,7 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ActivityGraph;
+use App\ApiResource\Member;
 use App\Entity\Origin;
 use App\Entity\User;
 use App\Helper\Arr;
@@ -14,7 +15,6 @@ use App\State\TeaType\TeaTypeProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @implements ProviderInterface<ActivityGraph|null>
@@ -23,17 +23,18 @@ readonly class UserStatsProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private Security $security,
 	) {
 	}
 
-	public function provide(
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): array|null|object {
-		$user = $this->security->getUser();
-		assert($user instanceof User);
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Member
+	{
+		$user = $this->em->createQuery("SELECT u FROM App\Entity\User u WHERE u.username = :username")
+			->setParameter("username", $uriVariables["username"])
+			->getSingleResult();
+
+		if (!$user instanceof User) {
+			return null;
+		}
 
 		$sessions = $this->em
 			->createQuery("SELECT COUNT(session) FROM App\Entity\TeaSession session WHERE session.author = :user")
@@ -99,10 +100,10 @@ readonly class UserStatsProvider implements ProviderInterface
 			FROM App\Entity\Origin origin
 				LEFT JOIN App\Entity\Origin o ON IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.id IN (:ids)
 			WHERE o.id IS NOT NULL
-			DQL
+			DQL,
 		)
-		->setParameter("ids", Arr::pluck($topTeas, fn($t) => $t->origin?->id, true), ArrayParameterType::INTEGER)
-		->getResult();
+			->setParameter("ids", Arr::pluck($topTeas, fn($t) => $t->origin?->id, true), ArrayParameterType::INTEGER)
+			->getResult();
 
 		$resource = MemberProvider::hydrate($user);
 		$resource->statsSessionsTotal = $sessions ?: 0;
