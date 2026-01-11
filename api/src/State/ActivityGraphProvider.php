@@ -6,9 +6,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ActivityGraph;
 use App\Entity\User;
+use App\Repository\UserRepository;
 use App\ValueObject\ActivityGraphDay;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * @implements ProviderInterface<ActivityGraph|null>
@@ -16,23 +16,21 @@ use Symfony\Bundle\SecurityBundle\Security;
 readonly class ActivityGraphProvider implements ProviderInterface
 {
 	public function __construct(
+		private UserRepository $userRepository,
 		private EntityManagerInterface $em,
-		private Security $security,
 	) {
 	}
 
-	public function provide(
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): array|null|object {
-		$user = $this->security->getUser();
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?ActivityGraph
+	{
+		$member = $this->userRepository->findOneBy(["username" => $uriVariables["username"]]);
 
-		assert($user instanceof User);
+		if (!$member instanceof User) {
+			return null;
+		}
 
-		$year = intval($uriVariables["year"]);
-		$from = new \DateTimeImmutable()->setDate($year, 0, 0)->setTime(0, 0);
-		$to = new \DateTimeImmutable()->setDate($year + 1, 0, 0)->setTime(0, 0);
+		$from = new \DateTimeImmutable()->sub(new \DateInterval("P1Y"))->setTime(0, 0);
+		$to = new \DateTimeImmutable()->add(new \DateInterval("P1D"))->setTime(0, 0);
 
 		$statsQB = $this->em->getConnection()->createQueryBuilder()
 			->select("count(*) as total", "session.drank_at::date")
@@ -46,7 +44,7 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		$statsQB
 			->setParameter("from", $from->format("c"))
 			->setParameter("to", $to->format("c"))
-			->setParameter("authorId", $user->id);
+			->setParameter("authorId", $member->id);
 
 		$data = $statsQB->fetchAllAssociative();
 
@@ -54,7 +52,7 @@ readonly class ActivityGraphProvider implements ProviderInterface
 
 		if (0 === count($totals)) {
 			$graph = new ActivityGraph();
-			$graph->year = $year;
+			$graph->year = intval($from->format("Y"));
 			$graph->items = [];
 			return $graph;
 		}
@@ -76,7 +74,7 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		);
 
 		$graph = new ActivityGraph();
-		$graph->year = $year;
+		$graph->year = intval($from->format("Y"));
 		$graph->items = $days;
 		$graph->levels = count($levels);
 		return $graph;
