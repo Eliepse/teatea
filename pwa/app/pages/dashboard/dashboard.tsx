@@ -16,6 +16,7 @@ import { usePopup } from "~/components/shared/modal/AlertManager";
 import { Logo } from "~/components/icons/Logo";
 import type { ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
+import { UserStat } from "~/components/stats/UserStat";
 
 export function meta() {
 	return [{ title: "Teatea" }];
@@ -129,6 +130,7 @@ function UserPresentation(props: { username?: string; teaSessions: number; taste
 								title="tea sessions"
 								value={props.teaSessions}
 								icon={<CoffeeCup className="size-5 inline mx-1" />}
+								withArrow
 							/>
 						</Link>
 
@@ -137,25 +139,11 @@ function UserPresentation(props: { username?: string; teaSessions: number; taste
 								title="tasted teas"
 								value={props.tastedTeas}
 								icon={<Leaf className="size-5 inline mx-1" />}
+								withArrow
 							/>
 						</Link>
 					</>
 				)}
-			</div>
-		</div>
-	);
-}
-
-function UserStat(props: { title: ReactNode; value: number; icon: ReactNode; className?: string }) {
-	return (
-		<div className={props.className}>
-			<div className="text-4xl font-bold font-header text-green-700">
-				{props.value}
-				{props.icon}
-			</div>
-			<div className="flex items-center text-sm">
-				{props.title}
-				<ArrowRightCircle direction="right" className="size-3 ml-1 translate-y-0.5 inline" />
 			</div>
 		</div>
 	);
