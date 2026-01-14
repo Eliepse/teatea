@@ -21,11 +21,6 @@ export function meta() {
 
 export async function clientLoader() {
 	const token = TokenUtils.get();
-
-	if (!token) {
-		throw new Error("Token missing");
-	}
-
 	const response = await getApi<MemberStats>(`/members/${token.username}/stats`);
 	return await response.json();
 }

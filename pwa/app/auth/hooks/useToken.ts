@@ -7,7 +7,7 @@ const refreshTokenKey = "refreshToken";
 
 type RefreshTokenStoragePayload = { token: string; expiredAt: number };
 
-type JWTokenPayload = {
+export type JWTokenPayload = {
 	roles: string[];
 	email: string;
 	username: string;

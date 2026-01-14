@@ -1,39 +1,12 @@
 import { AuthProvider } from "~/auth/hooks/useAuth";
-import { Outlet, redirect, useNavigate } from "react-router";
-import { TokenUtils } from "~/auth/hooks/useToken";
-import { refreshToken } from "~/auth/requests";
+import { Outlet } from "react-router";
 import { Leaf } from "iconoir-react";
+import type { Route } from "../../../.react-router/types/app/auth/components/+types/AuthenticatedGuard";
+import { authMiddleware } from "~/auth/authMiddleware";
 
-export async function clientLoader() {
-	if (null === TokenUtils.get()) {
-		try {
-			await refreshToken();
-		} catch (e) {
-			console.error(e);
-			throw redirect("/");
-		}
-	}
-
-	const token = TokenUtils.get();
-
-	if (!token) {
-		throw redirect("/");
-	}
-
-	if (false === token.roles.includes("ROLE_USER") || token.roles.includes("ROLE_ONBOARDING")) {
-		throw redirect("/onboarding");
-	}
-}
+export const clientMiddleware: Route.ClientMiddlewareFunction[] = [authMiddleware];
 
 export default function AuthenticatedGuard() {
-	const token = TokenUtils.get();
-	const navigate = useNavigate();
-
-	if (null === token) {
-		navigate("/");
-		return null;
-	}
-
 	return (
 		<AuthProvider>
 			<Outlet />
