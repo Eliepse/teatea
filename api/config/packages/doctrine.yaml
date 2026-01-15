@@ -197,6 +197,7 @@ doctrine:
                 similarity: App\Doctrine\ORM\Functions\TrgmSimilarityFunction
                 row_number: App\Doctrine\ORM\Functions\RowNumberFunction
                 rank: App\Doctrine\ORM\Functions\RankFunction
+                COALESCE_NUMERIC: App\Doctrine\ORM\Functions\CoalesceNumericFunction
 
 when@test:
     doctrine:
