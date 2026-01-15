@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\DTO\Stats\TeaFamilyAmount;
 use App\State\Member\MemberCreateProcessor;
 use App\State\Member\MemberOnboardingProcessor;
 use App\State\Member\MemberProvider;
@@ -83,4 +84,8 @@ class Member
 	/** @var TeaType[]  */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeaTypes = [];
+
+	/** @var TeaFamilyAmount[]  */
+	#[Groups(["member:stats"])]
+	public array $statsFamilies = [];
 }
