@@ -14,9 +14,12 @@ use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\ORM\Query\ResultSetMapping;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 /**
  * @implements ProviderInterface<TeaType[]>
@@ -46,16 +49,28 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		$expr = $this->em->getExpressionBuilder();
+		// TODO: Group by country
 		$searchQuery = $this->em->createQueryBuilder()
-			->select("type.id")
-			->from(\App\Entity\TeaType::class, "type")
-			->groupBy("type.id");
+			->select("type.id", "tea.family")
+			->from(\App\Entity\Tea::class, "tea")
+			->leftJoin("tea.type", "type")
+			->groupBy("tea.family", "type.id");
 
 		if (null !== $searchText) {
 			$searchQuery
-				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
-				->orderBy("SIMILARITY(unaccent(type.name), unaccent(:searchText))", "DESC")
-				->addGroupBy("type.name")
+				->andWhere(
+					"0.1 < COALESCE_NUMERIC(
+						SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText)),
+						SIMILARITY(UNACCENT(tea.family), UNACCENT(:searchText))
+					)",
+				)
+				->orderBy(
+					"COALESCE_NUMERIC(
+						SIMILARITY(UNACCENT(any_value(type.name)), UNACCENT(:searchText)),
+						SIMILARITY(UNACCENT(tea.family), UNACCENT(:searchText))
+					)",
+					"DESC",
+				)
 				->setParameter("searchText", $searchText);
 		}
 
@@ -73,17 +88,22 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		if ("popularity" === $sortParam) {
 			$searchQuery
-				->leftJoin("type.teas", "teas")
-				->leftJoin("teas.sessions", "session", Join::WITH, ":popularSince <= session.drankAt")
+				->leftJoin("tea.sessions", "session", Join::WITH, ":popularSince <= session.drankAt")
 				->addOrderBy("count(DISTINCT session.id)", "DESC")
-				->addOrderBy("count(DISTINCT teas.id)", "DESC")
+				->addOrderBy("count(DISTINCT tea.id)", "DESC")
 				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
 		}
 
+		/*
+		| --------------------------------
+		| Find total results
+		| --------------------------------
+		*/
+
 		$total = (clone $searchQuery)
-			->select("COUNT(DISTINCT type.id)")
-			->resetDQLPart("groupBy")
+			->select("COUNT(DISTINCT COALESCE(CAST(type.id AS text), tea.family))")
 			->resetDQLPart("orderBy")
+			->resetDQLPart("groupBy")
 			->getQuery()
 			->getSingleScalarResult();
 
