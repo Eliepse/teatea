@@ -5,6 +5,8 @@ import type { SearchFilters } from "~/search/hooks/useSearchQuery";
 import { safeEmpty } from "~/utils/general";
 import type { TeaFamily } from "~t/types";
 
+export async function clientLoader() {}
+
 export default function TeaSearchPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 
