@@ -77,7 +77,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$stats = $this->em->createNativeQuery(
 			<<<SQL
 			SELECT count(DISTINCT teas.id) as teas, count(sessions.id) as sessions
-			FROM tea_type tea_type
+			FROM tea_type
 				LEFT JOIN tea as teas ON teas.type_id = tea_type.id
 				LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id
 			WHERE tea_type.id = :typeId
@@ -101,7 +101,6 @@ readonly class TeaTypeProvider implements ProviderInterface
 		}
 
 		$resource = new TeaType();
-		$resource->id = $type->getId();
 		$resource->name = $type->name;
 		$resource->slug = $type->slug;
 		$resource->family = $type->family;
