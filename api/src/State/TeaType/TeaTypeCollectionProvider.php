@@ -132,15 +132,19 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$entitiesById = Arr::keyBy($entities, "id");
 
 		$namePathMap = $this->originRepo->getAncestorsNamesByPath(
-			Arr::pluck($entities, fn($type) => $type->origin->id, true),
+			Arr::pluck($entities, fn($type) => $type->origin?->id, true),
 		);
 
 		// Iterate over results (not entities) to keep ordering
 		$resources = array_map(function ($typeId) use ($entitiesById, $namePathMap) {
 			$type = $entitiesById[$typeId];
 			$resource = TeaTypeProvider::fromEntity($type);
-			$origin = $resource->origin;
-			$origin->namePath = $namePathMap[$origin->path];
+
+			if(null !== $resource->origin) {
+				$origin = $resource->origin;
+				$origin->namePath = $namePathMap[$origin->path];
+			}
+
 			return $resource;
 		}, $searchResults);
 
