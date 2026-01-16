@@ -8,6 +8,7 @@ use App\ApiResource\Tea;
 use App\Entity\User;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
+use App\Repository\TeaTypeRepository;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,6 +22,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private TeaRepository $teaRepository,
+		private TeaTypeRepository $typeRepository,
 		private OriginRepository $originRepo,
 		private Security $security,
 	) {
@@ -68,6 +70,16 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$this->em->persist($typeEntity);
 
 			$teaEntity->type = $typeEntity;
+		} else {
+			// Get the tea_type equivalent to this tea's family
+			$families = $this->typeRepository->getFamilies();
+			$familyType = $families[$data->family->value] ?? null;
+
+			if(null === $familyType) {
+				throw new \Error("Unable to find the type for the '{$data->family->value}' family");
+			}
+
+			$teaEntity->type = $familyType;
 		}
 
 		// Check if the tea has already been created.
