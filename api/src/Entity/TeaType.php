@@ -50,6 +50,9 @@ class TeaType
 	#[ORM\JoinColumn("created_by", nullable: false)]
 	public User $createdBy;
 
+	#[ORM\Column(options: ["default" => false])]
+	private(set) bool $isFamily = false;
+
 	public function __construct()
 	{
 		$this->teas = new ArrayCollection();
