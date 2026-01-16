@@ -45,7 +45,6 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		$data->id = $entity->id;
 		$data->name = $entity->name;
 		$data->family = $entity->family;
 		$data->origin = new \App\ApiResource\Origin();

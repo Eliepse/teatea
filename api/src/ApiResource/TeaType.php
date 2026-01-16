@@ -46,10 +46,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Post(processor: TeaTypeCreateProcessor::class)]
 class TeaType
 {
-	#[Groups(["read:origin"])]
-	#[ApiProperty(writable: false, identifier: false)]
-	public ?int $id = null;
-
 	#[Groups(["read:origin", "with:teatype"])]
 	#[ApiProperty(writable: false, identifier: true)]
 	public ?string $slug = null;
