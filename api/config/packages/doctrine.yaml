@@ -191,6 +191,10 @@ doctrine:
                 TO_DATE: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\ToDate
                 TO_NUMBER: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\ToNumber
                 TO_TIMESTAMP: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\ToTimestamp
+                
+                # LTree
+                SUBPATH: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\Ltree\Subpath
+                SUBTREE: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\Ltree\Subltree
             numeric_functions:
                 NLEVEL: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\Ltree\Nlevel
                 ltree: App\Doctrine\ORM\Functions\LTreeOperatorFunction
