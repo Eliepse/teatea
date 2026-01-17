@@ -14,12 +14,9 @@ use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\Expr\Join;
-use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 /**
  * @implements ProviderInterface<TeaType[]>
@@ -54,7 +51,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			->select("type.id", "tea.family")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
-			->groupBy("tea.family", "type.id");
+			->groupBy("tea.family", "type.id", "origin.id");
 
 		if (null !== $searchText) {
 			$searchQuery
@@ -76,8 +73,11 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		if (null !== $originPath) {
 			$searchQuery
-				->innerJoin("type.origin", "origin", Join::WITH, "CONTAINS(:pathFilter, origin.path) = TRUE")
+				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:pathFilter, origin.path) = TRUE")
 				->setParameter("pathFilter", $originPath);
+		} else {
+			$searchQuery
+				->leftJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");
 		}
 
 		if (null !== $familyFilter) {
@@ -88,7 +88,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		if ("popularity" === $sortParam) {
 			$searchQuery
-				->leftJoin("tea.sessions", "session", Join::WITH, ":popularSince <= session.drankAt")
+				->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")
 				->addOrderBy("count(DISTINCT session.id)", "DESC")
 				->addOrderBy("count(DISTINCT tea.id)", "DESC")
 				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
@@ -140,7 +140,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			$type = $entitiesById[$typeId];
 			$resource = TeaTypeProvider::fromEntity($type);
 
-			if(null !== $resource->origin) {
+			if (null !== $resource->origin) {
 				$origin = $resource->origin;
 				$origin->namePath = $namePathMap[$origin->path];
 			}
