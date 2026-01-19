@@ -17,6 +17,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * @implements ProviderInterface<TeaType[]>
@@ -45,12 +46,11 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		$expr = $this->em->getExpressionBuilder();
-		// TODO: Group by country
 		$searchQuery = $this->em->createQueryBuilder()
 			->select("type.id AS typeId", "origin.id AS originId")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
-			->groupBy("tea.family", "type.id", "origin.id");
+			->groupBy("type.id", "origin.id");
 
 		if (null !== $searchText) {
 			$searchQuery
@@ -99,9 +99,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		| --------------------------------
 		*/
 
-		// TODO: includes origin in the count
+		// Fix: use 'concat' workaround as Doctrine doesn't allow subqueries
+		//   and the '?' operator is mistaken as a prepared parameter
 		$total = (clone $searchQuery)
-			->select("COUNT(DISTINCT COALESCE(CAST(type.id AS text), tea.family))")
+			->select("COUNT(DISTINCT CONCAT(type.id, '-', origin.id))")
 			->resetDQLPart("orderBy")
 			->resetDQLPart("groupBy")
 			->getQuery()
