@@ -17,7 +17,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * @implements ProviderInterface<TeaType[]>
@@ -54,19 +53,8 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		if (null !== $searchText) {
 			$searchQuery
-				->andWhere(
-					"0.1 < COALESCE_NUMERIC(
-						SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText)),
-						SIMILARITY(UNACCENT(tea.family), UNACCENT(:searchText))
-					)",
-				)
-				->orderBy(
-					"COALESCE_NUMERIC(
-						SIMILARITY(UNACCENT(any_value(type.name)), UNACCENT(:searchText)),
-						SIMILARITY(UNACCENT(tea.family), UNACCENT(:searchText))
-					)",
-					"DESC",
-				)
+				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
+				->orderBy("SIMILARITY(UNACCENT(any_value(type.name)), UNACCENT(:searchText))", "DESC")
 				->setParameter("searchText", $searchText);
 		}
 
