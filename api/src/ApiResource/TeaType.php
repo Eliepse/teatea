@@ -18,7 +18,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "embedded:origin"]],
+	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "with:origin"]],
 	security: "is_granted('ROLE_USER')"
 )]
 #[Get(

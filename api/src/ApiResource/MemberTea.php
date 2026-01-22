@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		"id" => new Link(identifiers: ["id"]),
 	],
 	normalizationContext: [
-		"groups" => ["listedTea:read", "embedded:tea", "embedded:origin", "embedded:teaType", "embedded:cultivar"],
+		"groups" => ["listedTea:read", "embedded:tea", "with:origin", "embedded:teaType", "embedded:cultivar"],
 	],
 	denormalizationContext: ["groups" => ["listedTea:write"]],
 	security: "is_granted('ROLE_USER')",
