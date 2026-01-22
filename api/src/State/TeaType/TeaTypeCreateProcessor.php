@@ -34,12 +34,6 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$entity->slug = new AsciiSlugger()->slug($entity->name)->lower()->toString();
 		$entity->createdBy = $user;
 
-		$origin = $this->originRepo->byPath($data->origin->path);
-		assert($origin instanceof Origin);
-
-		$entity->isProtectedOrigin = $data->isPDO;
-		$entity->origin = $origin;
-
 		// Only define a precise origin
 
 		$this->em->persist($entity);
@@ -47,9 +41,7 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 
 		$data->name = $entity->name;
 		$data->family = $entity->family;
-		$data->origin = new \App\ApiResource\Origin();
-		$data->origin->path = $entity->origin->path;
-		$data->origin->name = $entity->origin->name;
+		$data->slug = $entity->slug;
 		return $data;
 	}
 }

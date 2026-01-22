@@ -5,12 +5,12 @@ namespace App\State\TeaType;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TeaType;
+use App\Helper\OperationHelper;
 use App\State\Origin\OriginProvider;
 use App\ValueObject\Stats\TeaTypeStats;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
-use Doctrine\Persistence\Proxy;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -25,17 +25,29 @@ readonly class TeaTypeProvider implements ProviderInterface
 	) {
 	}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaType|array|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaType|null
 	{
+		$originPath = OperationHelper::getParameter($operation, "origin");
+
 		$typeQb = $this->em->createQueryBuilder()
-			->select("type", "origin")
+			->select("type")
 			->from(\App\Entity\TeaType::class, "type")
-			->leftJoin("type.origin", "origin")
 			->where("type.slug = :slug")->setParameter("slug", $uriVariables["slug"])
 			->setMaxResults(1);
 
+		if (null !== $originPath) {
+			$typeQb
+				->innerJoin("type.teas", "tea", "WITH", "TRUE = CONTAINS(:parentOrigin, tea.originPath)")
+				->setParameter("parentOrigin", $originPath);
+		}
+
 		/** @var \App\Entity\TeaType|null $typeEntity */
 		$typeEntity = $typeQb->getQuery()->getOneOrNullResult();
+
+		$origin = null !== $originPath ? $this->em
+			->createQuery("SELECT o FROM App\Entity\Origin o WHERE o.path = :path")
+			->setParameter("path", $originPath)
+			->getSingleResult() : null;
 
 		$resource = static::fromEntity($typeEntity);
 
@@ -91,6 +103,11 @@ readonly class TeaTypeProvider implements ProviderInterface
 			->getSingleResult();
 
 		$resource->stats = new TeaTypeStats($rank, $stats["teas"], $stats["sessions"]);
+
+		if (null !== $origin) {
+			$resource->origin = OriginProvider::fromEntity($origin);
+		}
+
 		return $resource;
 	}
 
@@ -104,12 +121,6 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$resource->name = $type->name;
 		$resource->slug = $type->slug;
 		$resource->family = $type->family;
-
-		if ($type->origin && !$type->origin instanceof Proxy) {
-			$resource->origin = OriginProvider::fromEntity($type->origin);
-		}
-
-		$resource->isPDO = $type->isProtectedOrigin;
 
 		return $resource;
 	}

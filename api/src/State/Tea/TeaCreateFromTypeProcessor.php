@@ -41,9 +41,8 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		$user = $this->security->getUser();
 		/** @var \App\Entity\TeaType $typeEntity */
 		$typeEntity = $this->em->createQueryBuilder()
-			->select("type", "origin")
+			->select("type")
 			->from(\App\Entity\TeaType::class, "type")
-			->leftJoin("type.origin", "origin")
 			->where("type.id = :id")->setParameter("id", $uriVariables["typeId"])
 			->getQuery()->getSingleResult();
 
@@ -53,19 +52,6 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		$teaOrigin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
 		if (null !== $data->origin && null === $teaOrigin) {
 			throw new ItemNotFoundException("Tea origin doesn't exist");
-		}
-
-		// Check origins compatibility
-
-		if (null !== $teaOrigin) {
-			$countryKey = $teaOrigin->path->getNodes()[0];
-			if (false === $typeEntity->origin->path->isDescendant($countryKey)) {
-				throw new \RuntimeException("The origin must be of the same country than the tea type one");
-			}
-
-			if ($typeEntity->isProtectedOrigin && false === $teaOrigin->path->isDescendant($typeEntity->origin->path)) {
-				throw new \RuntimeException("The origin must be contained by the protected origin of the tea type");
-			}
 		}
 
 		$entity = new \App\Entity\Tea();

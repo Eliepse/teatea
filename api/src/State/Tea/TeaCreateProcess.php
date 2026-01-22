@@ -64,8 +64,6 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$typeEntity->family = $data->family;
 			$typeEntity->name = trim($data->type->name);
 			$typeEntity->slug = new AsciiSlugger()->slug($typeEntity->name)->lower()->toString();
-			$typeEntity->origin = $origin;
-			$typeEntity->isProtectedOrigin = $data->type->isPDO ?? false;
 			$typeEntity->createdBy = $user;
 			$this->em->persist($typeEntity);
 

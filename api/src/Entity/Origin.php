@@ -36,12 +36,6 @@ class Origin
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'origin')]
 	private Collection $teas;
 
-	/**
-	 * @var Collection<int, TeaType>
-	 */
-	#[ORM\OneToMany(targetEntity: TeaType::class, mappedBy: "origin")]
-	private Collection $types;
-
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(onDelete: "SET NULL")]
 	public ?User $author = null;
@@ -54,7 +48,6 @@ class Origin
 	public function __construct()
 	{
 		$this->teas = new ArrayCollection();
-		$this->types = new ArrayCollection();
 	}
 
 	/**

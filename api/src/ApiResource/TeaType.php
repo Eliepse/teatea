@@ -21,7 +21,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "embedded:origin"]],
 	security: "is_granted('ROLE_USER')"
 )]
-#[Get(provider: TeaTypeProvider::class)]
+#[Get(
+	provider: TeaTypeProvider::class,
+	parameters: [
+		"origin" => new QueryParameter(
+			schema: ["type" => "string", "example" => "Japan, China, ..."],
+			property: "origin",
+			description: "Filter by origin path, to get only the given branch",
+		),
+	],
+)]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -58,13 +67,8 @@ class TeaType
 	#[Groups(["embedded:teaType", "with:teatype", "read:origin", "tea:create"])]
 	public string $name;
 
-	#[Assert\NotNull]
 	#[Groups(["read:origin"])]
 	public ?Origin $origin = null;
-
-	#[ApiProperty]
-	#[Groups(["read:origin", "tea:create"])]
-	public bool $isPDO = false;
 
 	#[Groups(["type:read"])]
 	#[ApiProperty(readable: true, readableLink: true, genId: false)]

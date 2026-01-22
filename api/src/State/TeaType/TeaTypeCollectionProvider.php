@@ -110,14 +110,8 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$typeIds = Arr::pluck($searchResults, "typeId", true);
 		$originIds = Arr::pluck($searchResults, "originId", true);
 
-		$entities = $this->em->createQuery(
-			<<<DQL
-			SELECT type, origin
-			FROM App\Entity\TeaType type
-				LEFT JOIN type.origin origin
-			WHERE type.id IN (:ids)
-			DQL,
-		)
+		$entities = $this->em
+			->createQuery("SELECT type FROM App\Entity\TeaType type WHERE type.id IN (:ids)")
 			->setParameter("ids", $typeIds, ArrayParameterType::INTEGER)
 			->getResult();
 

@@ -36,16 +36,6 @@ class TeaType
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'type')]
 	private Collection $teas;
 
-	#[ORM\ManyToOne(targetEntity: Origin::class, inversedBy: 'types')]
-	public ?Origin $origin = null;
-
-	/**
-	 * @var bool Protected appellation (Protected Designation of Origin)
-	 * @see https://en.wikipedia.org/wiki/Protected_designation_of_origin
-	 */
-	#[ORM\Column(options: ["default" => false])]
-	public bool $isProtectedOrigin = false;
-
 	#[ORM\ManyToOne(targetEntity: User::class)]
 	#[ORM\JoinColumn("created_by", nullable: false)]
 	public User $createdBy;
