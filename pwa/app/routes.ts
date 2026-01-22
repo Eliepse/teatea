@@ -12,7 +12,7 @@ export default [
 		route("/tea/new", "pages/tea/tea-create.tsx"),
 		route("/tea/search", "pages/tea/search.tsx"),
 		route("/tea/:id", "pages/tea/tea.tsx"),
-		route("/tea_types/:slug", "pages/tea/tea-type.tsx"),
+		route("/tea_types/:origin/:slug", "pages/tea/tea-type.tsx"),
 
 		route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
 		route("/sessions", "pages/teaSession/teaSessions.tsx"),

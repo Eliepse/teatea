@@ -53,7 +53,8 @@ export function TeaSearchEngine(props: {
 		}
 
 		if ("name" in item) {
-			navigate(`/tea_types/${item.slug}`);
+			const origin = item.origin.path.split(".")[0];
+			navigate(`/tea_types/${origin}/${item.slug}`);
 			return;
 		}
 	}
