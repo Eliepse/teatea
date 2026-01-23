@@ -26,9 +26,6 @@ class Tea
 	#[ORM\Column]
 	public TeaFamily $family;
 
-	#[ORM\Column(nullable: true)]
-	public ?int $originId = null;
-
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	#[ORM\JoinColumn]
 	public ?TeaType $type = null;
@@ -36,16 +33,12 @@ class Tea
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	public ?Cultivar $cultivar = null;
 
-	/**
-	 * @var Origin|null
-	 * @deprecated Use originPath column until Origin's primary key is changed from id to path
-	 */
-	#[ORM\ManyToOne(inversedBy: 'teas')]
-	#[ORM\JoinColumn("origin_id")]
-	public ?Origin $origin = null;
-
 	#[ORM\Column(type: "ltree")]
 	public LTreePath $originPath;
+
+	#[ORM\ManyToOne(inversedBy: 'teas')]
+	#[ORM\JoinColumn("origin_path", referencedColumnName: "path")]
+	public ?Origin $origin = null;
 
 	#[Assert\GreaterThan(0)]
 	#[ORM\Column(nullable: true)]

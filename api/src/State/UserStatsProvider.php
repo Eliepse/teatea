@@ -110,15 +110,16 @@ readonly class UserStatsProvider implements ProviderInterface
 			->setParameter("fromDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
 			->getResult();
 
+		$originsPath = Arr::pluck($topTeas, fn(\App\Entity\Tea $t) => $t->originPath->getPath(), true);
 		$teasOrigins = $this->em->createQuery(
 			<<<DQL
 			SELECT origin
 			FROM App\Entity\Origin origin
-				LEFT JOIN App\Entity\Origin o ON IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.id IN (:ids)
-			WHERE o.id IS NOT NULL
+				LEFT JOIN App\Entity\Origin o ON IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.path IN (:paths)
+			WHERE o.path IS NOT NULL
 			DQL,
 		)
-			->setParameter("ids", Arr::pluck($topTeas, fn($t) => $t->origin?->id, true), ArrayParameterType::INTEGER)
+			->setParameter("paths", $originsPath, ArrayParameterType::STRING)
 			->getResult();
 
 		$resource = MemberProvider::hydrate($user);

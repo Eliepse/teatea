@@ -42,27 +42,6 @@ class OriginRepository extends ServiceEntityRepository
 		return $queryModifier(clone $originQb)->getQuery()->getResult();
 	}
 
-	/**
-	 * @param array<int|Origin> $origin
-	 *
-	 * @return array
-	 */
-	public function getWithAncestors(array $origin): array
-	{
-		$originIds = array_unique(array_filter(array_map(fn($o) => $o instanceof Origin ? $o->id : $o, $origin)));
-
-		if (empty($originIds)) {
-			return [];
-		}
-
-		return $this->createQueryBuilder("O")
-			->innerJoin(Origin::class, "base", "ON", "CONTAINS(O.path, base.path) = TRUE")
-			->where("base.id IN (:ids)")
-			->setParameter("ids", $originIds)
-			->getQuery()
-			->getResult();
-	}
-
 	public function byPath(string|LTreePath $path): ?Origin
 	{
 		$search = $path instanceof LTreePath ? $path : LTreePath::fromString($path);
@@ -70,53 +49,22 @@ class OriginRepository extends ServiceEntityRepository
 	}
 
 	/**
-	 * Return the names of ancestors for each given origin
-	 *
-	 * @param int[] $ids
-	 *
-	 * @return array<string, string[]>
-	 */
-	public function getAncestorsNamesByPath(array $ids): array
-	{
-		if (empty($ids)) {
-			return [];
-		}
-
-		$rows = $this->createQueryBuilder("origin")
-			->select("origin.path as path", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
-			->leftJoin("App\Entity\Origin", "ancestors", "ON", "CONTAINS(ancestors.path, origin.path) = TRUE")
-			->where("origin.id IN (:ids)")
-			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
-			->groupBy("origin.path")
-			->getQuery()
-			->getResult();
-
-		$map = [];
-
-		foreach ($rows as $row) {
-			$map[$row["path"]->getPath()] = json_decode($row["names"]);
-		}
-
-		return $map;
-	}
-
-	/**
-	 * @param int[] $ids
+	 * @param string[] $paths
 	 *
 	 * @return Origin[]
 	 */
-	public function findManyWithAncestorNames(array $ids): array
+	public function findManyWithAncestorNames(array $paths): array
 	{
-		if (empty($ids)) {
+		if (empty($paths)) {
 			return [];
 		}
 
 		$rows = $this->createQueryBuilder("origin")
 			->select("origin", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
 			->leftJoin("App\Entity\Origin", "ancestors", "ON", "CONTAINS(ancestors.path, origin.path) = TRUE")
-			->where("origin.id IN (:ids)")
-			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
-			->groupBy("origin.id")
+			->where("origin.path IN (:paths)")
+			->setParameter("paths", $paths, ArrayParameterType::STRING)
+			->groupBy("origin.path")
 			->getQuery()
 			->getResult();
 
@@ -128,8 +76,8 @@ class OriginRepository extends ServiceEntityRepository
 		}, $rows);
 	}
 
-	public function findWithAncestorNames(int $id): Origin|null
+	public function findWithAncestorNames(string $path): Origin|null
 	{
-		return $this->findManyWithAncestorNames([$id])[0] ?? null;
+		return $this->findManyWithAncestorNames([$path])[0] ?? null;
 	}
 }

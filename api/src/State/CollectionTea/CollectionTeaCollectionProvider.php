@@ -119,12 +119,11 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		/** @var array<integer, \App\Entity\CollectionTea> $entitiesById */
 		$entitiesById = Arr::keyBy($entities, "id");
 
+		$originsPath = Arr::pluck($entities, fn(\App\Entity\CollectionTea $c) => $c->tea->originPath->getPath(), true);
 		/** @var array<integer, \App\Entity\Origin> $entitiesById */
-		$originsById = Arr::keyBy(
-			$this->originRepo->findManyWithAncestorNames(
-				array_filter(Arr::pluck($entities, fn($e) => $e->tea->origin?->id, true)),
-			),
-			"id",
+		$originsByPaths = Arr::keyBy(
+			$this->originRepo->findManyWithAncestorNames(array_filter($originsPath)),
+			fn(\App\Entity\Origin $o) => $o->path->getPath(),
 		);
 
 		/** @var MediaObjectPivot[] $mediaPivots */
@@ -165,8 +164,9 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 				continue;
 			}
 
-			if (null !== $collectionTea->tea->origin) {
-				$collectionTea->tea->origin = $originsById[$collectionTea->tea->origin->id];
+			$origin = $originsByPaths[$collectionTea->tea->originPath->getPath()] ?? null;
+			if (null !== $origin) {
+				$collectionTea->tea->origin = $origin;
 			}
 
 			$resources[] = $this->hydrator->hydrate($collectionTea);

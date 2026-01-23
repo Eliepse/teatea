@@ -26,15 +26,15 @@ readonly class OriginCollectionProvider implements ProviderInterface
 		assert($operation instanceof CollectionOperationInterface);
 
 		$searchQb = $this->em->createQueryBuilder()
-			->select("origin.id as id", "COUNT(child) as children")
+			->select("origin.path as path", "COUNT(child) as children")
 			->from(\App\Entity\Origin::class, "origin")
 			->leftJoin(
 				\App\Entity\Origin::class,
 				"child",
 				"WITH",
-				"child.id != origin.id AND IS_CONTAINED_BY(child.path, origin.path) = TRUE",
+				"child.path != origin.path AND IS_CONTAINED_BY(child.path, origin.path) = TRUE",
 			)
-			->groupBy("origin.id");
+			->groupBy("origin.path");
 
 		// Limit max results
 		$limit = $this->getParameter($operation, "limit");
@@ -68,19 +68,21 @@ readonly class OriginCollectionProvider implements ProviderInterface
 				->setParameter("nlevel", $level);
 		}
 
-		$originResults = $searchQb->getQuery()->getResult();
+		/** @var \App\Entity\Origin[] $searchResults */
+		$searchResults = $searchQb->getQuery()->getResult();
 
-		if (empty($originResults)) {
+		if (empty($searchResults)) {
 			return [];
 		}
 
+		$originPaths = Arr::pluck($searchResults, fn(\App\Entity\Origin $o) => $o->path->getPath(), true);
 		$originQb = $this->em->createQueryBuilder()
 			->select("origin")
 			->addSelect("JSON_AGG(ancestors.name ORDER BY ancestors.path) as name_path")
 			->from(\App\Entity\Origin::class, "origin")
 			->leftJoin(\App\Entity\Origin::class, "ancestors", "WITH", "CONTAINS(ancestors.path, origin.path) = TRUE")
-			->where("origin.id IN (:ids)")
-			->setParameter("ids", Arr::pluck($originResults, "id", true), ArrayParameterType::INTEGER)
+			->where("origin.path IN (:paths)")
+			->setParameter("paths", $originPaths, ArrayParameterType::STRING)
 			->groupBy("origin");
 
 		$originById = Arr::keyBy($originQb->getQuery()->getResult(), fn($row) => $row[0]->id);
@@ -98,7 +100,7 @@ readonly class OriginCollectionProvider implements ProviderInterface
 				$resource->namePath = json_decode($originById[$row["id"]]["name_path"]);
 				return $resource;
 			},
-			$originResults, // Map with the search results to keep the order
+			$searchResults, // Map with the search results to keep the order
 		);
 	}
 

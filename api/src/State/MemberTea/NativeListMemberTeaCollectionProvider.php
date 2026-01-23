@@ -12,6 +12,7 @@ use App\Enum\TeaListPivotType;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
+use App\State\Origin\OriginProvider;
 use App\State\Tea\TeaProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -55,11 +56,14 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 			$listedTeaQuery->andWhere("pivot.tea = :tea")->setParameter("tea", $teaSearch);
 		}
 
+		/** @var \App\Entity\TeaListPivot[] $entities */
 		$entities = $listedTeaQuery->getQuery()->getResult();
 
-		$origins = $this->originRepo->getWithAncestors(array_map(fn($e) => $e->tea->originId, $entities));
-		$originsById = Arr::keyBy($origins, "id");
-		$originMap = TeaProvider::originsToMap($origins);
+		$originPaths = Arr::pluck($entities, fn(\App\Entity\TeaListPivot $p) => $p->tea->originPath->getPath(), true);
+		$originsByPath = Arr::keyBy(
+			$this->originRepo->findManyWithAncestorNames($originPaths),
+			fn(\App\Entity\Origin $o) => $o->path->getPath(),
+		);
 
 		$results = [];
 
@@ -71,12 +75,13 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 
 		foreach ($entities as $entity) {
 			$resource = MemberTeaProvider::fromEntity($entity);
+			$resource->tea = TeaProvider::hydrateResource($entity->tea);
 
-			$path = $entity->tea->originId ? TeaProvider::getOriginPath(
-				$originMap,
-				$originsById[$entity->tea->originId],
-			) : null;
-			$resource->tea = TeaProvider::hydrateResource($entity->tea, $path);
+			$path = $originsByPath[$entity->tea->originPath->getPath()] ?? null;
+			if (null !== $path) {
+				$resource->tea->origin = OriginProvider::fromEntity($path);
+			}
+
 			$resource->list = $list;
 			$resource->list->owner = $resource->author;
 

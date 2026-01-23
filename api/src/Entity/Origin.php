@@ -17,10 +17,6 @@ class Origin
 	use TimestampedEntity;
 
 	#[ORM\Id]
-	#[ORM\GeneratedValue]
-	#[ORM\Column]
-	public readonly int $id;
-
 	#[ORM\Column(type: "ltree", unique: true)]
 	public LTreePath $path;
 

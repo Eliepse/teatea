@@ -36,7 +36,7 @@ readonly class OriginProvider implements ProviderInterface
 				\App\Entity\Origin::class,
 				"child",
 				"WITH",
-				"child.id != origin.id AND IS_CONTAINED_BY(child.path, origin.path) = TRUE",
+				"child.path != origin.path AND IS_CONTAINED_BY(child.path, origin.path) = TRUE",
 			)
 			->orderBy("origin.path", "ASC")
 			->where("origin.path = :path")

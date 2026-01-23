@@ -46,10 +46,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		$expr = $this->em->getExpressionBuilder();
 		$searchQuery = $this->em->createQueryBuilder()
-			->select("type.id AS typeId", "origin.id AS originId")
+			->select("type.id AS typeId", "origin.path AS originPath")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
-			->groupBy("type.id", "origin.id");
+			->groupBy("type.id", "origin.path");
 
 		if (null !== $searchText) {
 			$searchQuery
@@ -90,7 +90,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		// Fix: use 'concat' workaround as Doctrine doesn't allow subqueries
 		//   and the '?' operator is mistaken as a prepared parameter
 		$total = (clone $searchQuery)
-			->select("COUNT(DISTINCT CONCAT(type.id, '-', origin.id))")
+			->select("COUNT(DISTINCT CONCAT(type.id, '-', origin.path))")
 			->resetDQLPart("orderBy")
 			->resetDQLPart("groupBy")
 			->getQuery()
@@ -108,7 +108,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			->getResult(AbstractQuery::HYDRATE_SCALAR);
 
 		$typeIds = Arr::pluck($searchResults, "typeId", true);
-		$originIds = Arr::pluck($searchResults, "originId", true);
+		$originPaths = Arr::pluck($searchResults, "originPath", true);
 
 		$entities = $this->em
 			->createQuery("SELECT type FROM App\Entity\TeaType type WHERE type.id IN (:ids)")
@@ -117,14 +117,14 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		$entitiesById = Arr::keyBy($entities, "id");
 
-		$origins = $this->originRepo->findManyWithAncestorNames($originIds);
-		$origins = Arr::keyBy($origins, "id");
+		$origins = $this->originRepo->findManyWithAncestorNames($originPaths);
+		$origins = Arr::keyBy($origins, fn(\App\Entity\Origin $o) => $o->path->getPath());
 
 		// Iterate over results (not entities) to keep ordering
 		$resources = array_map(function ($result) use ($entitiesById, $origins) {
 			$type = $entitiesById[$result["typeId"]];
 			$resource = TeaTypeProvider::fromEntity($type);
-			$origin = $origins[$result["originId"]] ?? null;
+			$origin = $origins[$result["originPath"]] ?? null;
 
 			if (null !== $origin) {
 				$resource->origin = OriginProvider::fromEntity($origin);

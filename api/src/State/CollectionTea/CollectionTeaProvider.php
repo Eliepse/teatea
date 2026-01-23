@@ -51,8 +51,9 @@ readonly class CollectionTeaProvider implements ProviderInterface
 			return null;
 		}
 
-		if (null !== $teaEntity->tea->origin) {
-			$teaEntity->tea->origin = $this->originRepo->findWithAncestorNames($teaEntity->tea->origin->id);
+
+		if (null !== $teaEntity->tea->originPath) {
+			$teaEntity->tea->origin = $this->originRepo->findWithAncestorNames($teaEntity->tea->originPath->getPath());
 		}
 
 		$teaEntity->media = $this->mediaRepo->findByHasMedia($teaEntity);
