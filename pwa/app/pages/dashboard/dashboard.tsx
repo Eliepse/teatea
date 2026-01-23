@@ -53,7 +53,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 					</div>
 					<ul>
 						{props.loaderData.statsTopTeaTypes.map((type) => (
-							<li key={type.id} className="border-t border-green-200">
+							<li key={type.slug} className="border-t border-green-200">
 								<Link to={{ pathname: "/tea/search", search: `?type=${type.slug}` }}>
 									<TeaShortCard family={type.family} type={type} />
 								</Link>
