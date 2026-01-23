@@ -15,6 +15,8 @@ import { CoffeeCup, Shop } from "iconoir-react";
 type Session = Embed<TeaSession, "author", Member>;
 type SessionDay = { [key: Member["username"]]: Session[] };
 
+export async function clientLoader() {}
+
 export default function ListTeaSessions() {
 	const [params] = useSearchParams();
 	const [filters, setFilters] = useState<{ username?: string }>({ username: params.get("username") ?? undefined });
