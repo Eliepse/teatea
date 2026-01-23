@@ -10,6 +10,7 @@ use App\State\Origin\OriginProvider;
 use App\ValueObject\Stats\TeaTypeStats;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -77,7 +78,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 					) as ranked
 					WHERE ranked.id = :typeId
 					SQL,
-					new ResultSetMappingBuilder($this->em)->addScalarResult("rank", "rank", Types::INTEGER),
+					new ResultSetMapping()->addScalarResult("rank", "rank", Types::INTEGER),
 				);
 
 				return $query->setParameter("typeId", $typeEntity->id)
