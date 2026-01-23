@@ -11,7 +11,6 @@ use App\ValueObject\Stats\TeaTypeStats;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Query\ResultSetMapping;
-use Doctrine\ORM\Query\ResultSetMappingBuilder;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -58,28 +57,43 @@ readonly class TeaTypeProvider implements ProviderInterface
 
 		$rank = $this->cacheAppStats->get(
 			"tea_types.$typeEntity->id.rank",
-			function (ItemInterface $item) use ($typeEntity) {
-				$item->expiresAt(new \DateTimeImmutable()->add(new \DateInterval("P1D"))->setTime(0, 0));
+			function (ItemInterface $item) use ($typeEntity, $originPath) {
+				$item->expiresAt(new \DateTimeImmutable()->sub(new \DateInterval("P1D"))->setTime(0, 0));
+
+				$rankQuery = $this->em->getConnection()->createQueryBuilder()
+					->select("type.id as id")
+					->addSelect(
+						"ROW_NUMBER() OVER (ORDER BY
+							count(sessions.id) DESC,
+							COUNT(DISTINCT teas.id) DESC,
+							MAX(type.created_at) DESC
+						) as rank",
+					)
+					->from("tea_type", "type")
+					->leftJoin("type", "tea", "teas", "teas.type_id = type.id")
+					->leftJoin(
+						"teas",
+						"tea_session",
+						"sessions",
+						"sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince",
+					)
+					->groupBy("type.id");
+
+				if (null !== $originPath) {
+					$rankQuery->andWhere(":origin @> teas.origin_path")
+						->setParameter("origin", $originPath);
+				}
 
 				$query = $this->em->createNativeQuery(
 					<<<SQL
 					SELECT ranked.rank
-					FROM (
-						SELECT type.id as id,
-							ROW_NUMBER() OVER (ORDER BY
-								count(sessions.id) DESC,
-								COUNT(DISTINCT teas.id) DESC,
-								MAX(type.created_at) DESC
-						    ) as rank
-						FROM tea_type type
-							LEFT JOIN tea as teas ON teas.type_id = type.id
-							LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince
-						GROUP BY type.id
-					) as ranked
+					FROM ({$rankQuery->getSQL()}) as ranked
 					WHERE ranked.id = :typeId
 					SQL,
 					new ResultSetMapping()->addScalarResult("rank", "rank", Types::INTEGER),
 				);
+
+				$query->setParameters($rankQuery->getParameters());
 
 				return $query->setParameter("typeId", $typeEntity->id)
 					->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")))
@@ -87,21 +101,19 @@ readonly class TeaTypeProvider implements ProviderInterface
 			},
 		);
 
-		$stats = $this->em->createNativeQuery(
-			<<<SQL
-			SELECT count(DISTINCT teas.id) as teas, count(sessions.id) as sessions
-			FROM tea_type
-				LEFT JOIN tea as teas ON teas.type_id = tea_type.id
-				LEFT JOIN tea_session as sessions ON sessions.tea_id = teas.id
-			WHERE tea_type.id = :typeId
-			SQL,
-			new ResultSetMappingBuilder($this->em)
-				->addScalarResult("rank", "rank", Types::INTEGER)
-				->addScalarResult("teas", "teas", Types::INTEGER)
-				->addScalarResult("sessions", "sessions", Types::INTEGER),
-		)
-			->setParameter("typeId", $typeEntity->id)
-			->getSingleResult();
+		$statsQuery = $this->em->getConnection()->createQueryBuilder()
+			->select("COUNT(DISTINCT tea.id) as teas")
+			->addSelect("COUNT(DISTINCT sessions.id) as sessions")
+			->from("tea", "tea")
+			->leftJoin("tea", "tea_session", "sessions", "sessions.tea_id = tea.id")
+			->where("tea.type_id = :typeId")
+			->setParameter("typeId", $typeEntity->id);
+
+		if (null !== $originPath) {
+			$statsQuery->andWhere(":origin @> tea.origin_path")->setParameter("origin", $originPath);
+		}
+
+		$stats = $statsQuery->fetchAssociative();
 
 		$resource->stats = new TeaTypeStats($rank, $stats["teas"], $stats["sessions"]);
 
