@@ -31,9 +31,9 @@ class OriginRepository extends ServiceEntityRepository
 	{
 		$originQb = $this->createQueryBuilder("origin")
 			->select("origin")->distinct()
-			->innerJoin(Origin::class, "teaOrigin", "WITH", "CONTAINS(origin.path, teaOrigin.path) = TRUE")
-			->innerJoin(Tea::class, "tea", "WITH", "teaOrigin = tea.origin")
-			->innerJoin(TeaSession::class, "session", "WITH", "tea = session.tea");
+			->innerJoin(Origin::class, "teaOrigin", "ON", "CONTAINS(origin.path, teaOrigin.path) = TRUE")
+			->innerJoin(Tea::class, "tea", "ON", "teaOrigin = tea.origin")
+			->innerJoin(TeaSession::class, "session", "ON", "tea = session.tea");
 
 		if (null === $queryModifier) {
 			return $originQb->getQuery()->getResult();
@@ -56,7 +56,7 @@ class OriginRepository extends ServiceEntityRepository
 		}
 
 		return $this->createQueryBuilder("O")
-			->innerJoin(Origin::class, "base", "WITH", "CONTAINS(O.path, base.path) = TRUE")
+			->innerJoin(Origin::class, "base", "ON", "CONTAINS(O.path, base.path) = TRUE")
 			->where("base.id IN (:ids)")
 			->setParameter("ids", $originIds)
 			->getQuery()
@@ -84,7 +84,7 @@ class OriginRepository extends ServiceEntityRepository
 
 		$rows = $this->createQueryBuilder("origin")
 			->select("origin.path as path", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
-			->leftJoin("App\Entity\Origin", "ancestors", Join::WITH, "CONTAINS(ancestors.path, origin.path) = TRUE")
+			->leftJoin("App\Entity\Origin", "ancestors", "ON", "CONTAINS(ancestors.path, origin.path) = TRUE")
 			->where("origin.id IN (:ids)")
 			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
 			->groupBy("origin.path")
@@ -113,7 +113,7 @@ class OriginRepository extends ServiceEntityRepository
 
 		$rows = $this->createQueryBuilder("origin")
 			->select("origin", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
-			->leftJoin("App\Entity\Origin", "ancestors", Join::WITH, "CONTAINS(ancestors.path, origin.path) = TRUE")
+			->leftJoin("App\Entity\Origin", "ancestors", "ON", "CONTAINS(ancestors.path, origin.path) = TRUE")
 			->where("origin.id IN (:ids)")
 			->setParameter("ids", $ids, ArrayParameterType::INTEGER)
 			->groupBy("origin.id")
