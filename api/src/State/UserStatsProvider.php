@@ -103,13 +103,11 @@ readonly class UserStatsProvider implements ProviderInterface
 					LEFT JOIN session.tea tea
 				WHERE session.author = :author
 				  AND session.drankAt >= :fromDrankAt
-				  AND session.drankAt < :toDrankAt
 				GROUP BY tea.family
 				DQL,
 			)
 			->setParameter("author", $user)
 			->setParameter("fromDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
-			->setParameter("toDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1D"))->setTime(0, 0))
 			->getResult();
 
 		$teasOrigins = $this->em->createQuery(
