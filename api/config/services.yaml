@@ -5,6 +5,11 @@ parameters:
     app.base_url: "%env(string:BASE_URL)%"
     auth.refresh_token.ttl: 2592000 # 30 days as seconds
 
+when@dev:
+    parameters:
+        # Key that must be passed to the url to gain access as admin, only in dev
+        auth.dev_login_key: "%env(string:DEV_LOGIN_KEY)%"
+
 services:
     # default configuration for services in *this* file
     _defaults:

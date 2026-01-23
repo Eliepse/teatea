@@ -18,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
@@ -200,5 +201,50 @@ class OTPAuthController extends AbstractController
 		$this->tokenRepo->validateToken($OTPToken);
 
 		return new Response(status: 204);
+	}
+
+	/**
+	 * Logging autmatically in dev env
+	 */
+	#[Route(
+		"/auth/dev/{token}",
+		name: "login.dev",
+		requirements: ["token" => "[A-Za-z0-9]+"],
+		methods: ["POST"],
+		format: "application/json",
+		env: "dev",
+	)]
+	public function loginDev(
+		string $token,
+		#[Autowire(param: "auth.dev_login_key")]
+		string $devKey,
+		UserRepository $userRepo,
+	): JsonResponse {
+		if (empty($token) || empty(trim($devKey)) || $token !== $devKey) {
+			throw new NotFoundHttpException();
+		}
+
+		$admin = $userRepo
+			->createQueryBuilder("admin")
+			->where("RIGHT_EXISTS_ON_LEFT(TO_JSONB(admin.roles), :role) = TRUE")
+			->setParameter("role", "ROLE_ADMIN")
+			->orderBy("admin.id")
+			->setMaxResults(1)
+			->getQuery()
+			->getSingleResult();
+
+		$jwt = $this->JWTManager->create($admin);
+		$refreshToken = $this->tokenManager->createToken(
+			Token::TYPE_JWT_REFRESH,
+			$admin,
+			new \DateTimeImmutable()->add(new \DateInterval("PT{$this->refreshTokenTtl}S")),
+			new \DateTimeImmutable(),
+		);
+
+		return $this->json([
+			"token" => $jwt,
+			"refresh_token" => $refreshToken->challenge,
+			"refresh_token_expiration" => $refreshToken->token->expiredAt?->getTimestamp(),
+		]);
 	}
 }
