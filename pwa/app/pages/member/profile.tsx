@@ -132,7 +132,7 @@ function Stats(props: {
 				{1 === families.length && (
 					<p>
 						{subject} only drank <strong>{teaFamilies[families[0][0]]}</strong> ({families[0][1].sessions}{" "}
-						sessions) in the last 30 days.
+						sessions).
 					</p>
 				)}
 				{1 < families.length && (
