@@ -8,9 +8,7 @@ use App\ApiResource\TeaType;
 use App\Helper\OperationHelper;
 use App\State\Origin\OriginProvider;
 use App\ValueObject\Stats\TeaTypeStats;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -56,48 +54,47 @@ readonly class TeaTypeProvider implements ProviderInterface
 		}
 
 		$rank = $this->cacheAppStats->get(
-			"tea_types.$typeEntity->id.rank",
+			"tea_types.$typeEntity->id.$originPath.rank",
 			function (ItemInterface $item) use ($typeEntity, $originPath) {
 				$item->expiresAt(new \DateTimeImmutable()->sub(new \DateInterval("P1D"))->setTime(0, 0));
 
 				$rankQuery = $this->em->getConnection()->createQueryBuilder()
-					->select("type.id as id")
+					->select("tea.type_id AS id", "origin.path AS path")
 					->addSelect(
 						"ROW_NUMBER() OVER (ORDER BY
 							count(sessions.id) DESC,
-							COUNT(DISTINCT teas.id) DESC,
-							MAX(type.created_at) DESC
-						) as rank",
+							COUNT(DISTINCT tea.id) DESC,
+							MAX(tea.created_at) DESC
+						) AS rank",
 					)
-					->from("tea_type", "type")
-					->leftJoin("type", "tea", "teas", "teas.type_id = type.id")
+					->from("tea", "tea")
+					->leftJoin("tea", "origin", "origin", "SUBPATH(tea.origin_path, 0, 1) = origin.path")
 					->leftJoin(
-						"teas",
+						"tea",
 						"tea_session",
 						"sessions",
-						"sessions.tea_id = teas.id AND sessions.drank_at >= :rankSince",
+						"sessions.tea_id = tea.id AND sessions.drank_at >= :rankSince",
 					)
-					->groupBy("type.id");
+					->groupBy("tea.type_id", "origin.path");
+
+				$query = $this->em->getConnection()->createQueryBuilder()
+					->select("ranked.rank")
+					->from("({$rankQuery->getSQL()})", "ranked")
+					->where("ranked.id = :typeId")
+					->orderBy("ranked.rank")
+					->setMaxResults(1)
+					->setParameters($rankQuery->getParameters())
+					->setParameter("typeId", $typeEntity->id)
+					->setParameter(
+						"rankSince",
+						new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->format("Y-m-d H:i:s"),
+					);
 
 				if (null !== $originPath) {
-					$rankQuery->andWhere(":origin @> teas.origin_path")
-						->setParameter("origin", $originPath);
+					$query->andWhere("ranked.path @> :origin")->setParameter("origin", $originPath);
 				}
 
-				$query = $this->em->createNativeQuery(
-					<<<SQL
-					SELECT ranked.rank
-					FROM ({$rankQuery->getSQL()}) as ranked
-					WHERE ranked.id = :typeId
-					SQL,
-					new ResultSetMapping()->addScalarResult("rank", "rank", Types::INTEGER),
-				);
-
-				$query->setParameters($rankQuery->getParameters());
-
-				return $query->setParameter("typeId", $typeEntity->id)
-					->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")))
-					->getSingleScalarResult();
+				return $query->fetchOne();
 			},
 		);
 
