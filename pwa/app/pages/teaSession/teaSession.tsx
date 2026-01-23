@@ -5,12 +5,13 @@ import {
 	type Iri,
 	type NullablePartial,
 	RoastLevelEnum,
+	type Tea,
 	type TeaSession,
 	type TeaType,
 } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
-import { useNavigate, useRevalidator, useSearchParams } from "react-router";
+import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { Modal } from "~/components/shared/modal/Modal";
 import { type ChangeEvent, type PropsWithChildren, type ReactNode, useState } from "react";
 import { handleUIEvent } from "~/utils/function";
@@ -45,6 +46,7 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
+import { extractId } from "~/utils/resource";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -52,10 +54,10 @@ const QualityIcon = {
 	[BrewingQualityEnum.Bad]: <EmojiSad className="size-5" />,
 };
 
-export async function clientLoader(props: Route.ClientLoaderArgs): Promise<TeaSession> {
+export async function clientLoader(props: Route.ClientLoaderArgs) {
 	const id = parseInt(props.params.id);
 	const response = await fetchApi<TeaSessionRaw>(`/tea_sessions/${id}`);
-	return denormalizeTeaSession(await response.json());
+	return denormalizeTeaSession(await response.json()) as TeaSession & { author: Iri; tea: Tea & { type: Iri } };
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
