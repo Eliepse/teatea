@@ -56,7 +56,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 		$rank = $this->cacheAppStats->get(
 			"tea_types.$typeEntity->id.$originPath.rank",
 			function (ItemInterface $item) use ($typeEntity, $originPath) {
-				$item->expiresAt(new \DateTimeImmutable()->sub(new \DateInterval("P1D"))->setTime(0, 0));
+				$item->expiresAt(new \DateTimeImmutable()->add(new \DateInterval("P1D"))->setTime(0, 0));
 
 				$rankQuery = $this->em->getConnection()->createQueryBuilder()
 					->select("tea.type_id AS id", "origin.path AS path")
