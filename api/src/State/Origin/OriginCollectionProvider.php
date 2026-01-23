@@ -7,7 +7,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ParameterNotFound;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Origin;
+use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\Helper\Arr;
+use App\Repository\OriginRepository;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -18,6 +20,7 @@ readonly class OriginCollectionProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private OriginRepository $originRepo,
 	) {
 	}
 
@@ -68,28 +71,22 @@ readonly class OriginCollectionProvider implements ProviderInterface
 				->setParameter("nlevel", $level);
 		}
 
-		/** @var \App\Entity\Origin[] $searchResults */
+		/** @var array{ path: LTreePath, children: int }[] $searchResults */
 		$searchResults = $searchQb->getQuery()->getResult();
 
 		if (empty($searchResults)) {
 			return [];
 		}
 
-		$originPaths = Arr::pluck($searchResults, fn(\App\Entity\Origin $o) => $o->path->getPath(), true);
-		$originQb = $this->em->createQueryBuilder()
-			->select("origin")
-			->addSelect("JSON_AGG(ancestors.name ORDER BY ancestors.path) as name_path")
-			->from(\App\Entity\Origin::class, "origin")
-			->leftJoin(\App\Entity\Origin::class, "ancestors", "WITH", "CONTAINS(ancestors.path, origin.path) = TRUE")
-			->where("origin.path IN (:paths)")
-			->setParameter("paths", $originPaths, ArrayParameterType::STRING)
-			->groupBy("origin");
-
-		$originById = Arr::keyBy($originQb->getQuery()->getResult(), fn($row) => $row[0]->id);
+		$originPaths = Arr::pluck($searchResults, fn(array $row) => $row["path"]->getPath(), true);
+		$originsByPath = Arr::keyBy(
+			$this->originRepo->findManyWithAncestorNames($originPaths),
+			fn(\App\Entity\Origin $o) => $o->path->getPath(),
+		);
 
 		return array_map(
-			function ($row) use ($originById) {
-				$entity = $originById[$row["id"]][0] ?? null;
+			function ($row) use ($originsByPath) {
+				$entity = $originsByPath[$row["path"]->getPath()] ?? null;
 
 				if (null === $entity) {
 					return null;
@@ -97,7 +94,6 @@ readonly class OriginCollectionProvider implements ProviderInterface
 
 				$resource = OriginProvider::fromEntity($entity);
 				$resource->isLeaf = empty($row["children"]);
-				$resource->namePath = json_decode($originById[$row["id"]]["name_path"]);
 				return $resource;
 			},
 			$searchResults, // Map with the search results to keep the order
