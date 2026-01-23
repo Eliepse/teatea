@@ -64,7 +64,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 				->setParameter("pathFilter", $originPath);
 		} else {
 			$searchQuery
-				->leftJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");
+				->innerJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");
 		}
 
 		if (null !== $familyFilter) {
