@@ -1,14 +1,13 @@
 import { AuthLayout } from "~/layouts/AuthLayout";
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/profile";
 import { getApi, postApi } from "~/utils/api";
-import type { Member, MemberStats, TeaFamily } from "~t/types";
+import { type Member, type MemberStats, teaFamilies, type TeaFamily } from "~t/types";
 import { usePopup } from "~/components/shared/modal/AlertManager";
 import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { Link, useNavigate } from "react-router";
 import { CoffeeCup, Leaf, LogOut, PeopleTag } from "iconoir-react";
 import { UserStat } from "~/components/stats/UserStat";
 import { BackButton } from "~/components/shared/navigation/BackButton";
-import clsx from "clsx";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -46,7 +45,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="bg-green-50 px-4">
+		<AuthLayout className="bg-green-50 px-4 text-green-900">
 			<div className="flex items-center pt-4 mb-4">
 				<BackButton className="shadow-xs" />
 				<button className="btn btn-lg btn-circle bg-white ml-auto shadow-xs" onClick={promptLogout}>
@@ -70,54 +69,46 @@ export default function ProfilePage(props: Route.ComponentProps) {
 			<Stats
 				sessions={stats.statsSessionsTotal}
 				teas={stats.statsConsumedTeasTotal}
-				username={isMemberSelf ? token?.username : undefined}
+				username={member.username}
+				isSelf={isMemberSelf}
 				familiesStats={familiesStats}
 			/>
 		</AuthLayout>
 	);
 }
 
-const teaFamilyColor = {
-	yellow: "bg-lime-600",
-	white: "bg-cyan-400",
-	green: "bg-green-600",
-	wulong: "bg-indigo-600",
-	black: "bg-orange-600",
-	fermented: "bg-stone-600",
-} as const;
-
-function Stats(props: { sessions: number; teas: number; username?: string; familiesStats: Record<TeaFamily, number> }) {
+function Stats(props: {
+	sessions: number;
+	teas: number;
+	username?: string;
+	familiesStats: Record<TeaFamily, number>;
+	isSelf: boolean;
+}) {
 	if (!props.sessions) {
 		return null;
 	}
 
-	console.debug(props.familiesStats);
+	const subject = props.isSelf ? "You" : props.username;
 	const totalFamiliesSessions = Object.values(props.familiesStats).reduce((c, i) => i + c, 0);
+	const families = Object.keys(teaFamilies)
+		.map((family) => {
+			const sessions = totalFamiliesSessions ? (props.familiesStats[family as TeaFamily] ?? 0) : 0;
+			return [family as TeaFamily, { sessions, ratio: sessions / totalFamiliesSessions }] as const;
+		})
+		.filter((a) => a[1].sessions)
+		.sort((a, b) => b[1].sessions - a[1].sessions);
+
 	const tastedTeasComp = (
 		<UserStat
 			title="tasted teas"
 			value={props.teas}
 			icon={<Leaf className="size-5 inline mx-1" />}
-			withArrow={!!props.username}
+			withArrow={props.isSelf}
 		/>
 	);
 
 	return (
 		<div className="grid grid-cols-2 gap-4 px-4 py-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
-			<div className="col-span-2 flex justify-stretch h-6 rounded overflow-hidden text-sm text-white">
-				{Object.entries(props.familiesStats).map(([family, count]) => {
-					const percent = Math.round((count * 100) / totalFamiliesSessions);
-					return (
-						<span
-							className={clsx("inline-flex justify-center items-center h-full", teaFamilyColor[family])}
-							style={{ width: percent + "%" }}
-						>
-							{percent >= 8 ? <>{percent.toFixed(0)} %</> : null}
-						</span>
-					);
-				})}
-			</div>
-
 			<Link to={`/sessions?username=${props.username}`}>
 				<UserStat
 					title="tea sessions"
@@ -127,7 +118,63 @@ function Stats(props: { sessions: number; teas: number; username?: string; famil
 				/>
 			</Link>
 
-			{props.username ? <Link to="/me/teas">{tastedTeasComp}</Link> : tastedTeasComp}
+			{props.isSelf ? <Link to="/me/teas">{tastedTeasComp}</Link> : tastedTeasComp}
+
+			<hr className="border-stone-200 col-span-2" />
+
+			<div className="col-span-2">
+				<h2 className="mb-2 text-xs font-bold text-stone-400 uppercase tracking-wide">Last 30 days</h2>
+				{0 === families.length && (
+					<p>
+						{subject} didn't drink tea recently.
+					</p>
+				)}
+				{1 === families.length && (
+					<p>
+						{subject} only drank <strong>{teaFamilies[families[0][0]]}</strong> ({families[0][1].sessions}{" "}
+						sessions) in the last 30 days.
+					</p>
+				)}
+				{1 < families.length && (
+					<p>
+						{subject} drank{" "}
+						<TeaStatInline
+							family={families[0][0]}
+							sessions={families[0][1].sessions}
+							ratio={families[0][1].ratio}
+						/>{" "}
+						and{" "}
+						<TeaStatInline
+							family={families[1][0]}
+							sessions={families[1][1].sessions}
+							ratio={families[1][1].ratio}
+						/>
+						.{" "}
+						{3 <= families.length && (
+							<>
+								{subject} also drank{" "}
+								<TeaStatInline
+									family={families[2][0]}
+									sessions={families[2][1].sessions}
+									ratio={families[2][1].ratio}
+								/>
+								.
+							</>
+						)}
+					</p>
+				)}
+			</div>
 		</div>
+	);
+}
+
+function TeaStatInline(props: { family: TeaFamily; sessions: number; ratio: number }) {
+	return (
+		<>
+			<strong>
+				<span className="font-header">{Math.round(props.ratio * 100)}%</span> {teaFamilies[props.family]}
+			</strong>{" "}
+			({props.sessions} sessions)
+		</>
 	);
 }
