@@ -108,7 +108,7 @@ export function TeaSearchEngine(props: {
 							<ul>
 								{query.data.pages.map((page) =>
 									page.member?.map((item) => (
-										<li key={item["@id"]} className={clsx("type" in item ? "mb-3" : "mb-2")}>
+										<li key={item["@id"] + item.origin?.path} className={clsx("type" in item ? "mb-3" : "mb-2")}>
 											{"name" in item && (
 												<Item
 													label={item.name}
