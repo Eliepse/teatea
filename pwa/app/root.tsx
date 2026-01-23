@@ -4,7 +4,7 @@ import "./app.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
 import { type ReactNode, StrictMode } from "react";
-import { PostHogProvider } from "posthog-js/react";
+import { PostHogErrorBoundary, PostHogProvider } from "posthog-js/react";
 import type { PostHogConfig } from "posthog-js";
 
 const options: Partial<PostHogConfig> = {
@@ -22,7 +22,7 @@ export const links: Route.LinksFunction = () => [
 	},
 	{
 		rel: "stylesheet",
-		href: 'https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,87.5,200..800&family=Commissioner:wght@100..900&display=swap',
+		href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,87.5,200..800&family=Commissioner:wght@100..900&display=swap",
 	},
 ];
 
@@ -74,7 +74,9 @@ export default function App() {
 	if (options.api_host && import.meta.env.PUBLIC_POSTHOG_KEY) {
 		return (
 			<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
-				<Outlet />
+				<PostHogErrorBoundary fallback={({ error }) => <ErrorBoundary error={error} />}>
+					<Outlet />
+				</PostHogErrorBoundary>
 			</PostHogProvider>
 		);
 	}
@@ -82,7 +84,7 @@ export default function App() {
 	return <Outlet />;
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+export function ErrorBoundary({ error }: { error: unknown }) {
 	let message = "Oops!";
 	let details = "An unexpected error occurred.";
 	let stack: string | undefined;
