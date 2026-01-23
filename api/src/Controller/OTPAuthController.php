@@ -226,7 +226,7 @@ class OTPAuthController extends AbstractController
 
 		$admin = $userRepo
 			->createQueryBuilder("admin")
-			->where("RIGHT_EXISTS_ON_LEFT(TO_JSONB(admin.roles), :role) = TRUE")
+			->where("RIGHT_EXISTS_ON_LEFT(admin.roles, :role) = TRUE")
 			->setParameter("role", "ROLE_ADMIN")
 			->orderBy("admin.id")
 			->setMaxResults(1)

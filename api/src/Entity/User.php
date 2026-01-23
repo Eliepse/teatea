@@ -36,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	public ?string $username = null;
 
 	/** @var list<string> The user roles */
-	#[ORM\Column]
+	#[ORM\Column(type: Types::JSONB)]
 	private array $roles = [];
 
 	/** @var ?string The hashed password */
