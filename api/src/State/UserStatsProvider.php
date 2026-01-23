@@ -108,7 +108,7 @@ readonly class UserStatsProvider implements ProviderInterface
 				DQL,
 			)
 			->setParameter("author", $user)
-			->setParameter("fromDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1Y"))->setTime(0, 0))
+			->setParameter("fromDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
 			->setParameter("toDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1D"))->setTime(0, 0))
 			->getResult();
 
