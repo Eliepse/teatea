@@ -128,9 +128,11 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						)}
 
 						{!!session.author && (
-							<Badge icon="" loading={member.isLoading}>
-								@{member.data?.username}
-							</Badge>
+							<Link to={`/members/${extractId(session.author)}`}>
+								<Badge icon="" loading={member.isLoading}>
+									@{member.data?.username}
+								</Badge>
+							</Link>
 						)}
 					</div>
 				</div>
