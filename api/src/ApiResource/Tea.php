@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "with:origin", "embedded:cultivar"]],
 	provider: TeaProvider::class
 )]
 #[GetCollection(
@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	paginationItemsPerPage: 15,
 	paginationMaximumItemsPerPage: 50,
 	paginationClientItemsPerPage: true,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "with:origin", "embedded:cultivar"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
@@ -88,7 +88,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	],
 	paginationEnabled: true,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "embedded:origin", "embedded:cultivar"]],
+	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "with:origin", "embedded:cultivar"]],
 	provider: ListedTeaCollectionProvider::class,
 )]
 class Tea
@@ -104,7 +104,7 @@ class Tea
 	public ?TeaType $type = null;
 
 	#[ApiProperty(genId: false)]
-	#[Groups(["embedded:tea", "with:tea", "embedded:origin"])]
+	#[Groups(["embedded:tea", "with:tea", "with:origin"])]
 	public ?OriginPath $originPath = null;
 
 	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:origin"])]

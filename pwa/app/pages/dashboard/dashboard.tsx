@@ -21,7 +21,7 @@ export function meta() {
 
 export async function clientLoader() {
 	const token = TokenUtils.get();
-	const response = await getApi<MemberStats>(`/members/${token.username}/stats`);
+	const response = await getApi<MemberStats>(`/members/${token?.username}/stats`);
 	return await response.json();
 }
 
@@ -54,7 +54,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 					<ul>
 						{props.loaderData.statsTopTeaTypes.map((type) => (
 							<li key={type.id} className="border-t border-green-200">
-								<Link to={`/tea_types/${type.slug}`}>
+								<Link to={{ pathname: "/tea/search", search: `?type=${type.slug}` }}>
 									<TeaShortCard family={type.family} type={type} />
 								</Link>
 							</li>

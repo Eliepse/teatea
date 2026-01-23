@@ -49,7 +49,6 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		// as a type already have some predefined constraints
 		if (null !== $typeFilter) {
 			$searchText = null;
-			$originPath = null;
 			$familyFilter = null;
 		}
 

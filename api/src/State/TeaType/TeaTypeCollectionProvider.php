@@ -12,11 +12,11 @@ use App\ApiResource\TeaType;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
+use App\State\Origin\OriginProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Query\Expr\Join;
 
 /**
  * @implements ProviderInterface<TeaType[]>
@@ -38,7 +38,6 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$page = $this->pagination->getPage($context);
 		$offset = $this->pagination->getOffset($operation, $context);
 		$limit = $this->pagination->getLimit($operation, $context);
-		$params = $operation->getParameters();
 
 		$searchText = OperationHelper::getParameter($operation, "q");
 		$originPath = OperationHelper::getParameter($operation, "originPath");
@@ -47,22 +46,25 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		$expr = $this->em->getExpressionBuilder();
 		$searchQuery = $this->em->createQueryBuilder()
-			->select("type.id")
-			->from(\App\Entity\TeaType::class, "type")
-			->groupBy("type.id");
+			->select("type.id AS typeId", "origin.id AS originId")
+			->from(\App\Entity\Tea::class, "tea")
+			->leftJoin("tea.type", "type")
+			->groupBy("type.id", "origin.id");
 
 		if (null !== $searchText) {
 			$searchQuery
 				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
-				->orderBy("SIMILARITY(unaccent(type.name), unaccent(:searchText))", "DESC")
-				->addGroupBy("type.name")
+				->orderBy("SIMILARITY(UNACCENT(any_value(type.name)), UNACCENT(:searchText))", "DESC")
 				->setParameter("searchText", $searchText);
 		}
 
 		if (null !== $originPath) {
 			$searchQuery
-				->innerJoin("type.origin", "origin", Join::WITH, "CONTAINS(:pathFilter, origin.path) = TRUE")
+				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:pathFilter, origin.path) = TRUE")
 				->setParameter("pathFilter", $originPath);
+		} else {
+			$searchQuery
+				->leftJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");
 		}
 
 		if (null !== $familyFilter) {
@@ -73,17 +75,24 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		if ("popularity" === $sortParam) {
 			$searchQuery
-				->leftJoin("type.teas", "teas")
-				->leftJoin("teas.sessions", "session", Join::WITH, ":popularSince <= session.drankAt")
+				->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")
 				->addOrderBy("count(DISTINCT session.id)", "DESC")
-				->addOrderBy("count(DISTINCT teas.id)", "DESC")
+				->addOrderBy("count(DISTINCT tea.id)", "DESC")
 				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
 		}
 
+		/*
+		| --------------------------------
+		| Find total results
+		| --------------------------------
+		*/
+
+		// Fix: use 'concat' workaround as Doctrine doesn't allow subqueries
+		//   and the '?' operator is mistaken as a prepared parameter
 		$total = (clone $searchQuery)
-			->select("COUNT(DISTINCT type.id)")
-			->resetDQLPart("groupBy")
+			->select("COUNT(DISTINCT CONCAT(type.id, '-', origin.id))")
 			->resetDQLPart("orderBy")
+			->resetDQLPart("groupBy")
 			->getQuery()
 			->getSingleScalarResult();
 
@@ -96,31 +105,31 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			->setFirstResult($offset)
 			->setMaxResults($limit)
 			->getQuery()
-			->getResult(AbstractQuery::HYDRATE_SCALAR_COLUMN);
+			->getResult(AbstractQuery::HYDRATE_SCALAR);
 
-		$entities = $this->em->createQuery(
-			<<<DQL
-			SELECT type, origin
-			FROM App\Entity\TeaType type
-				LEFT JOIN type.origin origin
-			WHERE type.id IN (:ids)
-			DQL,
-		)
-			->setParameter("ids", $searchResults, ArrayParameterType::INTEGER)
+		$typeIds = Arr::pluck($searchResults, "typeId", true);
+		$originIds = Arr::pluck($searchResults, "originId", true);
+
+		$entities = $this->em
+			->createQuery("SELECT type FROM App\Entity\TeaType type WHERE type.id IN (:ids)")
+			->setParameter("ids", $typeIds, ArrayParameterType::INTEGER)
 			->getResult();
 
 		$entitiesById = Arr::keyBy($entities, "id");
 
-		$namePathMap = $this->originRepo->getAncestorsNamesByPath(
-			Arr::pluck($entities, fn($type) => $type->origin->id, true),
-		);
+		$origins = $this->originRepo->findManyWithAncestorNames($originIds);
+		$origins = Arr::keyBy($origins, "id");
 
 		// Iterate over results (not entities) to keep ordering
-		$resources = array_map(function ($typeId) use ($entitiesById, $namePathMap) {
-			$type = $entitiesById[$typeId];
+		$resources = array_map(function ($result) use ($entitiesById, $origins) {
+			$type = $entitiesById[$result["typeId"]];
 			$resource = TeaTypeProvider::fromEntity($type);
-			$origin = $resource->origin;
-			$origin->namePath = $namePathMap[$origin->path];
+			$origin = $origins[$result["originId"]] ?? null;
+
+			if (null !== $origin) {
+				$resource->origin = OriginProvider::fromEntity($origin);
+			}
+
 			return $resource;
 		}, $searchResults);
 

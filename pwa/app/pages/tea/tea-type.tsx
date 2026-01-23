@@ -8,14 +8,20 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { Link, type LinkProps } from "react-router";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
+	const origin = args.params.origin;
+
 	const teaType = await (
-		await getApi<Omit<TeaType, "stats"> & { stats: Required<TeaType>["stats"] }>(`/tea_types/${args.params.slug}`)
+		await getApi<Omit<TeaType, "stats"> & { stats: Required<TeaType>["stats"] }>(
+			`/tea_types/${args.params.slug}?origin=${origin}`,
+		)
 	).json();
 	return { teaType };
 }
 
 export default function TeaTypePage(props: Route.ComponentProps) {
 	const { teaType } = props.loaderData;
+	const origin = teaType.origin;
+	const countryPath = origin.path.split(".")[0];
 	const stats = teaType.stats;
 
 	return (
@@ -74,7 +80,7 @@ export default function TeaTypePage(props: Route.ComponentProps) {
 
 					<li className="col-span-2">
 						<StatButton
-							to={{ pathname: "/tea/search", search: `?type=${props.loaderData.teaType.slug}` }}
+							to={{ pathname: "/tea/search", search: `?type=${teaType.slug}&originPath=${countryPath}` }}
 							value={stats.teasCount}
 							unit={1 < stats.teasCount ? "teas" : "tea"}
 							icon={<Leaf className="size-6" />}

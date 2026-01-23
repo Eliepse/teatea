@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\TeaType;
+use App\Helper\Arr;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -11,33 +12,17 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TeaTypeRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, TeaType::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, TeaType::class);
+	}
 
-    //    /**
-    //     * @return TeaType[] Returns an array of TeaType objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?TeaType
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+	/**
+	 * @return array<string, TeaType>
+	 */
+	public function getFamilies(): array
+	{
+		$types = $this->createQueryBuilder("T")->where("T.isFamily = TRUE")->getQuery()->getResult();
+		return Arr::keyBy($types, fn($t) => $t->family->value);
+	}
 }

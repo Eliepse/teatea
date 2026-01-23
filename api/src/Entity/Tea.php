@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Doctrine\DBAL\Types\RoastLevelType;
+use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\Doctrine\ORM\TimestampedEntity;
 use App\Enum\RoastLevel;
 use App\Enum\TeaFamily;
@@ -35,9 +36,16 @@ class Tea
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	public ?Cultivar $cultivar = null;
 
+	/**
+	 * @var Origin|null
+	 * @deprecated Use originPath column until Origin's primary key is changed from id to path
+	 */
 	#[ORM\ManyToOne(inversedBy: 'teas')]
 	#[ORM\JoinColumn("origin_id")]
 	public ?Origin $origin = null;
+
+	#[ORM\Column(type: "ltree")]
+	public LTreePath $originPath;
 
 	#[Assert\GreaterThan(0)]
 	#[ORM\Column(nullable: true)]

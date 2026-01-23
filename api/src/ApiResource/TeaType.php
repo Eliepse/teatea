@@ -18,10 +18,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "embedded:origin"]],
+	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "with:origin"]],
 	security: "is_granted('ROLE_USER')"
 )]
-#[Get(provider: TeaTypeProvider::class)]
+#[Get(
+	provider: TeaTypeProvider::class,
+	parameters: [
+		"origin" => new QueryParameter(
+			schema: ["type" => "string", "example" => "Japan, China, ..."],
+			property: "origin",
+			description: "Filter by origin path, to get only the given branch",
+		),
+	],
+)]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -46,10 +55,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Post(processor: TeaTypeCreateProcessor::class)]
 class TeaType
 {
-	#[Groups(["read:origin"])]
-	#[ApiProperty(writable: false, identifier: false)]
-	public ?int $id = null;
-
 	#[Groups(["read:origin", "with:teatype"])]
 	#[ApiProperty(writable: false, identifier: true)]
 	public ?string $slug = null;
@@ -62,13 +67,8 @@ class TeaType
 	#[Groups(["embedded:teaType", "with:teatype", "read:origin", "tea:create"])]
 	public string $name;
 
-	#[Assert\NotNull]
 	#[Groups(["read:origin"])]
 	public ?Origin $origin = null;
-
-	#[ApiProperty]
-	#[Groups(["read:origin", "tea:create"])]
-	public bool $isPDO = false;
 
 	#[Groups(["type:read"])]
 	#[ApiProperty(readable: true, readableLink: true, genId: false)]
