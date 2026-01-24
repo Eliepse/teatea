@@ -64,7 +64,7 @@ export function SteepFormModal(props: {
 	}
 
 	return (
-		<Modal onClose={props.onClose} open={props.open} className="flex flex-col" position="bottom">
+		<Modal onClose={props.onClose} open={props.open} className="flex flex-col">
 			<div className="flex justify-between">
 				<button
 					className="btn btn-outline"

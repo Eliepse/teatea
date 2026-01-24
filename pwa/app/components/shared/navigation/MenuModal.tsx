@@ -10,7 +10,7 @@ const ItemCls = {
 
 export function MenuModal(props: PropsWithChildren<{ open: boolean; onClose: () => void }>) {
 	return (
-		<Modal onClose={props.onClose} open={props.open} position="bottom" className="p-0 text-lg">
+		<Modal onClose={props.onClose} open={props.open} className="p-0 text-lg">
 			<ul aria-live="polite">
 				{Children.map(props.children, (child) => (
 					<li className="not-first:border-t border-teal-200">{child}</li>

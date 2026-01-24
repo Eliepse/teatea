@@ -59,7 +59,7 @@ export function YearInput(props: {
 				</button>
 			</div>
 
-			<Modal onClose={() => setModalOpen(false)} open={modalOpen} position="bottom">
+			<Modal onClose={() => setModalOpen(false)} open={modalOpen}>
 				<div className="flex mb-4">
 					<button className="btn btn-outline" onClick={() => setModalOpen(false)}>
 						Back

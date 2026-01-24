@@ -1,11 +1,11 @@
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
+import styles from "./Modal.module.scss";
 
 type ModalType = React.PropsWithChildren & {
 	open: boolean;
 	noBackdrop?: boolean;
-	position?: "top" | "bottom" | "middle" | "start" | "end";
 	className?: string;
 };
 
@@ -19,14 +19,6 @@ export function Modal(props: { open?: boolean; onClose?: () => void } & ModalTyp
 }
 
 function ModalContent(props: ModalType) {
-	const positionCls = clsx({
-		"modal-end": "end" === props.position,
-		"modal-start": "start" === props.position,
-		"modal-top": "top" === props.position,
-		"modal-middle": "middle" === props.position,
-		"modal-bottom sm:modal-middle": "bottom" === props.position,
-	});
-
 	const { noBackdrop, ...dialogProps } = props;
 
 	return (
@@ -34,7 +26,7 @@ function ModalContent(props: ModalType) {
 			{...dialogProps}
 			aria-label="Modal"
 			aria-modal={props.open}
-			className={clsx("modal z-40 modal-open transition-none", positionCls)}
+			className={styles.root}
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
 			exit={{ opacity: 0 }}
@@ -48,13 +40,13 @@ function ModalContent(props: ModalType) {
 					delay: 0.04,
 					ease: [0.22, 1, 0.36, 1],
 				}}
-				className={clsx("modal-box", props.className)}
+				className={clsx(styles.modal, props.className)}
 			>
 				{props.children}
 			</motion.div>
 
 			{true !== noBackdrop && (
-				<form method="dialog" className="modal-backdrop">
+				<form method="dialog" className={styles.backdrop}>
 					<button>close</button>
 				</form>
 			)}

@@ -4,7 +4,7 @@ import { CreateTeaSessionFlow } from "~/components/teaSession/CreateTeaSessionFl
 
 export function CreateSessionModal(props: { tea: Iri; onClose: () => void; open: boolean }) {
 	return (
-		<Modal onClose={props.onClose} open={props.open} position="bottom" className="h-2/3 p-0">
+		<Modal onClose={props.onClose} open={props.open} className="p-0">
 			<CreateTeaSessionFlow tea={props.tea} onCancel={props.onClose} />
 		</Modal>
 	);

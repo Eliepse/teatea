@@ -80,7 +80,7 @@ export function LoginModal(props: { open: boolean; onClose: () => void }) {
 	}
 
 	return (
-		<Modal onClose={props.onClose} open={props.open} position="bottom">
+		<Modal onClose={props.onClose} open={props.open}>
 			{null === token && null === OTPToken && (
 				<LoginForm
 					defaultEmail={defaultEmail.current}

@@ -31,7 +31,7 @@ export function TypeFilterListAll(props: {
 				{0 < props.value.length && <span className="badge badge-sm badge-secondary">{props.value.length}</span>}
 			</button>
 
-			<Modal open={open} onClose={() => setOpen(false)} position="bottom" className="overflow-hidden">
+			<Modal open={open} onClose={() => setOpen(false)} className="overflow-hidden">
 				<div className="overflow-auto relative max-h-[75vh]">
 					<MultilevelSelect types={props.types} value={props.value} onChange={props.onChange} />
 

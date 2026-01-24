@@ -66,7 +66,7 @@ export function AddPersonalCollectionModal(props: { tea: Iri; onClose: () => voi
 
 	if (mutation.isPending || mutation.isSuccess) {
 		return (
-			<Modal onClose={props.onClose} open={props.open} position="bottom" className="p-0 h-1/3">
+			<Modal onClose={props.onClose} open={props.open} className="p-0 h-1/3">
 				<div className="flex items-center justify-center h-full text-lg text-green-700">
 					<div>
 						<EcologyBook className="mx-auto mb-4 size-14 animate-bounce text-green-600" />
@@ -80,7 +80,7 @@ export function AddPersonalCollectionModal(props: { tea: Iri; onClose: () => voi
 	const progress = (FRAME_INFO_MAPPER[currentFrameKey].step / Object.values(FRAME_INFO_MAPPER).length) * 100;
 
 	return (
-		<Modal onClose={props.onClose} open={props.open} position="bottom" className="h-max p-0 overflow-auto">
+		<Modal onClose={props.onClose} open={props.open} className="h-max p-0 overflow-auto">
 			<SteppedModalFormLayout
 				title={FRAME_INFO_MAPPER[currentFrameKey].title}
 				progress={progress}

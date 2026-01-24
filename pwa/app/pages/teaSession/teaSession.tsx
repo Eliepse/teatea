@@ -238,7 +238,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</IfAuthor>
 			)}
 
-			<Modal onClose={() => setShowNodeEditor(false)} open={editMode && showNodeEditor} position="bottom">
+			<Modal onClose={() => setShowNodeEditor(false)} open={editMode && showNodeEditor}>
 				<div className="flex mb-2">
 					<button className="btn" onClick={handleUIEvent(() => setShowNodeEditor(false))}>
 						Cancel
@@ -359,7 +359,7 @@ function Options(props: { session: TeaSession }) {
 				/>
 			</MenuModal>
 
-			<Modal open={"place" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
+			<Modal open={"place" === modalKey} onClose={() => setModalKey(null)} className="p-0">
 				<SelectBusinessFrame
 					onConfirm={changePlace}
 					defaultValue={props.session.place?.["@id"]}
@@ -367,7 +367,7 @@ function Options(props: { session: TeaSession }) {
 				/>
 			</Modal>
 
-			<Modal open={"params" === modalKey} onClose={() => setModalKey(null)} position="bottom" className="p-0">
+			<Modal open={"params" === modalKey} onClose={() => setModalKey(null)} className="p-0">
 				<ParametersInput
 					onConfirm={updateBrewParams}
 					defaultWater={props.session.waterMl}

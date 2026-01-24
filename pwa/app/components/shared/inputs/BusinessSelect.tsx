@@ -184,7 +184,7 @@ function AddBusinessModal(props: { onClose: () => void; open: boolean; onCreated
 	});
 
 	return (
-		<Modal onClose={props.onClose} open={props.open} position="bottom">
+		<Modal onClose={props.onClose} open={props.open}>
 			<div className="flex mb-4">
 				<button className="btn mr-auto" onClick={props.onClose}>
 					Cancel

@@ -38,7 +38,7 @@ export function OriginSelectModal(props: {
 	}
 
 	return (
-		<Modal open={props.open} position="bottom" onClose={props.onClose} className="h-full p-0">
+		<Modal open={props.open} onClose={props.onClose} className="h-full p-0">
 			<div className="sticky top-0 flex justify-between items-center mb-4 pb-4 border-b border-green-200 bg-white px-4 pt-4">
 				<Button onClick={handleReturn}>
 					<ArrowLeft className="size-4" />

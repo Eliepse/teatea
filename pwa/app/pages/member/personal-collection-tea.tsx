@@ -152,12 +152,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 
 				<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
 
-				<Modal
-					open={undefined !== action}
-					onClose={() => setAction(undefined)}
-					position="bottom"
-					className="p-0"
-				>
+				<Modal open={undefined !== action} onClose={() => setAction(undefined)} className="p-0">
 					{"edit:acquiredFrom" === action && (
 						<SelectBusinessFrame
 							onConfirm={(iri) => patchResource({ acquiredFrom: iri ?? null })}
@@ -185,7 +180,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					)}
 				</Modal>
 
-				<Modal open={uploading} position="bottom" className="h-1/3">
+				<Modal open={uploading} className="h-1/3">
 					<div className="flex items-center justify-center h-full text-lg text-green-700">
 						<div>
 							<MediaImage className="mx-auto mb-4 size-10 animate-bounce text-green-600" />

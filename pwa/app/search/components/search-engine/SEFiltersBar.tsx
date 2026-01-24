@@ -80,7 +80,7 @@ export function SEFiltersBar(props: { className?: string }) {
 					</FilterButton>
 				</li>
 			</ul>
-			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)} position="bottom">
+			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)}>
 				<ul className="flex flex-col gap-2">
 					{Object.keys(teaFamilies).map((key) => (
 						<li key={key}>
@@ -110,7 +110,7 @@ export function SEFiltersBar(props: { className?: string }) {
 				}}
 				allowToggle
 			/>
-			<Modal open={"cultivar" === popup} onClose={() => setPopup(undefined)} position="bottom" className="p-0">
+			<Modal open={"cultivar" === popup} onClose={() => setPopup(undefined)} className="p-0">
 				<SelectCultivar
 					onConfirm={(v) => {
 						patchFilters({ cultivar: extractId(v) });
