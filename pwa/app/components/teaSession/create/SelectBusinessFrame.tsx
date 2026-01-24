@@ -40,23 +40,25 @@ export function SelectBusinessFrame(props: {
 	}
 
 	return (
-		<div className={clsx("flex flex-col", props.className)}>
-			{props.header}
+		<div className={props.className}>
+			<div className="sticky top-0 bg-white">
+				{props.header}
 
-			<div className="p-4">
-				<label className="input input-lg w-full rounded-xl">
-					<Search className="h-4 text-teal-600" />
-					<input
-						type="search"
-						className="grow"
-						placeholder="Search for a place"
-						value={search}
-						onChange={(e) => setSearch(e.currentTarget.value)}
-					/>
-				</label>
+				<div className="p-4">
+					<label className="input input-lg w-full rounded-xl">
+						<Search className="h-4 text-teal-600" />
+						<input
+							type="search"
+							className="grow"
+							placeholder="Search for a place"
+							value={search}
+							onChange={(e) => setSearch(e.currentTarget.value)}
+						/>
+					</label>
+				</div>
 			</div>
 
-			<div className="px-4 flex-1 overflow-y-auto">
+			<div className="px-4">
 				<ul>
 					{businessQuery.isPending && (
 						<>
@@ -97,7 +99,7 @@ export function SelectBusinessFrame(props: {
 				onBack={props.onBack}
 				onNext={confirm}
 				nextLabel={props.confirmLabel}
-				className="p-4 flex-none"
+				className="p-4 sticky bottom-0 bg-white"
 			/>
 		</div>
 	);

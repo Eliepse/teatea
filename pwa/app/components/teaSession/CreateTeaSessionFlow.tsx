@@ -110,7 +110,6 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 			<StackFrame frameKey="place:select">
 				<SelectBusinessFrame
 					header={header}
-					className="h-full"
 					onBack={goBack}
 					defaultValue={form.place}
 					buttonText="Save this session"
