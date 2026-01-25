@@ -47,7 +47,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 		"distinctByLevel" => new QueryParameter(
 			schema: ["type" => "integer", "min" => 1, "max" => 3],
-			property: "origin",
 			description: "Distinct tea types by the specified origin path level. Ex: '1' would group by countries",
 		),
 		"sort" => new QueryParameter(

@@ -83,8 +83,6 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 				->addSelect("SUBPATH(tea.originPath, 0, :level) AS originPath")
 				->setParameter("level", $distinctByLevelFilter)
 				->addGroupBy("originPath");
-		} else {
-			$searchQuery->addSelect("tea.originPath AS originPath")->addGroupBy("tea.originPath");
 		}
 
 		// Sorting
@@ -127,7 +125,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			->getResult(AbstractQuery::HYDRATE_SCALAR);
 
 		$typeIds = Arr::pluck($searchResults, "typeId", true);
-		$originPaths = Arr::pluck($searchResults, "originPath", true);
+		$originPaths = array_filter(Arr::pluck($searchResults, fn($row) => $row["originPath"] ?? null, true));
 
 		$entities = $this->em
 			->createQuery("SELECT type FROM App\Entity\TeaType type WHERE type.id IN (:ids)")
@@ -136,14 +134,14 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		$entitiesById = Arr::keyBy($entities, "id");
 
-		$origins = $this->originRepo->findManyWithAncestorNames($originPaths);
+		$origins = empty($originPaths) ? [] : $this->originRepo->findManyWithAncestorNames($originPaths);
 		$origins = Arr::keyBy($origins, fn(OriginEntity $o) => $o->path->getPath());
 
 		// Iterate over results (not entities) to keep ordering
 		$resources = array_map(function ($result) use ($entitiesById, $origins) {
 			$type = $entitiesById[$result["typeId"]];
 			$resource = TeaTypeProvider::fromEntity($type);
-			$origin = $origins[$result["originPath"]] ?? null;
+			$origin = $origins[$result["originPath"] ?? null] ?? null;
 
 			if (null !== $origin) {
 				$resource->origin = OriginProvider::fromEntity($origin);

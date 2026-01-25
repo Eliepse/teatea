@@ -31,9 +31,8 @@ export function useSearchQuery(type: ItemType, filters?: SearchFilters) {
 			let filters = queryKey[2] as SearchFilters;
 			const type = queryKey[1] as ItemType;
 
-			if (!filters.origin) {
-				filters = { ...filters, distinctByLevel: 1 };
-			}
+			const originFilterNodes = filters.origin?.split(".")?.length ?? 1;
+			filters = { ...filters, distinctByLevel: originFilterNodes > 1 ? 3 : 1 };
 
 			const response = await getApi<ApiPaginatedCollection<Tea | TeaType>>(
 				pageParam ? pageParam : `/${type}`,

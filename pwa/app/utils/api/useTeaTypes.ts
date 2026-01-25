@@ -5,6 +5,7 @@ import { type QueryFunctionContext, useQuery } from "@tanstack/react-query";
 type TeaTypesFilters = {
 	origin?: string;
 	family?: TeaFamily;
+	distinctByLevel?: 1 | 2 | 3;
 };
 
 async function fetchTypesByFamily(args: QueryFunctionContext<[string, TeaTypesFilters]>) {
