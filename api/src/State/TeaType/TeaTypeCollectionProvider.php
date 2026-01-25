@@ -9,6 +9,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TeaType;
+use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
@@ -40,8 +41,9 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$limit = $this->pagination->getLimit($operation, $context);
 
 		$searchText = OperationHelper::getParameter($operation, "q");
-		$originPath = OperationHelper::getParameter($operation, "originPath");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
+		$originPath = OperationHelper::getParameter($operation, "originPath");
+		$originPath = $originPath ? LTreePath::fromString($originPath) : null;
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		$expr = $this->em->getExpressionBuilder();
@@ -58,6 +60,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 				->setParameter("searchText", $searchText);
 		}
 
+		if (null !== $familyFilter) {
+			$searchQuery->andWhere("type.family = :family")->setParameter("family", $familyFilter);
+		}
+
 		if (null !== $originPath) {
 			$searchQuery
 				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:pathFilter, origin.path) = TRUE")
@@ -65,10 +71,6 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		} else {
 			$searchQuery
 				->innerJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");
-		}
-
-		if (null !== $familyFilter) {
-			$searchQuery->andWhere("type.family = :family")->setParameter("family", $familyFilter);
 		}
 
 		// Sorting
