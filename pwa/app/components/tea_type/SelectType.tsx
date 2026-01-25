@@ -17,6 +17,7 @@ export function SelectType(props: {
 	defaultValue?: TeaType;
 	filters?: Filters;
 }) {
+	console.debug(props);
 	const { data: types, isLoading } = useTeaTypes({ ...props.filters, itemsPerPage: 50 });
 	const [selected, setSelected] = useState(props.defaultValue);
 
@@ -113,7 +114,7 @@ export function SelectType(props: {
 						key={type.id}
 						label={type.name}
 						onClick={() => toggleType(type)}
-						selected={selected?.id === type.id}
+						selected={selected?.["@id"] === type["@id"]}
 					/>
 				))}
 
@@ -125,7 +126,7 @@ export function SelectType(props: {
 							key={type.id}
 							label={type.name}
 							onClick={() => toggleType(type)}
-							selected={selected?.id === type.id}
+							selected={selected?.["@id"] === type["@id"]}
 							isPDO={type.isPDO}
 						/>
 					))}
@@ -140,7 +141,7 @@ export function SelectType(props: {
 							key={type.id}
 							label={type.name}
 							onClick={() => toggleType(type)}
-							selected={selected?.id === type.id}
+							selected={selected?.["@id"] === type["@id"]}
 							isPDO={type.isPDO}
 						/>
 					))}
@@ -155,7 +156,7 @@ export function SelectType(props: {
 							key={type.id}
 							label={type.name}
 							onClick={() => toggleType(type)}
-							selected={selected?.id === type.id}
+							selected={selected?.["@id"] === type["@id"]}
 							isPDO={type.isPDO}
 						/>
 					))}
