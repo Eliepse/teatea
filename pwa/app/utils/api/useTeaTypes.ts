@@ -3,7 +3,7 @@ import { fetchApi } from "~/utils/api";
 import { type QueryFunctionContext, useQuery } from "@tanstack/react-query";
 
 type TeaTypesFilters = {
-	originPath?: string;
+	origin?: string;
 	family?: TeaFamily;
 };
 
@@ -11,8 +11,8 @@ async function fetchTypesByFamily(args: QueryFunctionContext<[string, TeaTypesFi
 	const filters = args.queryKey[1] ?? {};
 	const searchParams = new URLSearchParams();
 
-	if (filters.originPath) {
-		searchParams.append("originPath", filters.originPath);
+	if (filters.origin) {
+		searchParams.append("origin", filters.origin);
 	}
 
 	if (filters.family) {

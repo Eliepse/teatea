@@ -183,7 +183,7 @@ function computeSearchType(filters?: SearchFilters): "teas" | "tea_types" {
 		return "teas";
 	}
 
-	if (1 < (filters.originPath?.split(".")?.length ?? 0)) {
+	if (1 < (filters.origin?.split(".")?.length ?? 0)) {
 		return "teas";
 	}
 

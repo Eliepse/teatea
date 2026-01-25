@@ -42,8 +42,8 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		$searchText = OperationHelper::getParameter($operation, "q");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
-		$originPath = OperationHelper::getParameter($operation, "originPath");
-		$originPath = $originPath ? LTreePath::fromString($originPath) : null;
+		$originFilter = OperationHelper::getParameter($operation, "origin");
+		$originFilter = $originFilter ? LTreePath::fromString($originFilter) : null;
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		$expr = $this->em->getExpressionBuilder();
@@ -64,10 +64,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			$searchQuery->andWhere("type.family = :family")->setParameter("family", $familyFilter);
 		}
 
-		if (null !== $originPath) {
+		if (null !== $originFilter) {
 			$searchQuery
 				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:pathFilter, origin.path) = TRUE")
-				->setParameter("pathFilter", $originPath);
+				->setParameter("pathFilter", $originFilter);
 		} else {
 			$searchQuery
 				->innerJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");

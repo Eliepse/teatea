@@ -6,7 +6,7 @@ import { throwNotImplemented } from "~/utils/function";
 
 export type SearchFilters = {
 	q?: string;
-	originPath?: string;
+	origin?: string;
 	family?: TeaFamily;
 	type?: TeaType["slug"];
 	cultivar?: string | number;

@@ -149,7 +149,7 @@ export function CreateTeaFlow(props: { onClose: () => void }) {
 							}
 						}}
 						defaultValue={formValue.type && "id" in formValue.type ? formValue.type : undefined}
-						filters={{ family: formValue.family, originPath: getCountry(formValue.origin?.path) }}
+						filters={{ family: formValue.family, origin: getCountry(formValue.origin?.path) }}
 					/>
 				</StackFrame>
 				<StackFrame frameKey="select:cultivar">

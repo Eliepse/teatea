@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	parameters: [
 		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
 		"family" => new QueryParameter(schema: ["enum" => TeaFamily::QUERY_PARAMS], property: "family"),
-		"originPath" => new QueryParameter(
+		"origin" => new QueryParameter(
 			schema: ["type" => "string", "example" => "Japan, China.Yunnan, ..."],
 			property: "origin",
 			description: "Filter by origin path, to get only the given branch",

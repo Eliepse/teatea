@@ -80,7 +80,7 @@ export default function TeaTypePage(props: Route.ComponentProps) {
 
 					<li className="col-span-2">
 						<StatButton
-							to={{ pathname: "/tea/search", search: `?type=${teaType.slug}&originPath=${countryPath}` }}
+							to={{ pathname: "/tea/search", search: `?type=${teaType.slug}&origin=${countryPath}` }}
 							value={stats.teasCount}
 							unit={1 < stats.teasCount ? "teas" : "tea"}
 							icon={<Leaf className="size-6" />}

@@ -19,7 +19,7 @@ export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters } = useSEContext();
 	const [popup, setPopup] = useState<Filter | undefined>(undefined);
 
-	const originQuery = useResourceQuery<Origin>(filters.originPath, "/origins/");
+	const originQuery = useResourceQuery<Origin>(filters.origin, "/origins/");
 	const cultivarQuery = useResourceQuery<Origin>(filters.cultivar, "/cultivars/");
 
 	function handleFamilyBtn() {
@@ -51,10 +51,8 @@ export function SEFiltersBar(props: { className?: string }) {
 				{!filters.type && (
 					<li>
 						<FilterButton
-							onClick={() =>
-								!filters.originPath ? setPopup("origin") : patchFilters({ originPath: undefined })
-							}
-							active={!!filters.originPath}
+							onClick={() => (!filters.origin ? setPopup("origin") : patchFilters({ origin: undefined }))}
+							active={!!filters.origin}
 						>
 							{originQuery.isLoading ? (
 								<span className="skeleton w-16 h-4" />
@@ -105,7 +103,7 @@ export function SEFiltersBar(props: { className?: string }) {
 				open={"origin" === popup}
 				onClose={() => setPopup(undefined)}
 				onSelect={(iri) => {
-					patchFilters({ originPath: extractId(iri) });
+					patchFilters({ origin: extractId(iri) });
 					setPopup(undefined);
 				}}
 				allowToggle

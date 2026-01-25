@@ -29,7 +29,7 @@ export default function TeaSearchPage() {
 			<TeaSearchEngine
 				defaultFilters={{
 					q: safeEmpty((searchParams.get("q") ?? "").trim()),
-					originPath: safeEmpty((searchParams.get("originPath") ?? "").trim()),
+					origin: safeEmpty((searchParams.get("origin") ?? "").trim()),
 					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
 					type: safeEmpty((searchParams.get("type") ?? "").trim()),
 				}}
