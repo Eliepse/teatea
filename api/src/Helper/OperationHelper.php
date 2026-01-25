@@ -9,18 +9,12 @@ final class OperationHelper
 {
 	/**
 	 * Return the operation parameters, or null if it's missing (or empty)
-	 *
-	 * @param Operation $operation
-	 * @param string $key
-	 * @param bool $castEmptyToNull
-	 *
-	 * @return string|int|array|float|null
 	 */
 	public static function getParameter(
 		Operation $operation,
 		string $key,
 		bool $castEmptyToNull = true,
-	): string|int|array|float|null {
+	): string|int|array|float|null|bool {
 		$parameter = $operation->getParameters()?->get($key);
 
 		if (null === $parameter) {
