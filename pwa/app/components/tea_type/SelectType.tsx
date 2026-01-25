@@ -17,14 +17,14 @@ export function SelectType(props: {
 	defaultValue?: TeaType;
 	filters?: Filters;
 }) {
-	const { data: types, isLoading } = useTeaTypes(props.filters);
+	const { data: types, isLoading } = useTeaTypes({ ...props.filters, itemsPerPage: 50 });
 	const [selected, setSelected] = useState(props.defaultValue);
 
 	const hasTypes = !isLoading && 0 < (types?.member?.length ?? 0);
 
 	// Group by levels to display same country, same region, same locality
 	const typesByLevel = useMemo(() => {
-		const origin = props.filters?.originPath;
+		const origin = props.filters?.origin;
 
 		if (undefined === origin || !types) {
 			return { country: [], region: [], locality: [] };
@@ -50,7 +50,7 @@ export function SelectType(props: {
 			},
 			{ country: [], region: [], locality: [] } as { country: TeaType[]; region: TeaType[]; locality: TeaType[] },
 		);
-	}, [types, props.filters?.originPath]);
+	}, [types, props.filters?.origin]);
 
 	function toggleType(type: TeaType) {
 		setSelected((st) => (st === type ? undefined : type));
@@ -107,7 +107,7 @@ export function SelectType(props: {
 				</div>
 			)}
 
-			{!props.filters?.originPath &&
+			{!props.filters?.origin &&
 				types?.member?.map((type) => (
 					<TypeItem
 						key={type.id}
@@ -117,7 +117,7 @@ export function SelectType(props: {
 					/>
 				))}
 
-			{props.filters?.originPath && 0 < typesByLevel.locality.length && (
+			{props.filters?.origin && 0 < typesByLevel.locality.length && (
 				<div className="mb-8">
 					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same locality</div>
 					{typesByLevel.locality.map((type) => (
@@ -132,7 +132,7 @@ export function SelectType(props: {
 				</div>
 			)}
 
-			{props.filters?.originPath && 0 < typesByLevel.region.length && (
+			{props.filters?.origin && 0 < typesByLevel.region.length && (
 				<div className="mb-8">
 					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same region</div>
 					{typesByLevel.region.map((type) => (
@@ -147,7 +147,7 @@ export function SelectType(props: {
 				</div>
 			)}
 
-			{props.filters?.originPath && 0 < typesByLevel.country.length && (
+			{props.filters?.origin && 0 < typesByLevel.country.length && (
 				<div className="mb-8">
 					<div className="text-xs text-base-content/60 mb-2 uppercase tracking-wide">Same country</div>
 					{typesByLevel.country.map((type) => (

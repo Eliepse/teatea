@@ -6,6 +6,8 @@ type TeaTypesFilters = {
 	origin?: string;
 	family?: TeaFamily;
 	distinctByLevel?: 1 | 2 | 3;
+	noFamily?: boolean;
+	itemsPerPage?: number;
 };
 
 async function fetchTypesByFamily(args: QueryFunctionContext<[string, TeaTypesFilters]>) {
@@ -18,6 +20,18 @@ async function fetchTypesByFamily(args: QueryFunctionContext<[string, TeaTypesFi
 
 	if (filters.family) {
 		searchParams.append("family", filters.family);
+	}
+
+	if (filters.distinctByLevel) {
+		searchParams.append("distinctByLevel", filters.distinctByLevel.toFixed());
+	}
+
+	if (filters.noFamily) {
+		searchParams.append("noFamily", "1");
+	}
+
+	if (filters.itemsPerPage) {
+		searchParams.append("itemsPerPage", filters.itemsPerPage.toFixed());
 	}
 
 	const params = searchParams.size ? `?${searchParams}` : "";

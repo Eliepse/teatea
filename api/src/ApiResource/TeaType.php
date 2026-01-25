@@ -49,6 +49,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 			schema: ["type" => "integer", "min" => 1, "max" => 3],
 			description: "Distinct tea types by the specified origin path level. Ex: '1' would group by countries",
 		),
+		"noFamily" => new QueryParameter(
+			schema: ["type" => "boolean"],
+			description: "Prevent returning generic type families (green tea, black tea, ...)",
+		),
 		"sort" => new QueryParameter(
 			schema: ["enum" => ["popularity"]],
 			openApi: new OpenApiParameter(name: "enum", in: "query"),

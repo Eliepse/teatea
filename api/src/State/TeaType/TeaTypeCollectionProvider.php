@@ -47,6 +47,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$originFilter = OperationHelper::getParameter($operation, "origin");
 		$originFilter = $originFilter ? LTreePath::fromString($originFilter) : null;
 		$distinctByLevelFilter = OperationHelper::getParameter($operation, "distinctByLevel");
+		$noFamilyFilter = OperationHelper::getParameter($operation, "noFamily");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		if ($distinctByLevelFilter && $originFilter && $distinctByLevelFilter < $originFilter->level()) {
@@ -83,6 +84,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 				->addSelect("SUBPATH(tea.originPath, 0, :level) AS originPath")
 				->setParameter("level", $distinctByLevelFilter)
 				->addGroupBy("originPath");
+		}
+
+		if($noFamilyFilter) {
+			$searchQuery->andWhere("type.isFamily = FALSE");
 		}
 
 		// Sorting
