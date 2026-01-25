@@ -10,6 +10,7 @@ use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TeaType;
 use App\Doctrine\DBAL\Types\ValueObject\LTreePath;
+use App\Entity\Origin as OriginEntity;
 use App\Helper\Arr;
 use App\Helper\OperationHelper;
 use App\Repository\OriginRepository;
@@ -18,6 +19,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @implements ProviderInterface<TeaType[]>
@@ -44,14 +46,20 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$familyFilter = OperationHelper::getParameter($operation, "family");
 		$originFilter = OperationHelper::getParameter($operation, "origin");
 		$originFilter = $originFilter ? LTreePath::fromString($originFilter) : null;
+		$distinctByLevelFilter = OperationHelper::getParameter($operation, "distinctByLevel");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
+		if ($distinctByLevelFilter && $originFilter && $distinctByLevelFilter < $originFilter->level()) {
+			throw new BadRequestHttpException(
+				"The 'groupByLevel' filter cannot be lower that the level of the 'origin' filter",
+			);
+		}
 		$expr = $this->em->getExpressionBuilder();
 		$searchQuery = $this->em->createQueryBuilder()
-			->select("type.id AS typeId", "origin.path AS originPath")
+			->select("type.id AS typeId")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
-			->groupBy("type.id", "origin.path");
+			->groupBy("type.id");
 
 		if (null !== $searchText) {
 			$searchQuery
@@ -66,11 +74,17 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		if (null !== $originFilter) {
 			$searchQuery
-				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:pathFilter, origin.path) = TRUE")
+				->andWhere("CONTAINS(:pathFilter, tea.originPath) = TRUE")
 				->setParameter("pathFilter", $originFilter);
-		} else {
+		}
+
+		if (null !== $distinctByLevelFilter) {
 			$searchQuery
-				->innerJoin(\App\Entity\Origin::class, "origin", "WITH", "SUBPATH(tea.originPath, 0, 1) = origin.path");
+				->addSelect("SUBPATH(tea.originPath, 0, :level) AS originPath")
+				->setParameter("level", $distinctByLevelFilter)
+				->addGroupBy("originPath");
+		} else {
+			$searchQuery->addSelect("tea.originPath AS originPath")->addGroupBy("tea.originPath");
 		}
 
 		// Sorting
@@ -91,12 +105,15 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 
 		// Fix: use 'concat' workaround as Doctrine doesn't allow subqueries
 		//   and the '?' operator is mistaken as a prepared parameter
-		$total = (clone $searchQuery)
-			->select("COUNT(DISTINCT CONCAT(type.id, '-', origin.path))")
-			->resetDQLPart("orderBy")
-			->resetDQLPart("groupBy")
-			->getQuery()
-			->getSingleScalarResult();
+		$totalQuery = (clone $searchQuery)->resetDQLPart("orderBy")->resetDQLPart("groupBy");
+
+		if (null !== $distinctByLevelFilter) {
+			$totalQuery->select("COUNT(DISTINCT CONCAT(type.id, '-', SUBPATH(tea.originPath, 0, :level)))");
+		} else {
+			$totalQuery->select("COUNT(DISTINCT CONCAT(type.id, '-', tea.originPath))");
+		}
+
+		$total = $totalQuery->getQuery()->getSingleScalarResult();
 
 		if (0 === $total) {
 			return new TraversablePaginator(new ArrayCollection(), $page, $limit, $total);
@@ -120,7 +137,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$entitiesById = Arr::keyBy($entities, "id");
 
 		$origins = $this->originRepo->findManyWithAncestorNames($originPaths);
-		$origins = Arr::keyBy($origins, fn(\App\Entity\Origin $o) => $o->path->getPath());
+		$origins = Arr::keyBy($origins, fn(OriginEntity $o) => $o->path->getPath());
 
 		// Iterate over results (not entities) to keep ordering
 		$resources = array_map(function ($result) use ($entitiesById, $origins) {

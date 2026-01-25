@@ -48,7 +48,7 @@ export type Cultivar = Resource<"Cultivar"> & {
 
 export type TreePath = string;
 
-export type Origin = Omit<Resource, "id"> & {
+export type Origin = Omit<Resource<"Origin">, "id"> & {
 	name: string;
 	namePath: string[];
 	path: TreePath;

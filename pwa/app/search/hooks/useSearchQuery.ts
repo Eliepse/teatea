@@ -10,6 +10,7 @@ export type SearchFilters = {
 	family?: TeaFamily;
 	type?: TeaType["slug"];
 	cultivar?: string | number;
+	distinctByLevel?: 1 | 2 | 3;
 };
 
 export const SE_CONTEXT = createContext<{
@@ -27,8 +28,12 @@ type ItemType = "teas" | "tea_types";
 export function useSearchQuery(type: ItemType, filters?: SearchFilters) {
 	const query = useInfiniteQuery({
 		queryFn: async ({ queryKey, pageParam }) => {
-			const filters = queryKey[2] as SearchFilters;
+			let filters = queryKey[2] as SearchFilters;
 			const type = queryKey[1] as ItemType;
+
+			if (!filters.origin) {
+				filters = { ...filters, distinctByLevel: 1 };
+			}
 
 			const response = await getApi<ApiPaginatedCollection<Tea | TeaType>>(
 				pageParam ? pageParam : `/${type}`,

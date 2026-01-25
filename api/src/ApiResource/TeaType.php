@@ -45,6 +45,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 			property: "origin",
 			description: "Filter by origin path, to get only the given branch",
 		),
+		"distinctByLevel" => new QueryParameter(
+			schema: ["type" => "integer", "min" => 1, "max" => 3],
+			property: "origin",
+			description: "Distinct tea types by the specified origin path level. Ex: '1' would group by countries",
+		),
 		"sort" => new QueryParameter(
 			schema: ["enum" => ["popularity"]],
 			openApi: new OpenApiParameter(name: "enum", in: "query"),
