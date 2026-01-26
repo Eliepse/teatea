@@ -62,8 +62,8 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 
 	if (mutation.isPending || mutation.isSuccess) {
 		return (
-			<div className="flex items-center justify-center h-full text-lg text-green-700">
-				<div className="">
+			<div className="flex items-center justify-center h-full text-lg text-green-700 py-16">
+				<div>
 					<CoffeeCup className="mx-auto mb-4 size-14 animate-bounce text-green-600" />
 					<span className="ml-2 font-medium">Starting the session...</span>
 				</div>
