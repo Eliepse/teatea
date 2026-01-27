@@ -2,6 +2,4 @@
 
 namespace App\Exception\Auth;
 
-class ExpiredTokenException extends \RuntimeException
-{
-}
+class ExpiredTokenException extends \RuntimeException {}

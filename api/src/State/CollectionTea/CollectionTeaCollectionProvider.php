@@ -30,8 +30,7 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		private LoggerInterface $logger,
 		private Pagination $pagination,
 		private CollectionTeaHydrator $hydrator,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -45,20 +44,22 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		$limit = $this->pagination->getLimit($operation, $context);
 
 		$familyFilter = OperationHelper::getParameter($operation, "family");
-//		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
+		//		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		/*
-		| --------------------------------
-		| Search
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Search
+		 | --------------------------------
+		 */
 
 		$expr = $this->em->getExpressionBuilder();
-		$searchQb = $this->em->createQueryBuilder()
+		$searchQb = $this->em
+			->createQueryBuilder()
 			->select("collection_tea.id")
 			->from(\App\Entity\CollectionTea::class, "collection_tea")
 			->innerJoin("collection_tea.owner", "owner")
-			->where("owner.username = :username")->setParameter("username", $uriVariables["username"])
+			->where("owner.username = :username")
+			->setParameter("username", $uriVariables["username"])
 			->groupBy("collection_tea.id", "collection_tea.createdAt")
 			->orderBy("collection_tea.createdAt", "DESC");
 
@@ -72,13 +73,13 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 
 		// Sorting
 
-//		if ("popularity" === $sortParam) {
-//			$searchQb
-//				->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")
-//				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
-//
-//			$searchQb->addOrderBy("count(session.id)", "DESC");
-//		}
+		//		if ("popularity" === $sortParam) {
+		//			$searchQb
+		//				->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")
+		//				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
+		//
+		//			$searchQb->addOrderBy("count(session.id)", "DESC");
+		//		}
 
 		$total = (clone $searchQb)
 			->select("COUNT(collection_tea.id)")
@@ -92,20 +93,21 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		}
 
 		$searchResults = $searchQb
-//			->addOrderBy("collection_tea.createdAt", "DESC")
+			//			->addOrderBy("collection_tea.createdAt", "DESC")
 			->setFirstResult($offset)
 			->setMaxResults($limit)
 			->getQuery()
 			->getResult();
 
 		/*
-		| --------------------------------
-		| Hydrate
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Hydrate
+		 | --------------------------------
+		 */
 
 		/** @var array<\App\Entity\CollectionTea> $entities */
-		$entities = $this->em->createQueryBuilder()
+		$entities = $this->em
+			->createQueryBuilder()
 			->select("collection_tea", "tea", "type", "cultivar")
 			->from(\App\Entity\CollectionTea::class, "collection_tea")
 			->leftJoin("collection_tea.tea", "tea")
@@ -127,15 +129,14 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		);
 
 		/** @var MediaObjectPivot[] $mediaPivots */
-		$mediaPivots = $this->em->createQuery(
-			<<<DQL
-			SELECT pivot, media
-			FROM App\Entity\Pivot\MediaObjectPivot pivot
-				LEFT JOIN pivot.media media
-			WHERE pivot.mediableType = :type
-			  AND pivot.mediableId IN (:ids)
-			DQL,
-		)
+		$mediaPivots = $this->em
+			->createQuery(<<<DQL
+				SELECT pivot, media
+				FROM App\Entity\Pivot\MediaObjectPivot pivot
+					LEFT JOIN pivot.media media
+				WHERE pivot.mediableType = :type
+				  AND pivot.mediableId IN (:ids)
+				DQL)
 			->setParameter("type", CollectionTea::class)
 			->setParameter("ids", array_keys($entitiesById), ArrayParameterType::INTEGER)
 			->getResult();
@@ -157,10 +158,7 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 			$collectionTea = $entitiesById[$id] ?? null;
 
 			if (null === $collectionTea) {
-				$this->logger->warning(
-					"Couldn't hydrate a collection tea: not found in list",
-					["collectionTea" => $id],
-				);
+				$this->logger->warning("Couldn't hydrate a collection tea: not found in list", ["collectionTea" => $id]);
 				continue;
 			}
 

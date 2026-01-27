@@ -10,10 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
-#[AsCommand(
-	name: 'app:tea-type:gen-slug',
-	description: 'Re-generate tea types slug',
-)]
+#[AsCommand(name: "app:tea-type:gen-slug", description: "Re-generate tea types slug")]
 class GenerateTeaTypeSlugCommand extends Command
 {
 	public function __construct(
@@ -29,7 +26,10 @@ class GenerateTeaTypeSlugCommand extends Command
 
 		foreach ($types as $type) {
 			$key = bin2hex(random_bytes(1));
-			$type->slug = new AsciiSlugger()->slug("$key $type->name")->lower()->toString();
+			$type->slug = new AsciiSlugger()
+				->slug("$key $type->name")
+				->lower()
+				->toString();
 			$this->em->persist($type);
 		}
 

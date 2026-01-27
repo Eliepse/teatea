@@ -14,11 +14,6 @@ final class CustomizeJWTokenListener
 		$user = $event->getUser();
 		assert($user instanceof User);
 
-		$event->setData(
-			array_replace(
-				$event->getData(),
-				["username" => $user->username],
-			),
-		);
+		$event->setData(array_replace($event->getData(), ["username" => $user->username]));
 	}
 }

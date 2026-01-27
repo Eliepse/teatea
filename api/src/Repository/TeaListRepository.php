@@ -11,8 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TeaListRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, TeaList::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, TeaList::class);
+	}
 }

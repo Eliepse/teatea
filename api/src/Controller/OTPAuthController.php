@@ -108,18 +108,14 @@ class OTPAuthController extends AbstractController
 		$this->em->flush();
 
 		$link = "$this->baseUrl/login/verify/$OTPChallengeToken->challenge";
-		$this->mailer->send(
-			new Email()
-				->from("elie.meignan@eliepse.fr")
-				->to($email)
-				->subject("Login to your account")
-				->html(
-					<<<HTML
-					To login, please follow this link:<br/>
-					<a href="$link">$link</a>
-					HTML,
-				),
-		);
+		$this->mailer->send(new Email()
+			->from("elie.meignan@eliepse.fr")
+			->to($email)
+			->subject("Login to your account")
+			->html(<<<HTML
+				To login, please follow this link:<br/>
+				<a href="$link">$link</a>
+				HTML));
 
 		return $this->json([
 			"token" => $OTPToken->challenge,
@@ -216,8 +212,7 @@ class OTPAuthController extends AbstractController
 	)]
 	public function loginDev(
 		string $token,
-		#[Autowire(param: "auth.dev_login_key")]
-		string $devKey,
+		#[Autowire(param: "auth.dev_login_key")] string $devKey,
 		UserRepository $userRepo,
 	): JsonResponse {
 		if (empty($token) || empty(trim($devKey)) || $token !== $devKey) {

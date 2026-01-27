@@ -10,8 +10,7 @@ final readonly class MediaObjectHydrator implements ResourceHydrator
 {
 	public function __construct(
 		private StorageInterface $storage,
-	) {
-	}
+	) {}
 
 	public function hydrate(?object $entity): ?object
 	{

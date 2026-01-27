@@ -13,9 +13,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
+#[ORM\Table(name: "`user`")]
+#[ORM\UniqueConstraint(name: "UNIQ_IDENTIFIER_EMAIL", fields: ["email"])]
+#[ORM\UniqueConstraint(name: "UNIQ_IDENTIFIER_USERNAME", fields: ["username"])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
 	use TimestampedEntity;
@@ -46,19 +46,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	/**
 	 * @var Collection<int, TeaSession>
 	 */
-	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'author')]
+	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: "author")]
 	private Collection $sessions;
 
 	/**
 	 * @var Collection<int, TeaList>
 	 */
-	#[ORM\OneToMany(targetEntity: TeaList::class, mappedBy: 'owner', orphanRemoval: true)]
+	#[ORM\OneToMany(targetEntity: TeaList::class, mappedBy: "owner", orphanRemoval: true)]
 	private Collection $teaLists;
 
 	/**
 	 * @var Collection<int, CollectionTea>
 	 */
-	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: 'owner', orphanRemoval: true)]
+	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "owner", orphanRemoval: true)]
 	private Collection $collectionTeas;
 
 	public function __construct()
@@ -74,7 +74,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	 */
 	public function getUserIdentifier(): string
 	{
-		return (string)$this->email;
+		return (string) $this->email;
 	}
 
 	/**

@@ -21,10 +21,7 @@ class CoalesceNumericFunction extends FunctionNode
 
 	public function getSql(SqlWalker $sqlWalker): string
 	{
-		return sprintf(
-			"COALESCE(%s)",
-			join(",", array_map(fn($arg) => $arg->dispatch($sqlWalker), $this->args)),
-		);
+		return sprintf("COALESCE(%s)", join(",", array_map(fn($arg) => $arg->dispatch($sqlWalker), $this->args)));
 	}
 
 	public function parse(Parser $parser): void

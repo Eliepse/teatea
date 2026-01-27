@@ -17,16 +17,14 @@ readonly class NativeTeaListProvider implements ProviderInterface
 {
 	public function __construct(
 		private Security $security,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaList|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?TeaList
 	{
-		assert(false === ($operation instanceof CollectionOperationInterface));
+		assert(false === $operation instanceof CollectionOperationInterface);
 
 		$user = $this->security->getUser();
 		assert($user instanceof User);
-
 
 		$type = $operation->getExtraProperties()["list"] ?? null;
 		assert($type instanceof TeaListPivotType);

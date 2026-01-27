@@ -37,8 +37,8 @@ class CollectionTea implements HasMedia
 	#[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
 	public ?Business $acquiredFrom = null;
 
-//	TODO(elie): allow custom collections
-//	public ?UserCollection $collection = null;
+	//	TODO(elie): allow custom collections
+	//	public ?UserCollection $collection = null;
 
 	// Requires manual hydration
 	public ?Collection $media = null;

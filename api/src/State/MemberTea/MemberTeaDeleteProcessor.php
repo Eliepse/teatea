@@ -20,8 +20,7 @@ readonly class MemberTeaDeleteProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
 	{
@@ -35,7 +34,7 @@ readonly class MemberTeaDeleteProcessor implements ProcessorInterface
 			throw new AccessDeniedHttpException();
 		}
 
-		if (null === $pivot = $this->em->find(TeaListPivot::class, $data->id)) {
+		if (null === ($pivot = $this->em->find(TeaListPivot::class, $data->id))) {
 			throw new NotFoundHttpException();
 		}
 

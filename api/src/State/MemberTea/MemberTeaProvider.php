@@ -22,12 +22,11 @@ readonly class MemberTeaProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): MemberTea|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?MemberTea
 	{
-		assert(false === ($operation instanceof CollectionOperationInterface));
+		assert(false === $operation instanceof CollectionOperationInterface);
 
 		$user = $this->security->getUser();
 		assert($user instanceof User);
@@ -41,7 +40,8 @@ readonly class MemberTeaProvider implements ProviderInterface
 
 		$type = TeaListPivotType::tryFromSlug($listSlug) ?? TeaListPivotType::Custom;
 
-		$listQuery = $this->em->createQueryBuilder()
+		$listQuery = $this->em
+			->createQueryBuilder()
 			->select("pivot", "author", "list")
 			->from(\App\Entity\TeaListPivot::class, "pivot")
 			->leftJoin("pivot.author", "author")

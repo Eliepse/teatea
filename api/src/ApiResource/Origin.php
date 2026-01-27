@@ -24,19 +24,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 	normalizationContext: ["groups" => ["origin:read"]],
 	provider: OriginCollectionProvider::class,
 	parameters: [
-		"parent" => new QueryParameter(
-			schema: ["pattern" => "^[a-zA-Z0-9_.]+$"],
-			description: "Only return descendant from the given path",
-		),
+		"parent" => new QueryParameter(schema: [
+			"pattern" => "^[a-zA-Z0-9_.]+$",
+		], description: "Only return descendant from the given path"),
 		"level" => new QueryParameter(
 			schema: ["type" => "integer", "min" => 1, "max" => 3],
 			description: "Determine the specific level to return (1: country, 2: Region, 3: locality)",
 			castToNativeType: true,
 		),
-		"sort" => new QueryParameter(
-			schema: ["enum" => ["popularity", "name"]],
-			description: "Order of returned origins",
-		),
+		"sort" => new QueryParameter(schema: ["enum" => ["popularity", "name"]], description: "Order of returned origins"),
 		"limit" => new QueryParameter(
 			schema: ["type" => "integer", "min" => 1],
 			description: "Max origins to return",

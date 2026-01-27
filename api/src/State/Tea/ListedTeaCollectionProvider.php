@@ -25,8 +25,7 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private LoggerInterface $logger,
 		private Pagination $paginator,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -50,15 +49,14 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 		$offset = $this->paginator->getOffset($operation, $context);
 		$limit = $this->paginator->getLimit($operation, $context);
 
-		$teaIdsQb = $this->em->getConnection()
+		$teaIdsQb = $this->em
+			->getConnection()
 			->createQueryBuilder()
 			->from("tea_session", "session")
 			->where("session.author_id = :authorId")
 			->setParameter("authorId", $member->id);
 
-		$total = (clone $teaIdsQb)
-			->select("COUNT(DISTINCT session.tea_id)")
-			->fetchOne() ?: 0;
+		$total = (clone $teaIdsQb)->select("COUNT(DISTINCT session.tea_id)")->fetchOne() ?: 0;
 
 		if (0 === $total) {
 			return new TraversablePaginator(new ArrayCollection(), 1, $limit, $total);
@@ -72,7 +70,8 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 			->setMaxResults($limit)
 			->fetchFirstColumn();
 
-		$teas = $this->em->createQueryBuilder()
+		$teas = $this->em
+			->createQueryBuilder()
 			->select("tea", "type", "origin", "cultivar")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
@@ -85,7 +84,8 @@ readonly class ListedTeaCollectionProvider implements ProviderInterface
 
 		$teasById = Arr::keyBy($teas, "id");
 
-		$originsQb = $this->em->createQueryBuilder()
+		$originsQb = $this->em
+			->createQueryBuilder()
 			->select("origin")
 			->from(Origin::class, "origin");
 

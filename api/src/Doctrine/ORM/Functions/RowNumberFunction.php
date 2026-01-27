@@ -19,11 +19,8 @@ class RowNumberFunction extends FunctionNode
 
 	public function getSql(SqlWalker $sqlWalker): string
 	{
-//		dd($this->windowDefinition, $this->windowDefinition->dispatch($sqlWalker));
-		return sprintf(
-			"ROW_NUMBER() OVER (%s)",
-			$this->windowDefinition->dispatch($sqlWalker),
-		);
+		//		dd($this->windowDefinition, $this->windowDefinition->dispatch($sqlWalker));
+		return sprintf("ROW_NUMBER() OVER (%s)", $this->windowDefinition->dispatch($sqlWalker));
 	}
 
 	public function parse(Parser $parser): void

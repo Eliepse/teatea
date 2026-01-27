@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
 	normalizationContext: ["groups" => ["cultivar:read"]],
 	denormalizationContext: ["groups" => ["cultivar:write"]],
-	security: "is_granted('ROLE_USER')"
+	security: "is_granted('ROLE_USER')",
 )]
 #[Get(provider: CultivarProvider::class)]
 #[GetCollection(
@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	paginationMaximumItemsPerPage: 50,
 	paginationClientItemsPerPage: true,
 	provider: CultivarCollectionProvider::class,
-	parameters: ["q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name")],
+	parameters: ["q" => new QueryParameter(property: "hydra:freetextQuery", description: "Filter by name")],
 )]
 #[Post(processor: CultivarCreateProcessor::class)]
 class Cultivar

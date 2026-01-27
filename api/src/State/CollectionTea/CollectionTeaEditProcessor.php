@@ -13,8 +13,7 @@ readonly class CollectionTeaEditProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private CollectionTeaHydrator $hydrator,
-	) {
-	}
+	) {}
 
 	public function process(
 		mixed $data,
@@ -27,10 +26,9 @@ readonly class CollectionTeaEditProcessor implements ProcessorInterface
 		$entity = $this->em->find(\App\Entity\CollectionTea::class, $data->id);
 		$entity->description = $data->description;
 		$entity->acquiredAt = $data->acquiredAt;
-		$entity->acquiredFrom = $data->acquiredFrom ? $this->em->getReference(
-			\App\Entity\Business::class,
-			$data->acquiredFrom->id,
-		) : null;
+		$entity->acquiredFrom = $data->acquiredFrom
+			? $this->em->getReference(\App\Entity\Business::class, $data->acquiredFrom->id)
+			: null;
 		$this->em->persist($entity);
 		$this->em->flush();
 

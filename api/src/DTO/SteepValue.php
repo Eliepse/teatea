@@ -11,8 +11,7 @@ readonly class SteepValue
 		public string $key,
 		public Duration $duration,
 		public ?Temperature $temperature,
-	) {
-	}
+	) {}
 
 	public function toArray(): array
 	{
@@ -25,10 +24,6 @@ readonly class SteepValue
 
 	public static function fromArray(array $data): self
 	{
-		return new SteepValue(
-			$data["key"],
-			new Duration($data["dur"]),
-			$data["deg"] ? new Temperature($data["deg"]) : null,
-		);
+		return new SteepValue($data["key"], new Duration($data["dur"]), $data["deg"] ? new Temperature($data["deg"]) : null);
 	}
 }

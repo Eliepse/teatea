@@ -25,8 +25,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		private TeaTypeRepository $typeRepository,
 		private OriginRepository $originRepo,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	/**
 	 * @param mixed|Tea $data
@@ -63,7 +62,10 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$typeEntity = new \App\Entity\TeaType();
 			$typeEntity->family = $data->family;
 			$typeEntity->name = trim($data->type->name);
-			$typeEntity->slug = new AsciiSlugger()->slug($typeEntity->name)->lower()->toString();
+			$typeEntity->slug = new AsciiSlugger()
+				->slug($typeEntity->name)
+				->lower()
+				->toString();
 			$typeEntity->createdBy = $user;
 			$this->em->persist($typeEntity);
 
@@ -73,7 +75,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$families = $this->typeRepository->getFamilies();
 			$familyType = $families[$data->family->value] ?? null;
 
-			if(null === $familyType) {
+			if (null === $familyType) {
 				throw new \Error("Unable to find the type for the '{$data->family->value}' family");
 			}
 

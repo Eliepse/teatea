@@ -8,7 +8,7 @@ final class MediaObjectProvider
 {
 	public static function fromEntity(?\App\Entity\MediaObject $entity): ?MediaObject
 	{
-		if(null === $entity) {
+		if (null === $entity) {
 			return null;
 		}
 

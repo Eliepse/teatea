@@ -23,7 +23,8 @@ class MediaObjectRepository extends ServiceEntityRepository
 	public function findByHasMedia(HasMedia $mediable): Collection
 	{
 		/** @var MediaObject[] $associatedMedia */
-		$associatedMedia = $this->createQueryBuilder("media")
+		$associatedMedia = $this
+			->createQueryBuilder("media")
 			->addSelect("pivots")
 			->innerJoin("media.pivots", "pivots")
 			->andWhere("pivots.mediableType = :mediableType AND pivots.mediableId = :mediableId")

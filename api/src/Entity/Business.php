@@ -27,6 +27,6 @@ class Business
 	/**
 	 * @var Collection<int, CollectionTea>
 	 */
-	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: 'acquiredFrom')]
+	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "acquiredFrom")]
 	private Collection $acquiredTeas;
 }

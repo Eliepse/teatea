@@ -22,8 +22,7 @@ readonly class TeaListProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaList
 	{
@@ -36,7 +35,8 @@ readonly class TeaListProcessor implements ProcessorInterface
 		$entity->slug = trim(new UnicodeString($data->name)->trim()->ascii()->kebab()->toString(), "_");
 
 		// Check for duplicate
-		$duplicate = $this->em->createQueryBuilder()
+		$duplicate = $this->em
+			->createQueryBuilder()
 			->select("list.id")
 			->from(\App\Entity\TeaList::class, "list")
 			->where("list.owner = :owner AND list.slug = :slug")

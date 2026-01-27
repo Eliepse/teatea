@@ -17,10 +17,9 @@ readonly class SteepProvider implements ProviderInterface
 	public function __construct(
 		private TeaSessionRepository $repo,
 		private Security $security,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Steep|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Steep
 	{
 		$user = $this->security->getUser();
 		assert($user instanceof User);

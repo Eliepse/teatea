@@ -22,23 +22,24 @@ use App\State\TeaSession\TeaSessionsPaginatedProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(
-	normalizationContext: [
-		"groups" => [
-			"teaSession:read",
-			"embedded:tea",
-			"embedded:teaType",
-			"with:origin",
-			"embedded:cultivar",
-			"with:business",
-		]
+#[ApiResource(normalizationContext: [
+	"groups" => [
+		"teaSession:read",
+		"embedded:tea",
+		"embedded:teaType",
+		"with:origin",
+		"embedded:cultivar",
+		"with:business",
 	],
-	security: "is_granted('ROLE_USER')",
-)]
-#[Get(
-	normalizationContext: ["groups" => ["embedded:steep", "teaSession:read", "embedded:tea", "with:origin", "embedded:cultivar", "with:business"]],
-	provider: TeaSessionProvider::class,
-)]
+], security: "is_granted('ROLE_USER')")]
+#[Get(normalizationContext: ["groups" => [
+	"embedded:steep",
+	"teaSession:read",
+	"embedded:tea",
+	"with:origin",
+	"embedded:cultivar",
+	"with:business",
+]], provider: TeaSessionProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
 #[Patch(
 	denormalizationContext: ["groups" => ["teaSession:edit"]],
@@ -59,7 +60,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"embedded:member",
 			"embedded:cultivar",
 			"with:business",
-			"with:origin"
+			"with:origin",
 		],
 	],
 	security: "is_granted('ROLE_USER')",

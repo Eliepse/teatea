@@ -23,8 +23,7 @@ readonly class CultivarCollectionProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Pagination $pagination,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -39,12 +38,13 @@ readonly class CultivarCollectionProvider implements ProviderInterface
 		$searchText = OperationHelper::getParameter($operation, "q");
 
 		/*
-		| --------------------------------
-		| Search
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Search
+		 | --------------------------------
+		 */
 
-		$searchQb = $this->em->createQueryBuilder()
+		$searchQb = $this->em
+			->createQueryBuilder()
 			->select("cultivar.id")
 			->from(\App\Entity\Cultivar::class, "cultivar")
 			->groupBy("cultivar.id");
@@ -77,12 +77,13 @@ readonly class CultivarCollectionProvider implements ProviderInterface
 			->getResult();
 
 		/*
-		| --------------------------------
-		| Hydrate
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Hydrate
+		 | --------------------------------
+		 */
 
-		$entitiesQuery = $this->em->createQueryBuilder()
+		$entitiesQuery = $this->em
+			->createQueryBuilder()
 			->select("cultivar")
 			->from(\App\Entity\Cultivar::class, "cultivar")
 			->where("cultivar.id IN (:ids)")

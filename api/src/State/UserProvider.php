@@ -14,15 +14,12 @@ use Symfony\Bundle\SecurityBundle\Security;
  */
 readonly class UserProvider implements ProviderInterface
 {
-	public function __construct(private Security $security)
-	{
-	}
+	public function __construct(
+		private Security $security,
+	) {}
 
-	public function provide(
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): array|null|object {
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array|null|object
+	{
 		$user = $this->security->getUser();
 		assert($user instanceof User);
 		return MemberProvider::hydrate($user);

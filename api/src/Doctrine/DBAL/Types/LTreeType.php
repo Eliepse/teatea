@@ -29,7 +29,7 @@ class LTreeType extends Type
 			throw new RuntimeException("Invalid type. Expected LTreePath");
 		}
 
-		return (string)$value;
+		return (string) $value;
 	}
 
 	public function convertToPHPValue($value, AbstractPlatform $platform): ?LTreePath

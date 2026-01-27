@@ -9,6 +9,5 @@ readonly class RefreshTokenRequestPayload
 	public function __construct(
 		#[Assert\NotBlank]
 		public string $refresh_token,
-	) {
-	}
+	) {}
 }

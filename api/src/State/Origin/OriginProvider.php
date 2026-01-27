@@ -16,19 +16,19 @@ readonly class OriginProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Origin|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Origin
 	{
-		assert(false === ($operation instanceof CollectionOperationInterface));
+		assert(false === $operation instanceof CollectionOperationInterface);
 		$path = $uriVariables["path"] ?? null;
 
 		if (empty($path)) {
 			throw new BadRequestHttpException();
 		}
 
-		$originQb = $this->em->createQueryBuilder()
+		$originQb = $this->em
+			->createQueryBuilder()
 			->select("origin", "COUNT(child) as children", "JSON_AGG(ancestors.name) as namePath")
 			->from(\App\Entity\Origin::class, "origin")
 			->leftJoin(\App\Entity\Origin::class, "ancestors", "WITH", "CONTAINS(ancestors.path, origin.path) = TRUE")

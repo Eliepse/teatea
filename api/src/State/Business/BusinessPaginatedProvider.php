@@ -21,8 +21,7 @@ readonly class BusinessPaginatedProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Pagination $pagination,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -42,11 +41,7 @@ readonly class BusinessPaginatedProvider implements ProviderInterface
 				->setParameter("searchText", $searchText);
 		}
 
-		$total = (clone $search)
-			->select("COUNT(business)")
-			->resetDQLPart("orderBy")
-			->getQuery()
-			->getSingleScalarResult();
+		$total = (clone $search)->select("COUNT(business)")->resetDQLPart("orderBy")->getQuery()->getSingleScalarResult();
 
 		if (0 === $total) {
 			return new TraversablePaginator(new ArrayCollection(), $page, $pageSize, $total);

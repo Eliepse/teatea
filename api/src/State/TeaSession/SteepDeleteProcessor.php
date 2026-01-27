@@ -22,8 +22,7 @@ readonly class SteepDeleteProcessor implements ProcessorInterface
 		private EntityManagerInterface $em,
 		private TeaSessionRepository $repo,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
 	{

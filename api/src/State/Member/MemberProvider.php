@@ -18,12 +18,14 @@ readonly class MemberProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Member|array|null
 	{
-		$query = $this->em->createQueryBuilder()->select("user")->from(User::class, "user");
+		$query = $this->em
+			->createQueryBuilder()
+			->select("user")
+			->from(User::class, "user");
 
 		if ($operation instanceof CollectionOperationInterface) {
 			return array_map(fn($u) => self::hydrate($u), $query->getQuery()->getResult());

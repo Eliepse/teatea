@@ -22,8 +22,7 @@ readonly class NativeListMemberTeaProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): MemberTea
 	{
@@ -41,7 +40,8 @@ readonly class NativeListMemberTeaProcessor implements ProcessorInterface
 		$entity->tea = $this->em->getReference(\App\Entity\Tea::class, $data->tea->id);
 
 		// Check for duplicate
-		$duplicate = $this->em->createQueryBuilder()
+		$duplicate = $this->em
+			->createQueryBuilder()
 			->select("pivot.id")
 			->from(\App\Entity\TeaListPivot::class, "pivot")
 			->where("pivot.author = :author")

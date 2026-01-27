@@ -11,6 +11,5 @@ readonly class TeaTypeStats
 		public ?int $rank = null,
 		public ?int $teasCount = null,
 		public ?int $sessionsCount = null,
-	) {
-	}
+	) {}
 }

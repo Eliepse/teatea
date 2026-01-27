@@ -21,8 +21,7 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaSession
 	{
@@ -31,15 +30,18 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 		assert($data instanceof TeaSession);
 		assert($user instanceof User);
 
-		$tea = $this->em->createQueryBuilder()
+		$tea = $this->em
+			->createQueryBuilder()
 			->select("tea", "origin")
 			->from(Tea::class, "tea")
 			->leftJoin("tea.origin", "origin")
-			->where("tea.id = :id")->setParameter("id", $data->tea->id)
+			->where("tea.id = :id")
+			->setParameter("id", $data->tea->id)
 			->setMaxResults(1)
-			->getQuery()->getSingleResult();
+			->getQuery()
+			->getSingleResult();
 
-		if (false === ($tea instanceof Tea)) {
+		if (false === $tea instanceof Tea) {
 			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
 		}
 

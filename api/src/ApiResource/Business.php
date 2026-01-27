@@ -14,10 +14,7 @@ use App\State\Business\BusinessProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(
-	denormalizationContext: ["groups" => ["business:write"]],
-	security: "is_granted('ROLE_USER')",
-)]
+#[ApiResource(denormalizationContext: ["groups" => ["business:write"]], security: "is_granted('ROLE_USER')")]
 #[Get(provider: BusinessProvider::class)]
 #[GetCollection(
 	paginationEnabled: true,
@@ -26,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	paginationClientItemsPerPage: true,
 	provider: BusinessPaginatedProvider::class,
 	parameters: [
-		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
+		"q" => new QueryParameter(property: "hydra:freetextQuery", description: "Filter by name"),
 	],
 )]
 #[Post(processor: BusinessCreateProcessor::class)]

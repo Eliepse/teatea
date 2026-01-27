@@ -19,10 +19,7 @@ class RankFunction extends FunctionNode
 
 	public function getSql(SqlWalker $sqlWalker): string
 	{
-		return sprintf(
-			"RANK() OVER (%s)",
-			$this->windowDefinition->dispatch($sqlWalker),
-		);
+		return sprintf("RANK() OVER (%s)", $this->windowDefinition->dispatch($sqlWalker));
 	}
 
 	public function parse(Parser $parser): void

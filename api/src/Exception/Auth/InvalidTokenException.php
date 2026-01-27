@@ -2,6 +2,4 @@
 
 namespace App\Exception\Auth;
 
-class InvalidTokenException extends \RuntimeException
-{
-}
+class InvalidTokenException extends \RuntimeException {}

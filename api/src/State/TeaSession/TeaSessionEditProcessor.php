@@ -20,15 +20,10 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepository,
-	) {
-	}
+	) {}
 
-	public function process(
-		mixed $data,
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): TeaSession {
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaSession
+	{
 		assert($data instanceof TeaSession);
 
 		$entity = $this->em->find(\App\Entity\TeaSession::class, $data->id);
@@ -40,21 +35,24 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		$tea = $this->em->createQueryBuilder()
+		$tea = $this->em
+			->createQueryBuilder()
 			->select("tea", "origin")
 			->from(Tea::class, "tea")
 			->leftJoin("tea.origin", "origin")
-			->where("tea.id = :id")->setParameter("id", $data->tea->id)
+			->where("tea.id = :id")
+			->setParameter("id", $data->tea->id)
 			->setMaxResults(1)
-			->getQuery()->getSingleResult();
+			->getQuery()
+			->getSingleResult();
 
-		if (false === ($tea instanceof Tea)) {
+		if (false === $tea instanceof Tea) {
 			throw new \RuntimeException("Could not find tea relation (teaId: {$data->tea->id}");
 		}
 
-		$origins = $this->originRepository->fetchOriginsFromSession(
-			fn($qb) => $qb->andWhere("session.id = :sessionId")->setParameter("sessionId", $entity->id),
-		);
+		$origins = $this->originRepository->fetchOriginsFromSession(fn($qb) => $qb->andWhere(
+			"session.id = :sessionId",
+		)->setParameter("sessionId", $entity->id));
 		$originMap = TeaProvider::originsToMap($origins);
 		$teaResource = TeaProvider::hydrateResource($tea, TeaProvider::getOriginPath($originMap, $tea->origin));
 

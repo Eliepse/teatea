@@ -16,9 +16,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-	types: ['https://schema.org/MediaObject'],
-	inputFormats: ['multipart' => ['multipart/form-data']],
-	normalizationContext: ['groups' => ["read:media", "with:media"]],
+	types: ["https://schema.org/MediaObject"],
+	inputFormats: ["multipart" => ["multipart/form-data"]],
+	normalizationContext: ["groups" => ["read:media", "with:media"]],
 	compositeIdentifier: true,
 )]
 #[Get(security: "is_granted('ROLE_ADMIN')")]
@@ -26,45 +26,31 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Post(
 	uriTemplate: "/members/{username}/teas/{id}/media",
 	uriVariables: [
-		"username" => new Link(
-			fromProperty: "username",
-			fromClass: Member::class,
-			compositeIdentifier: true,
-			required: true,
-		),
+		"username" => new Link(fromProperty: "username", fromClass: Member::class, compositeIdentifier: true, required: true),
 		"id" => new Link(identifiers: ["id"]),
 	],
-	openapi: new Operation(
-		requestBody: new RequestBody(
-			content: new \ArrayObject([
-				'multipart/form-data' => [
-					'schema' => [
-						'type' => 'object',
-						'properties' => ['file' => ['type' => 'string', 'format' => 'binary']],
-					]
-				]
-			]),
-		),
-	),
+	openapi: new Operation(requestBody: new RequestBody(content: new \ArrayObject([
+		"multipart/form-data" => [
+			"schema" => [
+				"type" => "object",
+				"properties" => ["file" => ["type" => "string", "format" => "binary"]],
+			],
+		],
+	]))),
 	security: "is_granted('ROLE_USER') and user.username === request.attributes.get('username')",
-	processor: CollectionTeaMediaProcessor::class
+	processor: CollectionTeaMediaProcessor::class,
 )]
 class MediaObject
 {
 	#[ApiProperty(identifier: true)]
 	public ?int $id = null;
 
-	#[ApiProperty(writable: false, types: ['https://schema.org/contentUrl'])]
+	#[ApiProperty(writable: false, types: ["https://schema.org/contentUrl"])]
 	#[Groups(["read:media", "with:media"])]
 	public ?string $contentUrl = null;
 
 	#[Assert\NotNull]
-	#[Assert\Image(
-		maxSize: "5M",
-		minWidth: 360,
-		minHeight: 120,
-		extensions: ["png", "jpeg", "jpg", "tiff", "webp"],
-	)]
+	#[Assert\Image(maxSize: "5M", minWidth: 360, minHeight: 120, extensions: ["png", "jpeg", "jpg", "tiff", "webp"])]
 	public File $file;
 
 	#[Groups(["read:media", "with:media"])]

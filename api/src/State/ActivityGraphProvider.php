@@ -18,8 +18,7 @@ readonly class ActivityGraphProvider implements ProviderInterface
 	public function __construct(
 		private UserRepository $userRepository,
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?ActivityGraph
 	{
@@ -32,7 +31,9 @@ readonly class ActivityGraphProvider implements ProviderInterface
 		$from = new \DateTimeImmutable()->sub(new \DateInterval("P1Y"))->setTime(0, 0);
 		$to = new \DateTimeImmutable()->add(new \DateInterval("P1D"))->setTime(0, 0);
 
-		$statsQB = $this->em->getConnection()->createQueryBuilder()
+		$statsQB = $this->em
+			->getConnection()
+			->createQueryBuilder()
 			->select("count(*) as total", "session.drank_at::date")
 			->from("tea_session", "session")
 			->where("session.drank_at >= :from") // Inclusive range
@@ -59,7 +60,7 @@ readonly class ActivityGraphProvider implements ProviderInterface
 
 		$min = min($totals);
 		$max = max($totals);
-		$levelSize = (int)round(($max - $min) / 3);
+		$levelSize = (int) round(($max - $min) / 3);
 
 		$levels = array_map(fn($i) => $min + ($i * $levelSize), array_keys(array_fill(0, 3, null)));
 		$levels = array_reverse($levels, true);

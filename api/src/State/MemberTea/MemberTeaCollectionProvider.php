@@ -19,8 +19,7 @@ readonly class MemberTeaCollectionProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
 	{
@@ -28,21 +27,18 @@ readonly class MemberTeaCollectionProvider implements ProviderInterface
 		assert($operation instanceof CollectionOperationInterface, "Only supports collection operations");
 		assert($user instanceof User);
 
-
 		$list = $this->em->find(\App\Entity\TeaList::class, $uriVariables["listId"]);
 		if (empty($list)) {
 			throw new NotFoundHttpException();
 		}
 
-		$listedTeaQuery = $this->em->createQueryBuilder()
+		$listedTeaQuery = $this->em
+			->createQueryBuilder()
 			->select("pivot")
 			->from(\App\Entity\TeaListPivot::class, "pivot")
 			->andWhere("pivot.list = :list")
 			->setParameter("list", $list);
 
-		return array_map(
-			fn($entity) => MemberTeaProvider::fromEntity($entity),
-			$listedTeaQuery->getQuery()->getResult(),
-		);
+		return array_map(fn($entity) => MemberTeaProvider::fromEntity($entity), $listedTeaQuery->getQuery()->getResult());
 	}
 }

@@ -30,8 +30,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 		private Pagination $pagination,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -51,12 +50,11 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		if ($distinctByLevelFilter && $originFilter && $distinctByLevelFilter < $originFilter->level()) {
-			throw new BadRequestHttpException(
-				"The 'groupByLevel' filter cannot be lower that the level of the 'origin' filter",
-			);
+			throw new BadRequestHttpException("The 'groupByLevel' filter cannot be lower that the level of the 'origin' filter");
 		}
 		$expr = $this->em->getExpressionBuilder();
-		$searchQuery = $this->em->createQueryBuilder()
+		$searchQuery = $this->em
+			->createQueryBuilder()
 			->select("type.id AS typeId")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
@@ -74,9 +72,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		}
 
 		if (null !== $originFilter) {
-			$searchQuery
-				->andWhere("CONTAINS(:pathFilter, tea.originPath) = TRUE")
-				->setParameter("pathFilter", $originFilter);
+			$searchQuery->andWhere("CONTAINS(:pathFilter, tea.originPath) = TRUE")->setParameter("pathFilter", $originFilter);
 		}
 
 		if (null !== $distinctByLevelFilter) {
@@ -86,7 +82,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 				->addGroupBy("originPath");
 		}
 
-		if($noFamilyFilter) {
+		if ($noFamilyFilter) {
 			$searchQuery->andWhere("type.isFamily = FALSE");
 		}
 
@@ -101,10 +97,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		}
 
 		/*
-		| --------------------------------
-		| Find total results
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Find total results
+		 | --------------------------------
+		 */
 
 		// Fix: use 'concat' workaround as Doctrine doesn't allow subqueries
 		//   and the '?' operator is mistaken as a prepared parameter

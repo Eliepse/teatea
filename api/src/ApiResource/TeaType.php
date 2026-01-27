@@ -17,20 +17,19 @@ use App\ValueObject\Stats\TeaTypeStats;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(
-	normalizationContext: ["groups" => ["type:read", "read:origin", "origin:read", "with:origin"]],
-	security: "is_granted('ROLE_USER')"
-)]
-#[Get(
-	provider: TeaTypeProvider::class,
-	parameters: [
-		"origin" => new QueryParameter(
-			schema: ["type" => "string", "example" => "Japan, China, ..."],
-			property: "origin",
-			description: "Filter by origin path, to get only the given branch",
-		),
-	],
-)]
+#[ApiResource(normalizationContext: ["groups" => [
+	"type:read",
+	"read:origin",
+	"origin:read",
+	"with:origin",
+]], security: "is_granted('ROLE_USER')")]
+#[Get(provider: TeaTypeProvider::class, parameters: [
+	"origin" => new QueryParameter(
+		schema: ["type" => "string", "example" => "Japan, China, ..."],
+		property: "origin",
+		description: "Filter by origin path, to get only the given branch",
+	),
+])]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -38,27 +37,27 @@ use Symfony\Component\Validator\Constraints as Assert;
 	paginationClientItemsPerPage: true,
 	provider: TeaTypeCollectionProvider::class,
 	parameters: [
-		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
+		"q" => new QueryParameter(property: "hydra:freetextQuery", description: "Filter by name"),
 		"family" => new QueryParameter(schema: ["enum" => TeaFamily::QUERY_PARAMS], property: "family"),
 		"origin" => new QueryParameter(
 			schema: ["type" => "string", "example" => "Japan, China.Yunnan, ..."],
 			property: "origin",
 			description: "Filter by origin path, to get only the given branch",
 		),
-		"distinctByLevel" => new QueryParameter(
-			schema: ["type" => "integer", "min" => 1, "max" => 3],
-			description: "Distinct tea types by the specified origin path level. Ex: '1' would group by countries",
-		),
-		"noFamily" => new QueryParameter(
-			schema: ["type" => "boolean"],
-			description: "Prevent returning generic type families (green tea, black tea, ...)",
-		),
+		"distinctByLevel" => new QueryParameter(schema: [
+			"type" => "integer",
+			"min" => 1,
+			"max" => 3,
+		], description: "Distinct tea types by the specified origin path level. Ex: '1' would group by countries"),
+		"noFamily" => new QueryParameter(schema: [
+			"type" => "boolean",
+		], description: "Prevent returning generic type families (green tea, black tea, ...)"),
 		"sort" => new QueryParameter(
 			schema: ["enum" => ["popularity"]],
 			openApi: new OpenApiParameter(name: "enum", in: "query"),
 			description: "Sorting method",
 		),
-	]
+	],
 )]
 #[Post(processor: TeaTypeCreateProcessor::class)]
 class TeaType

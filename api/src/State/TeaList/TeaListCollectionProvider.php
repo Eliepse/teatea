@@ -19,10 +19,9 @@ readonly class TeaListCollectionProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?array
 	{
 		$user = $this->security->getUser();
 		assert($operation instanceof CollectionOperationInterface);
@@ -32,16 +31,14 @@ readonly class TeaListCollectionProvider implements ProviderInterface
 			throw new AccessDeniedHttpException();
 		}
 
-		$listQuery = $this->em->createQueryBuilder()
+		$listQuery = $this->em
+			->createQueryBuilder()
 			->select("list", "owner")
 			->from(\App\Entity\TeaList::class, "list")
 			->leftJoin("list.owner", "owner")
 			->where("list.owner = :member")
 			->setParameter("member", $user);
 
-		return array_map(
-			fn($entity) => TeaListProvider::fromEntity($entity),
-			$listQuery->getQuery()->getResult(),
-		);
+		return array_map(fn($entity) => TeaListProvider::fromEntity($entity), $listQuery->getQuery()->getResult());
 	}
 }

@@ -24,15 +24,10 @@ readonly class SteepCreateProcessor implements ProcessorInterface
 		private EntityManagerInterface $em,
 		private TeaSessionRepository $sessionRepository,
 		private Security $security,
-	) {
-	}
+	) {}
 
-	public function process(
-		mixed $data,
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): ?Steep {
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?Steep
+	{
 		$user = $this->security->getUser();
 
 		assert($data instanceof Steep);

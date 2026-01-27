@@ -26,17 +26,17 @@ class Tea
 	#[ORM\Column]
 	public TeaFamily $family;
 
-	#[ORM\ManyToOne(inversedBy: 'teas')]
+	#[ORM\ManyToOne(inversedBy: "teas")]
 	#[ORM\JoinColumn]
 	public ?TeaType $type = null;
 
-	#[ORM\ManyToOne(inversedBy: 'teas')]
+	#[ORM\ManyToOne(inversedBy: "teas")]
 	public ?Cultivar $cultivar = null;
 
 	#[ORM\Column(type: "ltree")]
 	public LTreePath $originPath;
 
-	#[ORM\ManyToOne(inversedBy: 'teas')]
+	#[ORM\ManyToOne(inversedBy: "teas")]
 	#[ORM\JoinColumn("origin_path", referencedColumnName: "path")]
 	public ?Origin $origin = null;
 
@@ -60,13 +60,13 @@ class Tea
 	/**
 	 * @var Collection<int, TeaSession>
 	 */
-	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: 'tea')]
+	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: "tea")]
 	private Collection $sessions;
 
 	/**
 	 * @var Collection<int, CollectionTea>
 	 */
-	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: 'tea')]
+	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "tea")]
 	private Collection $collectionTeas;
 
 	#[ORM\ManyToOne]
@@ -102,7 +102,8 @@ class Tea
 	{
 		if (!$this->sessions->contains($session)) {
 			$this->sessions->add($session);
-//			$session->setTea($this);
+
+			//			$session->setTea($this);
 		}
 
 		return $this;
@@ -110,12 +111,12 @@ class Tea
 
 	public function removeSession(TeaSession $session): static
 	{
-//		if ($this->sessions->removeElement($session)) {
+		//		if ($this->sessions->removeElement($session)) {
 		// set the owning side to null (unless already changed)
-//			if ($session->getTea() === $this) {
-//				$session->setTea(null);
-//			}
-//		}
+		//			if ($session->getTea() === $this) {
+		//				$session->setTea(null);
+		//			}
+		//		}
 
 		return $this;
 	}

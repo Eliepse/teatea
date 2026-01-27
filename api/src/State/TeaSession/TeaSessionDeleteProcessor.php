@@ -17,8 +17,7 @@ readonly class TeaSessionDeleteProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
 	{

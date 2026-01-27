@@ -29,7 +29,7 @@ class Cultivar
 	/**
 	 * @var Collection<int, Tea>
 	 */
-	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'cultivar')]
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "cultivar")]
 	private Collection $teas;
 
 	public function __construct()
@@ -59,9 +59,9 @@ class Cultivar
 	{
 		if ($this->teas->removeElement($tea)) {
 			// set the owning side to null (unless already changed)
-//            if ($tea->getCultivar() === $this) {
-//                $tea->setCultivar(null);
-//            }
+			//            if ($tea->getCultivar() === $this) {
+			//                $tea->setCultivar(null);
+			//            }
 		}
 
 		return $this;

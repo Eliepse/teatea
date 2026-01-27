@@ -18,7 +18,5 @@ final readonly class GeneratedToken
 		 */
 		public string $challenge,
 		public Token $token,
-	)
-	{
-	}
+	) {}
 }

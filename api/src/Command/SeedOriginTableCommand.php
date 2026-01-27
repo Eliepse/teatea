@@ -10,10 +10,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(
-	name: 'app:db:seed-origin',
-	description: 'Create a base of origins',
-)]
+#[AsCommand(name: "app:db:seed-origin", description: "Create a base of origins")]
 class SeedOriginTableCommand extends Command
 {
 	public function __construct(
@@ -24,9 +21,9 @@ class SeedOriginTableCommand extends Command
 
 	protected function configure(): void
 	{
-//		$this
-//			->addArgument('email', InputArgument::REQUIRED, 'The email of the new user')
-//			->addArgument('username', InputArgument::REQUIRED, 'The nickname');
+		//		$this
+		//			->addArgument('email', InputArgument::REQUIRED, 'The email of the new user')
+		//			->addArgument('username', InputArgument::REQUIRED, 'The nickname');
 	}
 
 	/** @noinspection SpellCheckingInspection */

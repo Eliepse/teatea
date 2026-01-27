@@ -26,15 +26,10 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 		#[Autowire("%app.base_url%")]
 		private string $baseUrl,
 		private LoggerInterface $logger,
-	) {
-	}
+	) {}
 
-	public function process(
-		mixed $data,
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): ?MediaObject {
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?MediaObject
+	{
 		assert($data instanceof MediaObject);
 		$username = $uriVariables["username"] ?? null;
 		$id = $uriVariables["id"] ?? null;
@@ -44,14 +39,13 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 		}
 
 		/** @var \App\Entity\CollectionTea|null $teaEntity */
-		$cteaEntity = $this->em->createQuery(
-			<<<DQL
-			SELECT collection_tea
-			FROM App\Entity\CollectionTea collection_tea
-				INNER JOIN collection_tea.owner owner WITH owner.username = :username
-			WHERE collection_tea.id = :id
-			DQL,
-		)
+		$cteaEntity = $this->em
+			->createQuery(<<<DQL
+				SELECT collection_tea
+				FROM App\Entity\CollectionTea collection_tea
+					INNER JOIN collection_tea.owner owner WITH owner.username = :username
+				WHERE collection_tea.id = :id
+				DQL)
 			->setParameter("id", $id)
 			->setParameter("username", $username)
 			->getOneOrNullResult();
@@ -132,18 +126,16 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 	 */
 	private function makeAutorotateProcess(File $file): Process
 	{
-		return new Process(
-			[
-				"convert",
-				"-auto-orient",
-				"-limit",
-				"memory",
-				"16MiB",
-				"-format",
-				"jpg",
-				$file->getPathname(),
-				$file->getPathname()
-			],
-		);
+		return new Process([
+			"convert",
+			"-auto-orient",
+			"-limit",
+			"memory",
+			"16MiB",
+			"-format",
+			"jpg",
+			$file->getPathname(),
+			$file->getPathname(),
+		]);
 	}
 }

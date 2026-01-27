@@ -25,8 +25,8 @@ class MediaObject
 	public ?int $id = null;
 
 	#[Vich\UploadableField(
-		mapping: 'media_object',
-		fileNameProperty: 'filePath',
+		mapping: "media_object",
+		fileNameProperty: "filePath",
 		size: "size",
 		mimeType: "mimeType",
 		dimensions: "dimensions",

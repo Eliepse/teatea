@@ -24,8 +24,7 @@ readonly class OriginProcessor implements ProcessorInterface
 		private Security $security,
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Origin
 	{
@@ -49,7 +48,6 @@ readonly class OriginProcessor implements ProcessorInterface
 		if (3 <= $parentPath->level()) {
 			throw new BadRequestHttpException("Cannot create an origin of a locality or lower level");
 		}
-
 
 		$entity = new \App\Entity\Origin();
 		$entity->name = $data->name;

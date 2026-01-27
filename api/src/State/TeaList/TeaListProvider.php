@@ -21,12 +21,11 @@ readonly class TeaListProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaList|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?TeaList
 	{
-		assert(false === ($operation instanceof CollectionOperationInterface));
+		assert(false === $operation instanceof CollectionOperationInterface);
 
 		$user = $this->security->getUser();
 		assert($user instanceof User);
@@ -49,7 +48,8 @@ readonly class TeaListProvider implements ProviderInterface
 			return static::fromEntity($entity);
 		}
 
-		$listQuery = $this->em->createQueryBuilder()
+		$listQuery = $this->em
+			->createQueryBuilder()
 			->select("list", "owner")
 			->from(\App\Entity\TeaList::class, "list")
 			->leftJoin("list.owner", "owner")

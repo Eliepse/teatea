@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	normalizationContext: ["groups" => ["teaList:read"]],
 	denormalizationContext: ["groups" => ["teaList:write"]],
 	security: "is_granted('ROLE_USER')",
-	provider: TeaListProvider::class
+	provider: TeaListProvider::class,
 )]
 #[Get]
 #[GetCollection(

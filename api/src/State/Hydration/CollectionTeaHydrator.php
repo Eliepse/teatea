@@ -11,8 +11,7 @@ class CollectionTeaHydrator implements ResourceHydrator
 {
 	public function __construct(
 		private MediaObjectHydrator $mediaHydrator,
-	) {
-	}
+	) {}
 
 	public function hydrate(?object $entity): ?object
 	{

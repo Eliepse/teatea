@@ -10,7 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-#[AsCommand(name: 'app:tea:fix_family_types', description: 'Associate each tea without type to its corresponding default TeaType',)]
+#[AsCommand(
+	name: "app:tea:fix_family_types",
+	description: "Associate each tea without type to its corresponding default TeaType",
+)]
 class TeaFixFamilyTypesCommand extends Command
 {
 	public function __construct(
@@ -27,15 +30,12 @@ class TeaFixFamilyTypesCommand extends Command
 		$familyTypes = $this->typeRepository->getFamilies();
 
 		foreach ($familyTypes as $type) {
-			$result = $this->em->createQuery(
-				<<<DQL
+			$result = $this->em->createQuery(<<<DQL
 				UPDATE App\Entity\Tea tea SET tea.type = :type
 				WHERE tea.family = :family AND tea.type IS NULL
-				DQL,
-			)->execute(["type" => $type, "family" => $type->family]);
+				DQL)->execute(["type" => $type, "family" => $type->family]);
 			$io->success("{$type->family->name}: $result teas associated");
 		}
-
 
 		return Command::SUCCESS;
 	}

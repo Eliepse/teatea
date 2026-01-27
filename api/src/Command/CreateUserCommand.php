@@ -12,32 +12,30 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-#[AsCommand(
-	name: 'app:create-user',
-	description: 'Create a new regular user',
-)]
+#[AsCommand(name: "app:create-user", description: "Create a new regular user")]
 class CreateUserCommand extends Command
 {
 	public function __construct(
 		private readonly UserPasswordHasherInterface $hasher,
-		private readonly EntityManagerInterface      $entityManager,
-	)
-	{
+		private readonly EntityManagerInterface $entityManager,
+	) {
 		parent::__construct();
 	}
 
 	protected function configure(): void
 	{
-		$this
-			->addArgument('email', InputArgument::REQUIRED, 'The email of the new user')
-			->addArgument('username', InputArgument::REQUIRED, 'The nickname');
+		$this->addArgument("email", InputArgument::REQUIRED, "The email of the new user")->addArgument(
+			"username",
+			InputArgument::REQUIRED,
+			"The nickname",
+		);
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$io = new SymfonyStyle($input, $output);
-		$email = $input->getArgument('email');
-		$username = trim($input->getArgument('username'));
+		$email = $input->getArgument("email");
+		$username = trim($input->getArgument("username"));
 
 		if (empty($email) || null === filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_NULL_ON_FAILURE)) {
 			$io->error("You must pass an email");

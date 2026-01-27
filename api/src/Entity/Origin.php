@@ -29,7 +29,7 @@ class Origin
 	/**
 	 * @var Collection<int, Tea>
 	 */
-	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'origin')]
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "origin")]
 	private Collection $teas;
 
 	#[ORM\ManyToOne]

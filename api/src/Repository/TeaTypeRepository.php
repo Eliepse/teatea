@@ -22,7 +22,11 @@ class TeaTypeRepository extends ServiceEntityRepository
 	 */
 	public function getFamilies(): array
 	{
-		$types = $this->createQueryBuilder("T")->where("T.isFamily = TRUE")->getQuery()->getResult();
+		$types = $this
+			->createQueryBuilder("T")
+			->where("T.isFamily = TRUE")
+			->getQuery()
+			->getResult();
 		return Arr::keyBy($types, fn($t) => $t->family->value);
 	}
 }

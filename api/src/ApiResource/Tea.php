@@ -22,12 +22,13 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ApiResource(security: "is_granted('ROLE_USER')")]
-#[Get(
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "with:origin", "embedded:cultivar"]],
-	provider: TeaProvider::class
-)]
+#[Get(normalizationContext: ["groups" => [
+	"tea:read",
+	"embedded:teaType",
+	"with:origin",
+	"embedded:cultivar",
+]], provider: TeaProvider::class)]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -51,10 +52,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 			property: "cultivar",
 			description: "Filter by cultivar",
 		),
-		"q" => new QueryParameter(property: 'hydra:freetextQuery', description: "Filter by name"),
+		"q" => new QueryParameter(property: "hydra:freetextQuery", description: "Filter by name"),
 		"originPath" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
 		"sort" => new QueryParameter(
-			schema: ["enum" => ["popularity"],],
+			schema: ["enum" => ["popularity"]],
 			openApi: new OpenApiParameter(name: "enum", in: "query"),
 			description: "Sorting method",
 		),
@@ -75,17 +76,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[GetCollection(
 	uriTemplate: "/members/{username}/tea_lists/{slug}/teas",
 	uriVariables: [
-		"username" => new Link(
-			fromProperty: "username",
-			fromClass: Member::class,
-			compositeIdentifier: true,
-			required: true,
-		),
-		"slug" => new Link(
-			compositeIdentifier: true,
-			schema: ["pattern" => "/^[a-zA-Z0-9-_]+$/"],
-			required: true,
-		),
+		"username" => new Link(fromProperty: "username", fromClass: Member::class, compositeIdentifier: true, required: true),
+		"slug" => new Link(compositeIdentifier: true, schema: ["pattern" => "/^[a-zA-Z0-9-_]+$/"], required: true),
 	],
 	paginationEnabled: true,
 	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "with:origin", "embedded:cultivar"]],

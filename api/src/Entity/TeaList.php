@@ -25,7 +25,7 @@ class TeaList
 	#[ORM\Column(type: Types::TEXT, nullable: true)]
 	public ?string $name = null;
 
-	#[ORM\ManyToOne(inversedBy: 'teaLists')]
+	#[ORM\ManyToOne(inversedBy: "teaLists")]
 	#[ORM\JoinColumn(nullable: false)]
 	public User $owner;
 

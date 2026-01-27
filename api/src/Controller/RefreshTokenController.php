@@ -18,10 +18,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class RefreshTokenController extends AbstractController
 {
-	#[Route('/auth/token/refresh', methods: ["POST"])]
+	#[Route("/auth/token/refresh", methods: ["POST"])]
 	public function refreshToken(
-		#[MapRequestPayload(acceptFormat: "json")]
-		RefreshTokenRequestPayload $payload,
+		#[MapRequestPayload(acceptFormat: "json")] RefreshTokenRequestPayload $payload,
 		TokenManager $tokenManager,
 		JWTTokenManagerInterface $JWTManager,
 	): JsonResponse {

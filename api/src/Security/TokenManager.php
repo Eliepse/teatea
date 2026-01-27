@@ -21,8 +21,7 @@ final readonly class TokenManager
 		private string $signingKey,
 		private EntityManagerInterface $em,
 		private TokenRepository $tokenRepository,
-	) {
-	}
+	) {}
 
 	private function generateTokenWithSalt(
 		string $type,
@@ -36,7 +35,6 @@ final readonly class TokenManager
 		$key = $this->generateRandomString(self::KEY_LENGTH);
 		$payload = [$salt, $type, $owner->id, $expiredAt->getTimestamp()];
 		$encodedPayload = base64_encode(serialize($payload));
-
 
 		$token = new Token($key, $owner, $this->sign($encodedPayload), $validFrom, $expiredAt);
 
@@ -93,7 +91,7 @@ final readonly class TokenManager
 			throw new InvalidTokenException();
 		}
 
-		if($token->isExpired()) {
+		if ($token->isExpired()) {
 			throw new ExpiredTokenException();
 		}
 
@@ -111,19 +109,13 @@ final readonly class TokenManager
 
 	private function verifySignature(Token $token, string $type, string $salt): bool
 	{
-		$generatedTokenDTO = $this->generateTokenWithSalt(
-			$type,
-			$token->owner,
-			$token->expiredAt,
-			$token->validFrom,
-			$salt,
-		);
+		$generatedTokenDTO = $this->generateTokenWithSalt($type, $token->owner, $token->expiredAt, $token->validFrom, $salt);
 		return hash_equals($token->signature, $generatedTokenDTO->token->signature);
 	}
 
 	private function sign(string $encodedPayload): string
 	{
-		return base64_encode(hash_hmac('sha256', $encodedPayload, $this->signingKey, true));
+		return base64_encode(hash_hmac("sha256", $encodedPayload, $this->signingKey, true));
 	}
 
 	private function generateRandomString(int $size = 32): string

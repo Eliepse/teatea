@@ -8,8 +8,7 @@ readonly class ActivityGraphDay
 		public int $total,
 		public \DateTimeImmutable $date,
 		public int $level = 1,
-	) {
-	}
+	) {}
 
 	public function getDate(): string
 	{

@@ -21,8 +21,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepository,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
@@ -33,7 +32,8 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$limit = $context["filters"]["limit"] ?? 1;
 		$limit = is_numeric($limit) ? max(1, min(31, intval($limit))) : null;
 
-		$sessionQb = $this->em->createQueryBuilder()
+		$sessionQb = $this->em
+			->createQueryBuilder()
 			->select("session", "tea", "type", "origin", "cultivar", "business")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
@@ -55,11 +55,13 @@ readonly class TeaSessionProvider implements ProviderInterface
 				->getSingleResult();
 
 			// Fetch sessions for a fixed amount of days
-			$searchQb = $this->em->getConnection()
+			$searchQb = $this->em
+				->getConnection()
 				->createQueryBuilder()
 				->select("array_agg(id) AS ids")
 				->from("tea_session")
-				->andWhere("author_id = :authorId")->setParameter("authorId", $member->id)
+				->andWhere("author_id = :authorId")
+				->setParameter("authorId", $member->id)
 				->groupBy("drank_at::date")
 				->orderBy("drank_at::date", "DESC")
 				->setMaxResults($limit);
@@ -80,9 +82,11 @@ readonly class TeaSessionProvider implements ProviderInterface
 				return [];
 			}
 
-			$sessionQb
-				->andWhere("session.id IN (:sessionIds)")
-				->setParameter("sessionIds", $sessionIds, ArrayParameterType::INTEGER);
+			$sessionQb->andWhere("session.id IN (:sessionIds)")->setParameter(
+				"sessionIds",
+				$sessionIds,
+				ArrayParameterType::INTEGER,
+			);
 
 			// TODO(elie): optimize to only fetch origins of requested sessions/teas
 			$origins = $this->originRepository->findAll();
@@ -96,14 +100,15 @@ readonly class TeaSessionProvider implements ProviderInterface
 			}, $sessionQb->getQuery()->getResult());
 		}
 
-		$origins = $this->originRepository->fetchOriginsFromSession(
-			fn($qb) => $qb->where("session.id = :sessionId")->setParameter("sessionId", $uriVariables["id"]),
-		);
+		$origins = $this->originRepository->fetchOriginsFromSession(fn($qb) => $qb->where(
+			"session.id = :sessionId",
+		)->setParameter("sessionId", $uriVariables["id"]));
 
 		$entity = $sessionQb
 			->andWhere("session.id = :sessionId")
 			->setParameter("sessionId", $uriVariables["id"])
-			->getQuery()->getSingleResult();
+			->getQuery()
+			->getSingleResult();
 
 		$originMap = TeaProvider::originsToMap($origins);
 		$path = TeaProvider::getOriginPath($originMap, $entity->tea->origin);
@@ -123,10 +128,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$resource->drankAt = $entity->drankAt;
 		$resource->quality = $entity->quality;
 
-		$resource->steeps = array_map(
-			fn($steepValue) => SteepProvider::hydrate($steepValue, $entity),
-			$entity->getSteeps(),
-		);
+		$resource->steeps = array_map(fn($steepValue) => SteepProvider::hydrate($steepValue, $entity), $entity->getSteeps());
 
 		if ($tea) {
 			$resource->tea = $tea;
@@ -144,7 +146,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 			$resource->place = new Business();
 			$resource->place->id = $entity->place->id;
 
-			if(!$entity->place instanceof Proxy) {
+			if (!$entity->place instanceof Proxy) {
 				$resource->place->name = $entity->place->name;
 			}
 		}

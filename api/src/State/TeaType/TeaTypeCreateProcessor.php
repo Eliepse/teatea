@@ -18,8 +18,7 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaType
 	{
@@ -31,7 +30,10 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 		$entity = new \App\Entity\TeaType();
 		$entity->family = $data->family;
 		$entity->name = trim($data->name);
-		$entity->slug = new AsciiSlugger()->slug($entity->name)->lower()->toString();
+		$entity->slug = new AsciiSlugger()
+			->slug($entity->name)
+			->lower()
+			->toString();
 		$entity->createdBy = $user;
 
 		// Only define a precise origin

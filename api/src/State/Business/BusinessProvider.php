@@ -17,15 +17,15 @@ readonly class BusinessProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Business|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Business
 	{
 		assert(!$operation instanceof CollectionOperationInterface);
 
 		$expr = $this->em->getExpressionBuilder();
-		$query = $this->em->createQueryBuilder()
+		$query = $this->em
+			->createQueryBuilder()
 			->select("business")
 			->from(\App\Entity\Business::class, "business")
 			->where("business.id = :id")
@@ -41,7 +41,7 @@ readonly class BusinessProvider implements ProviderInterface
 			return null;
 		}
 
-		if($entity instanceof Proxy && false === $entity->__isInitialized()) {
+		if ($entity instanceof Proxy && false === $entity->__isInitialized()) {
 			return null;
 		}
 

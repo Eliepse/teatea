@@ -13,13 +13,12 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Yaml\Yaml;
 
-#[AsCommand(name: 'app:seed:business', description: 'Seeds businesses')]
+#[AsCommand(name: "app:seed:business", description: "Seeds businesses")]
 final readonly class BusinessSeederCommand
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
 	public function __invoke(SymfonyStyle $io): int
 	{
@@ -42,7 +41,6 @@ final readonly class BusinessSeederCommand
 				$author = null;
 			}
 		} while (!$author instanceof User);
-
 
 		$businesses = Yaml::parseFile(__DIR__ . "/../../../data/businesses.yaml")["businesses"] ?? [];
 

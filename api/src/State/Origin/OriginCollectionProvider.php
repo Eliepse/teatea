@@ -21,14 +21,14 @@ readonly class OriginCollectionProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Origin|array|null
 	{
 		assert($operation instanceof CollectionOperationInterface);
 
-		$searchQb = $this->em->createQueryBuilder()
+		$searchQb = $this->em
+			->createQueryBuilder()
 			->select("origin.path as path", "COUNT(child) as children")
 			->from(\App\Entity\Origin::class, "origin")
 			->leftJoin(
@@ -58,17 +58,13 @@ readonly class OriginCollectionProvider implements ProviderInterface
 		// Filter by parent
 		$parentPath = $this->getParameter($operation, "parent");
 		if (is_string($parentPath)) {
-			$searchQb
-				->andWhere("IS_CONTAINED_BY(origin.path, :parentPath) = TRUE")
-				->setParameter("parentPath", $parentPath);
+			$searchQb->andWhere("IS_CONTAINED_BY(origin.path, :parentPath) = TRUE")->setParameter("parentPath", $parentPath);
 		}
 
 		// Filter by level
 		$level = $this->getParameter($operation, "level");
 		if (is_int($level)) {
-			$searchQb
-				->andWhere("NLEVEL(origin.path) = :nlevel")
-				->setParameter("nlevel", $level);
+			$searchQb->andWhere("NLEVEL(origin.path) = :nlevel")->setParameter("nlevel", $level);
 		}
 
 		/** @var array{ path: LTreePath, children: int }[] $searchResults */

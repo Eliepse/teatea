@@ -16,9 +16,9 @@ class LTreeOperatorFunction extends FunctionNode
 
 	public function getSql(SqlWalker $sqlWalker): string
 	{
-//		if (false === in_array($this->operator, ["@>", "<@", "~", "?", "||", "@", "?~", "?@"])) {
-//			throw new ParserException("Invalid ltree operator: $this->operator");
-//		}
+		//		if (false === in_array($this->operator, ["@>", "<@", "~", "?", "||", "@", "?~", "?@"])) {
+		//			throw new ParserException("Invalid ltree operator: $this->operator");
+		//		}
 
 		return sprintf(
 			"(%s %s %s)",
@@ -41,7 +41,7 @@ class LTreeOperatorFunction extends FunctionNode
 		$this->operator = $lexer->lookahead->value;
 		$lexer->moveNext();
 
-		if("," !== $token = $lexer->lookahead->value) {
+		if ("," !== ($token = $lexer->lookahead->value)) {
 			$this->operator .= $token;
 		}
 

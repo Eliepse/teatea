@@ -26,14 +26,10 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		private UserRepository $userRepo,
 		private OriginRepository $originRepo,
 		private Pagination $pagination,
-	) {
-	}
+	) {}
 
-	public function provide(
-		Operation $operation,
-		array $uriVariables = [],
-		array $context = [],
-	): PartialPaginatorInterface {
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PartialPaginatorInterface
+	{
 		assert($operation instanceof CollectionOperationInterface);
 
 		$isContentful = $operation->getParameters()->get("contentful")?->getValue() ?? false;
@@ -55,7 +51,8 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		}
 
 		$expr = $this->em->createQueryBuilder()->expr();
-		$sessionQb = $this->em->createQueryBuilder()
+		$sessionQb = $this->em
+			->createQueryBuilder()
 			->select("session", "tea", "type", "business")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
@@ -80,22 +77,14 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 				->setParameter("quality", BrewingQuality::Improvable);
 		}
 
-		$total = (clone $sessionQb)
-			->select("COUNT(session)")
-			->resetDQLPart("orderBy")
-			->getQuery()
-			->getSingleScalarResult();
+		$total = (clone $sessionQb)->select("COUNT(session)")->resetDQLPart("orderBy")->getQuery()->getSingleScalarResult();
 
 		if (0 === $total) {
 			return new TraversablePaginator(new ArrayCollection(), $currentPage, $itemsPerPage, $total);
 		}
 
 		/** @var TeaSession[] $entities */
-		$entities = $sessionQb
-			->setFirstResult($offset)
-			->setMaxResults($itemsPerPage)
-			->getQuery()
-			->getResult();
+		$entities = $sessionQb->setFirstResult($offset)->setMaxResults($itemsPerPage)->getQuery()->getResult();
 
 		$items = new \ArrayIterator();
 

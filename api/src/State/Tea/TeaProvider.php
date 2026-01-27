@@ -21,14 +21,14 @@ readonly class TeaProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Tea|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Tea
 	{
-		assert(false === ($operation instanceof CollectionOperationInterface), "Collection operation not supported");
+		assert(false === $operation instanceof CollectionOperationInterface, "Collection operation not supported");
 
-		$teaQb = $this->em->createQueryBuilder()
+		$teaQb = $this->em
+			->createQueryBuilder()
 			->select("tea", "type", "origin", "cultivar")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
@@ -44,7 +44,8 @@ readonly class TeaProvider implements ProviderInterface
 			return null;
 		}
 
-		$originsQb = $this->em->createQueryBuilder()
+		$originsQb = $this->em
+			->createQueryBuilder()
 			->select("origin")
 			->from(Origin::class, "origin");
 
@@ -61,10 +62,14 @@ readonly class TeaProvider implements ProviderInterface
 	 */
 	public static function originsToMap(array $origins): array
 	{
-		return array_reduce($origins, function ($map, Origin $o) {
-			$map[(string)$o->path] = $o;
-			return $map;
-		}, []);
+		return array_reduce(
+			$origins,
+			function ($map, Origin $o) {
+				$map[(string) $o->path] = $o;
+				return $map;
+			},
+			[],
+		);
 	}
 
 	/**
@@ -101,7 +106,7 @@ readonly class TeaProvider implements ProviderInterface
 		$tea->type = TeaTypeProvider::fromEntity($entity->type);
 
 		$tea->originPath = $originPath;
-		if (null !== $entity->origin && false === ($entity->origin instanceof Proxy)) {
+		if (null !== $entity->origin && false === $entity->origin instanceof Proxy) {
 			$tea->origin = OriginProvider::fromEntity($entity->origin);
 		}
 

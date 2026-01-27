@@ -19,11 +19,7 @@ class TrgmSimilarityFunction extends FunctionNode
 
 	public function getSql(SqlWalker $sqlWalker): string
 	{
-		return sprintf(
-			"similarity(%s, %s)",
-			$this->first->dispatch($sqlWalker),
-			$this->second->dispatch($sqlWalker),
-		);
+		return sprintf("similarity(%s, %s)", $this->first->dispatch($sqlWalker), $this->second->dispatch($sqlWalker));
 	}
 
 	public function parse(Parser $parser): void

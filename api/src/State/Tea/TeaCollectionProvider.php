@@ -25,8 +25,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private LoggerInterface $logger,
 		private Pagination $pagination,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -53,13 +52,14 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		}
 
 		/*
-		| --------------------------------
-		| Search
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Search
+		 | --------------------------------
+		 */
 
 		$expr = $this->em->getExpressionBuilder();
-		$searchQb = $this->em->createQueryBuilder()
+		$searchQb = $this->em
+			->createQueryBuilder()
 			->select("tea.id")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.type", "type")
@@ -81,9 +81,10 @@ readonly class TeaCollectionProvider implements ProviderInterface
 
 		// Origin
 		if (null !== $originPath) {
-			$searchQb
-				->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:originPath, origin.path) = TRUE")
-				->setParameter("originPath", $originPath);
+			$searchQb->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:originPath, origin.path) = TRUE")->setParameter(
+				"originPath",
+				$originPath,
+			);
 		}
 
 		// Type
@@ -95,15 +96,17 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		if (null !== $cultivarFilter) {
 			$searchQb
 				->innerJoin("tea.cultivar", "cultivar")
-				->andWhere("cultivar.id = :cultivarId")->setParameter("cultivarId", $cultivarFilter);
+				->andWhere("cultivar.id = :cultivarId")
+				->setParameter("cultivarId", $cultivarFilter);
 		}
 
 		// Sorting
 
 		if ("popularity" === $sortParam) {
-			$searchQb
-				->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")
-				->setParameter("popularSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M")));
+			$searchQb->leftJoin("tea.sessions", "session", "WITH", ":popularSince <= session.drankAt")->setParameter(
+				"popularSince",
+				new \DateTimeImmutable()->sub(new \DateInterval("P1M")),
+			);
 
 			$searchQb->addOrderBy("count(session.id)", "DESC");
 		}
@@ -127,13 +130,14 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			->getResult();
 
 		/*
-		| --------------------------------
-		| Hydrate
-		| --------------------------------
-		*/
+		 | --------------------------------
+		 | Hydrate
+		 | --------------------------------
+		 */
 
 		/** @var array<\App\Entity\Tea> $teaEntities */
-		$teaEntities = $this->em->createQueryBuilder()
+		$teaEntities = $this->em
+			->createQueryBuilder()
 			->select("tea", "type", "origin", "cultivar")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.origin", "origin")
@@ -147,7 +151,8 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		/** @var array<integer, \App\Entity\Tea> $teaEntitiesById */
 		$teaEntitiesById = Arr::keyBy($teaEntities, "id");
 
-		$originsQb = $this->em->createQueryBuilder()
+		$originsQb = $this->em
+			->createQueryBuilder()
 			->select("origin")
 			->from(Origin::class, "origin");
 

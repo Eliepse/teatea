@@ -15,8 +15,7 @@ readonly class CultivarCreateProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Cultivar
 	{
@@ -28,9 +27,7 @@ readonly class CultivarCreateProcessor implements ProcessorInterface
 		$refinedName = preg_replace("/\s+/", " ", $data->name);
 
 		$exitingIds = $this->em
-			->createQuery(
-				"SELECT c.id FROM App\Entity\Cultivar c WHERE lower(unaccent(c.name)) = lower(unaccent(:name))",
-			)
+			->createQuery("SELECT c.id FROM App\Entity\Cultivar c WHERE lower(unaccent(c.name)) = lower(unaccent(:name))")
 			->setParameter("name", $refinedName)
 			->getScalarResult();
 

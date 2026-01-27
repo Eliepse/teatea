@@ -24,8 +24,7 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		private TeaRepository $repository,
 		private OriginRepository $originRepo,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	/**
 	 * @param mixed|Tea $data
@@ -40,11 +39,14 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 	{
 		$user = $this->security->getUser();
 		/** @var \App\Entity\TeaType $typeEntity */
-		$typeEntity = $this->em->createQueryBuilder()
+		$typeEntity = $this->em
+			->createQueryBuilder()
 			->select("type")
 			->from(\App\Entity\TeaType::class, "type")
-			->where("type.id = :id")->setParameter("id", $uriVariables["typeId"])
-			->getQuery()->getSingleResult();
+			->where("type.id = :id")
+			->setParameter("id", $uriVariables["typeId"])
+			->getQuery()
+			->getSingleResult();
 
 		assert($data instanceof Tea);
 		assert($user instanceof User);

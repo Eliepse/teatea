@@ -42,10 +42,6 @@ readonly class OriginPath
 			throw new \RuntimeException("Invalid locality node");
 		}
 
-		return new OriginPath(
-			$nodes[0],
-			$nodes[1] ?? null,
-			$nodes[2] ?? null,
-		);
+		return new OriginPath($nodes[0], $nodes[1] ?? null, $nodes[2] ?? null);
 	}
 }

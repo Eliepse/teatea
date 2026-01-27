@@ -13,12 +13,11 @@ readonly class TeaStatProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): TeaStats|null
+	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?TeaStats
 	{
-		assert(false === ($operation instanceof CollectionOperationInterface), "Collection operation not supported");
+		assert(false === $operation instanceof CollectionOperationInterface, "Collection operation not supported");
 
 		$teaId = $uriVariables["teaId"] ?? null;
 
@@ -26,19 +25,17 @@ readonly class TeaStatProvider implements ProviderInterface
 			throw new NotFoundHttpException();
 		}
 
-		$teaResult = $this->em->createQuery(
-			<<<DQL
+		$teaResult = $this->em
+			->createQuery(<<<DQL
 				SELECT tea.id, COUNT(session) as sessions, COUNT(DISTINCT author) as authors
 				FROM App\Entity\Tea tea
 					LEFT JOIN tea.sessions session
 					LEFT JOIN session.author author
 				WHERE tea.id = :teaId
 				GROUP BY tea.id
-				DQL,
-		)
+				DQL)
 			->setParameter("teaId", $teaId)
 			->getSingleResult();
-
 
 		$stats = new TeaStats();
 		$stats->teaId = $teaId;

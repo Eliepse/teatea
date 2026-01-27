@@ -16,9 +16,7 @@ readonly class WebpEncoder
 		public bool $stripMetadata = false,
 		public ?int $quality = null,
 		public ?int $compressionQuality = null,
-	) {
-	}
-
+	) {}
 
 	/**
 	 * @param File $input
@@ -93,7 +91,6 @@ readonly class WebpEncoder
 		} else {
 			$size = $oSize->h > $this->resize->h ? $oSize->scaleByHeight($this->resize) : null;
 		}
-
 
 		return null !== $size ? ["-resize", $size->w, $size->h] : [];
 	}

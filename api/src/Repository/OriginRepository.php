@@ -29,8 +29,10 @@ class OriginRepository extends ServiceEntityRepository
 	 */
 	public function fetchOriginsFromSession(?callable $queryModifier = null): array
 	{
-		$originQb = $this->createQueryBuilder("origin")
-			->select("origin")->distinct()
+		$originQb = $this
+			->createQueryBuilder("origin")
+			->select("origin")
+			->distinct()
 			->innerJoin(Origin::class, "teaOrigin", "ON", "CONTAINS(origin.path, teaOrigin.path) = TRUE")
 			->innerJoin(Tea::class, "tea", "ON", "teaOrigin = tea.origin")
 			->innerJoin(TeaSession::class, "session", "ON", "tea = session.tea");
@@ -59,7 +61,8 @@ class OriginRepository extends ServiceEntityRepository
 			return [];
 		}
 
-		$rows = $this->createQueryBuilder("origin")
+		$rows = $this
+			->createQueryBuilder("origin")
 			->select("origin", "JSON_AGG(ancestors.name ORDER BY ancestors.path) as names")
 			->leftJoin("App\Entity\Origin", "ancestors", "ON", "CONTAINS(ancestors.path, origin.path) = TRUE")
 			->where("origin.path IN (:paths)")
@@ -68,15 +71,18 @@ class OriginRepository extends ServiceEntityRepository
 			->getQuery()
 			->getResult();
 
-		return array_map(function ($row) {
-			/** @var Origin $origin */
-			$origin = $row[0];
-			$origin->namePath = array_values(json_decode($row["names"]));
-			return $origin;
-		}, $rows);
+		return array_map(
+			function ($row) {
+				/** @var Origin $origin */
+				$origin = $row[0];
+				$origin->namePath = array_values(json_decode($row["names"]));
+				return $origin;
+			},
+			$rows,
+		);
 	}
 
-	public function findWithAncestorNames(string $path): Origin|null
+	public function findWithAncestorNames(string $path): ?Origin
 	{
 		return $this->findManyWithAncestorNames([$path])[0] ?? null;
 	}

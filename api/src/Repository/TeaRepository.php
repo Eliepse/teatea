@@ -12,18 +12,20 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TeaRepository extends ServiceEntityRepository
 {
-	public function __construct(
-		ManagerRegistry $registry,
-	) {
+	public function __construct(ManagerRegistry $registry)
+	{
 		parent::__construct($registry, Tea::class);
 	}
 
 	public function hasDuplicate(Tea $tea): bool
 	{
-		$qb = $this->createQueryBuilder("tea")
+		$qb = $this
+			->createQueryBuilder("tea")
 			->select("count(tea)")
-			->where("tea.family = :family")->setParameter("family", $tea->family)
-			->andWhere("tea.origin = :origin")->setParameter("origin", $tea->origin);
+			->where("tea.family = :family")
+			->setParameter("family", $tea->family)
+			->andWhere("tea.origin = :origin")
+			->setParameter("origin", $tea->origin);
 
 		if (null !== $tea->type?->id) {
 			$qb->andWhere("tea.type = :type")->setParameter("type", $tea->type);

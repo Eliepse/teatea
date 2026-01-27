@@ -25,12 +25,12 @@ readonly class UserStatsProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Member
 	{
-		$user = $this->em->createQuery("SELECT u FROM App\Entity\User u WHERE u.username = :username")
+		$user = $this->em
+			->createQuery("SELECT u FROM App\Entity\User u WHERE u.username = :username")
 			->setParameter("username", $uriVariables["username"])
 			->getSingleResult();
 
@@ -44,20 +44,17 @@ readonly class UserStatsProvider implements ProviderInterface
 			->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR);
 
 		$teas = $this->em
-			->createQuery(
-				<<<DQL
+			->createQuery(<<<DQL
 				SELECT COUNT(DISTINCT tea.id)
 				FROM App\Entity\Tea tea
 					INNER JOIN tea.sessions session
 				WHERE session.author = :user
-				DQL,
-			)
+				DQL)
 			->setParameter("user", $user)
 			->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR);
 
 		$topTeas = $this->em
-			->createQuery(
-				<<<DQL
+			->createQuery(<<<DQL
 				SELECT tea, type
 				FROM App\Entity\Tea tea
 					LEFT JOIN tea.type type
@@ -68,16 +65,14 @@ readonly class UserStatsProvider implements ProviderInterface
 					GROUP BY searchTea.id
 					ORDER BY COUNT(session) DESC
 				)
-				DQL,
-			)
+				DQL)
 			->setParameter("user", $user)
 			->setParameter("before", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
 			->setMaxResults(3)
 			->getResult();
 
 		$topTeaTypes = $this->em
-			->createQuery(
-				<<<DQL
+			->createQuery(<<<DQL
 				SELECT type
 				FROM App\Entity\TeaType type
 				WHERE type.id IN (
@@ -88,37 +83,33 @@ readonly class UserStatsProvider implements ProviderInterface
 					GROUP BY searchType.id
 					ORDER BY COUNT(sessions) DESC
 				)
-				DQL,
-			)
+				DQL)
 			->setParameter("user", $user)
 			->setParameter("before", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
 			->setMaxResults(3)
 			->getResult();
 
 		$familyStats = $this->em
-			->createQuery(
-				<<<DQL
+			->createQuery(<<<DQL
 				SELECT tea.family, count(session) as count
 				FROM App\Entity\TeaSession session
 					LEFT JOIN session.tea tea
 				WHERE session.author = :author
 				  AND session.drankAt >= :fromDrankAt
 				GROUP BY tea.family
-				DQL,
-			)
+				DQL)
 			->setParameter("author", $user)
 			->setParameter("fromDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
 			->getResult();
 
 		$originsPath = Arr::pluck($topTeas, fn(\App\Entity\Tea $t) => $t->originPath->getPath(), true);
-		$teasOrigins = $this->em->createQuery(
-			<<<DQL
-			SELECT origin
-			FROM App\Entity\Origin origin
-				LEFT JOIN App\Entity\Origin o ON IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.path IN (:paths)
-			WHERE o.path IS NOT NULL
-			DQL,
-		)
+		$teasOrigins = $this->em
+			->createQuery(<<<DQL
+				SELECT origin
+				FROM App\Entity\Origin origin
+					LEFT JOIN App\Entity\Origin o ON IS_CONTAINED_BY(o.path, origin.path) = TRUE AND o.path IN (:paths)
+				WHERE o.path IS NOT NULL
+				DQL)
 			->setParameter("paths", $originsPath, ArrayParameterType::STRING)
 			->getResult();
 
@@ -140,7 +131,7 @@ readonly class UserStatsProvider implements ProviderInterface
 		$resource->statsTopTeaTypes = array_map(fn($t) => TeaTypeProvider::fromEntity($t), $topTeaTypes);
 
 		$resource->statsFamilies = array_map(
-			fn($row) => new TeaFamilyAmount($row["family"], $row["count"] ?? 0 ),
+			fn($row) => new TeaFamilyAmount($row["family"], $row["count"] ?? 0),
 			$familyStats,
 		);
 

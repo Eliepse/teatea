@@ -33,7 +33,7 @@ class TeaType
 	/**
 	 * @var Collection<int, Tea>
 	 */
-	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: 'type')]
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "type")]
 	private Collection $teas;
 
 	#[ORM\ManyToOne(targetEntity: User::class)]

@@ -47,7 +47,7 @@ class TeaSession
 	public ?BrewingTechnic $technic = null;
 
 	public function __construct(
-		#[ORM\ManyToOne(inversedBy: 'sessions')]
+		#[ORM\ManyToOne(inversedBy: "sessions")]
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly Tea $tea,
 
@@ -57,8 +57,7 @@ class TeaSession
 
 		#[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
 		public readonly ?DateTimeImmutable $drankAt = null,
-	) {
-	}
+	) {}
 
 	/**
 	 * @return SteepValue[]

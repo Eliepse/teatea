@@ -28,8 +28,7 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
 	{
@@ -43,7 +42,8 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 
 		$teaSearch = OperationHelper::getParameter($operation, "tea");
 
-		$listedTeaQuery = $this->em->createQueryBuilder()
+		$listedTeaQuery = $this->em
+			->createQueryBuilder()
 			->select("pivot", "tea")
 			->from(\App\Entity\TeaListPivot::class, "pivot")
 			->leftJoin("pivot.tea", "tea")

@@ -2,8 +2,9 @@
 
 namespace App\Enum;
 
-enum TeawareType: string {
-    case Gaiwan = "gaiwan";
+enum TeawareType: string
+{
+	case Gaiwan = "gaiwan";
 	case Yixing = "yixing";
 	case Kyusu = "kyusu";
 	case Shiboridashi = "shiboridashi";

@@ -11,8 +11,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class TeaListPivotRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, TeaListPivot::class);
-    }
+	public function __construct(ManagerRegistry $registry)
+	{
+		parent::__construct($registry, TeaListPivot::class);
+	}
 }

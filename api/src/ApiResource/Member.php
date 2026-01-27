@@ -18,11 +18,7 @@ use App\State\UserStatsProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Get(
-	uriTemplate: "/members/{username}",
-	security: "is_granted('ROLE_ADMIN')",
-	provider: MemberProvider::class,
-)]
+#[Get(uriTemplate: "/members/{username}", security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class)]
 #[Get(
 	uriTemplate: "/me",
 	normalizationContext: ["groups" => ["member:self"]],
@@ -32,11 +28,21 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Get(
 	uriTemplate: "/members/{username}/stats",
 	uriVariables: ["username" => new Link(fromProperty: "username")],
-	normalizationContext: ["groups" => ["member:stats", "embedded:tea", "with:origin", "embedded:teaType", "with:teatype"]],
+	normalizationContext: ["groups" => [
+		"member:stats",
+		"embedded:tea",
+		"with:origin",
+		"embedded:teaType",
+		"with:teatype",
+	]],
 	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
-	provider: UserStatsProvider::class
+	provider: UserStatsProvider::class,
 )]
-#[GetCollection(normalizationContext: ["groups" => ["role:admin"]], security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class,)]
+#[GetCollection(
+	normalizationContext: ["groups" => ["role:admin"]],
+	security: "is_granted('ROLE_ADMIN')",
+	provider: MemberProvider::class,
+)]
 #[Post(
 	denormalizationContext: ["groups" => "member:create"],
 	security: "is_granted('ROLE_ADMIN')",
@@ -48,7 +54,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	denormalizationContext: ["groups" => "member:onboarding"],
 	security: "is_granted('ROLE_ONBOARDING')",
 	provider: MemberProvider::class,
-	processor: MemberOnboardingProcessor::class
+	processor: MemberOnboardingProcessor::class,
 )]
 class Member
 {

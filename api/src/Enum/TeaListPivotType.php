@@ -13,7 +13,7 @@ enum TeaListPivotType: int
 		return strtolower(self::Favorites->name);
 	}
 
-	static public function tryFromSlug(string $slug): TeaListPivotType|null
+	public static function tryFromSlug(string $slug): ?TeaListPivotType
 	{
 		return array_find(self::cases(), fn($case) => $slug === strtolower($case->name));
 	}

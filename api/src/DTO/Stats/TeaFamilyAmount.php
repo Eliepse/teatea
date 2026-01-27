@@ -16,6 +16,5 @@ readonly class TeaFamilyAmount
 		#[ApiProperty(identifier: true)]
 		public TeaFamily $family,
 		public int $sessions,
-	) {
-	}
+	) {}
 }

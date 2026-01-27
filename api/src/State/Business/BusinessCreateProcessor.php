@@ -16,8 +16,7 @@ readonly class BusinessCreateProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {
-	}
+	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Business
 	{
@@ -30,9 +29,7 @@ readonly class BusinessCreateProcessor implements ProcessorInterface
 		$refinedName = trim(preg_replace("/\s+/", " ", $data->name));
 
 		$exitingIds = $this->em
-			->createQuery(
-				"SELECT c.id FROM App\Entity\Business c WHERE lower(unaccent(c.name)) = lower(unaccent(:name))",
-			)
+			->createQuery("SELECT c.id FROM App\Entity\Business c WHERE lower(unaccent(c.name)) = lower(unaccent(:name))")
 			->setParameter("name", $refinedName)
 			->getScalarResult();
 
