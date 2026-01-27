@@ -4,3 +4,4 @@ node_modules/
 .pnpm-store/
 data/
 Dockerfile
+runtime-env.js

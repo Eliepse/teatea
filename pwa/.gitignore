@@ -7,3 +7,6 @@
 /build/
 .vscode/settings.json
 *.local
+
+# Generated envs
+runtime-env.js

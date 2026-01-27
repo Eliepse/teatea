@@ -1,0 +1,13 @@
+{
+	"type": "object",
+	"properties": {
+		"API_URL": { "type": "string" },
+		"SUPPORT_EMAIL": { "type": "string" },
+		"POSTHOG_KEY": { "type": "string" },
+		"POSTHOG_HOST": { "type": "string" }
+	},
+	"required": [
+		"API_URL",
+		"SUPPORT_EMAIL"
+	]
+}

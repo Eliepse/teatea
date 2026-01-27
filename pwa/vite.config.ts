@@ -9,8 +9,8 @@ export default defineConfig({
 		noExternal: ["posthog-js", "posthog-js/react"],
 	},
 	logLevel: "info",
-	envPrefix: "PUBLIC_",
 	server: {
 		host: "0.0.0.0",
 	},
+
 });

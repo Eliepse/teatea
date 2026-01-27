@@ -53,6 +53,7 @@
 
 	# Keep media in cache for 60 days
 	header /media* ?Cache-Control max-age=5184000
+	header /runtime-env.js* Cache-Control no-cache
 
 	# Matches requests for HTML documents, for static files and for PWA files,
 	# except for known API paths and paths with extensions handled by API Platform

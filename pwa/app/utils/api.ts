@@ -21,7 +21,7 @@ type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> 
 export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promise<TResponse<T>> {
 	const fetchConfigs: RequestInit = { ...config };
 	const cleanedPath = path.startsWith("/api/") ? path.substring(4) : path;
-	const oUrl = new URL(`${import.meta.env.PUBLIC_API_URL}${cleanedPath}`, window.location.toString());
+	const oUrl = new URL(`${runtimeEnv.API_URL}${cleanedPath}`, window.location.toString());
 	let searchParams = oUrl.searchParams;
 
 	fetchConfigs.headers = new Headers({

@@ -73,7 +73,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 			<p className="my-8 text-center">
 				If you need help or have any feedback,
 				<br />
-				contact me at: {import.meta.env.PUBLIC_SUPPORT_EMAIL}
+				contact me at: {runtimeEnv.SUPPORT_EMAIL}
 			</p>
 
 			{pwaInstall.installable && false === pwaInstall.installed && (

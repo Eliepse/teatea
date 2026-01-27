@@ -1,6 +1,7 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import type { Route } from "./+types/root";
 import "./app.css";
+import "/public/runtime-env.js?no-inline";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
 import { type ReactNode, StrictMode } from "react";
@@ -8,7 +9,7 @@ import { PostHogErrorBoundary, PostHogProvider } from "posthog-js/react";
 import type { PostHogConfig } from "posthog-js";
 
 const options: Partial<PostHogConfig> = {
-	api_host: import.meta.env.PUBLIC_POSTHOG_HOST as string,
+	api_host: runtimeEnv.POSTHOG_HOST as string,
 	defaults: "2025-05-24",
 	debug: import.meta.env.DEV,
 };
@@ -71,9 +72,9 @@ export function Layout({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
-	if (options.api_host && import.meta.env.PUBLIC_POSTHOG_KEY) {
+	if (options.api_host && runtimeEnv.POSTHOG_KEY) {
 		return (
-			<PostHogProvider apiKey={import.meta.env.PUBLIC_POSTHOG_KEY} options={options}>
+			<PostHogProvider apiKey={runtimeEnv.POSTHOG_KEY} options={options}>
 				<PostHogErrorBoundary fallback={({ error }) => <ErrorBoundary error={error} />}>
 					<Outlet />
 				</PostHogErrorBoundary>
