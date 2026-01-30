@@ -13,7 +13,7 @@ import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normaliza
 import { intlFormat } from "date-fns";
 import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { Modal } from "~/components/shared/modal/Modal";
-import { type ChangeEvent, type PropsWithChildren, type ReactNode, useState } from "react";
+import { type ChangeEvent, type ReactNode, useState } from "react";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
@@ -47,6 +47,7 @@ import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 import { extractId } from "~/utils/resource";
+import { Badge } from "~/components/shared/Badge";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -129,9 +130,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 						{!!session.author && (
 							<Link to={`/members/${extractId(session.author)}`}>
-								<Badge icon="" loading={member.isLoading}>
-									@{member.data?.username}
-								</Badge>
+								<Badge loading={member.isLoading}>@{member.data?.username}</Badge>
 							</Link>
 						)}
 					</div>
@@ -295,20 +294,6 @@ function useSessionMutations(sessionId: number) {
 	});
 
 	return { edit: editMutation, delete: deleteMutation };
-}
-
-function Badge(props: PropsWithChildren<{ icon?: ReactNode; className?: string; loading?: boolean }>) {
-	return (
-		<div
-			className={clsx(
-				"inline-flex items-center bg-white rounded-full px-2.5 h-8 border border-green-100 whitespace-nowrap text-sm",
-				props.className,
-			)}
-		>
-			{props.icon && <span className="inline-block mr-2">{props.icon}</span>}
-			{true === props.loading ? <span className="skeleton h-3 w-16" /> : props.children}
-		</div>
-	);
 }
 
 function Options(props: { session: TeaSession }) {
