@@ -181,7 +181,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 				</Modal>
 
 				<Modal open={uploading} className="h-1/3">
-					<div className="flex items-center justify-center h-full text-lg text-green-700">
+					<div className="flex items-center justify-center h-full text-lg text-green-700 py-16">
 						<div>
 							<MediaImage className="mx-auto mb-4 size-10 animate-bounce text-green-600" />
 							<span className="ml-2 font-medium">Uploading the image...</span>
