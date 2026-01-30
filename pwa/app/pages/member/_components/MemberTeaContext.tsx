@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import type { CollectionTea } from "~t/types";
 
-type Action = "edit:acquiredFrom" | "edit:acquiredAt" | "edit:description";
+type Action = "edit:acquiredFrom" | "edit:acquiredAt" | "edit:description" | "edit:finishedAt";
 
 export type MemberTeaContext = {
 	item: CollectionTea;

@@ -3,7 +3,7 @@ import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { Calendar, EditPencil, MediaImage, MediaImagePlus, MoreVert, Shop, Trash } from "iconoir-react";
+import { Calendar, CalendarPlus, GlassEmpty, MediaImage, MediaImagePlus, MoreVert, Shop, Trash } from "iconoir-react";
 import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
 import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
@@ -26,6 +26,7 @@ import {
 	MemberTeaCTX,
 	useCollectionTeaContext,
 } from "~/pages/member/_components/MemberTeaContext";
+import { Badge } from "~/components/shared/Badge";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const response = await getApi<CollectionTeaRaw>(`/members/${args.params.username}/teas/${args.params.teaId}`);
@@ -129,25 +130,27 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 						className="text-stone-500"
 					/>
 
-					<div className="my-4 border-t border-green-200" />
-
-					<ul className="my-4 text-green-900">
-						{meta.acquiredFrom && (
-							<li className="flex items-center gap-2 my-2">
-								<Shop className="size-4" />
-								{meta.acquiredFrom.name}
+					<ul className="my-4 flex flex-wrap gap-2">
+						{!!meta.acquiredFrom && (
+							<li>
+								<Badge icon={<Shop className="size-4" />}>{meta.acquiredFrom.name}</Badge>
 							</li>
 						)}
 
-						{meta.acquiredAt && (
-							<li className="flex items-center gap-2 my-2">
-								<Calendar className="size-4" />
-								{meta.acquiredAt.toLocaleDateString()}
+						{!!meta.acquiredAt && (
+							<li>
+								<Badge icon={<CalendarPlus className="size-4" />}>
+									{meta.acquiredAt.toLocaleDateString()}
+								</Badge>
 							</li>
 						)}
 					</ul>
 
-					<div className="my-4 border-t border-green-200" />
+					{!!meta.finishedAt && (
+						<div className="bg-white grid gap-2 rounded-lg px-4 py-4 my-4 text-green-900 shadow-xs">
+							<p>You finished this tea on {meta.finishedAt.toLocaleDateString()}</p>
+						</div>
+					)}
 				</header>
 
 				<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
@@ -165,6 +168,14 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 						<DatePickerStep
 							onNext={(date) => patchResource({ acquiredAt: jsonableDate(date) })}
 							defaultValue={meta.acquiredAt}
+							allowEmpty
+						/>
+					)}
+
+					{"edit:finishedAt" === action && (
+						<DatePickerStep
+							onNext={(date) => patchResource({ finishedAt: jsonableDate(date) })}
+							defaultValue={meta.finishedAt}
 							allowEmpty
 						/>
 					)}
@@ -267,6 +278,14 @@ function OptionsMenu(props: { collectionTea: CollectionTea }) {
 						setModalKey(null);
 					}}
 					icon={<Calendar className="size-5" />}
+				/>
+				<MenuItem
+					label="Mark as finished"
+					onClick={() => {
+						context?.act("edit:finishedAt");
+						setModalKey(null);
+					}}
+					icon={<GlassEmpty className="size-5" />}
 				/>
 				<MenuItem
 					label="Delete this session"
