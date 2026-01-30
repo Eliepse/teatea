@@ -9,8 +9,6 @@ use App\Helper\OperationHelper;
 use App\State\Origin\OriginProvider;
 use App\ValueObject\Stats\TeaTypeStats;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @implements ProviderInterface<TeaType|null>
@@ -19,8 +17,8 @@ readonly class TeaTypeProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private CacheInterface $cacheAppStats,
-	) {}
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?TeaType
 	{
@@ -35,7 +33,12 @@ readonly class TeaTypeProvider implements ProviderInterface
 			->setMaxResults(1);
 
 		if (null !== $originPath) {
-			$typeQb->innerJoin("type.teas", "tea", "WITH", "TRUE = CONTAINS(:parentOrigin, tea.originPath)")->setParameter(
+			$typeQb->innerJoin(
+				"type.teas",
+				"tea",
+				"WITH",
+				"TRUE = CONTAINS(:parentOrigin, tea.originPath)",
+			)->setParameter(
 				"parentOrigin",
 				$originPath,
 			);
@@ -44,6 +47,10 @@ readonly class TeaTypeProvider implements ProviderInterface
 		/** @var \App\Entity\TeaType|null $typeEntity */
 		$typeEntity = $typeQb->getQuery()->getOneOrNullResult();
 
+		if (null === $typeEntity) {
+			return null;
+		}
+
 		$origin = null !== $originPath
 			? $this->em
 				->createQuery("SELECT o FROM App\Entity\Origin o WHERE o.path = :path")
@@ -51,50 +58,39 @@ readonly class TeaTypeProvider implements ProviderInterface
 				->getSingleResult()
 			: null;
 
-		$resource = static::fromEntity($typeEntity);
-
-		if (null === $resource) {
-			return null;
-		}
-
-		$rank = $this->cacheAppStats->get("tea_types.$typeEntity->id.$originPath.rank", function (ItemInterface $item) use (
-			$typeEntity,
-			$originPath,
-		) {
-			$item->expiresAt(new \DateTimeImmutable()->add(new \DateInterval("P1D"))->setTime(0, 0));
-
-			$rankQuery = $this->em
-				->getConnection()
-				->createQueryBuilder()
-				->select("tea.type_id AS id", "origin.path AS path")
-				->addSelect("ROW_NUMBER() OVER (ORDER BY
+		$rankQuery = $this->em
+			->getConnection()
+			->createQueryBuilder()
+			->select("tea.type_id AS id", "origin.path AS path")
+			->addSelect(
+				"ROW_NUMBER() OVER (ORDER BY
 							count(sessions.id) DESC,
 							COUNT(DISTINCT tea.id) DESC,
 							MAX(tea.created_at) DESC
-						) AS rank")
-				->from("tea", "tea")
-				->leftJoin("tea", "origin", "origin", "SUBPATH(tea.origin_path, 0, 1) = origin.path")
-				->leftJoin("tea", "tea_session", "sessions", "sessions.tea_id = tea.id AND sessions.drank_at >= :rankSince")
-				->groupBy("tea.type_id", "origin.path");
+						) AS rank",
+			)
+			->from("tea", "tea")
+			->leftJoin("tea", "origin", "origin", "SUBPATH(tea.origin_path, 0, 1) = origin.path")
+			->leftJoin("tea", "tea_session", "sessions", "sessions.tea_id = tea.id AND sessions.drank_at >= :rankSince")
+			->groupBy("tea.type_id", "origin.path");
 
-			$query = $this->em
-				->getConnection()
-				->createQueryBuilder()
-				->select("ranked.rank")
-				->from("({$rankQuery->getSQL()})", "ranked")
-				->where("ranked.id = :typeId")
-				->orderBy("ranked.rank")
-				->setMaxResults(1)
-				->setParameters($rankQuery->getParameters())
-				->setParameter("typeId", $typeEntity->id)
-				->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->format("Y-m-d H:i:s"));
+		$query = $this->em
+			->getConnection()
+			->createQueryBuilder()
+			->select("ranked.rank")
+			->from("({$rankQuery->getSQL()})", "ranked")
+			->where("ranked.id = :typeId")
+			->orderBy("ranked.rank")
+			->setMaxResults(1)
+			->setParameters($rankQuery->getParameters())
+			->setParameter("typeId", $typeEntity->id)
+			->setParameter("rankSince", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->format("Y-m-d H:i:s"));
 
-			if (null !== $originPath) {
-				$query->andWhere("ranked.path @> :origin")->setParameter("origin", $originPath);
-			}
+		if (null !== $originPath) {
+			$query->andWhere("ranked.path @> :origin")->setParameter("origin", $originPath);
+		}
 
-			return $query->fetchOne();
-		});
+		$rank = $query->fetchOne();
 
 		$statsQuery = $this->em
 			->getConnection()
@@ -112,6 +108,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 
 		$stats = $statsQuery->fetchAssociative();
 
+		$resource = static::fromEntity($typeEntity);
 		$resource->stats = new TeaTypeStats($rank, $stats["teas"], $stats["sessions"]);
 
 		if (null !== $origin) {
