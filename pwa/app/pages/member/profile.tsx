@@ -8,6 +8,7 @@ import { Link, useNavigate } from "react-router";
 import { CoffeeCup, Leaf, LogOut, PeopleTag } from "iconoir-react";
 import { UserStat } from "~/components/stats/UserStat";
 import { BackButton } from "~/components/shared/navigation/BackButton";
+import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -48,9 +49,12 @@ export default function ProfilePage(props: Route.ComponentProps) {
 		<AuthLayout className="bg-green-50 px-4 text-green-900">
 			<div className="flex items-center pt-4 mb-4">
 				<BackButton className="shadow-xs" />
-				<button className="btn btn-lg btn-circle bg-white ml-auto shadow-xs" onClick={promptLogout}>
-					<LogOut className="size-4" />
-				</button>
+
+				<IfAuthor author={member}>
+					<button className="btn btn-lg btn-circle bg-white ml-auto shadow-xs" onClick={promptLogout}>
+						<LogOut className="size-4" />
+					</button>
+				</IfAuthor>
 			</div>
 
 			<h1 className="text-3xl font-header font-bold text-green-700 mb-4">
