@@ -19,7 +19,7 @@ final readonly class Arr
 	 */
 	public static function keyBy(array $array, string|callable $key): array
 	{
-		$extractor = is_string($key) ? fn($item) => is_object($item) ? $item->{$key} : $item[$key] : $key;
+		$extractor = is_string($key) ? fn($item) => strval(is_object($item) ? $item->{$key} : $item[$key]) : $key;
 		return array_reduce(
 			$array,
 			function ($map, $item) use ($extractor) {
