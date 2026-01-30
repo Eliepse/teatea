@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Process\Process;
 use Vich\UploaderBundle\Storage\StorageInterface;
 
-class CollectionTeaMediaProcessor implements ProcessorInterface
+readonly class CollectionTeaMediaProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
@@ -59,7 +59,7 @@ class CollectionTeaMediaProcessor implements ProcessorInterface
 		 */
 
 		try {
-			$exif = @exif_read_data($data->file->getPathname()) ?: [];
+			$exif = @exif_read_data($data->file->getPathname(), null) ?: [];
 
 			if (in_array($exif["Orientation"], [3, 5, 6, 7, 8], true)) {
 				$this->makeAutorotateProcess($data->file)->mustRun();
