@@ -41,6 +41,7 @@ RUN install-php-extensions xdebug
 
 COPY --link frankenphp/conf.d/app.dev.ini $PHP_INI_DIR/conf.d/
 COPY --link frankenphp/Caddyfile /etc/caddy/Caddyfile
+RUN mkdir /.cache && chmod -R 777 /.cache
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
 
