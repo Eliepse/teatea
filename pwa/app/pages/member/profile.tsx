@@ -69,6 +69,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 			<Stats
 				sessions={stats.statsSessionsTotal}
 				teas={stats.statsConsumedTeasTotal}
+				leavesKg={stats.statsConsumedTeaKgTotal}
 				username={member.username}
 				isSelf={isMemberSelf}
 				familiesStats={familiesStats}
@@ -80,6 +81,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 function Stats(props: {
 	sessions: number;
 	teas: number;
+	leavesKg: number;
 	username?: string;
 	familiesStats: Record<TeaFamily, number>;
 	isSelf: boolean;
@@ -108,7 +110,7 @@ function Stats(props: {
 	);
 
 	return (
-		<div className="grid grid-cols-2 gap-4 px-4 py-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
+		<div className="grid grid-cols-3 gap-4 px-4 py-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
 			<Link to={`/sessions?username=${props.username}`}>
 				<UserStat
 					title="tea sessions"
@@ -120,15 +122,17 @@ function Stats(props: {
 
 			{props.isSelf ? <Link to="/me/teas">{tastedTeasComp}</Link> : tastedTeasComp}
 
-			<hr className="border-stone-200 col-span-2" />
+			<UserStat
+				title="brewed leaves"
+				value={props.leavesKg > 1 ? props.leavesKg.toFixed(2) : props.leavesKg * 1000}
+				icon={<span className="text-lg font-normal mx-1">{props.leavesKg > 1 ? "kg" : "g"}</span>}
+			/>
 
-			<div className="col-span-2">
+			<hr className="border-stone-200 col-span-3" />
+
+			<div className="col-span-3">
 				<h2 className="mb-2 text-xs font-bold text-stone-400 uppercase tracking-wide">Last 30 days</h2>
-				{0 === families.length && (
-					<p>
-						{subject} didn't drink tea recently.
-					</p>
-				)}
+				{0 === families.length && <p>{subject} didn't drink tea recently.</p>}
 				{1 === families.length && (
 					<p>
 						{subject} only drank <strong>{teaFamilies[families[0][0]]}</strong> ({families[0][1].sessions}{" "}

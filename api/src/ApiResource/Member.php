@@ -83,6 +83,9 @@ class Member
 	#[Groups(["member:stats"])]
 	public int $statsConsumedTeasTotal = 0;
 
+	#[Groups(["member:stats"])]
+	public float $statsConsumedTeaKgTotal = 0;
+
 	/** @var Tea[]  */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeas = [];

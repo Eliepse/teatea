@@ -3,7 +3,7 @@ import { ArrowRightCircle } from "iconoir-react";
 
 export function UserStat(props: {
 	title: ReactNode;
-	value: number;
+	value: number | string;
 	icon: ReactNode;
 	className?: string;
 	withArrow?: boolean;

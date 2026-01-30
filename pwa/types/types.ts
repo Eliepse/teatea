@@ -24,6 +24,7 @@ export type User = Resource & {
 export type MemberStats = Resource & {
 	statsSessionsTotal: number;
 	statsConsumedTeasTotal: number;
+	statsConsumedTeaKgTotal: number;
 	statsTopTeas: Tea[];
 	statsTopTeaTypes: TeaType[];
 	statsFamilies: { family: TeaFamily; sessions: number }[];

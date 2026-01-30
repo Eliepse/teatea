@@ -41,10 +41,20 @@ readonly class UserStatsProvider implements ProviderInterface
 
 		$resource = MemberProvider::hydrate($user);
 
-		$resource->statsSessionsTotal = $this->em
-			->createQuery("SELECT COUNT(session) FROM App\Entity\TeaSession session WHERE session.author = :user")
+		/** @var array{ total?: int, weight?: float } $totalSessionStats */
+		$totalSessionStats = $this->em
+			->createQuery(
+				<<<DQL
+				SELECT COUNT(session) as total, SUM(session.teaQuantity) as weight
+				FROM App\Entity\TeaSession session
+				WHERE session.author = :user
+				DQL,
+			)
 			->setParameter("user", $user)
-			->getOneOrNullResult(AbstractQuery::HYDRATE_SINGLE_SCALAR) ?: 0;
+			->getOneOrNullResult(AbstractQuery::HYDRATE_SCALAR) ?: [];
+
+		$resource->statsSessionsTotal = $totalSessionStats["total"] ?? 0;
+		$resource->statsConsumedTeaKgTotal = $totalSessionStats["weight"] ?? 0;
 
 		$resource->statsConsumedTeasTotal = $this->em
 			->createQuery(
