@@ -39,7 +39,7 @@ readonly class TeaListProvider implements ProviderInterface
 		// Handle native lists
 		// Those list are available to query even if not persisted
 		// in database. They're auto persisted on the first tea added.
-		if (TeaListPivotType::Custom !== $type) {
+		if (null !== $type && TeaListPivotType::Custom !== $type) {
 			$entity = new \App\Entity\TeaList();
 			$entity->id = -1;
 			$entity->slug = $type->getSlug();

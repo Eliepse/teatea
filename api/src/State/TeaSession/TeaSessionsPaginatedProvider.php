@@ -32,7 +32,7 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 	{
 		assert($operation instanceof CollectionOperationInterface);
 
-		$isContentful = $operation->getParameters()->get("contentful")?->getValue() ?? false;
+		$isContentful = $operation->getParameters()?->get("contentful")?->getValue() ?? false;
 		$isContentful = !$isContentful instanceof ParameterNotFound;
 		$currentPage = $this->pagination->getPage($context);
 		$itemsPerPage = $this->pagination->getLimit($operation, $context);
