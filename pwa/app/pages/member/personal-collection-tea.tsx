@@ -3,7 +3,7 @@ import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { Calendar, EditPencil, MediaImage, MediaImagePlus, Shop, Trash } from "iconoir-react";
+import { Calendar, EditPencil, MediaImage, MediaImagePlus, MoreVert, Shop, Trash } from "iconoir-react";
 import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
 import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
@@ -250,7 +250,7 @@ function OptionsMenu(props: { collectionTea: CollectionTea }) {
 
 	return (
 		<>
-			<MenuButton onClick={() => setModalKey("_menu")} icon={<EditPencil className="size-6" />} />
+			<MenuButton onClick={() => setModalKey("_menu")} icon={<MoreVert className="size-6" />} />
 			<MenuModal onClose={() => setModalKey(null)} open={"_menu" === modalKey}>
 				<MenuItem
 					label="Change shop"
