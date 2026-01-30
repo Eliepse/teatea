@@ -17,8 +17,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 class TeaFixFamilyTypesCommand extends Command
 {
 	public function __construct(
-		private EntityManagerInterface $em,
-		private TeaTypeRepository $typeRepository,
+		private readonly EntityManagerInterface $em,
+		private readonly TeaTypeRepository $typeRepository,
 	) {
 		parent::__construct();
 	}
@@ -30,6 +30,7 @@ class TeaFixFamilyTypesCommand extends Command
 		$familyTypes = $this->typeRepository->getFamilies();
 
 		foreach ($familyTypes as $type) {
+			/** @var int $result */
 			$result = $this->em->createQuery(<<<DQL
 				UPDATE App\Entity\Tea tea SET tea.type = :type
 				WHERE tea.family = :family AND tea.type IS NULL

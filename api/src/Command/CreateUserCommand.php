@@ -34,8 +34,10 @@ class CreateUserCommand extends Command
 	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$io = new SymfonyStyle($input, $output);
+
+		/** @var string $email */
 		$email = $input->getArgument("email");
-		$username = trim($input->getArgument("username"));
+		$username = trim(strval($input->getArgument("username")));
 
 		if (empty($email) || null === filter_var($email, FILTER_VALIDATE_EMAIL, FILTER_NULL_ON_FAILURE)) {
 			$io->error("You must pass an email");
@@ -50,7 +52,7 @@ class CreateUserCommand extends Command
 		$user = new User();
 		$user->email = $email;
 		$user->username = $username;
-		$user->setPassword($this->hasher->hashPassword($user, $io->askHidden("Password")));
+		$user->setPassword($this->hasher->hashPassword($user, strval($io->askHidden("Password"))));
 		$user->setRoles(["ROLE_USER"]);
 		$this->entityManager->persist($user);
 		$this->entityManager->flush();

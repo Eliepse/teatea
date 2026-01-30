@@ -18,7 +18,8 @@ final readonly class BusinessSeederCommand
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {}
+	) {
+	}
 
 	public function __invoke(SymfonyStyle $io): int
 	{
@@ -30,6 +31,7 @@ final readonly class BusinessSeederCommand
 		}
 
 		do {
+			/** @var int|string $userId */
 			$userId = $io->ask("Who should be the author?");
 			$author = $this->em->find(User::class, $userId);
 
@@ -42,12 +44,16 @@ final readonly class BusinessSeederCommand
 			}
 		} while (!$author instanceof User);
 
+		/** @var array{ name: string }[] $businesses */
 		$businesses = Yaml::parseFile(__DIR__ . "/../../../data/businesses.yaml")["businesses"] ?? [];
 
 		foreach ($businesses as $data) {
 			$entity = new Business();
 			$entity->name = $data["name"];
+
+			// @mago-expect analysis:undefined-variable,mixed-property-type-coercion
 			$entity->author = $author;
+
 			$this->em->persist($entity);
 		}
 
