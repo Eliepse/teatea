@@ -3,14 +3,24 @@ import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AuthLayout } from "~/layouts/AuthLayout";
-import { Calendar, CalendarPlus, GlassEmpty, MediaImage, MediaImagePlus, MoreVert, Shop, Trash } from "iconoir-react";
+import {
+	ArrowRightCircle,
+	Calendar,
+	CalendarPlus,
+	GlassEmpty,
+	MediaImage,
+	MediaImagePlus,
+	MoreVert,
+	Shop,
+	Trash,
+} from "iconoir-react";
 import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
 import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { Modal } from "~/components/shared/modal/Modal";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { MenuButton } from "~/components/shared/navigation/MenuModalButton";
-import { useNavigate, useRevalidator } from "react-router";
+import { Link, useNavigate, useRevalidator } from "react-router";
 import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
 import { DatePickerStep } from "~/components/shared/form/modal-multistep/DatePickerStep";
 import { jsonableDate } from "~/utils/time";
@@ -117,9 +127,12 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					<div className="">
 						{!!tea.type && <Family family={tea.family} className="capitalize text-teal-800 mb-1" />}
 
-						<h1 className="font-header font-bold text-4xl text-green-800">
-							{!tea.type ? `${tea.family} tea` : tea.type.name}
-						</h1>
+						<Link to={`/tea/${tea.id}`}>
+							<h1 className="font-header font-bold text-4xl text-green-800">
+								{!tea.type ? `${tea.family} tea` : tea.type.name}
+								<ArrowRightCircle className="inline ml-3 size-5 opacity-70" />
+							</h1>
+						</Link>
 					</div>
 
 					<SpecList
