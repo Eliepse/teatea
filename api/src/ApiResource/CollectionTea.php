@@ -22,7 +22,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
 	uriTemplate: "/members/{username}/teas/{id}",
 	uriVariables: [
-		"username" => new Link(fromProperty: "username", fromClass: Member::class, compositeIdentifier: true, required: true),
+		"username" => new Link(
+			fromProperty: "username",
+			fromClass: Member::class,
+			compositeIdentifier: true,
+			required: true,
+		),
 		"id" => new Link(identifiers: ["id"]),
 	],
 	normalizationContext: [
@@ -42,7 +47,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[GetCollection(
 	uriTemplate: "/members/{username}/teas",
 	uriVariables: [
-		"username" => new Link(fromProperty: "username", fromClass: Member::class, compositeIdentifier: true, required: true),
+		"username" => new Link(
+			fromProperty: "username",
+			fromClass: Member::class,
+			compositeIdentifier: true,
+			required: true,
+		),
 	],
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -61,7 +71,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Post(
 	uriTemplate: "/members/{username}/teas",
 	uriVariables: [
-		"username" => new Link(fromProperty: "username", fromClass: Member::class, compositeIdentifier: true, required: true),
+		"username" => new Link(
+			fromProperty: "username",
+			fromClass: Member::class,
+			compositeIdentifier: true,
+			required: true,
+		),
 	],
 	denormalizationContext: ["groups" => ["create:collectionTea"]],
 	processor: CollectionTeaCreateProcessor::class,
