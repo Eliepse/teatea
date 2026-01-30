@@ -15,7 +15,6 @@
 		"martin-georgiev/postgresql-for-doctrine": "^v4.0",
 		"nelmio/cors-bundle": "^2.6",
 		"phpstan/phpdoc-parser": "^2.3",
-		"runtime/frankenphp-symfony": "^1.0",
 		"stof/doctrine-extensions-bundle": "^1.15",
 		"symfony/asset": "7.4.*",
 		"symfony/brevo-mailer": "7.4.*",
