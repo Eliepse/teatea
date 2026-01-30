@@ -29,6 +29,7 @@ readonly class CollectionTeaEditProcessor implements ProcessorInterface
 		$entity->acquiredFrom = $data->acquiredFrom
 			? $this->em->getReference(\App\Entity\Business::class, $data->acquiredFrom->id)
 			: null;
+		$entity->finishedAt = $data->finishedAt;
 		$this->em->persist($entity);
 		$this->em->flush();
 

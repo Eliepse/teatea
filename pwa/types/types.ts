@@ -215,6 +215,7 @@ export type CollectionTea = Resource<"CollectionTea"> & {
 	owner: Iri;
 	description?: string;
 	acquiredAt?: Date;
+	finishedAt?: Date;
 	acquiredFrom?: Business;
 	thumbnail?: MediaObject;
 };

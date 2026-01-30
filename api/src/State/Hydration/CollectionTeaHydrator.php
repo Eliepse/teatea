@@ -7,7 +7,10 @@ use App\State\Business\BusinessProvider;
 use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
 
-class CollectionTeaHydrator implements ResourceHydrator
+/**
+ * @implements ResourceHydrator<CollectionTea>
+ */
+readonly class CollectionTeaHydrator implements ResourceHydrator
 {
 	public function __construct(
 		private MediaObjectHydrator $mediaHydrator,
@@ -28,6 +31,7 @@ class CollectionTeaHydrator implements ResourceHydrator
 		$tea->description = $entity->description;
 		$tea->acquiredAt = $entity->acquiredAt;
 		$tea->acquiredFrom = BusinessProvider::fromEntity($entity->acquiredFrom);
+		$tea->finishedAt = $entity->finishedAt;
 
 		$tea->thumbnail = $this->mediaHydrator->hydrate($entity->media?->first() ?: null);
 

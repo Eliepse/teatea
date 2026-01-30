@@ -37,6 +37,9 @@ class CollectionTea implements HasMedia
 	#[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
 	public ?Business $acquiredFrom = null;
 
+	#[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+	public ?\DateTimeImmutable $finishedAt = null;
+
 	//	TODO(elie): allow custom collections
 	//	public ?UserCollection $collection = null;
 
