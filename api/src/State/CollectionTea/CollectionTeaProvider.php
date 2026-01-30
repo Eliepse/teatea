@@ -21,14 +21,16 @@ readonly class CollectionTeaProvider implements ProviderInterface
 		private OriginRepository $originRepo,
 		private MediaObjectRepository $mediaRepo,
 		private CollectionTeaHydrator $hydrator,
-	) {}
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?CollectionTea
 	{
 		assert(false === $operation instanceof CollectionOperationInterface, "Collection operation not supported");
 		assert(false === empty($uriVariables["username"]));
 
-		$query = $this->em->createQuery(<<<DQL
+		$query = $this->em->createQuery(
+			<<<DQL
 			SELECT collection_tea, owner, tea, type, cultivar
 			FROM App\Entity\CollectionTea collection_tea
 				INNER JOIN collection_tea.owner owner WITH owner.username = :username
@@ -36,24 +38,24 @@ readonly class CollectionTeaProvider implements ProviderInterface
 				LEFT JOIN tea.type type
 				LEFT JOIN tea.cultivar cultivar
 			WHERE collection_tea.id = :id
-			DQL);
+			DQL,
+		);
 
-		/** @var \App\Entity\CollectionTea|null $teaEntity */
-		$teaEntity = $query
+		/** @var \App\Entity\CollectionTea|null $collectionTea */
+		$collectionTea = $query
 			->setParameter("id", $uriVariables["id"])
 			->setParameter("username", $uriVariables["username"])
 			->getOneOrNullResult();
 
-		if (null === $teaEntity) {
+		if (null === $collectionTea) {
 			return null;
 		}
 
-		if (null !== $teaEntity->tea->originPath) {
-			$teaEntity->tea->origin = $this->originRepo->findWithAncestorNames($teaEntity->tea->originPath->getPath());
-		}
+		$collectionTea->media = $this->mediaRepo->findByHasMedia($collectionTea);
+		$collectionTea->tea->origin = $this->originRepo->findWithAncestorNames(
+			$collectionTea->tea->originPath->getPath(),
+		);
 
-		$teaEntity->media = $this->mediaRepo->findByHasMedia($teaEntity);
-
-		return $this->hydrator->hydrate($teaEntity);
+		return $this->hydrator->hydrate($collectionTea);
 	}
 }

@@ -71,7 +71,7 @@ class TeaSession
 	{
 		// Edit an existing steep (if exists)
 		foreach ($this->steeps ?? [] as $i => $raw) {
-			if ($raw["key"] === $steep->key) {
+			if ($raw->key === $steep->key) {
 				$this->steeps[$i] = $steep->toArray();
 				return;
 			}
@@ -87,7 +87,7 @@ class TeaSession
 		$original = $this->steeps ?? [];
 
 		// Delete the steep
-		$filtered = array_values(array_filter($original, fn($raw) => $raw["key"] !== $key));
+		$filtered = array_values(array_filter($original, fn($raw) => $raw->key !== $key));
 
 		// Check if a steep has been correctly deleted
 		if (count($original) === count($filtered)) {

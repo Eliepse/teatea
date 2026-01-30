@@ -26,10 +26,14 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		private UserRepository $userRepo,
 		private OriginRepository $originRepo,
 		private Pagination $pagination,
-	) {}
+	) {
+	}
 
-	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PartialPaginatorInterface
-	{
+	public function provide(
+		Operation $operation,
+		array $uriVariables = [],
+		array $context = [],
+	): PartialPaginatorInterface {
 		assert($operation instanceof CollectionOperationInterface);
 
 		$isContentful = $operation->getParameters()?->get("contentful")?->getValue() ?? false;
@@ -38,15 +42,15 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		$itemsPerPage = $this->pagination->getLimit($operation, $context);
 		$offset = $this->pagination->getOffset($operation, $context);
 		$username = $context["filters"]["username"] ?? null;
-		$member = null;
+		$member = null !== $username ? $this->userRepo->findOneBy(["username" => $username]) : null;
 		$teaId = $context["filters"]["tea"] ?? null;
-		$tea = null;
+		$tea = null !== $teaId ? $this->em->find(\App\Entity\Tea::class, $teaId) : null;
 
-		if (null !== $teaId && null === ($tea = $this->em->find(\App\Entity\Tea::class, $teaId))) {
+		if (null !== $teaId && null === $tea) {
 			throw new NotFoundHttpException();
 		}
 
-		if (null !== $username && null === ($member = $this->userRepo->findOneBy(["username" => $username]))) {
+		if (null !== $username && null === $member) {
 			throw new NotFoundHttpException();
 		}
 
@@ -77,7 +81,8 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 				->setParameter("quality", BrewingQuality::Improvable);
 		}
 
-		$total = (clone $sessionQb)->select("COUNT(session)")->resetDQLPart("orderBy")->getQuery()->getSingleScalarResult();
+		$total = (clone $sessionQb)->select("COUNT(session)")->resetDQLPart("orderBy")->getQuery(
+		)->getSingleScalarResult();
 
 		if (0 === $total) {
 			return new TraversablePaginator(new ArrayCollection(), $currentPage, $itemsPerPage, $total);

@@ -154,7 +154,7 @@ readonly class CollectionTeaCollectionProvider implements ProviderInterface
 		// Iterate over search results to keep the right ordering
 		foreach ($searchResults as $searchResult) {
 			$id = $searchResult["id"];
-			/** @var CollectionTea $collectionTea */
+			/** @var CollectionTea|null $collectionTea */
 			$collectionTea = $entitiesById[$id] ?? null;
 
 			if (null === $collectionTea) {

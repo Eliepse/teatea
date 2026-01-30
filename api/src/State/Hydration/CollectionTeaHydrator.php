@@ -29,8 +29,7 @@ class CollectionTeaHydrator implements ResourceHydrator
 		$tea->acquiredAt = $entity->acquiredAt;
 		$tea->acquiredFrom = BusinessProvider::fromEntity($entity->acquiredFrom);
 
-		$thumbnail = $entity->media?->first();
-		$tea->thumbnail = $thumbnail ? $this->mediaHydrator->hydrate($thumbnail) : null;
+		$tea->thumbnail = $this->mediaHydrator->hydrate($entity->media?->first());
 
 		return $tea;
 	}
