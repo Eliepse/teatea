@@ -47,7 +47,7 @@ function ModalContent(props: ModalType) {
 
 			{true !== noBackdrop && (
 				<form method="dialog" className={styles.backdrop}>
-					<button>close</button>
+					<button className="opacity-0">close</button>
 				</form>
 			)}
 		</motion.dialog>
