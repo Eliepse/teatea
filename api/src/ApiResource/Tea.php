@@ -45,7 +45,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		"type" => new QueryParameter(
 			schema: ["type" => Requirement::ASCII_SLUG, "example" => "kamairicha, sencha-mature, ..."],
 			property: "type",
-			description: "Filter by tea type. Ignore `family`, `q` and `originPath` filters when applied.",
+			description: "Filter by tea type. Ignore `family`, `q` and `origin` filters when applied.",
 		),
 		"cultivar" => new QueryParameter(
 			schema: ["type" => Requirement::POSITIVE_INT, "example" => "Cultivar id"],
@@ -53,7 +53,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			description: "Filter by cultivar",
 		),
 		"q" => new QueryParameter(property: "hydra:freetextQuery", description: "Filter by name"),
-		"originPath" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
+		"origin" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
 		"sort" => new QueryParameter(
 			schema: ["enum" => ["popularity"]],
 			openApi: new OpenApiParameter(name: "enum", in: "query"),

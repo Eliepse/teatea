@@ -38,7 +38,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$limit = $this->pagination->getLimit($operation, $context);
 
 		$searchText = OperationHelper::getParameter($operation, "q");
-		$originPath = OperationHelper::getParameter($operation, "originPath");
+		$originPath = OperationHelper::getParameter($operation, "origin");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
 		$typeFilter = OperationHelper::getParameter($operation, "type");
 		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar");
@@ -81,10 +81,8 @@ readonly class TeaCollectionProvider implements ProviderInterface
 
 		// Origin
 		if (null !== $originPath) {
-			$searchQb->innerJoin("tea.origin", "origin", "WITH", "CONTAINS(:originPath, origin.path) = TRUE")->setParameter(
-				"originPath",
-				$originPath,
-			);
+			$searchQb->andWhere("CONTAINS(:originPath, tea.originPath) = TRUE")
+				->setParameter("originPath", $originPath);
 		}
 
 		// Type
