@@ -12,7 +12,6 @@ import { AskName } from "~/components/tea/create/AskName";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SelectCultivar } from "~/components/cultivar/SelectCultivar";
 import { useNavigate } from "react-router";
-import { getCountry } from "~/utils/api/useOrigins";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -34,12 +33,12 @@ export function useTeaFormContext() {
 }
 
 async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" | "origin">>) {
-	const path = data.type && "id" in data.type ? `/tea_types/${data.type.id}/teas` : "/teas";
+	const path = data.type && "slug" in data.type ? `/tea_types/${data.type.slug}/teas` : "/teas";
 
 	const response = await postApi<Tea>(path, {
 		...data,
 		origin: data.origin ? data.origin["@id"] : undefined,
-		type: !data.type || "id" in data.type ? undefined : data.type,
+		type: !data.type || "slug" in data.type ? undefined : data.type,
 		cultivar: data.cultivar?.["@id"],
 	});
 

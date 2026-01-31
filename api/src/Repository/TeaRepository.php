@@ -24,7 +24,7 @@ class TeaRepository extends ServiceEntityRepository
 			->select("count(tea)")
 			->where("tea.family = :family")
 			->setParameter("family", $tea->family)
-			->andWhere("tea.origin = :origin")
+			->andWhere("tea.originPath = :origin")
 			->setParameter("origin", $tea->origin);
 
 		if (null !== $tea->type?->id) {

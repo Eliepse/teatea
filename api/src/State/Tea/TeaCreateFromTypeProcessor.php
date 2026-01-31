@@ -43,8 +43,8 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 			->createQueryBuilder()
 			->select("type")
 			->from(\App\Entity\TeaType::class, "type")
-			->where("type.id = :id")
-			->setParameter("id", $uriVariables["typeId"])
+			->where("type.slug = :slug")
+			->setParameter("slug", $uriVariables["slug"])
 			->getQuery()
 			->getSingleResult();
 

@@ -67,8 +67,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 	processor: TeaCreateProcess::class,
 )]
 #[Post(
-	uriTemplate: "/tea_types/{typeId}/teas",
-	uriVariables: ["typeId" => new Link(toProperty: "type", fromClass: TeaType::class)],
+	uriTemplate: "/tea_types/{slug}/teas",
+	uriVariables: ["slug" => new Link(toProperty: "type", fromClass: TeaType::class)],
 	normalizationContext: ["groups" => ["tea:read"]],
 	denormalizationContext: ["groups" => ["tea:createFromType"]],
 	processor: TeaCreateFromTypeProcessor::class,
