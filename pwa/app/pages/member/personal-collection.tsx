@@ -25,7 +25,9 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 export default function PersonalCollectionPage(props: Route.ComponentProps) {
 	const itemsQuery = useQuery({
 		queryFn: async (ctx) => {
-			const response = await getApi<ApiPaginatedCollection<CollectionTeaRaw>>(`/members/${ctx.queryKey[1]}/teas`);
+			const response = await getApi<ApiPaginatedCollection<CollectionTeaRaw>>(
+				`/members/${ctx.queryKey[1]}/teas?itemsPerPage=50`,
+			);
 			const data = await response.json();
 			return { ...data, member: data.member.map(denormalizeCollectionTea) };
 		},
