@@ -219,4 +219,5 @@ export type CollectionTea = Resource<"CollectionTea"> & {
 	finishedAt?: Date;
 	acquiredFrom?: Business;
 	thumbnail?: MediaObject;
+	rating?: number;
 };

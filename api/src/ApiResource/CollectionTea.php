@@ -111,5 +111,8 @@ class CollectionTea
 	#[Groups(["edit:collectionTea"])]
 	public ?\DateTimeImmutable $finishedAt = null;
 
+	#[Groups(["edit:collectionTea"])]
+	public ?int $rating = null;
+
 	public ?MediaObject $thumbnail = null;
 }

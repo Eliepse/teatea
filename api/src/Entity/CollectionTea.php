@@ -17,7 +17,7 @@ class CollectionTea implements HasMedia
 	#[ORM\Id]
 	#[ORM\GeneratedValue]
 	#[ORM\Column]
-	public int $id;
+	private(set) int $id;
 
 	#[ORM\ManyToOne(inversedBy: "collectionTeas")]
 	#[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
@@ -40,8 +40,9 @@ class CollectionTea implements HasMedia
 	#[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
 	public ?\DateTimeImmutable $finishedAt = null;
 
-	//	TODO(elie): allow custom collections
-	//	public ?UserCollection $collection = null;
+	/** The rating of this tea */
+	#[ORM\Column(nullable: true)]
+	public ?int $rating = null;
 
 	// Requires manual hydration
 	public ?Collection $media = null;
@@ -56,8 +57,4 @@ class CollectionTea implements HasMedia
 		return CollectionTea::class;
 	}
 
-	public function getId(): int
-	{
-		return $this->id;
-	}
 }
