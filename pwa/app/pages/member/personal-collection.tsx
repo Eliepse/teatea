@@ -34,6 +34,9 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 		queryKey: ["collectionTeas", props.params.username],
 	});
 
+	const active = itemsQuery.data?.member?.filter((el) => !el.finishedAt) ?? [];
+	const inactive = itemsQuery.data?.member?.filter((el) => !!el.finishedAt) ?? [];
+
 	return (
 		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
 			<header className="mb-8 pt-2 relative">
@@ -55,8 +58,8 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 				</div>
 			)}
 
-			<ul>
-				{itemsQuery.data?.member?.map((item) => (
+			<ul className="mb-8">
+				{active.map((item) => (
 					<li key={item.id} className={clsx("mb-3", !!item.finishedAt && "opacity-60")}>
 						<Link to={`/members/${props.params.username}/teas/${item.id}`}>
 							<CollectionTeaCard
@@ -70,6 +73,27 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 					</li>
 				))}
 			</ul>
+
+			{0 !== inactive.length && (
+				<>
+					<h2 className="uppercase text-sm font-medium text-stone-500 mb-4">Finished</h2>
+					<ul>
+						{inactive.map((item) => (
+							<li key={item.id} className="mb-3">
+								<Link to={`/members/${props.params.username}/teas/${item.id}`}>
+									<CollectionTeaCard
+										tea={item.tea}
+										acquiredFrom={item.acquiredFrom}
+										acquiredAt={item.acquiredAt}
+										description={item.description}
+										thumbnail={item.thumbnail}
+									/>
+								</Link>
+							</li>
+						))}
+					</ul>
+				</>
+			)}
 		</AuthLayout>
 	);
 }
