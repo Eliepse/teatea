@@ -5,7 +5,11 @@ import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/nor
 
 export function useCollectionTeaMutations(collectionTeaIri: Iri) {
 	const mutation = useMutation({
-		mutationFn: async (args: NullablePartial<Pick<CollectionTea, "acquiredAt" | "finishedAt" | "description"> & { acquiredFrom: Iri }>) => {
+		mutationFn: async (
+			args: NullablePartial<
+				Pick<CollectionTea, "acquiredAt" | "finishedAt" | "description" | "rating"> & { acquiredFrom: Iri }
+			>,
+		) => {
 			const response = await patchApi<CollectionTeaRaw>(collectionTeaIri, args);
 			return denormalizeCollectionTea(await response.json());
 		},

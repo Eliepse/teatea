@@ -37,6 +37,7 @@ import {
 	useCollectionTeaContext,
 } from "~/pages/member/_components/MemberTeaContext";
 import { Badge } from "~/components/shared/Badge";
+import { TeaRatingInput } from "~/components/shared/TeaRatingInput";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const response = await getApi<CollectionTeaRaw>(`/members/${args.params.username}/teas/${args.params.teaId}`);
@@ -165,6 +166,13 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 						</div>
 					)}
 				</header>
+
+				<TeaRatingInput
+					value={meta.rating}
+					onChange={(rating) => patchResource({ rating })}
+					className="my-8 justify-center"
+					readonly={mutations.patch.isPending}
+				/>
 
 				<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
 
