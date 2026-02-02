@@ -11,7 +11,7 @@ export function EditableDescription(props: { collTeaIri: Iri; value?: string; cl
 			{!props.value && (
 				<button
 					className={clsx(
-						"p-2 px-3 flex items-center justify-center rounded-full text-green-600 cursor-pointer ",
+						"mx-auto p-2 px-3 flex items-center justify-center rounded-full text-green-600 cursor-pointer ",
 						"border border-green-700 hover:border-green-900 hover:text-green-900",
 					)}
 					onClick={() => context?.act("edit:description")}
