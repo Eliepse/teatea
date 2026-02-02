@@ -29,7 +29,7 @@ class MediaObjectRepository extends ServiceEntityRepository
 			->innerJoin("media.pivots", "pivots")
 			->andWhere("pivots.mediableType = :mediableType AND pivots.mediableId = :mediableId")
 			->setParameter("mediableType", $mediable->getType())
-			->setParameter("mediableId", $mediable->getId())
+			->setParameter("mediableId", $mediable->id)
 			->getQuery()
 			->getResult();
 

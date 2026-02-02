@@ -39,6 +39,6 @@ final class MediaObjectPivot
 	{
 		$this->mediable = $mediable;
 		$this->mediableType = $mediable->getType();
-		$this->mediableId = $mediable->getId();
+		$this->mediableId = $mediable->id;
 	}
 }

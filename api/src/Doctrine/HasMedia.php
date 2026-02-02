@@ -14,8 +14,7 @@ interface HasMedia
 	 */
 	public function getType(): string;
 
-	/**
-	 * Return the unique identifier of the entity for the polymorphic association
-	 */
-	public function getId(): int;
+	public int $id {
+		get;
+	}
 }
