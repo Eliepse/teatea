@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use MartinGeorgiev\Doctrine\DBAL\Type;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -36,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	public ?string $username = null;
 
 	/** @var list<string> The user roles */
-	#[ORM\Column(type: Types::JSONB)]
+	#[ORM\Column(type: Type::JSONB)]
 	private array $roles = [];
 
 	/** @var ?string The hashed password */
