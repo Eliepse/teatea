@@ -38,7 +38,7 @@ export function MemberTeaFamiliesChart(props: { memberIri: Iri }) {
 			options={{
 				responsive: true,
 				scales: {
-					y: { beginAtZero: true, border: { color: "#e7e5e4" }, grid: { color: "#e7e5e4" } },
+					y: { stacked: true, beginAtZero: true, border: { color: "#e7e5e4" }, grid: { color: "#e7e5e4" } },
 					x: { stacked: true, display: false },
 				},
 				plugins: { legend: { display: false } },
@@ -50,26 +50,32 @@ export function MemberTeaFamiliesChart(props: { memberIri: Iri }) {
 					{
 						data: weeks.map((week) => data[week]?.white ?? 0),
 						backgroundColor: "#a5f3fc", // cyan-200
+						order: 6,
 					},
 					{
 						data: weeks.map((week) => data[week]?.yellow ?? 0),
 						backgroundColor: "#d9f99d", // lime-200
+						order: 5,
 					},
 					{
 						data: weeks.map((week) => data[week]?.green ?? 0),
 						backgroundColor: "#86efac", // green-300
+						order: 4,
 					},
 					{
 						data: weeks.map((week) => data[week]?.wulong ?? 0),
 						backgroundColor: "#a5b4fc", // indigo-300
+						order: 3,
 					},
 					{
 						data: weeks.map((week) => data[week]?.black ?? 0),
 						backgroundColor: "#fb923c", // orange-400
+						order: 2,
 					},
 					{
 						data: weeks.map((week) => data[week]?.fermented ?? 0),
 						backgroundColor: "#78716c", // stone-500
+						order: 1	,
 					},
 				],
 			}}
