@@ -18,7 +18,7 @@ use App\State\UserStatsProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[Get(uriTemplate: "/members/{username}", security: "is_granted('ROLE_ADMIN')", provider: MemberProvider::class)]
+#[Get(uriTemplate: "/members/{username}", provider: MemberProvider::class)]
 #[Get(
 	uriTemplate: "/me",
 	normalizationContext: ["groups" => ["member:self"]],
