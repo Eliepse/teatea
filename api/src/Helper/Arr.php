@@ -29,4 +29,20 @@ final readonly class Arr
 			[],
 		);
 	}
+
+	/**
+	 * @template T
+	 * @param array<T> $array
+	 * @param string|(callable(T $item): mixed) $key
+	 *
+	 * @return array
+	 */
+	public static function groupBy(array $array, string|callable $key): array
+	{
+		$extractor = is_string($key) ? fn($item) => strval(is_object($item) ? $item->{$key} : $item[$key]) : $key;
+		return array_reduce($array, function ($groups, $item) use ($extractor) {
+			$groups[$extractor($item)][] = $item;
+			return $groups;
+		}, []);
+	}
 }
