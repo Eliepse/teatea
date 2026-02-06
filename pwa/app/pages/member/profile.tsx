@@ -9,6 +9,8 @@ import { CoffeeCup, Leaf, LogOut, PeopleTag } from "iconoir-react";
 import { UserStat } from "~/components/stats/UserStat";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
+import { useQuery } from "@tanstack/react-query";
+import { MemberTeaFamiliesChart } from "~/pages/member/_components/MemberTeaFamiliesChart";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -78,6 +80,11 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				isSelf={isMemberSelf}
 				familiesStats={familiesStats}
 			/>
+
+			<section className="p-4 pl-2 pr-3 mt-4 bg-white rounded-xl text-lg shadow-sm">
+				<h2 className="mb-2 text-xs font-bold text-stone-400 uppercase tracking-wide">Last 6 months</h2>
+				<MemberTeaFamiliesChart memberIri={member["@id"]} />
+			</section>
 		</AuthLayout>
 	);
 }
@@ -114,7 +121,7 @@ function Stats(props: {
 	);
 
 	return (
-		<div className="grid grid-cols-3 gap-4 px-4 py-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
+		<div className="grid grid-cols-3 gap-4 p-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
 			<Link to={`/sessions?username=${props.username}`}>
 				<UserStat
 					title="tea sessions"
