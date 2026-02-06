@@ -3,7 +3,6 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiProperty;
-use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
@@ -28,13 +27,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Get(
 	uriTemplate: "/members/{username}/stats",
 	uriVariables: ["username" => new Link(fromProperty: "username")],
-	normalizationContext: ["groups" => [
-		"member:stats",
-		"embedded:tea",
-		"with:origin",
-		"embedded:teaType",
-		"with:teatype",
-	]],
+	normalizationContext: [
+		"groups" => [
+			"member:stats",
+			"embedded:tea",
+			"with:origin",
+			"embedded:teaType",
+			"with:teatype",
+		]
+	],
 	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
 	provider: UserStatsProvider::class,
 )]
@@ -86,15 +87,15 @@ class Member
 	#[Groups(["member:stats"])]
 	public float $statsConsumedTeaKgTotal = 0;
 
-	/** @var Tea[]  */
+	/** @var Tea[] */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeas = [];
 
-	/** @var TeaType[]  */
+	/** @var TeaType[] */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeaTypes = [];
 
-	/** @var TeaFamilyAmount[]  */
+	/** @var TeaFamilyAmount[] */
 	#[Groups(["member:stats"])]
 	public array $statsFamilies = [];
 }

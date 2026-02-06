@@ -78,7 +78,7 @@ export function SEFiltersBar(props: { className?: string }) {
 					</FilterButton>
 				</li>
 			</ul>
-			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)}>
+			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)} className="p-4">
 				<ul className="flex flex-col gap-2">
 					{Object.keys(teaFamilies).map((key) => (
 						<li key={key}>
