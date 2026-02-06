@@ -132,6 +132,7 @@ doctrine:
                 
                 # date specific functions
                 DATE_ADD: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\DateAdd
+                DATE_TRUNC: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\DateTrunc
                 DATE_BIN: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\DateBin
                 DATE_EXTRACT: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\DateExtract
                 DATE_OVERLAPS: MartinGeorgiev\Doctrine\ORM\Query\AST\Functions\DateOverlaps
