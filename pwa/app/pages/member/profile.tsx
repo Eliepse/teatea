@@ -92,7 +92,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 
 				<hr className="border-stone-200 col-span-3" />
 
-				<div className="col-span-3 flex rounded border border-green-600 text-base mb-4">
+				<div className="col-span-3 flex rounded text-green-700 border border-green-600 text-base mb-4">
 					<button
 						className={clsx(
 							"flex-1 py-2 rounded cursor-pointer",
