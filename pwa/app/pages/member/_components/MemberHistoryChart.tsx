@@ -8,12 +8,14 @@ import {
 	eachWeekOfInterval,
 	formatISO,
 	intervalToDuration,
+	parseISO,
 	sub,
 } from "date-fns";
 import { Bar } from "react-chartjs-2";
-import { BarElement, CategoryScale, Chart, LinearScale } from "chart.js";
+import { BarElement, CategoryScale, Chart, LinearScale, TimeScale } from "chart.js";
+import "chartjs-adapter-date-fns";
 
-Chart.register(CategoryScale, LinearScale, BarElement);
+Chart.register(CategoryScale, LinearScale, BarElement, TimeScale);
 
 type TInterval = Partial<{ [key in TeaFamily]: number }>;
 type TStats = { [key: string]: TInterval };
@@ -41,19 +43,15 @@ function decideInterval(since: Date): QInterval {
 	return "month";
 }
 
-function getLabels(since: Date, interval: QInterval): string[] {
+function getLabels(since: Date, interval: QInterval): Date[] {
 	if ("month" === interval) {
-		return eachMonthOfInterval({ start: since, end: new Date() }).map((d) =>
-			formatISO(d, { representation: "date" }),
-		);
+		return eachMonthOfInterval({ start: since, end: new Date() });
 	}
 	if ("week" === interval) {
-		return eachWeekOfInterval({ start: since, end: new Date() }, { weekStartsOn: 1 }).map((d) =>
-			formatISO(d, { representation: "date" }),
-		);
+		return eachWeekOfInterval({ start: since, end: new Date() }, { weekStartsOn: 1 });
 	}
 
-	return eachDayOfInterval({ start: since, end: new Date() }).map((d) => formatISO(d, { representation: "date" }));
+	return eachDayOfInterval({ start: since, end: new Date() });
 }
 
 export function MemberHistoryChart(props: { memberIri: Iri; className?: string; since?: Date }) {
@@ -78,7 +76,7 @@ export function MemberHistoryChart(props: { memberIri: Iri; className?: string; 
 		return "Error";
 	}
 
-	const data = query.data ?? {};
+	const data = Object.entries(query.data ?? {}).map(([strDate, stats]) => ({ date: parseISO(strDate), stats }));
 
 	return (
 		<Bar
@@ -87,41 +85,46 @@ export function MemberHistoryChart(props: { memberIri: Iri; className?: string; 
 				responsive: true,
 				scales: {
 					y: { stacked: true, beginAtZero: true, border: { color: "#e7e5e4" }, grid: { color: "#e7e5e4" } },
-					x: { stacked: true, display: false },
+					x: {
+						type: "time",
+						stacked: true,
+						grid: { display: false },
+						time: { round: queryParams.interval },
+					},
 				},
 				plugins: { legend: { display: false } },
 				datasets: { bar: { borderRadius: 6, barPercentage: 1 } },
 			}}
 			data={{
-				labels: labels,
+				labels,
 				datasets: [
 					{
-						data: labels.map((week) => data[week]?.white ?? 0),
+						data: data.map((entry) => ({ x: entry.date, y: entry.stats.white ?? 0 })),
 						backgroundColor: "#a5f3fc", // cyan-200
 						order: 6,
 					},
 					{
-						data: labels.map((week) => data[week]?.yellow ?? 0),
+						data: data.map((entry) => ({ x: entry.date, y: entry.stats.yellow ?? 0 })),
 						backgroundColor: "#d9f99d", // lime-200
 						order: 5,
 					},
 					{
-						data: labels.map((week) => data[week]?.green ?? 0),
+						data: data.map((entry) => ({ x: entry.date, y: entry.stats.green ?? 0 })),
 						backgroundColor: "#86efac", // green-300
 						order: 4,
 					},
 					{
-						data: labels.map((week) => data[week]?.wulong ?? 0),
+						data: data.map((entry) => ({ x: entry.date, y: entry.stats.wulong ?? 0 })),
 						backgroundColor: "#a5b4fc", // indigo-300
 						order: 3,
 					},
 					{
-						data: labels.map((week) => data[week]?.black ?? 0),
+						data: data.map((entry) => ({ x: entry.date, y: entry.stats.black ?? 0 })),
 						backgroundColor: "#fb923c", // orange-400
 						order: 2,
 					},
 					{
-						data: labels.map((week) => data[week]?.fermented ?? 0),
+						data: data.map((entry) => ({ x: entry.date, y: entry.stats.fermented ?? 0 })),
 						backgroundColor: "#78716c", // stone-500
 						order: 1,
 					},
