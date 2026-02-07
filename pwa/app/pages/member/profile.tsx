@@ -1,7 +1,7 @@
 import { AuthLayout } from "~/layouts/AuthLayout";
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/profile";
 import { getApi, postApi } from "~/utils/api";
-import { type Member, type MemberStats, type TeaFamily } from "~t/types";
+import { type Member, type MemberStats } from "~t/types";
 import { usePopup } from "~/components/shared/modal/AlertManager";
 import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { Link, useNavigate } from "react-router";
@@ -11,6 +11,9 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { MemberHistoryChart } from "~/pages/member/_components/MemberHistoryChart";
 import { MemberFamiliesChart } from "~/pages/member/_components/MemberFamiliesChart";
+import { useState } from "react";
+import clsx from "clsx";
+import { startOfDay, sub } from "date-fns";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -25,11 +28,21 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 	return { member, stats };
 }
 
+function getSince(interval: "30d" | "6m"): Date {
+	if ("30d" === interval) {
+		return startOfDay(sub(new Date(), { days: 30 }));
+	}
+
+	return startOfDay(sub(new Date(), { months: 6 }));
+}
+
 export default function ProfilePage(props: Route.ComponentProps) {
 	const { member, stats } = props.loaderData;
 	const [token] = useToken();
 	const navigate = useNavigate();
 	const popup = usePopup();
+	const [statsInterval, setStatsInterval] = useState<"30d" | "6m">("30d");
+	const statsSince = getSince(statsInterval);
 	const isMemberSelf = member.username === token?.username;
 
 	function promptLogout() {
@@ -79,17 +92,30 @@ export default function ProfilePage(props: Route.ComponentProps) {
 
 				<hr className="border-stone-200 col-span-3" />
 
-				<div className="col-span-3">
-					<h2 className="mb-2 text-xs font-bold text-stone-400 uppercase tracking-wide">Last 30 days</h2>
+				<div className="col-span-3 flex rounded border border-green-600 text-base mb-4">
+					<button
+						className={clsx(
+							"flex-1 py-2 rounded cursor-pointer",
+							"30d" === statsInterval ? "bg-green-600 text-white" : "hover:bg-green-100",
+						)}
+						onClick={() => setStatsInterval("30d")}
+					>
+						30 days
+					</button>
+					<button
+						className={clsx(
+							"flex-1 py-2 rounded cursor-pointer",
+							"6m" === statsInterval ? "bg-green-600 text-white" : "hover:bg-green-100",
+						)}
+						onClick={() => setStatsInterval("6m")}
+					>
+						6 months
+					</button>
 				</div>
 
-				<MemberFamiliesChart memberIri={member["@id"]} className="mx-8" />
+				<MemberFamiliesChart memberIri={member["@id"]} since={statsSince} className="col-span-3 mx-8 mb-6" />
+				<MemberHistoryChart memberIri={member["@id"]} since={statsSince} className="col-span-3" />
 			</div>
-
-			<section className="p-4 pl-2 pr-3 mt-4 bg-white rounded-xl text-lg shadow-sm">
-				<h2 className="mb-2 text-xs font-bold text-stone-400 uppercase tracking-wide">Last 6 months</h2>
-				<MemberHistoryChart memberIri={member["@id"]} />
-			</section>
 		</AuthLayout>
 	);
 }

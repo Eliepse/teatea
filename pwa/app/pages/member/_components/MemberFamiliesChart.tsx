@@ -10,9 +10,9 @@ Chart.register(CategoryScale, ArcElement);
 
 type TData = Partial<{ [key in TeaFamily]: number }>;
 
-export function MemberFamiliesChart(props: { memberIri: Iri; className?: string }) {
-	const since = sub(new Date(), { months: 1 });
-	const queryParams = { since: formatISO(since, { representation: "date" }) };
+export function MemberFamiliesChart(props: { memberIri: Iri; className?: string; since?: Date }) {
+	const sinceDate = props.since ?? sub(new Date(), { months: 1 });
+	const queryParams = { since: formatISO(sinceDate, { representation: "date" }) };
 
 	const query = useQuery({
 		queryFn: async () => {
@@ -21,6 +21,7 @@ export function MemberFamiliesChart(props: { memberIri: Iri; className?: string 
 			).json();
 		},
 		queryKey: [props.memberIri, "stats:families", queryParams],
+		staleTime: 120_000,
 	});
 
 	if (!query.isPending && !query.data) {
