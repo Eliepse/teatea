@@ -11,7 +11,7 @@ Chart.register(CategoryScale, LinearScale, BarElement);
 type TInterval = Partial<{ [key in TeaFamily]: number }>;
 type TStats = { [key: string]: TInterval };
 
-export function MemberTeaFamiliesChart(props: { memberIri: Iri }) {
+export function MemberHistoryChart(props: { memberIri: Iri }) {
 	const since = sub(new Date(), { months: 6 });
 	const weeks = eachWeekOfInterval({ start: since, end: new Date() }, { weekStartsOn: 1 }).map((d) =>
 		formatISO(d, { representation: "date" }),
@@ -21,10 +21,10 @@ export function MemberTeaFamiliesChart(props: { memberIri: Iri }) {
 	const query = useQuery({
 		queryFn: async () => {
 			return await (
-				await getApi<TStats>(`/api/members/${extractId(props.memberIri)}/tea-families/stats`, queryParams)
+				await getApi<TStats>(`/api/members/${extractId(props.memberIri)}/stats/history`, queryParams)
 			).json();
 		},
-		queryKey: [props.memberIri, "stats:families", queryParams],
+		queryKey: [props.memberIri, "stats:history", queryParams],
 	});
 
 	if (!query.isPending && !query.data) {
@@ -75,7 +75,7 @@ export function MemberTeaFamiliesChart(props: { memberIri: Iri }) {
 					{
 						data: weeks.map((week) => data[week]?.fermented ?? 0),
 						backgroundColor: "#78716c", // stone-500
-						order: 1	,
+						order: 1,
 					},
 				],
 			}}

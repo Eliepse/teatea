@@ -10,7 +10,8 @@ import { UserStat } from "~/components/stats/UserStat";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { useQuery } from "@tanstack/react-query";
-import { MemberTeaFamiliesChart } from "~/pages/member/_components/MemberTeaFamiliesChart";
+import { MemberHistoryChart } from "~/pages/member/_components/MemberHistoryChart";
+import { MemberFamiliesChart } from "~/pages/member/_components/MemberFamiliesChart";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -81,9 +82,11 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				familiesStats={familiesStats}
 			/>
 
+			<MemberFamiliesChart memberIri={member["@id"]} />
+
 			<section className="p-4 pl-2 pr-3 mt-4 bg-white rounded-xl text-lg shadow-sm">
 				<h2 className="mb-2 text-xs font-bold text-stone-400 uppercase tracking-wide">Last 6 months</h2>
-				<MemberTeaFamiliesChart memberIri={member["@id"]} />
+				<MemberHistoryChart memberIri={member["@id"]} />
 			</section>
 		</AuthLayout>
 	);

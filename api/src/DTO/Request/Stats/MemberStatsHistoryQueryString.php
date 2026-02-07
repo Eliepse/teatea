@@ -4,7 +4,7 @@ namespace App\DTO\Request\Stats;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class MemberFamiliesStatsQueryString
+class MemberStatsHistoryQueryString
 {
 	#[Assert\Choice(choices: ["month", "week", "day"])]
 	public string $interval = "week";

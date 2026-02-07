@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller\Stats;
 
-use App\DTO\Request\Stats\MemberFamiliesStatsQueryString;
+use App\DTO\Request\Stats\MemberStatsHistoryQueryString;
 use App\Entity\Tea;
 use App\Entity\User;
 use App\Helper\Arr;
@@ -15,14 +15,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/api/members/{username}/tea-families/stats')]
-class MemberFamiliesStatsController extends AbstractController
+#[Route('/api/members/{username}/stats/history')]
+class MemberStatsHistoryController extends AbstractController
 {
 	public function __invoke(
 		#[MapEntity(mapping: ["username" => "username"])]
 		User $member,
 		#[MapQueryString]
-		MemberFamiliesStatsQueryString $query,
+		MemberStatsHistoryQueryString $query,
 		EntityManagerInterface $em,
 	): JsonResponse {
 		$since = ($query->since ?? new \DateTimeImmutable()->sub(new \DateInterval("P12M")));
