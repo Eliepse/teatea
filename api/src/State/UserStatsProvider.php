@@ -109,21 +109,6 @@ readonly class UserStatsProvider implements ProviderInterface
 			->setMaxResults(3)
 			->getResult();
 
-		$familyStats = $this->em
-			->createQuery(
-				<<<DQL
-				SELECT tea.family, count(session) as count
-				FROM App\Entity\TeaSession session
-					LEFT JOIN session.tea tea
-				WHERE session.author = :author
-				  AND session.drankAt >= :fromDrankAt
-				GROUP BY tea.family
-				DQL,
-			)
-			->setParameter("author", $user)
-			->setParameter("fromDrankAt", new \DateTimeImmutable()->sub(new \DateInterval("P1M"))->setTime(0, 0))
-			->getResult();
-
 		$originsPath = Arr::pluck($topTeas, fn(TeaEntity $t) => $t->originPath->getPath(), true);
 		$originsByPath = Arr::keyBy($this->originRepo->findManyWithAncestorNames($originsPath), "path");
 
@@ -136,11 +121,6 @@ readonly class UserStatsProvider implements ProviderInterface
 
 		$resource->statsTopTeas = $teas;
 		$resource->statsTopTeaTypes = array_map(fn($t) => TeaTypeProvider::fromEntity($t), $topTeaTypes);
-
-		$resource->statsFamilies = array_map(
-			fn($row) => new TeaFamilyAmount($row["family"], $row["count"] ?? 0),
-			$familyStats,
-		);
 
 		return $resource;
 	}

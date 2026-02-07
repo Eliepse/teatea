@@ -94,8 +94,4 @@ class Member
 	/** @var TeaType[] */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeaTypes = [];
-
-	/** @var TeaFamilyAmount[] */
-	#[Groups(["member:stats"])]
-	public array $statsFamilies = [];
 }
