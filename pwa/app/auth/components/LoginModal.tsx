@@ -9,6 +9,7 @@ import { Link } from "react-router";
 import axios, { AxiosError } from "axios";
 import { attemptOTPLogin } from "~/auth/requests";
 import { useToken } from "~/auth/hooks/useToken";
+import { usePostHog } from "@posthog/react";
 
 export type OTPToken = { value: string; expiredAt: Date };
 type OTPResponse =
@@ -170,6 +171,7 @@ function LoginForm(props: {
 }) {
 	const alert = useAlert();
 	const [email, setEmail] = useState("");
+	const posthog = usePostHog();
 
 	const isEmailValid = 3 < email.length && email.includes("@");
 
@@ -189,6 +191,8 @@ function LoginForm(props: {
 		if (!isEmailValid) {
 			return;
 		}
+
+		posthog?.capture("user_requested_otp", { email });
 		mutate(email);
 	}
 

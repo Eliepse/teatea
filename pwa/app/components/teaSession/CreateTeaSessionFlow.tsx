@@ -14,6 +14,7 @@ import Arrow from "~/components/icons/arrow";
 import clsx from "clsx";
 import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { CoffeeCup, RefreshDouble } from "iconoir-react";
+import { usePostHog } from "@posthog/react";
 
 export type SessionForm = {
 	tea: Tea["@id"];
@@ -32,17 +33,20 @@ const FRAME_INFO_MAPPER = {
 export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) {
 	const navigate = useNavigate();
 	const alert = useAlert();
+	const posthog = usePostHog();
 	const [form, setForm] = useState<SessionForm>({ drankAt: new Date(), tea: props.tea });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({ defaultFrame: "parameters:input" });
 	const currentFrameKey = stackNavigator.stack.slice(-1)[0] as keyof typeof FRAME_INFO_MAPPER;
 
 	function goBack() {
 		if (1 === stackNavigator.stack.length) {
+			posthog.capture("session_flow_closed");
 			props.onCancel();
 			return;
 		}
 
 		stackNavigator.back();
+		posthog.capture("session_flow_back");
 		return;
 	}
 
@@ -90,6 +94,7 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 					defaultTea={form.teaQuantity}
 					defaultWater={form.waterMl}
 					onConfirm={(tea, water) => {
+						posthog.capture("session_flow_next", { step: "parameters" });
 						setForm((st) => ({ ...st, teaQuantity: tea, waterMl: water }));
 						stackNavigator.next("date:select");
 					}}
@@ -102,6 +107,7 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 					onBack={goBack}
 					defaultValue={form.drankAt}
 					onConfirm={(date) => {
+						posthog.capture("session_flow_next", { step: "date" });
 						setForm({ ...form, drankAt: date });
 						stackNavigator.next("place:select");
 					}}
@@ -114,6 +120,7 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 					defaultValue={form.place}
 					buttonText="Save this session"
 					onConfirm={(place) => {
+						posthog.capture("session_flow_next", { step: "place" });
 						setForm({ ...form, place });
 						mutation.mutate({ ...form, place });
 					}}
