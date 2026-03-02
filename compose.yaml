@@ -27,6 +27,8 @@ services:
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-!ChangeMe!}
       BASE_URL: ${BASE_URL}
       MAILER_DSN: "smtp://aaa:bbb@maildev:1025"
+      POSTHOG_KEY: ${POSTHOG_KEY}
+      POSTHOG_HOST: ${POSTHOG_HOST}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -53,6 +55,8 @@ services:
       target: dev
     environment:
       API_URL: /api
+      POSTHOG_KEY: ${POSTHOG_KEY}
+      POSTHOG_HOST: ${POSTHOG_HOST}
     depends_on:
       - api
     volumes:

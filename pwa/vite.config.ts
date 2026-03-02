@@ -6,11 +6,10 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
 	plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
 	ssr: {
-		noExternal: ["posthog-js", "posthog-js/react"],
+		noExternal: ["@posthog/react", "posthog-js"],
 	},
 	logLevel: "info",
 	server: {
 		host: "0.0.0.0",
 	},
-
 });
