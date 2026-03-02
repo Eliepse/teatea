@@ -1,5 +1,4 @@
 import type { Route } from "../../../.react-router/types/app/pages/auth/+types/verify";
-import axios from "axios";
 import { KeyXmark, SecurityPass } from "iconoir-react";
 import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
 import { type OTPToken } from "~/auth/components/LoginModal";

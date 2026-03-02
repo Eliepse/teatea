@@ -2,6 +2,7 @@ import { TokenUtils } from "~/auth/hooks/useToken";
 import axios from "axios";
 import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
 import { isPast } from "date-fns";
+import posthog from "posthog-js";
 
 export type OTPToken = { value: string; expiredAt: Date };
 type OTPResponse =
@@ -55,6 +56,12 @@ export async function attemptOTPLogin(token: OTPToken): Promise<boolean> {
 		TokenUtils.set(data.token);
 		TokenUtils.setRefreshToken(data.refresh_token, new Date(data.refresh_token_expiration * 1_000));
 		LocalStorageUtils.remove("otp_token");
+
+		const userToken = TokenUtils.get();
+		if (userToken) {
+			posthog.identify(userToken.username, { username: userToken.username });
+		}
+
 		return true;
 	}
 
