@@ -2,19 +2,19 @@ import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
 import { HydratedRouter } from "react-router/dom";
 import posthog from "posthog-js";
-import { PostHogErrorBoundary, PostHogProvider } from "posthog-js/react";
+import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
 import { isRouteErrorResponse } from "react-router";
-
-posthog.init(runtimeEnv.POSTHOG_KEY as string, {
-	api_host: runtimeEnv.POSTHOG_HOST as string,
-	defaults: "2026-01-30",
-	__add_tracing_headers: [window.location.host, "localhost"], // TODO(elie): add real host on prod
-	debug: import.meta.env.DEV,
-	autocapture: false,
-});
 
 startTransition(() => {
 	if (runtimeEnv.POSTHOG_HOST && runtimeEnv.POSTHOG_KEY) {
+		posthog.init(runtimeEnv.POSTHOG_KEY as string, {
+			api_host: runtimeEnv.POSTHOG_HOST as string,
+			defaults: "2026-01-30",
+			__add_tracing_headers: [window.location.host, "localhost"], // TODO(elie): add real host on prod
+			debug: import.meta.env.DEV,
+			autocapture: false,
+		});
+
 		hydrateRoot(
 			document,
 			<PostHogProvider client={posthog}>
