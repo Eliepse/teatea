@@ -1,7 +1,7 @@
-import { TokenUtils } from "~/auth/hooks/useToken";
+import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { redirect, useNavigate } from "react-router";
 import { useMutation } from "@tanstack/react-query";
-import { type ChangeEvent, useState } from "react";
+import { type ChangeEvent, type PropsWithChildren, useState } from "react";
 import { ArrowDownCircleIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { handleUIEvent } from "~/utils/function";
 import { useUser } from "~/auth/hooks/useUser";
@@ -10,6 +10,8 @@ import { refreshToken } from "~/auth/requests";
 import clsx from "clsx";
 import { patchApi } from "~/utils/api";
 import { usePWAInstall } from "~/utils/browser/usePWAInstall";
+import { usePostHog } from "@posthog/react";
+import { RefreshDouble } from "iconoir-react";
 
 export async function clientLoader() {
 	const token = TokenUtils.get();
@@ -25,7 +27,9 @@ export async function clientLoader() {
 
 export default function OnboardingPage() {
 	const user = useUser();
+	const [token] = useToken();
 	const navigate = useNavigate();
+	const posthog = usePostHog();
 	const { installable, installed } = usePWAInstall();
 	const { NavigationStack, ...stack } = useNavigationStack({ defaultFrame: "welcome" });
 
@@ -36,6 +40,7 @@ export default function OnboardingPage() {
 				return;
 			}
 
+			posthog.capture("onboarding_submitted_username", { username });
 			await patchApi(`/members/${user.data.id}/onboarding`, { username });
 			stack.next("cta:session");
 		},
@@ -50,9 +55,9 @@ export default function OnboardingPage() {
 	return (
 		<NavigationStack>
 			<StackFrame frameKey="welcome">
-				<div className="flex flex-col h-dvh p-4">
+				<div className="flex flex-col h-dvh p-4 text-green-950">
 					<div className="flex-1 flex flex-col justify-center">
-						<h2 className="text-3xl text-primary">Welcome to Teatea!</h2>
+						<h2 className="text-3xl font-header font-extrabold text-green-600">Welcome to Teatea!</h2>
 						<p className="max-w-xs mt-8 text-lg">
 							Teatea is a place dedicated to Tea and the social interaction around it.
 						</p>
@@ -64,24 +69,31 @@ export default function OnboardingPage() {
 
 					<div className="flex-none flex items-center">
 						<ProgressDots steps={installable ? 4 : 3} active={1} className="mr-auto" />
-						<button
-							className="btn btn-primary"
-							onClick={handleUIEvent(() => stack.next(installable ? "ask:pwa" : "ask:username"))}
+						<NextButton
+							onClick={() => {
+								posthog.capture("onboarding_confirmed_step", { step: "intro" });
+								stack.next(installable ? "ask:pwa" : "ask:username");
+							}}
 						>
-							Next <ArrowRightIcon className="size-4" />
-						</button>
+							Next <ArrowRightIcon direction="right" className="size-4 ml-1" />
+						</NextButton>
 					</div>
 				</div>
 			</StackFrame>
 
 			<StackFrame frameKey="ask:pwa">
-				<ProposePWA onNext={() => stack.next("ask:username")} />
+				<ProposePWA
+					onNext={() => {
+						posthog.capture("onboarding_confirmed_step", { step: "pwa" });
+						stack.next("ask:username");
+					}}
+				/>
 			</StackFrame>
 
 			<StackFrame frameKey="ask:username">
 				<AskUsername
 					submitting={mutation.isPending}
-					onSubmit={(username) => mutation.mutate(username)}
+					onSubmit={(username) => mutation.mutateAsync(username)}
 					steps={installable ? 4 : 3}
 					step={installable ? 3 : 2}
 				/>
@@ -90,19 +102,31 @@ export default function OnboardingPage() {
 			<StackFrame frameKey="cta:session">
 				<div className="flex flex-col h-dvh p-4">
 					<div className="flex-1 flex flex-col justify-center items-start">
-						<h2 className="text-xl text-primary">Ready?</h2>
+						<h2 className="text-3xl font-header font-extrabold text-green-600">Ready?</h2>
 						<p className="max-w-xs mt-6 text-lg">
 							Start your journey by adding your first tea session in your journal.
 						</p>
 
-						<button className="btn btn-primary mt-6" onClick={handleUIEvent(() => start("/tea/search"))}>
+						<button
+							className="mt-4 btn btn-lg bg-green-700 text-white rounded-xl"
+							onClick={() => {
+								posthog.capture("onboarding_confirmed_step", { step: "session", target: "search" });
+								start("/tea/search");
+							}}
+						>
 							Add my first tea session <ArrowRightIcon className="size-4" />
 						</button>
 					</div>
 
 					<div className="flex-none flex items-center">
 						<ProgressDots steps={installable ? 4 : 3} active={installable ? 4 : 3} className="mr-auto" />
-						<button className="btn" onClick={handleUIEvent(() => start("/welcome"))}>
+						<button
+							className="ml-auto btn btn-lg bg-green-100 text-green-600 rounded-xl"
+							onClick={() => {
+								posthog.capture("onboarding_confirmed_step", { step: "session", target: "home" });
+								start("/welcome");
+							}}
+						>
 							Skip <ArrowRightIcon className="size-4" />
 						</button>
 					</div>
@@ -114,11 +138,12 @@ export default function OnboardingPage() {
 
 function AskUsername(props: {
 	submitting: boolean;
-	onSubmit: (username: string) => void;
+	onSubmit: (username: string) => Promise<void>;
 	steps: number;
 	step: number;
 }) {
 	const [username, setUsername] = useState<string>();
+	const [error, setError] = useState<string | undefined>();
 
 	function handleUsernameChange(e: ChangeEvent<HTMLInputElement>) {
 		const value = e.target.value
@@ -130,40 +155,52 @@ function AskUsername(props: {
 		setUsername(value.length ? value.substring(0, 16) : undefined);
 	}
 
+	function submitUsername() {
+		if (!username) {
+			return;
+		}
+
+		props.onSubmit(username).catch((e) => {
+			if ("Unavailable username" === e.message) {
+				setError("This username is not available");
+				return;
+			}
+
+			setError("Failed to save the username, try again later");
+		});
+	}
+
 	return (
 		<div className="flex flex-col h-dvh p-4">
 			<div className="flex-1 flex flex-col justify-center">
-				<h2 className="text-xl text-primary">How should people call you here?</h2>
+				<h2 className="text-3xl font-header font-extrabold text-green-600">How should people call you here?</h2>
 				<fieldset className="fieldset w-full mt-8">
 					<label className="label">Username</label>
 					<input
 						type="email"
 						name="email"
 						autoComplete="email"
-						className="input w-full"
+						className={clsx("input w-full", error && "input-error")}
 						value={username ?? ""}
 						minLength={2}
 						maxLength={16}
 						onChange={handleUsernameChange}
 					/>
+					{error && <p className="label text-error">{error}</p>}
 				</fieldset>
 			</div>
 
 			<div className="flex-none flex items-center">
 				<ProgressDots steps={props.steps} active={props.step} className="mr-auto" />
-				<button
-					className="btn btn-primary ml-auto"
-					disabled={(username?.length ?? 0) < 2 || props.submitting}
-					type="submit"
-					onClick={handleUIEvent(() => !!username && props.onSubmit(username))}
-				>
-					{false === props.submitting && (
-						<>
-							Next <ArrowRightIcon className="size-4" />
-						</>
+				<NextButton disabled={(username?.length ?? 0) < 2 || props.submitting} onClick={submitUsername}>
+					{props.submitting ? "Submitting" : "Submit"}
+
+					{props.submitting ? (
+						<RefreshDouble className="size-4 animate-spin" />
+					) : (
+						<ArrowRightIcon direction="right" className="size-4 ml-1" />
 					)}
-					{props.submitting && "Submitting..."}
-				</button>
+				</NextButton>
 			</div>
 		</div>
 	);
@@ -181,7 +218,7 @@ function ProposePWA(props: { onNext: () => void }) {
 	return (
 		<div className="flex flex-col h-dvh p-4">
 			<div className="flex-1 flex flex-col justify-center">
-				<h2 className="text-xl text-primary">Quick access</h2>
+				<h2 className="text-3xl font-header font-extrabold text-green-600">Quick access</h2>
 				<p className="max-w-xs mt-6 text-lg">
 					Add your journal to your phone as an app to access it easily anytime!
 				</p>
@@ -206,9 +243,21 @@ function ProgressDots(props: { steps: number; active: number; className?: string
 	const dots = [];
 
 	for (let i = 1; i <= props.steps; i++) {
-		const cls = props.active >= i ? "bg-primary" : "bg-gray-100";
-		dots.push(<span key={i} className={clsx("inline-block rounded-full h-3 w-3 mr-2", cls)}></span>);
+		const cls = props.active >= i ? "bg-green-600" : "bg-green-100";
+		dots.push(<span key={i} className={clsx("inline-block rounded-full h-4 w-4 mr-2", cls)}></span>);
 	}
 
 	return <div className={props.className}>{dots}</div>;
+}
+
+function NextButton(props: PropsWithChildren<{ onClick: () => void; disabled?: boolean }>) {
+	return (
+		<button
+			className="ml-auto btn btn-lg bg-green-700 text-white rounded-xl disabled:bg-teal-100 disabled:text-teal-500"
+			onClick={props.onClick}
+			disabled={props.disabled}
+		>
+			{props.children}
+		</button>
+	);
 }
