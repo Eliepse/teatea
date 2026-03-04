@@ -6,6 +6,7 @@ use App\Entity\Token;
 use App\Entity\User;
 use App\Exception\Auth\ExpiredTokenException;
 use App\Exception\Auth\InvalidTokenException;
+use App\Mail\VerifyLoginMail;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Security\TokenManager;
@@ -20,7 +21,6 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
@@ -107,15 +107,11 @@ class OTPAuthController extends AbstractController
 		$this->em->persist($OTPChallengeToken->token);
 		$this->em->flush();
 
-		$link = "$this->baseUrl/login/verify/$OTPChallengeToken->challenge";
-		$this->mailer->send(new Email()
-			->from("elie.meignan@eliepse.fr")
-			->to($email)
-			->subject("Login to your account")
-			->html(<<<HTML
-				To login, please follow this link:<br/>
-				<a href="$link">$link</a>
-				HTML));
+		$this->mailer->send(
+			new VerifyLoginMail("$this->baseUrl/login/verify/$OTPChallengeToken->challenge")
+				->from("elie.meignan@eliepse.fr")
+				->to($email),
+		);
 
 		return $this->json([
 			"token" => $OTPToken->challenge,
@@ -212,7 +208,8 @@ class OTPAuthController extends AbstractController
 	)]
 	public function loginDev(
 		string $token,
-		#[Autowire(param: "auth.dev_login_key")] string $devKey,
+		#[Autowire(param: "auth.dev_login_key")]
+		string $devKey,
 		UserRepository $userRepo,
 	): JsonResponse {
 		if (empty($token) || empty(trim($devKey)) || $token !== $devKey) {
