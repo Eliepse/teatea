@@ -19,6 +19,7 @@ use App\State\TeaSession\TeaSessionDeleteProcessor;
 use App\State\TeaSession\TeaSessionEditProcessor;
 use App\State\TeaSession\TeaSessionProvider;
 use App\State\TeaSession\TeaSessionsPaginatedProvider;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -124,13 +125,13 @@ class TeaSession
 	public Member $author;
 
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
-	public ?\DateTimeImmutable $drankAt;
+	public ?DatePoint $drankAt;
 
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:edit", "with:business"])]
 	public ?Business $place = null;
 
 	public function __construct()
 	{
-		$this->drankAt = new \DateTimeImmutable();
+		$this->drankAt = new DatePoint();
 	}
 }

@@ -12,6 +12,7 @@ use App\ValueObject\Weight;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Clock\DatePoint;
 
 #[ORM\Entity(repositoryClass: TeaSessionRepository::class)]
 class TeaSession
@@ -55,8 +56,8 @@ class TeaSession
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly User $author,
 
-		#[ORM\Column(type: Types::DATETIMETZ_IMMUTABLE)]
-		public readonly ?DateTimeImmutable $drankAt = null,
+		#[ORM\Column(type: "date_point")]
+		public readonly ?DatePoint $drankAt = null,
 	) {}
 
 	/**
