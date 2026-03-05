@@ -12,7 +12,7 @@ class VerifyLoginMail extends Email
 
 		$this->getHeaders()
 			->addTextHeader('templateId', 1)
-			->addTextHeader('subject', "SUBJECT @TODO")
+			->addTextHeader('subject', "Confirm login to your teatea account")
 			->addParameterizedHeader('params', 'params', [
 				"OTPLink" => $otpLink,
 //				"OTPReject" => "",
