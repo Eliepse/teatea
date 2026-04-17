@@ -1,4 +1,4 @@
-import { Duration, Temperature, type Volume, type Weight } from "~/utils/value-objects/units";
+import { Duration, Temperature, type Volume } from "~/utils/value-objects/units";
 import type { TeawareType } from "./teawareType";
 
 export type Id = number;
@@ -85,6 +85,11 @@ export type TeaSession = Resource<"TeaSession"> & {
 	place?: Business;
 };
 
+export type Steep = {
+	duration: Duration;
+	temperature?: Temperature;
+};
+
 export type TeaTypeTreeNode = TeaType & LTreeNode;
 export type OriginTreeNode = Origin & LTreeNode;
 
@@ -97,14 +102,6 @@ export type Teaware = Resource & {
 	type: TeawareType;
 	name: string;
 	volume?: Volume;
-};
-
-export type BrewingSession = Resource & {
-	tea: Tea;
-	teaware?: Teaware;
-	teaQuantity?: Weight;
-	steeps: Steep[];
-	createdAt: Date;
 };
 
 export type Member = Resource<"Member"> & {
@@ -151,13 +148,6 @@ export type TeaStats = Pick<Resource<"TeaStats">, "@type" | "@id"> & {
 	teaId: number;
 	sessionsCount: number;
 	authorsCount: number;
-};
-
-export type Steep = Omit<Resource<"Steep">, "id"> & {
-	key: string;
-	duration: Duration;
-	temperature?: Temperature;
-	order: number;
 };
 
 export const BrewingQualityEnum = {

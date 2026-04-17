@@ -7,20 +7,19 @@ import { Modal } from "~/components/shared/modal/Modal";
 import { DurationInput } from "~/components/shared/inputs/DurationInput";
 import { DigitInput } from "~/components/shared/inputs/DigitInput";
 import { clamp } from "~/utils/math";
-
-export type SteepValues = { duration: Duration; temperature: Temperature | null };
+import type { Steep } from "~t/types";
 
 export function SteepFormModal(props: {
 	open: boolean;
 	onClose: () => void;
-	defaultValue?: Partial<SteepValues>;
-	onSubmit?: (values: SteepValues) => Promise<void>;
+	defaultValue?: Partial<Steep>;
+	onSubmit?: (values: Steep) => Promise<void>;
 	onRemove?: () => Promise<void>;
 }) {
 	const [loading, setLoading] = useState<"save" | "delete">();
-	const [values, setValues] = useState<SteepValues>({
+	const [values, setValues] = useState<Steep>({
 		duration: new Duration(0),
-		temperature: null,
+		temperature: undefined,
 		...props.defaultValue,
 	});
 
@@ -34,7 +33,7 @@ export function SteepFormModal(props: {
 		}
 
 		setLoading("save");
-		const temperature = 0 === values.temperature?.deg ? null : values.temperature;
+		const temperature = 0 === values.temperature?.deg ? undefined : values.temperature;
 		props.onSubmit({ ...values, temperature }).finally(() => setLoading(undefined));
 	}
 
