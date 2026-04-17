@@ -17,7 +17,6 @@ export function SelectType(props: {
 	defaultValue?: TeaType;
 	filters?: Filters;
 }) {
-	console.debug(props);
 	const { data: types, isLoading } = useTeaTypes({ ...props.filters, itemsPerPage: 50 });
 	const [selected, setSelected] = useState(props.defaultValue);
 

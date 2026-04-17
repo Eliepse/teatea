@@ -28,7 +28,7 @@ final readonly class LTreePath implements \Stringable
 	{
 		foreach ($path as $node) {
 			if (false === ctype_alnum(str_replace("_", "", $node))) {
-				throw new RuntimeException("Invalid path node");
+				throw new RuntimeException("Invalid path node: {$this->getPath()}");
 			}
 		}
 	}

@@ -1,0 +1,48 @@
+origins:
+    # China
+    -   name: China
+        path: China
+    -   name: Anhui
+        path: China.Anhui
+    -   name: Fujian
+        path: China.Fujian
+    -   name: Guangdong
+        path: China.Guangdong
+    -   name: Yunnan
+        path: China.Yunnan
+    -   name: Zhejian
+        path: China.Zhejian
+    # Japan
+    -   name: Japan
+        path: Japan
+    -   name: Ehime
+        path: Japan.Ehime
+    -   name: Fukuoka
+        path: Japan.Fukuoka
+    -   name: Hyôgo
+        path: Japan.Hyogo
+    -   name: Kagoshima
+        path: Japan.Kagoshima
+    -   name: Kumamoto
+        path: Japan.Kumamoto
+    -   name: Kyôto
+        path: Japan.Kyoto
+    -   name: Kôchi
+        path: Japan.Kochi
+    -   name: Miyazaki
+        path: Japan.Miyazaki
+    -   name: Nagazaki
+        path: Japan.Nagazaki
+    -   name: Nara
+        path: Japan.Nara
+    -   name: Okayama
+        path: Japan.Okayama
+    -   name: Shizuoka
+        path: Japan.Shizuoka
+    # Others
+    -   name: India
+        path: India
+    -   name: Korea
+        path: Korea
+    -   name: Taiwan
+        path: Taiwan
