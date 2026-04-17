@@ -16,7 +16,6 @@ readonly class TeaTypeCreateProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private OriginRepository $originRepo,
 		private Security $security,
 	) {}
 
