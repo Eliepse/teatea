@@ -53,7 +53,7 @@ readonly class OriginProcessor implements ProcessorInterface
 		$entity->name = $data->name;
 		$entity->author = $user;
 
-		$pathNode = u($data->name)->pascal();
+		$pathNode = u($data->name)->ascii()->pascal();
 		$entity->path = new LTreePath([...$parentPath->getNodes(), $pathNode]);
 
 		// Check for duplicates
