@@ -1,5 +1,5 @@
 # Base FrankenPHP image
-FROM dunglas/frankenphp:1-php8.5  AS base
+FROM dunglas/frankenphp:1.12-php8.5  AS base
 
 ARG CWEBP_VERSION=1.6.0
 
