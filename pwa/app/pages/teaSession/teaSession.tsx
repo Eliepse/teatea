@@ -221,7 +221,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					steeps={session.steeps ?? []}
 					className="mb-12"
 					readonly={!editMode}
-					onChange={() => revalidator.revalidate()}
+					onChange={async (steeps) => await sessionMutations.edit.mutateAsync({ steeps })}
 				/>
 			)}
 
@@ -277,10 +277,16 @@ function useSessionMutations(sessionId: number) {
 	const editMutation = useMutation({
 		mutationFn: async (
 			args: NullablePartial<
-				Pick<TeaSession, "note" | "quality" | "teaQuantity" | "waterMl"> & { place: Iri | null }
+				Pick<TeaSession, "note" | "quality" | "teaQuantity" | "waterMl" | "steeps"> & { place: Iri | null }
 			>,
 		) => {
-			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, args);
+			const response = await patchApi<TeaSessionRaw>(`/tea_sessions/${sessionId}`, {
+				...args,
+				steeps: args.steeps?.map((steep) => ({
+					duration: steep.duration.totalSeconds,
+					temperature: steep.temperature?.deg,
+				})),
+			});
 			return denormalizeTeaSession(await response.json());
 		},
 		onError: (e) => alert({ title: "Failed to change this session", body: e.message }),

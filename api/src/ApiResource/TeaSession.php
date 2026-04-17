@@ -7,11 +7,11 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use App\DTO\SteepValue;
 use App\Enum\BrewingQuality;
 use App\Enum\BrewingTechnic;
 use App\State\TeaSession\TeaSessionCreateProcessor;
@@ -33,17 +33,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 		"with:business",
 	],
 ], security: "is_granted('ROLE_USER')")]
-#[Get(normalizationContext: ["groups" => [
-	"embedded:steep",
-	"teaSession:read",
-	"embedded:tea",
-	"with:origin",
-	"embedded:cultivar",
-	"with:business",
-]], provider: TeaSessionProvider::class)]
+#[Get(normalizationContext: [
+	"groups" => [
+		"with:steep",
+		"teaSession:read",
+		"embedded:tea",
+		"with:origin",
+		"embedded:cultivar",
+		"with:business",
+	]
+], provider: TeaSessionProvider::class)]
 #[Post(denormalizationContext: ["groups" => ["teaSession:create"]], processor: TeaSessionCreateProcessor::class)]
 #[Patch(
-	denormalizationContext: ["groups" => ["teaSession:edit"]],
+	denormalizationContext: ["groups" => ["teaSession:edit", "with:steep"]],
 	provider: TeaSessionProvider::class,
 	processor: TeaSessionEditProcessor::class,
 )]
@@ -112,10 +114,10 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
 	public ?float $waterMl = null;
 
-	/** @var Steep[] */
-	#[Groups(["teaSession:edit", "embedded:steep"])]
-	#[ApiProperty(genId: false)]
-	#[Link(toProperty: "sessionId")]
+	#[Groups(["teaSession:edit", "with:steep"])]
+	/**
+	 * @var SteepValue[] $steeps
+	 */
 	public array $steeps = [];
 
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal", "teaSession:edit"])]

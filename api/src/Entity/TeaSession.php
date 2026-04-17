@@ -9,7 +9,6 @@ use App\Enum\BrewingTechnic;
 use App\Repository\TeaSessionRepository;
 use App\ValueObject\Volume;
 use App\ValueObject\Weight;
-use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Clock\DatePoint;
@@ -58,7 +57,8 @@ class TeaSession
 
 		#[ORM\Column(type: "date_point")]
 		public readonly ?DatePoint $drankAt = null,
-	) {}
+	) {
+	}
 
 	/**
 	 * @return SteepValue[]
@@ -68,34 +68,12 @@ class TeaSession
 		return array_map(fn($data) => SteepValue::fromArray($data), $this->steeps ?? []);
 	}
 
-	public function persistSteep(SteepValue $steep): void
+	/**
+	 * @param SteepValue[] $steeps
+	 */
+	public function setSteeps(array $steeps): self
 	{
-		// Edit an existing steep (if exists)
-		foreach ($this->steeps ?? [] as $i => $raw) {
-			if ($raw->key === $steep->key) {
-				$this->steeps[$i] = $steep->toArray();
-				return;
-			}
-		}
-
-		// Fallback on adding a new one
-		$this->steeps = [...($this->steeps ?? []), $steep->toArray()];
-	}
-
-	public function removeSteep(SteepValue|string $value): void
-	{
-		$key = $value instanceof SteepValue ? $value->key : $value;
-		$original = $this->steeps ?? [];
-
-		// Delete the steep
-		$filtered = array_values(array_filter($original, fn($raw) => $raw->key !== $key));
-
-		// Check if a steep has been correctly deleted
-		if (count($original) === count($filtered)) {
-			throw new \RuntimeException("Steep '$key' doesn't exist");
-		}
-
-		// Save the change
-		$this->steeps = $filtered;
+		$this->steeps = array_map(fn($steep) => $steep->toArray(), $steeps);
+		return $this;
 	}
 }
