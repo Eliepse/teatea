@@ -23,7 +23,7 @@ export function makeSearchInfinitQueryOpt(type: ItemType, filters?: SearchFilter
 
 			return querySearch(queryKey[1] as ItemType, queryKey[2] as SearchFilters);
 		},
-		queryKey: ["search", type, { ...filters, itemsPerPage: 10, sort: "popularity" }],
+		queryKey: ["search", type, { ...filters, itemsPerPage: 15, sort: "popularity" }],
 		getPreviousPageParam: (lastPage) => lastPage.view.previous,
 		getNextPageParam: (lastPage) => lastPage.view.next,
 		initialPageParam: "",
