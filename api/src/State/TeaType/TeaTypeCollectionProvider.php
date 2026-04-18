@@ -142,11 +142,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$resources = array_map(function ($result) use ($entitiesById, $origins) {
 			$type = $entitiesById[$result["typeId"]];
 			$resource = TeaTypeProvider::fromEntity($type);
-			$origin = $origins[$result["originPath"] ?? null] ?? null;
-
-			if (null !== $origin) {
-				$resource->origin = OriginProvider::fromEntity($origin);
-			}
+			$originPath = $result["originPath"] ?? null;
+			
+			$origin = $originPath ? ($origins[$originPath] ?? null) : null;
+			$resource->origin = OriginProvider::fromEntity($origin);
 
 			return $resource;
 		}, $searchResults);
