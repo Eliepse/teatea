@@ -14,6 +14,7 @@ final class OperationHelper
 		Operation $operation,
 		string $key,
 		bool $castEmptyToNull = true,
+		?callable $castFn = null,
 	): string|int|array|float|null|bool {
 		$parameter = $operation->getParameters()?->get($key);
 
@@ -27,6 +28,10 @@ final class OperationHelper
 			return null;
 		}
 
-		return $castEmptyToNull && empty($value) ? null : $value;
+		if($castEmptyToNull && empty($value)) {
+			return null;
+		}
+
+		return $castFn ? $castFn($value) : $value;
 	}
 }

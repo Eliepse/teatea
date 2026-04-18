@@ -24,6 +24,8 @@ export default function TeaSearchPage() {
 		});
 	}
 
+	const year = safeEmpty((searchParams.get("year") ?? "").trim());
+
 	return (
 		<AuthLayout activeKey="search">
 			<TeaSearchEngine
@@ -32,6 +34,7 @@ export default function TeaSearchPage() {
 					origin: safeEmpty((searchParams.get("origin") ?? "").trim()),
 					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
 					type: safeEmpty((searchParams.get("type") ?? "").trim()),
+					year: year ? parseInt(year) : undefined,
 				}}
 				onFiltersChange={handleFiltersChanged}
 				allowCreation

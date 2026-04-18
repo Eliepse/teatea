@@ -12,8 +12,9 @@ import styles from "~/components/origin/OriginSelect.module.css";
 import { Family } from "~/components/tea/Family";
 import { SelectCultivar } from "~/components/tea/SelectCultivar";
 import { Check } from "iconoir-react";
+import { YearFilterButton } from "~/search/components/filter/YearFilterButton";
 
-type Filter = "family" | "origin" | "cultivar";
+type Filter = "family" | "origin" | "cultivar" | "year";
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters } = useSEContext();
@@ -76,6 +77,10 @@ export function SEFiltersBar(props: { className?: string }) {
 							<>{cultivarQuery?.data?.name ?? "Cultivar"}</>
 						)}
 					</FilterButton>
+				</li>
+
+				<li>
+					<YearFilterButton year={filters.year} onChange={(year) => patchFilters({ year })} />
 				</li>
 			</ul>
 			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)} className="p-4">

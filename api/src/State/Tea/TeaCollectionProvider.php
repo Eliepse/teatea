@@ -25,7 +25,8 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private LoggerInterface $logger,
 		private Pagination $pagination,
-	) {}
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -41,6 +42,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$originPath = OperationHelper::getParameter($operation, "origin");
 		$familyFilter = OperationHelper::getParameter($operation, "family");
 		$typeFilter = OperationHelper::getParameter($operation, "type");
+		$yearFilter = OperationHelper::getParameter($operation, "year", castFn: "intval");
 		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
@@ -96,6 +98,11 @@ readonly class TeaCollectionProvider implements ProviderInterface
 				->innerJoin("tea.cultivar", "cultivar")
 				->andWhere("cultivar.id = :cultivarId")
 				->setParameter("cultivarId", $cultivarFilter);
+		}
+
+		// Yaer
+		if (is_int($yearFilter)) {
+			$searchQb->andWhere("tea.year = :year")->setParameter("year", $yearFilter);
 		}
 
 		// Sorting
