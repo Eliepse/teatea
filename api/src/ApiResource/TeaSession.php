@@ -136,4 +136,15 @@ class TeaSession
 	{
 		$this->drankAt = new DatePoint();
 	}
+
+	/**
+	 * @param SteepValue[] $steeps
+	 */
+	public function setSteeps(array $steeps): void
+	{
+		$this->steeps = array_map(
+			fn($v) => $v instanceof SteepValue ? $v : new SteepValue($v["duration"], $v["temperature"] ?? null),
+			$steeps,
+		);
+	}
 }
