@@ -1,11 +1,10 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
-import { deleteApi, fetchApi, patchApi } from "~/utils/api";
+import { deleteApi, patchApi } from "~/utils/api";
 import {
 	BrewingQualityEnum,
 	type Iri,
 	type NullablePartial,
 	RoastLevelEnum,
-	type Tea,
 	type TeaSession,
 	type TeaType,
 } from "~t/types";
@@ -48,6 +47,7 @@ import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusine
 import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 import { extractId } from "~/utils/resource";
 import { Badge } from "~/components/shared/Badge";
+import { queryTeaSession } from "~/utils/query/queryTeaSession";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -56,9 +56,7 @@ const QualityIcon = {
 };
 
 export async function clientLoader(props: Route.ClientLoaderArgs) {
-	const id = parseInt(props.params.id);
-	const response = await fetchApi<TeaSessionRaw>(`/tea_sessions/${id}`);
-	return denormalizeTeaSession(await response.json()) as TeaSession & { author: Iri; tea: Tea & { type: Iri } };
+	return queryTeaSession(parseInt(props.params.id));
 }
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
