@@ -41,7 +41,7 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 		// TODO(elie): Find a way to have SteepValue array to be auto hydrated in Resource
 		$entity->setSteeps(
 			array_map(
-				fn($st) => new SteepValue($st["duration"], $st["temperature"] ?? null),
+				fn($v) => $v instanceof SteepValue ? $v : new SteepValue($v["duration"], $v["temperature"] ?? null),
 				$data->steeps,
 			),
 		);
