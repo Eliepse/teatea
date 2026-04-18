@@ -56,9 +56,9 @@ use function Symfony\Component\TypeInfo\TypeFactoryTrait;
 			property: "cultivar",
 			description: "Filter by cultivar",
 		),
-		// 1950 -> 2999
+		// 1850 -> 2999
 		"year" => new QueryParameter(
-			schema: ["type" => "[1-2][5-9][0-9]{2}", "example" => "1993, 2008, ..."],
+			schema: ["type" => "[1-2][8-9][0-9]{2}", "example" => "1993, 2008, ..."],
 			property: "year",
 			description: "Filter by harvest year",
 			castToNativeType: true,
