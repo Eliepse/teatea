@@ -38,6 +38,7 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
 		$entity->quality = $data->quality;
 		$entity->place = $data->place ? $this->em->getReference(\App\Entity\Business::class, $data->place->id) : null;
+		// TODO(elie): Find a way to have SteepValue array to be auto hydrated in Resource
 		$entity->setSteeps(
 			array_map(
 				fn($st) => new SteepValue($st["duration"], $st["temperature"] ?? null),
