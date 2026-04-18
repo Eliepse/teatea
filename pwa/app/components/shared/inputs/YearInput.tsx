@@ -1,8 +1,7 @@
 import { XmarkCircle } from "iconoir-react";
 import { useMemo, useState } from "react";
 import { handleUIEvent } from "~/utils/function";
-import { Modal } from "~/components/shared/modal/Modal";
-import { WheelPicker, WheelPickerWrapper } from "@ncdai/react-wheel-picker";
+import { SelectYearModal } from "~/components/shared/modal/SelectYearModal";
 
 export function YearInput(props: {
 	value?: number;
@@ -59,29 +58,17 @@ export function YearInput(props: {
 				</button>
 			</div>
 
-			<Modal onClose={() => setModalOpen(false)} open={modalOpen}>
-				<div className="flex mb-4">
-					<button className="btn btn-outline" onClick={() => setModalOpen(false)}>
-						Back
-					</button>
-					<button className="btn btn-primary ml-auto" onClick={confirm}>
-						Confirm
-					</button>
-				</div>
-
-				<WheelPickerWrapper className="rounded-md border border-zinc-200 bg-white">
-					<WheelPicker
-						options={options}
-						value={value.toFixed()}
-						onValueChange={(v) => setValue(parseInt(v))}
-						classNames={{
-							optionItem: "text-zinc-400",
-							highlightWrapper: "bg-zinc-100 text-zinc-950",
-							highlightItem: "",
-						}}
-					/>
-				</WheelPickerWrapper>
-			</Modal>
+			<SelectYearModal
+				open={modalOpen}
+				min={props.min}
+				max={props.max}
+				value={props.value}
+				onConfirm={(value) => {
+					setModalOpen(false);
+					props.onChange(value);
+				}}
+				onClose={() => setModalOpen(false)}
+			/>
 		</>
 	);
 }
