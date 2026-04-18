@@ -30,7 +30,8 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 		private Pagination $pagination,
-	) {}
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): PaginatorInterface
 	{
@@ -50,7 +51,9 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		if ($distinctByLevelFilter && $originFilter && $distinctByLevelFilter < $originFilter->level()) {
-			throw new BadRequestHttpException("The 'groupByLevel' filter cannot be lower that the level of the 'origin' filter");
+			throw new BadRequestHttpException(
+				"The 'groupByLevel' filter cannot be lower that the level of the 'origin' filter",
+			);
 		}
 		$expr = $this->em->getExpressionBuilder();
 		$searchQuery = $this->em
@@ -72,7 +75,10 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 		}
 
 		if (null !== $originFilter) {
-			$searchQuery->andWhere("CONTAINS(:pathFilter, tea.originPath) = TRUE")->setParameter("pathFilter", $originFilter);
+			$searchQuery->andWhere("CONTAINS(:pathFilter, tea.originPath) = TRUE")->setParameter(
+				"pathFilter",
+				$originFilter,
+			);
 		}
 
 		if (null !== $distinctByLevelFilter) {
@@ -143,7 +149,7 @@ readonly class TeaTypeCollectionProvider implements ProviderInterface
 			$type = $entitiesById[$result["typeId"]];
 			$resource = TeaTypeProvider::fromEntity($type);
 			$originPath = $result["originPath"] ?? null;
-			
+
 			$origin = $originPath ? ($origins[$originPath] ?? null) : null;
 			$resource->origin = OriginProvider::fromEntity($origin);
 
