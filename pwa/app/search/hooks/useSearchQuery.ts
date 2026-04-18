@@ -11,6 +11,7 @@ export type SearchFilters = {
 	type?: TeaType["slug"];
 	cultivar?: string | number;
 	distinctByLevel?: 1 | 2 | 3;
+	year?: number;
 };
 
 export const SE_CONTEXT = createContext<{

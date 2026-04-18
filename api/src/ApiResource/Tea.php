@@ -22,13 +22,17 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use function Symfony\Component\TypeInfo\TypeFactoryTrait;
+
 #[ApiResource(security: "is_granted('ROLE_USER')")]
-#[Get(normalizationContext: ["groups" => [
-	"tea:read",
-	"embedded:teaType",
-	"with:origin",
-	"embedded:cultivar",
-]], provider: TeaProvider::class)]
+#[Get(normalizationContext: [
+	"groups" => [
+		"tea:read",
+		"embedded:teaType",
+		"with:origin",
+		"embedded:cultivar",
+	]
+], provider: TeaProvider::class)]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -48,9 +52,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 			description: "Filter by tea type. Ignore `family`, `q` and `origin` filters when applied.",
 		),
 		"cultivar" => new QueryParameter(
-			schema: ["type" => Requirement::POSITIVE_INT, "example" => "Cultivar id"],
+			schema: ["type" => Requirement::POSITIVE_INT, "example" => "12, 42, ..."],
 			property: "cultivar",
 			description: "Filter by cultivar",
+		),
+		// 1950 -> 2999
+		"year" => new QueryParameter(
+			schema: ["type" => "[1-2][5-9][0-9]{2}", "example" => "1993, 2008, ..."],
+			property: "year",
+			description: "Filter by harvest year",
+			castToNativeType: true,
 		),
 		"q" => new QueryParameter(property: "hydra:freetextQuery", description: "Filter by name"),
 		"origin" => new QueryParameter(schema: ["pattern" => "^[a-zA-Z0-9_.]+$"], description: "Filter by origin"),
@@ -76,7 +87,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[GetCollection(
 	uriTemplate: "/members/{username}/tea_lists/{slug}/teas",
 	uriVariables: [
-		"username" => new Link(fromProperty: "username", fromClass: Member::class, compositeIdentifier: true, required: true),
+		"username" => new Link(
+			fromProperty: "username",
+			fromClass: Member::class,
+			compositeIdentifier: true,
+			required: true,
+		),
 		"slug" => new Link(compositeIdentifier: true, schema: ["pattern" => "/^[a-zA-Z0-9-_]+$/"], required: true),
 	],
 	paginationEnabled: true,

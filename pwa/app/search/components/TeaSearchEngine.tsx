@@ -148,7 +148,7 @@ export function TeaSearchEngine(props: {
 						</ul>
 					)}
 
-					{!!query.hasNextPage && (
+					{query.hasNextPage && (
 						<div className="px-4">
 							<button
 								className="btn btn-outline btn-secondary btn-block h-14 mt-4"
@@ -179,7 +179,7 @@ function computeSearchType(filters?: SearchFilters): "teas" | "tea_types" {
 		return "tea_types";
 	}
 
-	if (filters.type || filters.cultivar) {
+	if (filters.type || filters.cultivar || filters.year) {
 		return "teas";
 	}
 
