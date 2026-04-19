@@ -85,6 +85,9 @@
             "config/packages/lexik_jwt_authentication.yaml"
         ]
     },
+    "martinkup/symfony-profiler-optimization-advisor-bundle": {
+        "version": "0.1.0"
+    },
     "nelmio/cors-bundle": {
         "version": "2.5",
         "recipe": {

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "303234ef3293372a7be55fbf10c05c88",
+    "content-hash": "b7557bf0d3846885d51d99d6d37c65a6",
     "packages": [
         {
             "name": "api-platform/doctrine-common",
@@ -9453,6 +9453,113 @@
                 "source": "https://github.com/marc-mabe/php-enum/tree/v4.7.2"
             },
             "time": "2025-09-14T11:18:39+00:00"
+        },
+        {
+            "name": "martinkup/symfony-profiler-optimization-advisor-bundle",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/martinkup/symfony-profiler-optimization-advisor-bundle.git",
+                "reference": "391c71ab964658968adf7bb63e3d6b7b52ee1b61"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/martinkup/symfony-profiler-optimization-advisor-bundle/zipball/391c71ab964658968adf7bb63e3d6b7b52ee1b61",
+                "reference": "391c71ab964658968adf7bb63e3d6b7b52ee1b61",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.3",
+                "symfony/framework-bundle": "^7.2|^8.0",
+                "symfony/twig-bundle": "^7.2|^8.0"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^4.0",
+                "doctrine/sql-formatter": "^1.1",
+                "php-parallel-lint/php-parallel-lint": "^1.4",
+                "phpstan/extension-installer": "^1.4",
+                "phpstan/phpstan": "^2.0",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpstan/phpstan-strict-rules": "^2.0",
+                "phpunit/phpunit": "^12.0",
+                "roave/security-advisories": "dev-latest",
+                "slevomat/coding-standard": "^8.4",
+                "squizlabs/php_codesniffer": "^4.0",
+                "symfony/ai-symfony-mate-extension": "^0.5",
+                "symfony/cache": "^7.2|^8.0",
+                "symfony/doctrine-bridge": "^7.2|^8.0",
+                "symfony/event-dispatcher": "^7.2|^8.0",
+                "symfony/http-client": "^7.2|^8.0",
+                "symfony/messenger": "^7.2|^8.0",
+                "symfony/stopwatch": "^7.2|^8.0",
+                "symfony/web-profiler-bundle": "^7.2|^8.0"
+            },
+            "suggest": {
+                "doctrine/sql-formatter": "Required for SQL syntax highlighting in the Database tab",
+                "symfony/ai-symfony-mate-extension": "Required for AI Mate MCP integration (optimization tools and collector formatter)",
+                "symfony/doctrine-bridge": "Required for Database query analysis",
+                "symfony/http-client": "Required for HTTP client call analysis",
+                "symfony/messenger": "Required for automatic synchronous Messenger handler analysis",
+                "symfony/stopwatch": "Required for Stopwatch performance breakdown"
+            },
+            "type": "symfony-bundle",
+            "extra": {
+                "ai-mate": {
+                    "includes": [
+                        "src/AiMate/config.php"
+                    ],
+                    "scan-dirs": [
+                        "src/AiMate/Capability"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MartinKup\\OptimizationAdvisorBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Martin Kup",
+                    "homepage": "https://martinkup.dev",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Symfony Profiler bundle that analyzes per-request signals and produces scored, actionable optimization opportunities with ready-made AI agent prompts.",
+            "homepage": "https://github.com/martinkup/symfony-profiler-optimization-advisor-bundle",
+            "keywords": [
+                "advisor",
+                "ai-prompts",
+                "cache",
+                "debug",
+                "developer-tools",
+                "doctrine",
+                "n-plus-one",
+                "optimization",
+                "performance",
+                "profiler",
+                "query-optimization",
+                "symfony",
+                "symfony-bundle",
+                "twig",
+                "web-debug-toolbar"
+            ],
+            "support": {
+                "issues": "https://github.com/martinkup/symfony-profiler-optimization-advisor-bundle/issues",
+                "source": "https://github.com/martinkup/symfony-profiler-optimization-advisor-bundle"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/martinkup",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-03-07T17:54:08+00:00"
         },
         {
             "name": "nette/php-generator",

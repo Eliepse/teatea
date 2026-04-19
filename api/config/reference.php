@@ -1000,8 +1000,8 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  * }
  * @psalm-type MercureConfig = array{
  *     hubs?: array<string, array{ // Default: []
- *         url?: scalar|Param|null, // URL of the hub's publish endpoint // Default: null
- *         public_url?: scalar|Param|null, // URL of the hub's public endpoint
+ *         url?: scalar|Param|null, // URL of the hub's publish endpoint
+ *         public_url?: scalar|Param|null, // URL of the hub's public endpoint // Default: null
  *         jwt?: string|array{ // JSON Web Token configuration.
  *             value?: scalar|Param|null, // JSON Web Token to use to publish to this hub.
  *             provider?: scalar|Param|null, // The ID of a service to call to provide the JSON Web Token.
@@ -1923,6 +1923,25 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         db_driver?: scalar|Param|null, // Default: null
  *     }>,
  * }
+ * @psalm-type OptimizationAdvisorConfig = array{
+ *     thresholds?: array{
+ *         slow_query_ms?: float|Param, // Default: 30.0
+ *         n_plus_one_count?: int|Param, // Default: 10
+ *         slow_listener_ms?: float|Param, // Default: 10.0
+ *         max_items?: int|Param, // Default: 200
+ *     },
+ *     app_namespace_prefix?: scalar|Param|null, // Default: "App\\"
+ *     redact_sensitive_data?: bool|Param, // Default: true
+ *     sensitive_param_patterns?: list<scalar|Param|null>,
+ *     sensitive_value_patterns?: list<scalar|Param|null>,
+ *     sensitive_query_params?: list<scalar|Param|null>,
+ *     infra_db_tables?: list<scalar|Param|null>,
+ *     app_cache_pool_prefixes?: list<scalar|Param|null>,
+ *     profiler_cache_pool_prefixes?: list<scalar|Param|null>,
+ *     profiler_template_prefixes?: list<scalar|Param|null>,
+ *     profiler_event_namespace_prefixes?: list<scalar|Param|null>,
+ *     profiler_event_classes?: list<scalar|Param|null>,
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1958,6 +1977,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *         vich_uploader?: VichUploaderConfig,
+ *         optimization_advisor?: OptimizationAdvisorConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1994,6 +2014,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         lexik_jwt_authentication?: LexikJwtAuthenticationConfig,
  *         stof_doctrine_extensions?: StofDoctrineExtensionsConfig,
  *         vich_uploader?: VichUploaderConfig,
+ *         optimization_advisor?: OptimizationAdvisorConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
