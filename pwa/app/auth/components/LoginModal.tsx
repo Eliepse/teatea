@@ -13,15 +13,6 @@ import { usePostHog } from "@posthog/react";
 import { loginDevMode } from "~/auth/query/loginQuery";
 
 export type OTPToken = { value: string; expiredAt: Date };
-type OTPResponse =
-	| {
-			token: string;
-			refresh_token: string;
-			refresh_token_expiration: number;
-	  }
-	| {
-			message?: string;
-	  };
 
 export function LoginModal(props: { open: boolean; onClose: () => void }) {
 	const defaultEmail = useRef("");
@@ -199,6 +190,10 @@ function LoginForm(props: {
 	}
 
 	function submitDevMode() {
+		if (!runtimeEnv.VITE_DEV_LOGIN_KEY) {
+			return;
+		}
+
 		void loginDevMode(runtimeEnv.VITE_DEV_LOGIN_KEY);
 		navigate("/welcome");
 	}
