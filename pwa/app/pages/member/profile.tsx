@@ -11,10 +11,9 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { MemberHistoryChart } from "~/pages/member/_components/MemberHistoryChart";
 import { MemberFamiliesChart } from "~/pages/member/_components/MemberFamiliesChart";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
 import { startOfDay, sub } from "date-fns";
-import { FriendsList } from "~/account/components/FriendsList";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -118,13 +117,15 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				<MemberHistoryChart memberIri={member["@id"]} since={statsSince} className="col-span-3" />
 			</div>
 
-			<Link
-				to={`/members/${member.username}/friends`}
-				className="flex items-center bg-white text-green-900 rounded-xl px-6 h-16 text-lg shadow-sm my-4"
-			>
-				Friends
-				<User className="ml-auto size-6" />
-			</Link>
+			<IfAuthor author={member}>
+				<Link
+					to={`/members/${member.username}/friends`}
+					className="flex items-center bg-white text-green-900 rounded-xl px-6 h-16 text-lg shadow-sm my-4"
+				>
+					Friends
+					<User className="ml-auto size-6" />
+				</Link>
+			</IfAuthor>
 		</AuthLayout>
 	);
 }

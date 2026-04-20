@@ -2,8 +2,16 @@ import { AuthLayout } from "~/layouts/AuthLayout";
 import { getMember } from "~/shared/query/memberQuery";
 import type { Route } from "./+types/friends";
 import { getFriends } from "~/account/query/friendsQuery";
+import { Link, redirect } from "react-router";
+import { TokenUtils } from "~/auth/hooks/useToken";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+	const currentUsername = TokenUtils.get()?.username;
+
+	if (params.username !== currentUsername) {
+		return redirect(`/members/${currentUsername}`);
+	}
+
 	const member = await getMember(params.username);
 	const friends = await getFriends(params.username);
 
