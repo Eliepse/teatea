@@ -6,9 +6,9 @@ import { PostHogErrorBoundary, PostHogProvider } from "@posthog/react";
 import { isRouteErrorResponse } from "react-router";
 
 startTransition(() => {
-	if (runtimeEnv.POSTHOG_HOST && runtimeEnv.POSTHOG_KEY) {
-		posthog.init(runtimeEnv.POSTHOG_KEY as string, {
-			api_host: runtimeEnv.POSTHOG_HOST as string,
+	if (runtimeEnv.VITE_POSTHOG_HOST && runtimeEnv.VITE_POSTHOG_KEY) {
+		posthog.init(runtimeEnv.VITE_POSTHOG_KEY as string, {
+			api_host: runtimeEnv.VITE_POSTHOG_HOST as string,
 			defaults: "2026-01-30",
 			__add_tracing_headers: [window.location.host, "localhost"], // TODO(elie): add real host on prod
 			debug: import.meta.env.DEV,

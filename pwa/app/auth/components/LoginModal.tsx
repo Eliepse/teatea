@@ -199,7 +199,7 @@ function LoginForm(props: {
 	}
 
 	function submitDevMode() {
-		void loginDevMode(runtimeEnv.DEV_LOGIN_KEY);
+		void loginDevMode(runtimeEnv.VITE_DEV_LOGIN_KEY);
 		navigate("/welcome");
 	}
 
