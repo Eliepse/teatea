@@ -1,12 +1,13 @@
 {
 	"include": [
-		"app/**/*",
-		"data/**/*",
-		"types/**/*",
-		//    "**/.server/**/*",
-		//    "**/.client/**/*",
-		".react-router/types/**/*"
-	],
+      "app/**/*",
+      "data/**/*",
+      "types/**/*",
+      //    "**/.server/**/*",
+      //    "**/.client/**/*",
+      ".react-router/types/**/*",
+      "src/runtime-env.d.ts"
+    ],
 	"compilerOptions": {
 		"lib": ["DOM", "DOM.Iterable", "ES2022"],
 		"types": ["node", "vite/client"],

@@ -17,6 +17,7 @@
     "@react-router/node": "^7.13.1",
     "@react-router/serve": "^7.13.1",
     "@runtime-env/cli": "^1.1.0",
+    "@runtime-env/vite-plugin": "^0.1.5",
     "@tanstack/react-query": "^5.90.21",
     "axios": "^1.13.6",
     "chart.js": "^4.5.1",

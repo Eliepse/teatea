@@ -11,6 +11,7 @@
         "@react-router/node": "^7.13.1",
         "@react-router/serve": "^7.13.1",
         "@runtime-env/cli": "^1.1.0",
+        "@runtime-env/vite-plugin": "^0.1.5",
         "@tanstack/react-query": "^5.90.21",
         "axios": "^1.13.6",
         "chart.js": "^4.5.1",
@@ -355,6 +356,8 @@
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.59.0", "", { "os": "win32", "cpu": "x64" }, "sha512-2HRCml6OztYXyJXAvdDXPKcawukWY2GpR5/nxKp4iBgiO3wcoEGkAaqctIbZcNB6KlUQBIqt8VYkNSj2397EfA=="],
 
     "@runtime-env/cli": ["@runtime-env/cli@1.1.0", "", { "dependencies": { "ajv": "8.17.1", "ajv-formats": "3.0.1", "chokidar": "5.0.0", "commander": "14.0.3", "json-schema-to-typescript": "15.0.4", "lodash": "4.17.23" }, "bin": { "runtime-env": "bin/runtime-env.js" } }, "sha512-T7Ywxk1T4y4qWtQ0r2v4BaCtU3+axwaUEMvEq5AIJHvmwvVidJI1SXnHjTymhVZtoUUG/1u/S2S8DUgjsxlCgg=="],
+
+    "@runtime-env/vite-plugin": ["@runtime-env/vite-plugin@0.1.5", "", { "peerDependencies": { "@runtime-env/cli": "*", "vite": "*", "vitest": "*" }, "optionalPeers": ["vitest"] }, "sha512-En3I2GYw1cbTCiTxOjpa5WuOWPLp7jNgRuDeV2zkRJZrcx6lt3BldknMhOLahvEzgAyEoHj7spTmpLH5z6Fx8A=="],
 
     "@tabby_ai/hijri-converter": ["@tabby_ai/hijri-converter@1.0.5", "", {}, "sha512-r5bClKrcIusDoo049dSL8CawnHR6mRdDwhlQuIgZRNty68q0x8k3Lf1BtPAMxRf/GgnHBnIO4ujd3+GQdLWzxQ=="],
 
