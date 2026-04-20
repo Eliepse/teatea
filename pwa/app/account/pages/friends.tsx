@@ -3,6 +3,7 @@ import { getMember } from "~/shared/query/memberQuery";
 import type { Route } from "./+types/friends";
 import { getFriends } from "~/account/query/friendsQuery";
 import { Link, redirect } from "react-router";
+import { ArrowRight } from "iconoir-react";
 import { TokenUtils } from "~/auth/hooks/useToken";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
@@ -38,7 +39,15 @@ export default function friendsPage(props: Route.ComponentProps) {
 
 			<ul>
 				{friends.member.map((friend) => (
-					<li className="mb-2 px-3 py-3 bg-white rounded-md shadow-xs">{friend.username}</li>
+					<li key={friend["@id"]}>
+						<Link
+							className="flex items-center mb-2 px-3 py-3 bg-white rounded-md shadow-xs"
+							to={`/members/${friend.username}`}
+						>
+							{friend.username}
+							<ArrowRight className="ml-auto w-5" />
+						</Link>
+					</li>
 				))}
 			</ul>
 		</AuthLayout>
