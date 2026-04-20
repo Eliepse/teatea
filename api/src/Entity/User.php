@@ -62,6 +62,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "owner", orphanRemoval: true)]
 	private Collection $collectionTeas;
 
+	#[ORM\ManyToOne]
+	private ?User $referrer = null;
+
 	public function __construct()
 	{
 		$this->teaLists = new ArrayCollection();

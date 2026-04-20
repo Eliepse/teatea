@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\DTO\Stats\TeaFamilyAmount;
+use App\State\Member\FriendCollectionProvider;
 use App\State\Member\MemberCreateProcessor;
 use App\State\Member\MemberOnboardingProcessor;
 use App\State\Member\MemberProvider;
@@ -56,6 +56,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 	security: "is_granted('ROLE_ONBOARDING')",
 	provider: MemberProvider::class,
 	processor: MemberOnboardingProcessor::class,
+)]
+#[GetCollection(
+	uriTemplate: "/members/{username}/friends",
+	normalizationContext: [],
+	security: "is_granted('ROLE_USER')", // TODO(elie): improve privacy
+	provider: FriendCollectionProvider::class,
 )]
 class Member
 {

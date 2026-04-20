@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * @implements ProviderInterface<ActivityGraph|null>
+ * @implements ProviderInterface<Member[]|Member|null>
  */
 readonly class MemberProvider implements ProviderInterface
 {
