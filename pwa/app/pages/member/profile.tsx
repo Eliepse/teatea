@@ -5,15 +5,16 @@ import { type Member, type MemberStats } from "~t/types";
 import { usePopup } from "~/components/shared/modal/AlertManager";
 import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { Link, useNavigate } from "react-router";
-import { CoffeeCup, Leaf, LogOut, PeopleTag } from "iconoir-react";
+import { CoffeeCup, Leaf, LogOut, PeopleTag, User } from "iconoir-react";
 import { UserStat } from "~/components/stats/UserStat";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { MemberHistoryChart } from "~/pages/member/_components/MemberHistoryChart";
 import { MemberFamiliesChart } from "~/pages/member/_components/MemberFamiliesChart";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import clsx from "clsx";
 import { startOfDay, sub } from "date-fns";
+import { FriendsList } from "~/account/components/FriendsList";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -116,6 +117,14 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				<MemberFamiliesChart memberIri={member["@id"]} since={statsSince} className="col-span-3 mx-8 mb-6" />
 				<MemberHistoryChart memberIri={member["@id"]} since={statsSince} className="col-span-3" />
 			</div>
+
+			<Link
+				to={`/members/${member.username}/friends`}
+				className="flex items-center bg-white text-green-900 rounded-xl px-6 h-16 text-lg shadow-sm my-4"
+			>
+				Friends
+				<User className="ml-auto size-6" />
+			</Link>
 		</AuthLayout>
 	);
 }

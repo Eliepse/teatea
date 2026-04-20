@@ -19,6 +19,7 @@ export default [
 
 		route("/lists/:id", "pages/member/teaList.tsx"),
 
+		route("/members/:username/friends", "account/pages/friends.tsx"),
 		route("/members/:username/teas", "pages/member/personal-collection.tsx"),
 		route("/members/:username/teas/:teaId", "pages/member/personal-collection-tea.tsx"),
 		route("/members/:username", "pages/member/profile.tsx"),

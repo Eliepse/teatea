@@ -109,6 +109,8 @@ export type Member = Resource<"Member"> & {
 	email: string;
 };
 
+export type Friend = Pick<Member, "@id" | "@type" | "username">;
+
 export type TeaFamily = "white" | "yellow" | "green" | "wulong" | "black" | "fermented";
 
 export const teaFamilies: Record<TeaFamily, string> = {
