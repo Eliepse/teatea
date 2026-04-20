@@ -5,7 +5,7 @@ import { isPast } from "date-fns";
 import posthog from "posthog-js";
 
 export type OTPToken = { value: string; expiredAt: Date };
-type OTPResponse =
+export type OTPResponse =
 	| {
 			token: string;
 			refresh_token: string;

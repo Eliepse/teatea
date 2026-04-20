@@ -100,7 +100,7 @@ export async function getApi<T>(
 
 export async function postApi<T>(
 	url: string,
-	payload: string | number | object,
+	payload?: string | number | object,
 	config?: Omit<FetchApiConfig, "payload" | "method">,
 ): Promise<TResponse<T>> {
 	return fetchApi<T>(url, { ...config, method: "POST", payload });
