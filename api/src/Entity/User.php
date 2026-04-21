@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
+use App\Entity\Pivot\FriendshipRequest;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -64,6 +65,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 	#[ORM\ManyToOne]
 	private ?User $referrer = null;
+
+	#[ORM\OneToMany(targetEntity: FriendshipRequest::class, mappedBy: "requestedBy")]
+	private Collection $friendRequestsSent;
+
+	#[ORM\OneToMany(targetEntity: FriendshipRequest::class, mappedBy: "target")]
+	private Collection $friendRequestsReceived;
 
 	public function __construct()
 	{

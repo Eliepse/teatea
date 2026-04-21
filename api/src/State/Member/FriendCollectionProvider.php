@@ -26,13 +26,14 @@ readonly class FriendCollectionProvider implements ProviderInterface
 		assert($operation instanceof CollectionOperationInterface);
 		assert(null !== $username);
 
-
 		$query = $this->em
 			->createQueryBuilder()
 			->select("user")
 			->from(User::class, "user")
-			->innerJoin("user.referrer", "referrer")
-			->where("referrer.username = :username")
+			->innerJoin("user.friendRequestsReceived", "friend_requests")
+			->innerJoin("friend_requests.requestedBy", "request_user")
+			->where("request_user.username = :username")
+			->andWhere("friend_requests.acceptedAt IS NOT NULL AND friend_requests.rejectedAt IS NULL")
 			->setParameter("username", $username);
 
 		return array_map(fn($user) => self::hydrate($user), $query->getQuery()->getResult());
