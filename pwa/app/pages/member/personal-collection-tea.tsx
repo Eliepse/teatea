@@ -2,7 +2,7 @@ import type { Route } from "../../../.react-router/types/app/pages/member/+types
 import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import {
 	ArrowRightCircle,
 	Calendar,
@@ -83,7 +83,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
+		<WithMainMenu activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
 			<MemberTeaCTX.Provider value={context}>
 				<nav className="mb-6 pt-2 relative flex">
 					<BackButton className="mr-auto shadow-sm" />
@@ -221,7 +221,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					</div>
 				</Modal>
 			</MemberTeaCTX.Provider>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }
 

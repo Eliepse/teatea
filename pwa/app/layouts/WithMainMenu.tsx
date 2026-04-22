@@ -6,7 +6,7 @@ import { Link, useNavigation } from "react-router";
 import { EcologyBook, Leaf } from "iconoir-react";
 import { useUser } from "~/auth/hooks/useUser";
 
-export function AuthLayout(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
+export function WithMainMenu(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
 	const navigation = useNavigation();
 	const user = useUser();
 	const isNavigating = Boolean(navigation.location);

@@ -1,4 +1,4 @@
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/profile";
 import { getApi, postApi } from "~/utils/api";
 import { type Member, type MemberStats } from "~t/types";
@@ -57,7 +57,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="bg-green-50 px-4 text-green-900">
+		<WithMainMenu className="bg-green-50 px-4 text-green-900">
 			<div className="flex items-center pt-4 mb-4">
 				<BackButton className="shadow-xs" />
 
@@ -126,7 +126,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 					<User className="ml-auto size-6" />
 				</Link>
 			</IfAuthor>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }
 

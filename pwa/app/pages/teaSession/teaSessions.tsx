@@ -3,7 +3,7 @@ import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Embed, Member, TeaSession } from "~t/types";
 import { formatDate, formatISO, isToday, isYesterday } from "date-fns";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { f, handleUIEvent } from "~/utils/function";
 import { useState } from "react";
@@ -59,7 +59,7 @@ export default function ListTeaSessions() {
 	);
 
 	return (
-		<AuthLayout className="px-4 pb-18 bg-green-50" activeKey="activity">
+		<WithMainMenu className="px-4 pb-18 bg-green-50" activeKey="activity">
 			<SessionsUserFilter username={filters.username} onChange={filterUser} className="my-8" />
 
 			{0 !== items.length && (
@@ -115,7 +115,7 @@ export default function ListTeaSessions() {
 			<Link to="/tea/search" className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 shadow-md">
 				<CoffeeCup className="size-4" /> Start brewing
 			</Link>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }
 

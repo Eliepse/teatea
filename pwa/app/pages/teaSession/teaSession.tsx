@@ -17,7 +17,7 @@ import { handleUIEvent } from "~/utils/function";
 import { useMutation } from "@tanstack/react-query";
 import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
@@ -91,7 +91,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<AuthLayout className="px-4 pb-24 bg-green-50" activeKey="activity">
+		<WithMainMenu className="px-4 pb-24 bg-green-50" activeKey="activity">
 			<header className="py-4 relative">
 				<div className="absolute inset-x-0 top-4 flex items-center mb-6">
 					<BackButton className="mr-auto shadow-xs" />
@@ -254,7 +254,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
 			</Modal>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }
 

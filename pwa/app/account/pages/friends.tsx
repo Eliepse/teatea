@@ -1,4 +1,4 @@
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { getMember } from "~/shared/query/memberQuery";
 import type { Route } from "./+types/friends";
 import { getFriends } from "~/account/query/friendsQuery";
@@ -23,7 +23,7 @@ export default function friendsPage(props: Route.ComponentProps) {
 	const { member, friends } = props.loaderData;
 
 	return (
-		<AuthLayout className="bg-green-50 p-4">
+		<WithMainMenu className="bg-green-50 p-4">
 			<div className="flex items-center mb-6">
 				<h1 className="flex items-center flex-1 text-3xl font-header font-bold text-green-700">
 					Friends
@@ -50,6 +50,6 @@ export default function friendsPage(props: Route.ComponentProps) {
 					</li>
 				))}
 			</ul>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }

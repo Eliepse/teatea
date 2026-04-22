@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router";
 import { useUser } from "~/auth/hooks/useUser";
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { usePWAInstall } from "~/utils/browser/usePWAInstall";
 import { handleUIEvent } from "~/utils/function";
@@ -32,7 +32,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 
 	return (
-		<AuthLayout className="px-4 bg-green-50 grid auto-rows-min gap-4 text-green-900" activeKey="home">
+		<WithMainMenu className="px-4 bg-green-50 grid auto-rows-min gap-4 text-green-900" activeKey="home">
 			<div className="flex items-center pt-4">
 				<Logo className="w-24 flex-none mr-auto text-green-700" />
 				<Link className="btn btn-lg btn-circle bg-white shadow-xs" to={`/members/${token?.username}`}>
@@ -91,7 +91,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 					Admin dashboard
 				</Link>
 			</IfAdmin>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }
 
