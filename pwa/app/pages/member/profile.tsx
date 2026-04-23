@@ -5,7 +5,7 @@ import { type Member, type MemberStats } from "~t/types";
 import { usePopup } from "~/components/shared/modal/AlertManager";
 import { TokenUtils, useToken } from "~/auth/hooks/useToken";
 import { Link, useNavigate } from "react-router";
-import { CoffeeCup, Leaf, LogOut, PeopleTag, User } from "iconoir-react";
+import { CoffeeCup, Leaf, LogOut, PeopleTag, QrCode, User } from "iconoir-react";
 import { UserStat } from "~/components/stats/UserStat";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
@@ -14,6 +14,8 @@ import { MemberFamiliesChart } from "~/pages/member/_components/MemberFamiliesCh
 import { useState } from "react";
 import clsx from "clsx";
 import { startOfDay, sub } from "date-fns";
+import { Modal } from "~/components/shared/modal/Modal";
+import { MemberQRCodeBtn } from "~/account/components/MemberQRCodeBtn";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -62,8 +64,12 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				<BackButton className="shadow-xs" />
 
 				<IfAuthor author={member}>
-					<button className="btn btn-lg btn-circle bg-white ml-auto shadow-xs" onClick={promptLogout}>
-						<LogOut className="size-4" />
+					<MemberQRCodeBtn username={member.username} />
+				</IfAuthor>
+
+				<IfAuthor author={member}>
+					<button className="btn btn-lg btn-circle bg-white ml-2 shadow-xs" onClick={promptLogout}>
+						<LogOut className="size-5" />
 					</button>
 				</IfAuthor>
 			</div>
