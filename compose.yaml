@@ -57,6 +57,7 @@ services:
       VITE_API_URL: /api
       VITE_POSTHOG_KEY: ${POSTHOG_KEY}
       VITE_POSTHOG_HOST: ${POSTHOG_HOST}
+      VITE_BASE_URL: ${BASE_URL}
     depends_on:
       - api
     volumes:

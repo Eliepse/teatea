@@ -5,10 +5,12 @@
 		"VITE_SUPPORT_EMAIL": { "type": "string" },
 		"VITE_POSTHOG_KEY": { "type": "string" },
 		"VITE_POSTHOG_HOST": { "type": "string" },
-		"VITE_DEV_LOGIN_KEY": {"type":  "string" }
+		"VITE_DEV_LOGIN_KEY": {"type":  "string" },
+		"VITE_BASE_URL": {"type":  "string" }
 	},
 	"required": [
 		"VITE_API_URL",
-		"VITE_SUPPORT_EMAIL"
+		"VITE_SUPPORT_EMAIL",
+		"VITE_BASE_URL"
 	]
 }
