@@ -107,6 +107,7 @@ export type Teaware = Resource & {
 export type Member = Resource<"Member"> & {
 	username: string;
 	email: string;
+	friendshipped_at?: Date;
 };
 
 export type Friend = Pick<Member, "@id" | "@type" | "username">;
