@@ -10,5 +10,6 @@ export function makeMemberStatsQueryOpt(username: string) {
 	return queryOptions({
 		queryFn: async () => await queryMemberStats(username),
 		queryKey: ["member", username, "stats"],
+		staleTime: 3 * 60_000,
 	});
 }
