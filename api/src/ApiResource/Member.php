@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"with:teatype",
 		]
 	],
-	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
+	security: "is_granted('ROLE_USER')",
 	provider: UserStatsProvider::class,
 )]
 #[GetCollection(
@@ -60,7 +60,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[GetCollection(
 	uriTemplate: "/members/{username}/friends",
 	normalizationContext: [],
-	security: "is_granted('ROLE_USER')", // TODO(elie): improve privacy
+	security: "is_granted('ROLE_USER') and request.attributes.get('username') === user.username",
 	provider: FriendCollectionProvider::class,
 )]
 class Member
@@ -72,7 +72,7 @@ class Member
 	#[ApiProperty(identifier: true)]
 	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
-	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member"])]
+	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member", "auth:guest"])]
 	public ?string $username;
 
 	#[Assert\Email]
@@ -81,7 +81,7 @@ class Member
 
 	/** @var string[] */
 	#[Groups(["member:self", "role:admin"])]
-	#[ApiProperty(security: "is_granted('ROLE_ADMIN') or (object.id == user.id)")]
+	#[ApiProperty(security: "object.username === user?.username")]
 	public array $roles = [];
 
 	#[Groups(["member:stats"])]

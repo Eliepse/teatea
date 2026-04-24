@@ -19,7 +19,7 @@ export async function refreshToken(): Promise<void> {
 	const refreshToken = TokenUtils.getRefreshToken();
 
 	if (null === refreshToken) {
-		throw new Error("Invalid refresh token");
+		return;
 	}
 
 	const response = await fetch("/auth/token/refresh", {
