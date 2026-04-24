@@ -4,17 +4,17 @@ import styles from "./AuthLayout.module.css";
 import { CalendarDaysIcon, HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigation } from "react-router";
 import { EcologyBook, Leaf } from "iconoir-react";
-import { useUser } from "~/auth/hooks/useUser";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
+import { useToken } from "~/auth/hooks/useToken";
 
 export function WithMainMenu(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
 	const navigation = useNavigation();
 	const isNavigating = Boolean(navigation.location);
-	const user = useUser();
+	const [token] = useToken();
 
 	return (
 		<div className={styles.root}>
-			<div className="relative overflow-hidden bg-green-50">
+			<div className={clsx("relative overflow-hidden bg-green-50", !token && "row-span-2")}>
 				{isNavigating && (
 					<div className="h-full flex items-center justify-center bg-green-50">
 						<Leaf className="size-8 animate-spin text-green-700" />
@@ -39,7 +39,7 @@ export function WithMainMenu(props: PropsWithChildren<{ className?: string; acti
 							</Link>
 						</li>
 						<li className="flex-1">
-							<Link to={`/members/${user.data?.username}/teas`}>
+							<Link to={`/members/${token?.username}/teas`}>
 								<NavItem
 									icon={<EcologyBook className="size-5" />}
 									label="My teas"
