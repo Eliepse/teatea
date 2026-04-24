@@ -113,11 +113,13 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				</div>
 			</IfAuthenticated>
 
-			{!member.friendshipped_at && member.username !== token?.username && (
-				<nav className="fixed bottom-20 inset-x-4 flex items-center justify-center gap-2">
-					<FloatingActionButton icon={<UserPlus className="size-5" />} label="Add friend" />
-				</nav>
-			)}
+			<IfAuthenticated>
+				{!member.friendshipped_at && member.username !== token?.username && (
+					<nav className="fixed bottom-20 inset-x-4 flex items-center justify-center gap-2">
+						<FloatingActionButton icon={<UserPlus className="size-5" />} label="Add friend" />
+					</nav>
+				)}
+			</IfAuthenticated>
 
 			<IfAuthor author={member}>
 				<Link
