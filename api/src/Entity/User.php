@@ -66,9 +66,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[ORM\ManyToOne]
 	private ?User $referrer = null;
 
+	/** @var Collection<FriendshipRequest> */
 	#[ORM\OneToMany(targetEntity: FriendshipRequest::class, mappedBy: "requestedBy")]
 	private Collection $friendRequestsSent;
 
+	/** @var Collection<FriendshipRequest> */
 	#[ORM\OneToMany(targetEntity: FriendshipRequest::class, mappedBy: "target")]
 	private Collection $friendRequestsReceived;
 
@@ -134,5 +136,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[\Deprecated]
 	public function eraseCredentials(): void
 	{
+	}
+
+	public function findFriendship(User $friend): ?FriendshipRequest
+	{
+		return $this->friendRequestsReceived->findFirst(fn($i, $req) => $req->requestedBy->id === $friend->id);
 	}
 }

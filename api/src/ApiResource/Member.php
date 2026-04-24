@@ -100,4 +100,6 @@ class Member
 	/** @var TeaType[] */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeaTypes = [];
+
+	public ?\DateTimeImmutable $friendshipped_at = null;
 }

@@ -21,11 +21,11 @@ class FriendshipRequest
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: "friendRequestsSent")]
 	#[ORM\JoinColumn(nullable: false)]
-	private User $requestedBy;
+	public User $requestedBy;
 
 	#[ORM\ManyToOne(targetEntity: User::class, inversedBy: "friendRequestsReceived")]
 	#[ORM\JoinColumn(nullable: false)]
-	private User $target;
+	public User $target;
 
 	#[ORM\Column(nullable: true)]
 	private ?\DateTimeImmutable $requestedAt = null;
@@ -35,4 +35,14 @@ class FriendshipRequest
 
 	#[ORM\Column(nullable: true)]
 	private ?\DateTimeImmutable $rejectedAt = null;
+
+	public function accepted(): bool
+	{
+		return null !== $this->acceptedAt && null === $this->rejectedAt;
+	}
+
+	public function friendshippedAt(): ?\DateTimeImmutable
+	{
+		return $this->accepted() ? $this->acceptedAt : null;
+	}
 }
