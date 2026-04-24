@@ -78,7 +78,7 @@ export default function Dashboard(props: Route.ComponentProps) {
 	);
 }
 
-function UserPresentation(props: { username: string; teaSessions: number; tastedTeas: number }) {
+function UserPresentation(props: { username: string }) {
 	const statsQuery = useQuery(makeMemberStatsQueryOpt(props.username));
 	const teaSessions = statsQuery.data?.statsSessionsTotal ?? 0;
 	const tastedTeas = statsQuery.data?.statsConsumedTeasTotal ?? 0;
