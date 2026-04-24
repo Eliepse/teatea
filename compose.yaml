@@ -33,6 +33,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./api/:/app
+      - ./api/frankenphp/Caddyfile:/etc/caddy/Caddyfile
     ports:
       - "80:80"
     develop:
