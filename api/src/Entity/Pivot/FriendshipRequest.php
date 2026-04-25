@@ -28,13 +28,20 @@ class FriendshipRequest
 	public User $target;
 
 	#[ORM\Column(nullable: true)]
-	private ?\DateTimeImmutable $requestedAt = null;
+	private(set) ?\DateTimeImmutable $requestedAt = null;
 
 	#[ORM\Column(nullable: true)]
-	private ?\DateTimeImmutable $acceptedAt = null;
+	private(set) ?\DateTimeImmutable $acceptedAt = null;
 
 	#[ORM\Column(nullable: true)]
-	private ?\DateTimeImmutable $rejectedAt = null;
+	private(set) ?\DateTimeImmutable $rejectedAt = null;
+
+	public function __construct(User $requestor, User $target)
+	{
+		$this->requestedBy = $requestor;
+		$this->requestedAt = new \DateTimeImmutable();
+		$this->target = $target;
+	}
 
 	public function accepted(): bool
 	{

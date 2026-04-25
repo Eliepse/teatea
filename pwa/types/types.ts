@@ -108,6 +108,8 @@ export type Member = Resource<"Member"> & {
 	username: string;
 	email: string;
 	friendshipped_at?: Date;
+	friendship_requested?: boolean;
+	friendship_rejected?: boolean;
 };
 
 export type Friend = Pick<Member, "@id" | "@type" | "username">;

@@ -102,4 +102,6 @@ class Member
 	public array $statsTopTeaTypes = [];
 
 	public ?\DateTimeImmutable $friendshipped_at = null;
+	public ?bool $friendship_requested = null;
+	public ?bool $friendship_rejected = null;
 }
