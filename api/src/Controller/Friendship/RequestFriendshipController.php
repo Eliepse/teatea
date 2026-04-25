@@ -32,6 +32,10 @@ class RequestFriendshipController extends AbstractController
 		$requestor = $security->getUser();
 		assert($requestor instanceof User);
 
+		if($requestor->username === $target->username) {
+			throw new BadRequestHttpException("Cannot be freind to self ");
+		}
+
 		if (null !== $target->findFriendship($requestor)) {
 			throw new BadRequestHttpException("Request already sent");
 		}

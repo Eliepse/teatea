@@ -78,7 +78,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 
 				<ul className="text-green-900 text-sm flex gap-1 leading-normal select-none">
 					<IfAuthenticated>
-						{!member.friendship_rejected && (
+						{!member.friendship_rejected && member.username !== token?.username && (
 							<li>
 								<FriendTag status={getFriendshipStatus(member)} username={member.username} />
 							</li>

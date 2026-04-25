@@ -63,7 +63,7 @@ readonly class MemberProvider implements ProviderInterface
 		$entity = $query->getQuery()->getOneOrNullResult();
 		$member = self::hydrate($entity);
 
-		if (null !== $member && $checkFriendship) {
+		if (null !== $member && $checkFriendship && $member->username !== $user->username) {
 			$friendship = $entity->findFriendship($user);
 
 			$member->friendshipped_at = $friendship?->friendshippedAt();
