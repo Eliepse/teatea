@@ -16,7 +16,7 @@ readonly class FriendshipHydrator implements ResourceHydrator
 			return null;
 		}
 
-		assert($entity instanceof \App\Entity\Pivot\FriendshipRequest);
+		assert($entity instanceof \App\Entity\Pivot\Friendship);
 
 		$resource = new Friendship();
 		$resource->id = $entity->id;

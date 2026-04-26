@@ -2,7 +2,7 @@
 
 namespace App\Security\Voter;
 
-use App\Entity\Pivot\FriendshipRequest;
+use App\Entity\Pivot\Friendship;
 use App\Entity\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
@@ -14,7 +14,7 @@ final class FriendshipRequestVoter extends Voter
 
 	protected function supports(string $attribute, mixed $subject): bool
 	{
-		return in_array($attribute, [self::DECISION]) && $subject instanceof FriendshipRequest;
+		return in_array($attribute, [self::DECISION]) && $subject instanceof Friendship;
 	}
 
 	protected function voteOnAttribute(
@@ -23,7 +23,7 @@ final class FriendshipRequestVoter extends Voter
 		TokenInterface $token,
 		?Vote $vote = null,
 	): bool {
-		if (!$subject instanceof FriendshipRequest) {
+		if (!$subject instanceof Friendship) {
 			return false;
 		}
 

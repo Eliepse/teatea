@@ -2,17 +2,17 @@
 
 namespace App\Repository;
 
-use App\Entity\Pivot\FriendshipRequest;
+use App\Entity\Pivot\Friendship;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<FriendshipRequest>
+ * @extends ServiceEntityRepository<Friendship>
  */
-class FriendshipRequestRepository extends ServiceEntityRepository
+class FriendshipRepository extends ServiceEntityRepository
 {
 	public function __construct(ManagerRegistry $registry)
 	{
-		parent::__construct($registry, FriendshipRequest::class);
+		parent::__construct($registry, Friendship::class);
 	}
 }

@@ -5,10 +5,10 @@ namespace App\State\Friendship;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Friendship;
-use App\Entity\Pivot\FriendshipRequest;
+use App\Entity\Pivot\Friendship;
 use App\Entity\User;
 use App\Mail\FriendshipAcceptedMail;
-use App\Repository\FriendshipRequestRepository;
+use App\Repository\FriendshipRepository;
 use App\State\Hydration\FriendshipHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -24,7 +24,7 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 	public function __construct(
 		private Security $security,
 		private EntityManagerInterface $em,
-		private FriendshipRequestRepository $friendshipRepo,
+		private FriendshipRepository $friendshipRepo,
 		private FriendshipHydrator $hydrator,
 		private MailerInterface $mailer,
 		#[Autowire("%app.base_url%")]
@@ -59,7 +59,7 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 		if ("accept" === $decision) {
 			$target = $entity->target;
 			$inverse = $this->friendshipRepo->findOneBy(["requestedBy" => $target, "target" => $entity->requestedBy]);
-			$inverse ??= new FriendshipRequest($target, $entity->requestedBy);
+			$inverse ??= new Friendship($target, $entity->requestedBy);
 			$entity->accept();
 			$inverse->accept();
 			$this->em->persist($inverse);

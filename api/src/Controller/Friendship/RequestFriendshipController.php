@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Controller\Friendship;
 
-use App\Entity\Pivot\FriendshipRequest;
+use App\Entity\Pivot\Friendship;
 use App\Entity\User;
 use App\Mail\FriendshipAcceptedMail;
 use App\Mail\FriendshipRequestedMail;
-use App\Repository\FriendshipRequestRepository;
+use App\Repository\FriendshipRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +33,7 @@ class RequestFriendshipController extends AbstractController
 		User $target,
 		Security $security,
 		EntityManagerInterface $em,
-		FriendshipRequestRepository $friendshipRepo,
+		FriendshipRepository $friendshipRepo,
 		MailerInterface $mailer,
 		UrlGeneratorInterface $urlGenerator,
 		#[Autowire("%app.base_url%")]
@@ -52,7 +52,7 @@ class RequestFriendshipController extends AbstractController
 			throw new BadRequestHttpException("Request already sent");
 		}
 
-		$friendship = new FriendshipRequest($requestor, $target);
+		$friendship = new Friendship($requestor, $target);
 		$em->persist($friendship);
 
 		// Opposite side already sent a request, so it means both are willing

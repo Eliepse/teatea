@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table]
 #[ORM\UniqueConstraint(fields: ["requestedBy", "target"])]
-class FriendshipRequest
+class Friendship
 {
 	use TimestampedEntity;
 
