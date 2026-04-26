@@ -1,10 +1,14 @@
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { getMember } from "~/shared/query/memberQuery";
 import type { Route } from "./+types/friends";
-import { getFriends } from "~/account/query/friendsQuery";
-import { Link, redirect } from "react-router";
+import { getFriends, getFriendships } from "~/account/query/friendsQuery";
+import { Link, redirect, useRevalidator } from "react-router";
 import { ArrowRight } from "iconoir-react";
 import { TokenUtils } from "~/auth/hooks/useToken";
+import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
+import type { Friendship } from "~t/types";
+import { FriendshipDecisionModal } from "~/account/components/FriendshipDecisionModal";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 	const currentUsername = TokenUtils.get()?.username;
@@ -15,12 +19,15 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 
 	const member = await getMember(params.username);
 	const friends = await getFriends(params.username);
+	const friendships = await getFriendships(params.username);
 
-	return { member, friends };
+	return { member, friends, friendships };
 }
 
 export default function friendsPage(props: Route.ComponentProps) {
-	const { member, friends } = props.loaderData;
+	const { member, friends, friendships } = props.loaderData;
+	const [decideFriendship, setDecideFriendship] = useState<Friendship | undefined>();
+	const revalidator = useRevalidator();
 
 	return (
 		<WithMainMenu className="bg-green-50 p-4">
@@ -31,13 +38,9 @@ export default function friendsPage(props: Route.ComponentProps) {
 						{friends.totalItems}
 					</span>
 				</h1>
-
-				{/*<button className="flex-none btn btn-circle bg-white">*/}
-				{/*	<UserPlus />*/}
-				{/*</button>*/}
 			</div>
 
-			<ul>
+			<ul className="mb-8">
 				{friends.member.map((friend) => (
 					<li key={friend["@id"]}>
 						<Link
@@ -50,6 +53,35 @@ export default function friendsPage(props: Route.ComponentProps) {
 					</li>
 				))}
 			</ul>
+
+			{0 !== friendships.member.length && (
+				<>
+					<h2 className="mb-4">Requests</h2>
+
+					<ul>
+						{friendships.member.map((friendship) => (
+							<li key={friendship["@id"]}>
+								<button
+									className="w-full text-left mb-2 px-3 pt-3 pb-2 bg-white rounded-md shadow-xs"
+									onClick={() => setDecideFriendship(friendship)}
+								>
+									<span className="flex items-center">
+										{friendship.requestor.username}
+										<ArrowRight className="ml-auto w-5" />
+									</span>
+
+									{friendship.requestedAt && (
+										<span className="text-xs text-stone-600 leading-none mt-1">
+											{formatDistanceToNow(friendship.requestedAt)} ago
+										</span>
+									)}
+								</button>
+							</li>
+						))}
+					</ul>
+				</>
+			)}
+
 		</WithMainMenu>
 	);
 }

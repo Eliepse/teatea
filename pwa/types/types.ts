@@ -113,6 +113,10 @@ export type Member = Resource<"Member"> & {
 };
 
 export type Friend = Pick<Member, "@id" | "@type" | "username">;
+export type Friendship = Resource<"Friendship"> & {
+	requestor: Pick<Member, "@id" | "@type" | "username">;
+	requestedAt?: Date;
+};
 
 export type TeaFamily = "white" | "yellow" | "green" | "wulong" | "black" | "fermented";
 

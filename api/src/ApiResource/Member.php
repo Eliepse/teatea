@@ -72,7 +72,7 @@ class Member
 	#[ApiProperty(identifier: true)]
 	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
-	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member", "auth:guest"])]
+	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member", "with:member", "auth:guest"])]
 	public ?string $username;
 
 	#[Assert\Email]

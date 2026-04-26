@@ -43,9 +43,43 @@ class FriendshipRequest
 		$this->target = $target;
 	}
 
+	public function decided(): bool
+	{
+		return null === $this->requestedAt || $this->acceptedAt || $this->rejectedAt;
+	}
+
 	public function accepted(): bool
 	{
-		return null !== $this->acceptedAt && null === $this->rejectedAt;
+		return null !== $this->acceptedAt;
+	}
+
+	public function ignored(): bool
+	{
+		return null === $this->requestedAt;
+	}
+
+	public function rejected(): bool
+	{
+		return null !== $this->rejectedAt;
+	}
+
+	public function accept(): void
+	{
+		$this->acceptedAt = new \DateTimeImmutable();
+		$this->rejectedAt = null;
+	}
+
+	public function reject(): void
+	{
+		$this->acceptedAt = null;
+		$this->rejectedAt = new \DateTimeImmutable();
+	}
+
+	public function ignore(): void
+	{
+		$this->requestedAt = null;
+		$this->acceptedAt = null;
+		$this->rejectedAt = null;
 	}
 
 	public function friendshippedAt(): ?\DateTimeImmutable
