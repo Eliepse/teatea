@@ -7,14 +7,17 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Friendship;
 use App\Entity\Pivot\FriendshipRequest;
 use App\Entity\User;
+use App\Mail\FriendshipAcceptedMail;
 use App\Repository\FriendshipRequestRepository;
 use App\State\Hydration\FriendshipHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Mailer\MailerInterface;
 
 readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 {
@@ -23,6 +26,9 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 		private EntityManagerInterface $em,
 		private FriendshipRequestRepository $friendshipRepo,
 		private FriendshipHydrator $hydrator,
+		private MailerInterface $mailer,
+		#[Autowire("%app.base_url%")]
+		private string $baseUrl,
 	) {
 	}
 
@@ -51,14 +57,18 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 		}
 
 		if ("accept" === $decision) {
-			$inverse = $this->friendshipRepo->findOneBy([
-				"requestedBy" => $entity->target,
-				"target" => $entity->requestedBy,
-			]);
-			$inverse ??= new FriendshipRequest($entity->target, $entity->requestedBy);
+			$target = $entity->target;
+			$inverse = $this->friendshipRepo->findOneBy(["requestedBy" => $target, "target" => $entity->requestedBy]);
+			$inverse ??= new FriendshipRequest($target, $entity->requestedBy);
 			$entity->accept();
 			$inverse->accept();
 			$this->em->persist($inverse);
+
+			$this->mailer->send(
+				new FriendshipAcceptedMail($target->username, "$this->baseUrl/members/$target->username")
+					->from("elie.meignan@eliepse.fr")
+					->to($target->email),
+			);
 		} elseif ("reject" === $decision) {
 			$entity->reject();
 		} else {

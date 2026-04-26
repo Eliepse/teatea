@@ -6,6 +6,7 @@ namespace App\Controller\Friendship;
 
 use App\Entity\Pivot\FriendshipRequest;
 use App\Entity\User;
+use App\Mail\FriendshipAcceptedMail;
 use App\Mail\FriendshipRequestedMail;
 use App\Repository\FriendshipRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(
@@ -33,6 +35,7 @@ class RequestFriendshipController extends AbstractController
 		EntityManagerInterface $em,
 		FriendshipRequestRepository $friendshipRepo,
 		MailerInterface $mailer,
+		UrlGeneratorInterface $urlGenerator,
 		#[Autowire("%app.base_url%")]
 		string $baseUrl,
 	): JsonResponse {
@@ -58,6 +61,12 @@ class RequestFriendshipController extends AbstractController
 		if (null !== $inverse && false === $inverse->decided()) {
 			$inverse->accept();
 			$friendship->accept();
+
+			$mailer->send(
+				new FriendshipAcceptedMail($target->username, "$baseUrl/members/$target->username")
+					->from("elie.meignan@eliepse.fr")
+					->to($target->email),
+			);
 
 			$em->flush();
 			return $this->json([]);
