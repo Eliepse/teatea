@@ -5,7 +5,7 @@ namespace App\State\Friendship;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Friendship;
-use App\Entity\Pivot\Friendship;
+use App\Entity\Pivot\Friendship as FriendshipEntity;
 use App\Entity\User;
 use App\Mail\FriendshipAcceptedMail;
 use App\Repository\FriendshipRepository;
@@ -59,7 +59,7 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 		if ("accept" === $decision) {
 			$target = $entity->target;
 			$inverse = $this->friendshipRepo->findOneBy(["requestedBy" => $target, "target" => $entity->requestedBy]);
-			$inverse ??= new Friendship($target, $entity->requestedBy);
+			$inverse ??= new FriendshipEntity($target, $entity->requestedBy);
 			$entity->accept();
 			$inverse->accept();
 			$this->em->persist($inverse);

@@ -6,7 +6,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Friendship;
-use App\Entity\Pivot\Friendship;
+use App\Entity\Pivot\Friendship as Entity;
 use App\Helper\OperationHelper;
 use App\State\Hydration\FriendshipHydrator;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,7 +34,7 @@ readonly class FriendshipCollectionProvider implements ProviderInterface
 		$query = $this->em
 			->createQueryBuilder()
 			->select("friendship", "requestor")
-			->from(Friendship::class, "friendship")
+			->from(Entity::class, "friendship")
 			->innerJoin("friendship.target", "target")
 			->leftJoin("friendship.requestedBy", "requestor")
 			->where("target.username = :username")
