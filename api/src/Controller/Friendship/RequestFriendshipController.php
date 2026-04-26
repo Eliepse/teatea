@@ -6,13 +6,16 @@ namespace App\Controller\Friendship;
 
 use App\Entity\Pivot\FriendshipRequest;
 use App\Entity\User;
+use App\Mail\FriendshipRequestedMail;
 use App\Repository\FriendshipRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -29,6 +32,9 @@ class RequestFriendshipController extends AbstractController
 		Security $security,
 		EntityManagerInterface $em,
 		FriendshipRequestRepository $friendshipRepo,
+		MailerInterface $mailer,
+		#[Autowire("%app.base_url%")]
+		string $baseUrl,
 	): JsonResponse {
 		$requestor = $security->getUser();
 		assert($requestor instanceof User);
@@ -44,18 +50,26 @@ class RequestFriendshipController extends AbstractController
 		}
 
 		$friendship = new FriendshipRequest($requestor, $target);
+		$em->persist($friendship);
 
 		// Opposite side already sent a request, so it means both are willing
 		// to connect and we can skip confirmation (accept both sides)
 		$inverse = $friendshipRepo->findOneBy(["target" => $requestor, "requestedBy" => $target]);
-		if ($inverse && false === $inverse->decided()) {
+		if (null !== $inverse && false === $inverse->decided()) {
 			$inverse->accept();
 			$friendship->accept();
+
+			$em->flush();
+			return $this->json([]);
 		}
 
-		$em->persist($friendship);
-		$em->flush();
+		$mailer->send(
+			new FriendshipRequestedMail($requestor->username, "$baseUrl/members/$target->username/friends")
+				->from("elie.meignan@eliepse.fr")
+				->to($target->email),
+		);
 
+		$em->flush();
 		return $this->json([]);
 	}
 }

@@ -15,7 +15,6 @@ class VerifyLoginMail extends Email
 			->addTextHeader('subject', "Confirm login to your teatea account")
 			->addParameterizedHeader('params', 'params', [
 				"OTPLink" => $otpLink,
-//				"OTPReject" => "",
 			]);
 
 		$this->html(
