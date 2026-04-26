@@ -6,7 +6,7 @@ namespace App\Controller\Friendship;
 
 use App\Entity\Pivot\FriendshipRequest;
 use App\Entity\User;
-use App\Exception\FriendRequestAlreadySentException;
+use App\Repository\FriendshipRequestRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,19 +28,30 @@ class RequestFriendshipController extends AbstractController
 		User $target,
 		Security $security,
 		EntityManagerInterface $em,
+		FriendshipRequestRepository $friendshipRepo,
 	): JsonResponse {
 		$requestor = $security->getUser();
 		assert($requestor instanceof User);
 
-		if($requestor->username === $target->username) {
+		if ($requestor->username === $target->username) {
 			throw new BadRequestHttpException("Cannot be freind to self ");
 		}
 
-		if (null !== $target->findFriendship($requestor)) {
+		$friendship = $friendshipRepo->findOneBy(["target" => $target, "requestedBy" => $requestor]);
+
+		if (null !== $friendship) {
 			throw new BadRequestHttpException("Request already sent");
 		}
 
 		$friendship = new FriendshipRequest($requestor, $target);
+
+		// Opposite side already sent a request, so it means both are willing
+		// to connect and we can skip confirmation (accept both sides)
+		$inverse = $friendshipRepo->findOneBy(["target" => $requestor, "requestedBy" => $target]);
+		if ($inverse && false === $inverse->decided()) {
+			$inverse->accept();
+			$friendship->accept();
+		}
 
 		$em->persist($friendship);
 		$em->flush();
