@@ -77,7 +77,7 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 		if ($isContentful) {
 			$sessionQb
 				->andWhere("session.quality >= :quality")
-				->andWhere("session.steeps IS NOT NULL AND JSON_ARRAY_LENGTH(session.steeps) > 0")
+				->andWhere("session.steeps IS NOT NULL AND JSONB_ARRAY_LENGTH(session.steeps) > 0")
 				->setParameter("quality", BrewingQuality::Improvable);
 		}
 

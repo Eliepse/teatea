@@ -55,6 +55,13 @@
 	header /media* ?Cache-Control max-age=5184000
 	header /runtime-env.js* Cache-Control no-cache
 
+	# Short link for members pages
+	@shortFriend {
+		path /m/*
+		path_regexp /m/(.*)
+	}
+	redir @shortFriend /members/{re.1}
+
 	# Matches requests for HTML documents, for static files and for PWA files,
 	# except for known API paths and paths with extensions handled by API Platform
 	@pwa expression `

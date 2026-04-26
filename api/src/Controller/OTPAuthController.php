@@ -213,7 +213,7 @@ class OTPAuthController extends AbstractController
 		UserRepository $userRepo,
 	): JsonResponse {
 		if (empty($token) || empty(trim($devKey)) || $token !== $devKey) {
-			throw new NotFoundHttpException();
+			throw $this->createNotFoundException();
 		}
 
 		$admin = $userRepo

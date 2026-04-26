@@ -33,6 +33,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./api/:/app
+      - ./api/frankenphp/Caddyfile:/etc/caddy/Caddyfile
     ports:
       - "80:80"
     develop:
@@ -54,9 +55,10 @@ services:
       context: ./pwa
       target: dev
     environment:
-      API_URL: /api
-      POSTHOG_KEY: ${POSTHOG_KEY}
-      POSTHOG_HOST: ${POSTHOG_HOST}
+      VITE_API_URL: /api
+      VITE_POSTHOG_KEY: ${POSTHOG_KEY}
+      VITE_POSTHOG_HOST: ${POSTHOG_HOST}
+      VITE_BASE_URL: ${BASE_URL}
     depends_on:
       - api
     volumes:

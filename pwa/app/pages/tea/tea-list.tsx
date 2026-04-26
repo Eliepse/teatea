@@ -1,4 +1,4 @@
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { Link, useNavigate } from "react-router";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
@@ -35,7 +35,7 @@ export default function TeaListPage() {
 	const hasTeas = !!teasQuery.data && 0 !== teasQuery.data.pages.length;
 
 	return (
-		<AuthLayout className="p-4 pb-8 bg-green-50">
+		<WithMainMenu className="p-4 pb-8 bg-green-50">
 			<header className="mb-8 pt-2 relative">
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
 				<h1 className="text-3xl font-bold font-header text-center text-green-900">Tasted teas</h1>
@@ -93,6 +93,6 @@ export default function TeaListPage() {
 					)}
 				</div>
 			)}
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }

@@ -7,11 +7,13 @@ export function UserStat(props: {
 	icon: ReactNode;
 	className?: string;
 	withArrow?: boolean;
+	loading?: boolean;
 }) {
 	return (
 		<div className={props.className}>
 			<div className="text-4xl font-bold font-header text-green-700">
-				{props.value}
+				{props.loading && <span className="inline-block w-10 h-8 skeleton" />}
+				{!props.loading && props.value}
 				{props.icon}
 			</div>
 			<div className="flex items-center text-sm">

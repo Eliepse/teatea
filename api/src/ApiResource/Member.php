@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
-use App\DTO\Stats\TeaFamilyAmount;
+use App\State\Member\FriendCollectionProvider;
 use App\State\Member\MemberCreateProcessor;
 use App\State\Member\MemberOnboardingProcessor;
 use App\State\Member\MemberProvider;
@@ -36,7 +36,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 			"with:teatype",
 		]
 	],
-	security: "is_granted('ROLE_USER') or is_granted('ROLE_ONBOARDING')",
+	security: "is_granted('ROLE_USER')",
 	provider: UserStatsProvider::class,
 )]
 #[GetCollection(
@@ -57,6 +57,12 @@ use Symfony\Component\Validator\Constraints as Assert;
 	provider: MemberProvider::class,
 	processor: MemberOnboardingProcessor::class,
 )]
+#[GetCollection(
+	uriTemplate: "/members/{username}/friends",
+	normalizationContext: [],
+	security: "is_granted('ROLE_USER') and request.attributes.get('username') === user.username",
+	provider: FriendCollectionProvider::class,
+)]
 class Member
 {
 	#[Groups(["role:admin", "member:self", "member:stats"])]
@@ -66,7 +72,7 @@ class Member
 	#[ApiProperty(identifier: true)]
 	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
-	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member"])]
+	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member", "with:member", "auth:guest"])]
 	public ?string $username;
 
 	#[Assert\Email]
@@ -75,7 +81,7 @@ class Member
 
 	/** @var string[] */
 	#[Groups(["member:self", "role:admin"])]
-	#[ApiProperty(security: "is_granted('ROLE_ADMIN') or (object.id == user.id)")]
+	#[ApiProperty(security: "object.username === user?.username")]
 	public array $roles = [];
 
 	#[Groups(["member:stats"])]
@@ -94,4 +100,8 @@ class Member
 	/** @var TeaType[] */
 	#[Groups(["member:stats"])]
 	public array $statsTopTeaTypes = [];
+
+	public ?\DateTimeImmutable $friendshipped_at = null;
+	public ?bool $friendship_requested = null;
+	public ?bool $friendship_rejected = null;
 }

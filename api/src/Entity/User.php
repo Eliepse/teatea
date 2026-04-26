@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
+use App\Entity\Pivot\FriendshipRequest;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -61,6 +62,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	 */
 	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "owner", orphanRemoval: true)]
 	private Collection $collectionTeas;
+
+	#[ORM\ManyToOne]
+	private ?User $referrer = null;
+
+	/** @var Collection<FriendshipRequest> */
+	#[ORM\OneToMany(targetEntity: FriendshipRequest::class, mappedBy: "requestedBy")]
+	private Collection $friendRequestsSent;
+
+	/** @var Collection<FriendshipRequest> */
+	#[ORM\OneToMany(targetEntity: FriendshipRequest::class, mappedBy: "target")]
+	private Collection $friendRequestsReceived;
 
 	public function __construct()
 	{
@@ -124,5 +136,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	#[\Deprecated]
 	public function eraseCredentials(): void
 	{
+	}
+
+	public function findFriendship(User $friend): ?FriendshipRequest
+	{
+		return $this->friendRequestsReceived->findFirst(fn($i, $req) => $req->requestedBy->id === $friend->id);
 	}
 }

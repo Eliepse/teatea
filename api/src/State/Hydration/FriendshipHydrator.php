@@ -1,0 +1,28 @@
+<?php
+
+namespace App\State\Hydration;
+
+use App\ApiResource\Friendship;
+use App\State\Member\MemberProvider;
+
+/**
+ * @implements ResourceHydrator<Friendship>
+ */
+readonly class FriendshipHydrator implements ResourceHydrator
+{
+	public function hydrate(?object $entity): ?object
+	{
+		if (null === $entity) {
+			return null;
+		}
+
+		assert($entity instanceof \App\Entity\Pivot\FriendshipRequest);
+
+		$resource = new Friendship();
+		$resource->id = $entity->id;
+		$resource->requestor = MemberProvider::hydrate($entity->requestedBy);
+		$resource->requestedAt = $entity->requestedAt;
+
+		return $resource;
+	}
+}

@@ -5,20 +5,22 @@ namespace App\State\Member;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\ActivityGraph;
 use App\ApiResource\Member;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Uid\Uuid;
 
 /**
- * @implements ProviderInterface<ActivityGraph|null>
+ * @implements ProviderInterface<Member[]|Member|null>
  */
 readonly class MemberProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-	) {}
+		private Security $security,
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): Member|array|null
 	{
@@ -43,7 +45,39 @@ readonly class MemberProvider implements ProviderInterface
 			return null;
 		}
 
-		return self::hydrate($query->getQuery()->getOneOrNullResult());
+		$user = $this->security->getUser();
+		$checkFriendship = $user instanceof User && $user->username !== $username;
+		if ($checkFriendship) {
+			$query
+				->addSelect("friend_requests")
+				->leftJoin(
+					"user.friendRequestsReceived",
+					"friend_requests",
+					"WITH",
+					"friend_requests.requestedBy = :requestUser",
+				)
+				->setParameter("requestUser", $user);
+		}
+
+		/** @var User|null $entity */
+		$entity = $query->getQuery()->getOneOrNullResult();
+		$member = self::hydrate($entity);
+
+		if (null !== $member && $checkFriendship && $member->username !== $user->username) {
+			$friendship = $entity->findFriendship($user);
+
+			$member->friendshipped_at = $friendship?->friendshippedAt();
+
+			if (!$member->friendshipped_at) {
+				if ($friendship?->rejectedAt) {
+					$member->friendship_rejected = true;
+				} elseif ($friendship?->requestedAt) {
+					$member->friendship_requested = true;
+				}
+			}
+		}
+
+		return $member;
 	}
 
 	public static function hydrate(?User $user): ?Member

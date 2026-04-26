@@ -1,5 +1,5 @@
 import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { useSearchParams } from "react-router";
 import type { SearchFilters } from "~/search/hooks/useSearchQuery";
 import { safeEmpty } from "~/utils/general";
@@ -27,7 +27,7 @@ export default function TeaSearchPage() {
 	const year = safeEmpty((searchParams.get("year") ?? "").trim());
 
 	return (
-		<AuthLayout activeKey="search">
+		<WithMainMenu activeKey="search">
 			<TeaSearchEngine
 				defaultFilters={{
 					q: safeEmpty((searchParams.get("q") ?? "").trim()),
@@ -39,6 +39,6 @@ export default function TeaSearchPage() {
 				onFiltersChange={handleFiltersChanged}
 				allowCreation
 			/>
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }

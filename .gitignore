@@ -7,3 +7,4 @@ compose.override.yml
 .pnpm-store
 /.env
 .env.local
+runtime-env.d.ts

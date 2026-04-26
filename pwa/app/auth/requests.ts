@@ -5,7 +5,7 @@ import { isPast } from "date-fns";
 import posthog from "posthog-js";
 
 export type OTPToken = { value: string; expiredAt: Date };
-type OTPResponse =
+export type OTPResponse =
 	| {
 			token: string;
 			refresh_token: string;
@@ -19,7 +19,7 @@ export async function refreshToken(): Promise<void> {
 	const refreshToken = TokenUtils.getRefreshToken();
 
 	if (null === refreshToken) {
-		throw new Error("Invalid refresh token");
+		return;
 	}
 
 	const response = await fetch("/auth/token/refresh", {

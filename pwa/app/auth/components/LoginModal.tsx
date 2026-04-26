@@ -5,22 +5,14 @@ import { differenceInMilliseconds } from "date-fns";
 import { LocalStorageUtils } from "~/utils/browser/useLocalStorage";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SecurityPass, TimerOff } from "iconoir-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import axios, { AxiosError } from "axios";
 import { attemptOTPLogin } from "~/auth/requests";
 import { useToken } from "~/auth/hooks/useToken";
 import { usePostHog } from "@posthog/react";
+import { loginDevMode } from "~/auth/query/loginQuery";
 
 export type OTPToken = { value: string; expiredAt: Date };
-type OTPResponse =
-	| {
-			token: string;
-			refresh_token: string;
-			refresh_token_expiration: number;
-	  }
-	| {
-			message?: string;
-	  };
 
 export function LoginModal(props: { open: boolean; onClose: () => void }) {
 	const defaultEmail = useRef("");
@@ -172,6 +164,7 @@ function LoginForm(props: {
 	const alert = useAlert();
 	const [email, setEmail] = useState("");
 	const posthog = usePostHog();
+	const navigate = useNavigate();
 
 	const isEmailValid = 3 < email.length && email.includes("@");
 
@@ -194,6 +187,15 @@ function LoginForm(props: {
 
 		posthog?.capture("user_requested_otp", { email });
 		mutate(email);
+	}
+
+	function submitDevMode() {
+		if (!runtimeEnv.VITE_DEV_LOGIN_KEY) {
+			return;
+		}
+
+		void loginDevMode(runtimeEnv.VITE_DEV_LOGIN_KEY);
+		navigate("/welcome");
 	}
 
 	return (
@@ -219,6 +221,12 @@ function LoginForm(props: {
 			<button className="btn btn-lg btn-block btn-primary" onClick={submit} disabled={!isEmailValid || isPending}>
 				Enter
 			</button>
+
+			{import.meta.env.DEV && (
+				<button className="btn btn-block btn-ghost mt-2" onClick={submitDevMode}>
+					Dev mode
+				</button>
+			)}
 
 			<hr className="my-8 border-teal-100" />
 

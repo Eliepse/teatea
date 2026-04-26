@@ -5,6 +5,7 @@ export default [
 	route("/login/verify/:token", "pages/auth/verify.tsx"),
 
 	route("/onboarding", "pages/auth/onboarding.tsx"),
+	route("/members/:username", "account/pages/profile.tsx"),
 
 	layout("auth/components/AuthenticatedGuard.tsx", [
 		route("/welcome", "pages/dashboard/dashboard.tsx"),
@@ -19,9 +20,9 @@ export default [
 
 		route("/lists/:id", "pages/member/teaList.tsx"),
 
+		route("/members/:username/friends", "account/pages/friends.tsx"),
 		route("/members/:username/teas", "pages/member/personal-collection.tsx"),
 		route("/members/:username/teas/:teaId", "pages/member/personal-collection-tea.tsx"),
-		route("/members/:username", "pages/member/profile.tsx"),
 
 		...prefix("/me", [route("/teas", "pages/tea/tea-list.tsx")]),
 	]),

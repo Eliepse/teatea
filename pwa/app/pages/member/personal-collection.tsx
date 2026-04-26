@@ -3,7 +3,7 @@ import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection } from "~t/types";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "~/components/shared/navigation/BackButton";
-import { AuthLayout } from "~/layouts/AuthLayout";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { TokenUtils } from "~/auth/hooks/useToken";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { CollectionTeaCard } from "~/pages/member/_components/CollectionTeaCard";
@@ -38,7 +38,7 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 	const inactive = itemsQuery.data?.member?.filter((el) => !!el.finishedAt) ?? [];
 
 	return (
-		<AuthLayout activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
+		<WithMainMenu activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
 			<header className="mb-8 pt-2 relative">
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
 				<h1 className="text-3xl font-bold font-header text-center text-green-900">Personal collection</h1>
@@ -94,6 +94,6 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 					</ul>
 				</>
 			)}
-		</AuthLayout>
+		</WithMainMenu>
 	);
 }

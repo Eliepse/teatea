@@ -35,6 +35,7 @@ security:
         - { path: ^/docs, roles: IS_AUTHENTICATED_FULLY } # Allows accessing the Swagger UI docs
         - { path: ^/contexts, roles: IS_AUTHENTICATED_FULLY } # Allows accessing the Swagger UI contexts
         - { path: ^/auth, roles: PUBLIC_ACCESS }
+        - { path: "^/api/members/[\\p{L}_]{2,16}$", roles: PUBLIC_ACCESS }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
