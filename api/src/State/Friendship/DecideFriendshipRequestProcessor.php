@@ -58,8 +58,9 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 
 		if ("accept" === $decision) {
 			$target = $entity->target;
-			$inverse = $this->friendshipRepo->findOneBy(["requestedBy" => $target, "target" => $entity->requestedBy]);
-			$inverse ??= new FriendshipEntity($target, $entity->requestedBy);
+			$requestor = $entity->requestedBy;
+			$inverse = $this->friendshipRepo->findOneBy(["requestedBy" => $target, "target" => $requestor]);
+			$inverse ??= new FriendshipEntity($target, $requestor);
 			$entity->accept();
 			$inverse->accept();
 			$this->em->persist($inverse);
@@ -67,7 +68,7 @@ readonly class DecideFriendshipRequestProcessor implements ProcessorInterface
 			$this->mailer->send(
 				new FriendshipAcceptedMail($target->username, "$this->baseUrl/members/$target->username")
 					->from("elie.meignan@eliepse.fr")
-					->to($target->email),
+					->to($requestor->email),
 			);
 		} elseif ("reject" === $decision) {
 			$entity->reject();
