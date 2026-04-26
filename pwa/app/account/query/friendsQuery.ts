@@ -31,3 +31,16 @@ export function requestFriendshipMutationOpt() {
 		},
 	});
 }
+
+export function decideFriendshiptMutationOpt(id?: Friendship["id"]) {
+	return mutationOptions({
+		mutationFn: async (decision: "accept" | "reject") => {
+			if (!id) {
+				throw new Error("Iri is missing");
+			}
+
+			await wait(250); // Slow a bit for a better ux feedback
+			return await (await postApi(`/api/friendships/${id}/${decision}`)).json();
+		},
+	});
+}

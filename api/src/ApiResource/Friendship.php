@@ -29,6 +29,17 @@ use Symfony\Component\Serializer\Attribute\Groups;
 		"status" => new QueryParameter(schema: ["enum" => ["pending"]], required: true),
 	]
 )]
+#[Post(
+	uriTemplate: "/friendships/{id}/{decision}",
+	uriVariables: ["id" => new Link(required: true)],
+	requirements: [
+		"id" => Requirement::POSITIVE_INT,
+		"decision" => "^(accept|reject)$",
+	],
+	security: "is_granted('ROLE_USER')",
+	deserialize: false,
+	processor: DecideFriendshipRequestProcessor::class,
+)]
 #[Groups(["friendship:read"])]
 class Friendship
 {

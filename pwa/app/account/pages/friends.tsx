@@ -82,6 +82,11 @@ export default function friendsPage(props: Route.ComponentProps) {
 				</>
 			)}
 
+			<FriendshipDecisionModal
+				friendship={decideFriendship}
+				onDecision={() => revalidator.revalidate()}
+				onClose={() => setDecideFriendship(undefined)}
+			/>
 		</WithMainMenu>
 	);
 }
