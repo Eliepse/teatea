@@ -36,18 +36,16 @@ export function SEFiltersBar(props: { className?: string }) {
 		setPopup("family");
 	}
 
-	if (filters.type) {
-		return null;
-	}
-
 	return (
 		<>
 			<ul className={clsx("overflow-y-auto flex gap-x-2", props.className)}>
-				<li>
-					<FilterButton onClick={handleFamilyBtn} active={!!filters.family}>
-						{filters.family ?? "Family"}
-					</FilterButton>
-				</li>
+				{!filters.type && (
+					<li>
+						<FilterButton onClick={handleFamilyBtn} active={!!filters.family}>
+							{filters.family ?? "Family"}
+						</FilterButton>
+					</li>
+				)}
 
 				{!filters.type && (
 					<li>
