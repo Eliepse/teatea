@@ -9,8 +9,9 @@ import { Family } from "~/components/tea/Family";
 import { useNavigate } from "react-router";
 import { SE_CONTEXT, type SearchFilters, useSearchQuery } from "~/search/hooks/useSearchQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
-import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { SearchTextInput } from "~/search/components/SearchTextInput";
+import { useQuery } from "@tanstack/react-query";
+import { makeTeaTypeQueryOpt } from "~/search/query/teatypeQuery";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;
@@ -21,7 +22,7 @@ export function TeaSearchEngine(props: {
 }) {
 	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
-	const typeQuery = useResourceQuery<TeaType>(filters?.type, "/api/tea_types/");
+	const typeQuery = useQuery(makeTeaTypeQueryOpt(filters?.type, filters?.origin));
 	const SEContext = useMemo(
 		() => ({
 			filters: filters ?? {},
@@ -32,7 +33,7 @@ export function TeaSearchEngine(props: {
 			},
 			searchType: computeSearchType(filters),
 		}),
-		[filters, props.onFiltersChange],
+		[filters, props.onFiltersChange, typeQuery.data],
 	);
 
 	const { query, isTeas } = useSearchQuery(SEContext.searchType, filters);
@@ -108,7 +109,10 @@ export function TeaSearchEngine(props: {
 							<ul>
 								{query.data.pages.map((page) =>
 									page.member?.map((item) => (
-										<li key={item["@id"] + item.origin?.path} className={clsx("type" in item ? "mb-3" : "mb-2")}>
+										<li
+											key={item["@id"] + item.origin?.path}
+											className={clsx("type" in item ? "mb-3" : "mb-2")}
+										>
 											{"name" in item && (
 												<Item
 													label={item.name}

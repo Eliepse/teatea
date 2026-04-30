@@ -25,13 +25,16 @@ export default function TeaSearchPage() {
 	}
 
 	const year = safeEmpty((searchParams.get("year") ?? "").trim());
+	const origin = safeEmpty((searchParams.get("origin") ?? "").trim());
+	const rootOrigin = safeEmpty((searchParams.get("rootOrigin") ?? "").trim());
 
 	return (
 		<WithMainMenu activeKey="search">
 			<TeaSearchEngine
 				defaultFilters={{
 					q: safeEmpty((searchParams.get("q") ?? "").trim()),
-					origin: safeEmpty((searchParams.get("origin") ?? "").trim()),
+					origin: origin ?? rootOrigin,
+					rootOrigin: rootOrigin,
 					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
 					type: safeEmpty((searchParams.get("type") ?? "").trim()),
 					year: year ? parseInt(year) : undefined,

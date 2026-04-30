@@ -7,6 +7,7 @@ import { type ItemType, makeSearchInfinitQueryOpt } from "~/search/query/searchQ
 export type SearchFilters = {
 	q?: string;
 	origin?: string;
+	rootOrigin?: string;
 	family?: TeaFamily;
 	type?: TeaType["slug"];
 	cultivar?: string | number;
@@ -18,6 +19,7 @@ export const SE_CONTEXT = createContext<{
 	filters: SearchFilters;
 	patchFilters: (patch: SearchFilters) => void;
 	searchType: ItemType;
+	rootOrigin?: string,
 }>({
 	filters: {},
 	patchFilters: throwNotImplemented,

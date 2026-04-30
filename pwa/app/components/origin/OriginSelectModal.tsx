@@ -14,11 +14,12 @@ export function OriginSelectModal(props: {
 	defaultValue?: Iri;
 	allowToggle?: boolean;
 	maxDepth?: number;
+	rootOrigin?: string,
 }) {
 	const [value, setValue] = useState<Iri | undefined>(props.defaultValue);
-	const [filterPath, setFilterPath] = useState<string | undefined>();
+	const [filterPath, setFilterPath] = useState<string | undefined>(props.rootOrigin);
 	const { data: filterOrigin, isLoading } = useResourceQuery<Origin>(
-		filterPath ? `/api/origins/${filterPath}` : undefined,
+		filterPath ? `/api/origins/${filterPath}` : props.rootOrigin ? `/api/origins/${props.rootOrigin}` : null,
 	);
 
 	function handleFilterPathChange(path: string | undefined) {
@@ -33,8 +34,15 @@ export function OriginSelectModal(props: {
 			return;
 		}
 
+		// Limit to the root origin
+		if (props.rootOrigin && filterOrigin?.path === props.rootOrigin) {
+			props.onClose();
+			return;
+		}
+
 		const nodes = filterPath.split(".");
-		setFilterPath(1 < nodes.length ? nodes.slice(0, -1).join(".") : undefined);
+		const parent = 1 < nodes.length ? nodes.slice(0, -1).join(".") : undefined;
+		setFilterPath(parent);
 	}
 
 	return (

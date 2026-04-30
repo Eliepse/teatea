@@ -17,19 +17,20 @@ use App\ValueObject\Stats\TeaTypeStats;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(normalizationContext: ["groups" => [
-	"type:read",
-	"read:origin",
-	"origin:read",
-	"with:origin",
-]], security: "is_granted('ROLE_USER')")]
-#[Get(provider: TeaTypeProvider::class, parameters: [
-	"origin" => new QueryParameter(
-		schema: ["type" => "string", "example" => "Japan, China, ..."],
-		property: "origin",
-		description: "Filter by origin path, to get only the given branch",
-	),
-])]
+#[ApiResource(
+	normalizationContext: ["groups" => ["type:read", "origin:read", "with:origin"]],
+	security: "is_granted('ROLE_USER')",
+)]
+#[Get(
+	provider: TeaTypeProvider::class,
+	parameters: [
+		"origin" => new QueryParameter(
+			schema: ["type" => "string", "example" => "Japan, China, ..."],
+			property: "origin",
+			description: "Filter by origin path, to get only the given branch",
+		),
+	],
+)]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
@@ -62,19 +63,19 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[Post(processor: TeaTypeCreateProcessor::class)]
 class TeaType
 {
-	#[Groups(["read:origin", "with:teatype"])]
+	#[Groups(["with:origin", "with:teatype"])]
 	#[ApiProperty(writable: false, identifier: true)]
 	public ?string $slug = null;
 
-	#[Groups(["read:origin", "with:teatype"])]
+	#[Groups(["with:origin", "with:teatype"])]
 	public TeaFamily $family;
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 16)]
-	#[Groups(["embedded:teaType", "with:teatype", "read:origin", "tea:create"])]
+	#[Groups(["embedded:teaType", "with:teatype", "with:origin", "tea:create"])]
 	public string $name;
 
-	#[Groups(["read:origin"])]
+	#[Groups(["with:origin"])]
 	public ?Origin $origin = null;
 
 	#[Groups(["type:read"])]
