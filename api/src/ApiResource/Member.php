@@ -81,7 +81,7 @@ class Member
 
 	/** @var string[] */
 	#[Groups(["member:self", "role:admin"])]
-	#[ApiProperty(security: "object.username === user?.username")]
+	#[ApiProperty(security: "object.username === user?.username or is_granted('ROLE_ADMIN')")]
 	public array $roles = [];
 
 	#[Groups(["member:stats"])]
