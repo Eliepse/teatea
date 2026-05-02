@@ -65,7 +65,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	const revalidator = useRevalidator();
 	const session = props.loaderData;
 	const tea = session.tea;
-	const teaType = useResourceQuery<TeaType>(tea.type);
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
@@ -136,12 +135,11 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 				<TeaCard
 					family={tea.family}
-					type={teaType.data}
+					type={tea.type}
 					origin={tea.originPath}
 					cultivar={tea.cultivar}
 					year={tea.year}
 					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
-					loading={teaType.isLoading}
 					onClick={() => navigate(`/tea/${tea.id}`)}
 					className="shadow bg-white my-2 overflow-hidden"
 				>
