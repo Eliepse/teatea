@@ -9,7 +9,6 @@ import { MainMenu } from "~/layouts/MainMenu";
 export function WithMainMenu(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
 	const navigation = useNavigation();
 	const isNavigating = Boolean(navigation.location);
-	const [token] = useToken();
 
 	return (
 		<>
