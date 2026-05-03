@@ -24,7 +24,7 @@ export function WithMainMenu(props: PropsWithChildren<{ className?: string; acti
 			)}
 
 			{!isNavigating && (
-				<div className={clsx("min-h-svh pt-0 pb-16", props.className)}>
+				<div className={clsx("min-h-svh pb-16", props.className)}>
 					{props.children}
 				</div>
 			)}
