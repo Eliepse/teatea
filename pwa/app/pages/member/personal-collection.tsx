@@ -41,7 +41,7 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 		<WithMainMenu activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
 			<header className="mb-8 pt-2 relative">
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
-				<h1 className="text-3xl font-bold font-header text-center text-green-900">Personal collection</h1>
+				<h1 className="text-3xl font-bold font-header text-center text-green-900">My teas</h1>
 			</header>
 
 			{!itemsQuery.isLoading && 0 === itemsQuery.data?.totalItems && (
