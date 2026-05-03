@@ -3,7 +3,6 @@ import clsx from "clsx";
 import { useNavigation } from "react-router";
 import { Leaf } from "iconoir-react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
-import { useToken } from "~/auth/hooks/useToken";
 import { MainMenu } from "~/layouts/MainMenu";
 
 export function WithMainMenu(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
@@ -25,7 +24,7 @@ export function WithMainMenu(props: PropsWithChildren<{ className?: string; acti
 			)}
 
 			{!isNavigating && (
-				<div className={clsx("min-h-svh overflow-auto bg-green-50 pb-16", props.className)}>
+				<div className={clsx("min-h-svh pt-0 pb-16", props.className)}>
 					{props.children}
 				</div>
 			)}
