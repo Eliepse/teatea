@@ -22,12 +22,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 	security: "is_granted('ROLE_USER')",
 )]
 #[Get(
+	normalizationContext: ["groups" => ["type:read", "type:stats", "origin:read", "with:origin"]],
 	provider: TeaTypeProvider::class,
 	parameters: [
 		"origin" => new QueryParameter(
 			schema: ["type" => "string", "example" => "Japan, China, ..."],
 			property: "origin",
 			description: "Filter by origin path, to get only the given branch",
+		),
+		"stats" => new QueryParameter(
+			schema: ["type" => "boolean"],
+			description: "Return some stats about the tea",
 		),
 	],
 )]
@@ -78,7 +83,7 @@ class TeaType
 	#[Groups(["with:origin"])]
 	public ?Origin $origin = null;
 
-	#[Groups(["type:read"])]
+	#[Groups(["type:stats"])]
 	#[ApiProperty(readable: true, readableLink: true, genId: false)]
 	public ?TeaTypeStats $stats = null;
 }

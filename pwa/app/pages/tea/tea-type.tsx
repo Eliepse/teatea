@@ -1,28 +1,22 @@
 import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea-type";
-import { getApi } from "~/utils/api";
-import { type TeaType } from "~t/types";
 import { type ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
 import { CoffeeCup, Leaderboard, LeaderboardStar, Leaf, NavArrowRight } from "iconoir-react";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { Link, type LinkProps } from "react-router";
+import { queryTeaType } from "~/search/query/teatypeQuery";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const origin = args.params.origin;
 
-	const teaType = await (
-		await getApi<Omit<TeaType, "stats"> & { stats: Required<TeaType>["stats"] }>(
-			`/tea_types/${args.params.slug}?origin=${origin}`,
-		)
-	).json();
-	return { teaType };
+	const type = await queryTeaType(args.params.slug, args.params.origin, true);
+	return { teaType: type, stats: type.stats };
 }
 
 export default function TeaTypePage(props: Route.ComponentProps) {
-	const { teaType } = props.loaderData;
+	const { teaType, stats } = props.loaderData;
 	const origin = teaType.origin;
 	const countryPath = origin.path.split(".")[0];
-	const stats = teaType.stats;
 
 	return (
 		<div className="pb-22 text-lg bg-green-50 min-h-dvh">

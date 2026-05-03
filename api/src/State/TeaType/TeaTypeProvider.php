@@ -23,6 +23,7 @@ readonly class TeaTypeProvider implements ProviderInterface
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?TeaType
 	{
 		$originPath = OperationHelper::getParameter($operation, "origin");
+		$withStats = OperationHelper::getParameter($operation, "stats", "boolval");
 
 		$typeQb = $this->em
 			->createQueryBuilder()
@@ -90,8 +91,6 @@ readonly class TeaTypeProvider implements ProviderInterface
 			$query->andWhere("ranked.path @> :origin")->setParameter("origin", $originPath);
 		}
 
-		$rank = $query->fetchOne();
-
 		$statsQuery = $this->em
 			->getConnection()
 			->createQueryBuilder()
@@ -106,13 +105,16 @@ readonly class TeaTypeProvider implements ProviderInterface
 			$statsQuery->andWhere(":origin @> tea.origin_path")->setParameter("origin", $originPath);
 		}
 
-		$stats = $statsQuery->fetchAssociative();
-
 		$resource = static::fromEntity($typeEntity);
-		$resource->stats = new TeaTypeStats($rank, $stats["teas"], $stats["sessions"]);
 
 		if (null !== $origin) {
 			$resource->origin = OriginProvider::fromEntity($origin);
+		}
+
+		if ($withStats) {
+			$rank = $query->fetchOne();
+			$stats = $statsQuery->fetchAssociative();
+			$resource->stats = new TeaTypeStats($rank, $stats["teas"], $stats["sessions"]);
 		}
 
 		return $resource;
