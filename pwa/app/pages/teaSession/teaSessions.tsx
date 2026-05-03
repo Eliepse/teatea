@@ -11,6 +11,7 @@ import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserF
 import { Family } from "~/components/tea/Family";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import { CoffeeCup, Shop } from "iconoir-react";
+import { FloatingActions } from "~/layouts/FloatingActions";
 
 type Session = Embed<TeaSession, "author", Member>;
 type SessionDay = { [key: Member["username"]]: Session[] };
@@ -112,9 +113,11 @@ export default function ListTeaSessions() {
 				</>
 			)}
 
-			<Link to="/tea/search" className="absolute right-3 bottom-3 btn btn-primary rounded-full h-12 shadow-md">
-				<CoffeeCup className="size-4" /> Start brewing
-			</Link>
+			<FloatingActions>
+				<Link to="/tea/search" className="ml-auto btn btn-primary rounded-full h-12 shadow-md">
+					<CoffeeCup className="size-4" /> Start brewing
+				</Link>
+			</FloatingActions>
 		</WithMainMenu>
 	);
 }

@@ -48,6 +48,7 @@ import { ParametersInput } from "~/components/teaSession/create/ParametersInput"
 import { extractId } from "~/utils/resource";
 import { Badge } from "~/components/shared/Badge";
 import { queryTeaSession } from "~/utils/query/queryTeaSession";
+import { FloatingActions } from "~/layouts/FloatingActions";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -99,7 +100,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 						<nav>
 							<Options session={props.loaderData} />
 
-							<div className="fixed inset-x-4 bottom-20 flex items-center justify-center z-10">
+							<FloatingActions className="justify-center">
 								<button
 									className={clsx(
 										"btn btn-lg rounded-full btn-primary shadow-lg",
@@ -110,7 +111,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 									{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
 									{editMode ? "Done" : "Edit"}
 								</button>
-							</div>
+							</FloatingActions>
 						</nav>
 					</IfAuthor>
 				</div>
