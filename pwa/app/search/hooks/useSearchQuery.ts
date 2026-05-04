@@ -18,12 +18,10 @@ export type SearchFilters = {
 export const SE_CONTEXT = createContext<{
 	filters: SearchFilters;
 	patchFilters: (patch: SearchFilters) => void;
-	searchType: ItemType;
 	rootOrigin?: string,
 }>({
 	filters: {},
 	patchFilters: throwNotImplemented,
-	searchType: "tea_types",
 });
 
 export function useSearchQuery(type: ItemType, filters?: SearchFilters) {

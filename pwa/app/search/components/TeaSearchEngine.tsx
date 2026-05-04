@@ -7,11 +7,12 @@ import { TeaFamilyFilter } from "~/search/components/TeaFamilyFilter";
 import { SEFiltersBar } from "~/search/components/search-engine/SEFiltersBar";
 import { Family } from "~/components/tea/Family";
 import { useNavigate } from "react-router";
-import { SE_CONTEXT, type SearchFilters, useSearchQuery } from "~/search/hooks/useSearchQuery";
+import { SE_CONTEXT, type SearchFilters } from "~/search/hooks/useSearchQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { SearchTextInput } from "~/search/components/SearchTextInput";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { makeTeaTypeQueryOpt } from "~/search/query/teatypeQuery";
+import { makeSearchInfinitQueryOpt } from "~/search/query/searchQuery";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;
@@ -31,12 +32,11 @@ export function TeaSearchEngine(props: {
 				setFilters(patched);
 				f(props.onFiltersChange)(patched);
 			},
-			searchType: computeSearchType(filters),
 		}),
 		[filters, props.onFiltersChange, typeQuery.data],
 	);
 
-	const { query, isTeas } = useSearchQuery(SEContext.searchType, filters);
+	const query = useInfiniteQuery(makeSearchInfinitQueryOpt("teas", filters));
 
 	function handleSearchUpdate(text?: string) {
 		SEContext.patchFilters({ q: text });
@@ -100,9 +100,7 @@ export function TeaSearchEngine(props: {
 					{query.isSuccess && query.data && (
 						<div className="px-4">
 							<div className="uppercase text-xs text-base-content/60 flex justify-between mb-4">
-								<span>
-									{query.data.pages[0].totalItems} {isTeas ? "teas" : "tea types"}
-								</span>
+								<span>{query.data.pages[0].totalItems} teas</span>
 								<span>Sorted by popularity</span>
 							</div>
 
@@ -143,13 +141,19 @@ export function TeaSearchEngine(props: {
 					)}
 
 					{query.isFetching && (
-						<ul className="px-4">
-							<li className="skeleton h-16 mb-2 block" />
-							<li className="skeleton h-16 mb-2 block" />
-							<li className="skeleton h-16 mb-2 block" />
-							<li className="skeleton h-16 mb-2 block" />
-							<li className="skeleton h-16 mb-2 block" />
-						</ul>
+						<div className="px-4">
+							<div className="uppercase text-xs text-base-content/60 flex justify-between mb-4">
+								<span className="skeleton w-16 h-5 block" />
+							</div>
+
+							<ul>
+								<li className="skeleton h-32 mb-2 block" />
+								<li className="skeleton h-32 mb-2 block" />
+								<li className="skeleton h-32 mb-2 block" />
+								<li className="skeleton h-32 mb-2 block" />
+								<li className="skeleton h-32 mb-2 block" />
+							</ul>
+						</div>
 					)}
 
 					{query.hasNextPage && (
@@ -172,26 +176,6 @@ export function TeaSearchEngine(props: {
 			</div>
 		</SE_CONTEXT.Provider>
 	);
-}
-
-/**
- * Determine if the search engine should display
- * teas or type of teas based on the given filters
- */
-function computeSearchType(filters?: SearchFilters): "teas" | "tea_types" {
-	if (undefined === filters) {
-		return "tea_types";
-	}
-
-	if (filters.type || filters.cultivar || filters.year) {
-		return "teas";
-	}
-
-	if (1 < (filters.origin?.split(".")?.length ?? 0)) {
-		return "teas";
-	}
-
-	return "tea_types";
 }
 
 function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void; className?: string }) {
