@@ -3,4 +3,5 @@
 	flex-wrap: nowrap;
 	gap: .375rem;
 	overflow-y: auto;
+	scrollbar-width: none;
 }
