@@ -19,9 +19,11 @@ export const SE_CONTEXT = createContext<{
 	filters: SearchFilters;
 	patchFilters: (patch: SearchFilters) => void;
 	rootOrigin?: string,
+	loading: boolean,
 }>({
 	filters: {},
 	patchFilters: throwNotImplemented,
+	loading: true,
 });
 
 export function useSearchQuery(type: ItemType, filters?: SearchFilters) {

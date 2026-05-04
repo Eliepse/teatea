@@ -13,6 +13,7 @@ import { SearchTextInput } from "~/search/components/SearchTextInput";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { makeTeaTypeQueryOpt } from "~/search/query/teatypeQuery";
 import { makeSearchInfinitQueryOpt } from "~/search/query/searchQuery";
+import { SmartFiltersBar } from "~/search/components/search-engine/SmartFiltersBar";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;
@@ -24,6 +25,7 @@ export function TeaSearchEngine(props: {
 	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
 	const typeQuery = useQuery(makeTeaTypeQueryOpt(filters?.type, filters?.origin));
+	const query = useInfiniteQuery(makeSearchInfinitQueryOpt("teas", filters));
 	const SEContext = useMemo(
 		() => ({
 			filters: filters ?? {},
@@ -32,11 +34,11 @@ export function TeaSearchEngine(props: {
 				setFilters(patched);
 				f(props.onFiltersChange)(patched);
 			},
+			loading: query.isLoading,
 		}),
-		[filters, props.onFiltersChange, typeQuery.data],
+		[filters, props.onFiltersChange, typeQuery.data, query.isLoading],
 	);
 
-	const query = useInfiniteQuery(makeSearchInfinitQueryOpt("teas", filters));
 
 	function handleSearchUpdate(text?: string) {
 		SEContext.patchFilters({ q: text });
@@ -90,9 +92,7 @@ export function TeaSearchEngine(props: {
 					<SEFiltersBar className="px-4 mt-2" />
 				</div>
 
-				{!filters?.family && !filters?.type && !filters?.q && (
-					<TeaFamilyFilter className="px-4 my-4" onSelect={(family) => SEContext.patchFilters({ family })} />
-				)}
+				<SmartFiltersBar className="px-4 my-4" />
 
 				<div className="py-4 flex-1 overflow-y-auto">
 					{query.isError && <div className="text-error px-4">Something went wrong...</div>}
