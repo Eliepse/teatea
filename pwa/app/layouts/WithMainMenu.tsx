@@ -12,7 +12,7 @@ export function WithMainMenu(props: PropsWithChildren<{ className?: string; acti
 	return (
 		<>
 			<IfAuthenticated>
-				<nav className="fixed bottom-0 left-0 right-0 h-16 z-40 bg-white border-t border-gray-200">
+				<nav className="fixed bottom-0 left-0 right-0 h-16 z-30 bg-white border-t border-gray-200">
 					<MainMenu />
 				</nav>
 			</IfAuthenticated>
