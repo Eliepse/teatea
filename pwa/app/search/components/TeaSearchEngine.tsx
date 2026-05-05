@@ -1,10 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
-import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
+import type { Tea, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { f } from "~/utils/function";
 import clsx from "clsx";
 import { SEFiltersBar } from "~/search/components/search-engine/SEFiltersBar";
-import { Family } from "~/components/tea/Family";
 import { useNavigate } from "react-router";
 import { SE_CONTEXT, type SearchFilters } from "~/search/hooks/useSearchQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
@@ -13,7 +12,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { makeTeaTypeQueryOpt } from "~/search/query/teatypeQuery";
 import { makeSearchInfinitQueryOpt } from "~/search/query/searchQuery";
 import { SmartFiltersBar } from "~/search/components/search-engine/SmartFiltersBar";
-import { Xmark } from "iconoir-react";
+import { SearchTypeCard } from "~/search/components/SearchTypeCard";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;
@@ -25,7 +24,7 @@ export function TeaSearchEngine(props: {
 	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
 	const typeQuery = useQuery(makeTeaTypeQueryOpt(filters?.type, filters?.origin));
-	const query = useInfiniteQuery(makeSearchInfinitQueryOpt("teas", filters));
+	const query = useInfiniteQuery(makeSearchInfinitQueryOpt(filters));
 	const SEContext = useMemo(
 		() => ({
 			filters: filters ?? {},
@@ -43,22 +42,13 @@ export function TeaSearchEngine(props: {
 		SEContext.patchFilters({ q: text });
 	}
 
-	function handleItemClicked(item: Tea | TeaType): void {
+	function handleItemClicked(item: Tea): void {
 		if (props.onSelect) {
 			props.onSelect(item);
 			return;
 		}
 
-		if ("type" in item) {
-			navigate(`/tea/${item.id}`);
-			return;
-		}
-
-		if ("name" in item) {
-			const origin = item.origin.path.split(".")[0];
-			navigate(`/tea_types/${origin}/${item.slug}`);
-			return;
-		}
+		navigate(`/tea/${item.id}`);
 	}
 
 	const onTeaCreated = useCallback(
@@ -75,7 +65,7 @@ export function TeaSearchEngine(props: {
 				<div className="sticky top-0 z-10 py-4 bg-green-50 border-b border-base-300">
 					<div className="px-4">
 						{typeQuery.data && (
-							<Item
+							<SearchTypeCard
 								label={typeQuery?.data?.name}
 								family={typeQuery?.data?.family}
 								origin={typeQuery?.data?.origin}
@@ -112,28 +102,16 @@ export function TeaSearchEngine(props: {
 											key={item["@id"] + item.origin?.path}
 											className={clsx("type" in item ? "mb-3" : "mb-2")}
 										>
-											{"name" in item && (
-												<Item
-													label={item.name}
-													family={item.family}
-													origin={item.origin}
-													onClick={() => handleItemClicked(item)}
-													className={"bg-white shadow-xs"}
-												/>
-											)}
-
-											{"type" in item && (
-												<TeaCard
-													type={item.type}
-													family={item.family}
-													origin={item.originPath}
-													cultivar={item.cultivar}
-													year={item.year}
-													roast={item.roast}
-													className={clsx("bg-white shadow-xs")}
-													onClick={() => handleItemClicked(item)}
-												/>
-											)}
+											<TeaCard
+												type={item.type}
+												family={item.family}
+												origin={item.originPath}
+												cultivar={item.cultivar}
+												year={item.year}
+												roast={item.roast}
+												className={clsx("bg-white shadow-xs")}
+												onClick={() => handleItemClicked(item)}
+											/>
 										</li>
 									)),
 								)}
@@ -176,48 +154,5 @@ export function TeaSearchEngine(props: {
 				</div>
 			</div>
 		</SE_CONTEXT.Provider>
-	);
-}
-
-function Item(props: {
-	label?: string;
-	family: TeaFamily;
-	origin?: Origin;
-	onClick?: () => void;
-	closable?: boolean;
-	className?: string;
-}) {
-	return (
-		<article
-			className={clsx(
-				"rounded-2xl min-h-16 px-4 py-3 flex items-center relative",
-				"bg-white text-green-900 text-lg",
-				!!props.onClick && "cursor-pointer hover:outline-1 active:bg-green-200 outline-green-400",
-				!!props.onClick && "focus:outline-2 focus:outline-green-600",
-				props.className,
-			)}
-			onClick={props.onClick}
-			tabIndex={0}
-		>
-			<div className="flex-1">
-				{props.label ? (
-					<div className="text-xs font-medium tracking-wide uppercase text-green-800/60">
-						<Family family={props.family} iconOnly className="mr-1" />
-						{props.family}
-					</div>
-				) : (
-					<Family family={props.family} iconOnly className="mr-2" />
-				)}
-				<span className="capitalize">{props.label ?? `${props.family} tea`}</span>
-			</div>
-
-			<div className="text-sm text-green-800/60">{props.origin && <div>{props.origin.namePath[0]}</div>}</div>
-
-			{props.closable && (
-				<button className="absolute top-5.5 right-4" onClick={props.onClick}>
-					<Xmark className="size-6 text-stone-500" />
-				</button>
-			)}
-		</article>
 	);
 }
