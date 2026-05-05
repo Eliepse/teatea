@@ -4,7 +4,7 @@ import "./app.css";
 import "/public/runtime-env.js?no-inline";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
-import { type ReactNode, StrictMode } from "react";
+import { type ReactNode, StrictMode, useState } from "react";
 
 export const links: Route.LinksFunction = () => [
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -18,8 +18,6 @@ export const links: Route.LinksFunction = () => [
 		href: "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,87.5,200..800&family=Commissioner:wght@100..900&display=swap",
 	},
 ];
-
-const queryClient = new QueryClient();
 
 if ("serviceWorker" in navigator) {
 	navigator.serviceWorker.register("/sw.js");
@@ -37,6 +35,17 @@ if (!import.meta.env.SSR) {
 }
 
 export function Layout({ children }: { children: ReactNode }) {
+	const [queryClient] = useState(
+		() =>
+			new QueryClient({
+				defaultOptions: {
+					queries: {
+						staleTime: 10_000,
+					},
+				},
+			}),
+	);
+
 	return (
 		<StrictMode>
 			<html lang="en">

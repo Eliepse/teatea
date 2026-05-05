@@ -1,8 +1,6 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
 import type { TeaFamily, TeaType } from "~t/types";
 import { createContext, useContext } from "react";
 import { throwNotImplemented } from "~/utils/function";
-import { type ItemType, makeSearchInfinitQueryOpt } from "~/search/query/searchQuery";
 
 export type SearchFilters = {
 	q?: string;
@@ -18,18 +16,13 @@ export type SearchFilters = {
 export const SE_CONTEXT = createContext<{
 	filters: SearchFilters;
 	patchFilters: (patch: SearchFilters) => void;
-	searchType: ItemType;
-	rootOrigin?: string,
+	rootOrigin?: string;
+	loading: boolean;
 }>({
 	filters: {},
 	patchFilters: throwNotImplemented,
-	searchType: "tea_types",
+	loading: true,
 });
-
-export function useSearchQuery(type: ItemType, filters?: SearchFilters) {
-	const query = useInfiniteQuery(makeSearchInfinitQueryOpt(type, filters));
-	return { query, isTeaTypes: "tea_types" === type, isTeas: "teas" === type };
-}
 
 export function useSEContext() {
 	return useContext(SE_CONTEXT);
