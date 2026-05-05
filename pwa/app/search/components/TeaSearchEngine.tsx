@@ -3,7 +3,6 @@ import type { Origin, Tea, TeaFamily, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { f } from "~/utils/function";
 import clsx from "clsx";
-import { TeaFamilyFilter } from "~/search/components/TeaFamilyFilter";
 import { SEFiltersBar } from "~/search/components/search-engine/SEFiltersBar";
 import { Family } from "~/components/tea/Family";
 import { useNavigate } from "react-router";
@@ -14,6 +13,7 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { makeTeaTypeQueryOpt } from "~/search/query/teatypeQuery";
 import { makeSearchInfinitQueryOpt } from "~/search/query/searchQuery";
 import { SmartFiltersBar } from "~/search/components/search-engine/SmartFiltersBar";
+import { Xmark } from "iconoir-react";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;
@@ -38,7 +38,6 @@ export function TeaSearchEngine(props: {
 		}),
 		[filters, props.onFiltersChange, typeQuery.data, query.isLoading],
 	);
-
 
 	function handleSearchUpdate(text?: string) {
 		SEContext.patchFilters({ q: text });
@@ -81,6 +80,8 @@ export function TeaSearchEngine(props: {
 								family={typeQuery?.data?.family}
 								origin={typeQuery?.data?.origin}
 								className="bg-white border border-green-700/20"
+								onClick={() => SEContext.patchFilters({ type: undefined })}
+								closable
 							/>
 						)}
 						{filters?.type && !typeQuery.data && <div className="skeleton h-16 rounded-2xl" />}
@@ -178,11 +179,18 @@ export function TeaSearchEngine(props: {
 	);
 }
 
-function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onClick?: () => void; className?: string }) {
+function Item(props: {
+	label?: string;
+	family: TeaFamily;
+	origin?: Origin;
+	onClick?: () => void;
+	closable?: boolean;
+	className?: string;
+}) {
 	return (
 		<article
 			className={clsx(
-				"rounded-2xl min-h-16 px-4 py-3 flex items-center",
+				"rounded-2xl min-h-16 px-4 py-3 flex items-center relative",
 				"bg-white text-green-900 text-lg",
 				!!props.onClick && "cursor-pointer hover:outline-1 active:bg-green-200 outline-green-400",
 				!!props.onClick && "focus:outline-2 focus:outline-green-600",
@@ -204,6 +212,12 @@ function Item(props: { label?: string; family: TeaFamily; origin?: Origin; onCli
 			</div>
 
 			<div className="text-sm text-green-800/60">{props.origin && <div>{props.origin.namePath[0]}</div>}</div>
+
+			{props.closable && (
+				<button className="absolute top-5.5 right-4" onClick={props.onClick}>
+					<Xmark className="size-6 text-stone-500" />
+				</button>
+			)}
 		</article>
 	);
 }
