@@ -38,13 +38,11 @@ export function SEFiltersBar(props: { className?: string }) {
 	return (
 		<>
 			<ul className={clsx("overflow-y-auto scrollbar-hide flex gap-x-2", props.className)}>
-				{!filters.type && (
-					<li>
-						<FilterButton onClick={handleFamilyBtn} active={!!filters.family}>
-							{filters.family ?? "Family"}
-						</FilterButton>
-					</li>
-				)}
+				<li>
+					<FilterButton onClick={handleFamilyBtn} active={!!filters.family} noIcon={!!filters.type}>
+						{filters.family ?? "Family"}
+					</FilterButton>
+				</li>
 
 				<li>
 					<OriginFilterButton
