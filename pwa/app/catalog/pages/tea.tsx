@@ -1,16 +1,11 @@
 import type { Route } from "../../../.react-router/types/app/catalog/pages/+types/tea";
-import styles from "./tea.module.css";
 import { deleteApi, getApi, postApi } from "~/utils/api";
 import {
 	type ApiCollection,
 	type ApiPaginatedCollection,
-	type Cultivar,
 	type MemberTea,
-	type OriginPath,
-	type RoastLevel,
-	type TeaFamily,
 	type TeaSession,
-	type TeaStats
+	type TeaStats,
 } from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { handleUIEvent } from "~/utils/function";
@@ -20,17 +15,14 @@ import { formatDistanceToNow } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { CoffeeCup, EcologyBook, Heart, HeartSolid, PeopleTag } from "iconoir-react";
-import { type ReactNode, useState } from "react";
+import { CoffeeCup, EcologyBook, Heart, HeartSolid, PeopleTag, Plus } from "iconoir-react";
+import { useState } from "react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
-import { Family } from "~/components/tea/Family";
-import { FormatOriginPath } from "~/components/shared/FormatOriginPath";
-import { RoastLevelLabel } from "~/components/shared/RoastLevelLabel";
-import clsx from "clsx";
 import { BrewButton } from "~/components/teaSession/BrewButton";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AddToPersonalCollectionButton } from "~/components/tea/AddToPersonalCollectionButton";
+import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -85,23 +77,13 @@ export default function TeaPage(props: Route.ComponentProps) {
 								{favorite ? <HeartSolid className="size-6" /> : <Heart className="size-6" />}
 							</button>
 						</li>
-						<li>
-							<AddToPersonalCollectionButton tea={tea["@id"]}>
-								<button
-									className="btn btn-lg bg-white btn-circle text-green-700"
-									aria-label={"Add this tea to my collection"}
-								>
-									<EcologyBook className="size-6" />
-								</button>
-							</AddToPersonalCollectionButton>
-						</li>
 					</ul>
 				</IfAuthenticated>
 			</nav>
 
 			<img src="/img/tea-header-placeholder.jpg" className="h-40 w-full object-cover bg-green-300" alt="" />
 
-			<header className=" bg-green-50">
+			<header>
 				<TeaCard
 					family={tea.family}
 					year={tea.year}
@@ -113,8 +95,29 @@ export default function TeaPage(props: Route.ComponentProps) {
 					className="-mt-12 mb-4 mx-4 relative z-10 bg-white shadow-sm"
 				/>
 
-				<nav className="fixed bottom-4 inset-x-4 flex items-center justify-center gap-2">
-					<BrewButton tea={props.loaderData.tea["@id"]} text="Brew" />
+				<nav className="mx-4 mb-8">
+					<ul className="text-green-900 flex items-center justify-center gap-2">
+						<IfAuthenticated>
+							<li className="flex-1">
+								<AddToPersonalCollectionButton tea={tea["@id"]}>
+									<SecondaryButton>
+										My teas
+										<Plus className="size-5 ml-auto" />
+									</SecondaryButton>
+								</AddToPersonalCollectionButton>
+							</li>
+						</IfAuthenticated>
+						<IfAuthenticated>
+							<li className="flex-1">
+								<BrewButton tea={props.loaderData.tea["@id"]}>
+									<PrimaryButton className="w-full text-lg">
+										Brew
+										<CoffeeCup className="size-5 ml-auto" />
+									</PrimaryButton>
+								</BrewButton>
+							</li>
+						</IfAuthenticated>
+					</ul>
 				</nav>
 			</header>
 
@@ -183,47 +186,5 @@ export default function TeaPage(props: Route.ComponentProps) {
 				</section>
 			</main>
 		</div>
-	);
-}
-
-function Specs(props: {
-	family?: TeaFamily;
-	origin?: OriginPath;
-	roast?: RoastLevel;
-	cultivar?: Cultivar;
-	year?: number;
-	className?: string;
-}) {
-	// No specs to display
-	if (false === Object.keys(props).some((k) => "className" !== k)) {
-		return null;
-	}
-
-	return (
-		<ul className={clsx(styles.specs, props.className)}>
-			{!!props.family && (
-				<SpecItem
-					label="Family"
-					value={
-						<span>
-							<Family family={props.family} className="capitalize" /> tea
-						</span>
-					}
-				/>
-			)}
-			{!!props.origin && <SpecItem label="Origin" value={<FormatOriginPath originPath={props.origin} />} />}
-			{!!props.cultivar && <SpecItem label="Cultivar" value={props.cultivar.name} />}
-			{!!props.year && <SpecItem label="Harvest" value={props.year} />}
-			{!!props.roast && <SpecItem label="Roast" value={<RoastLevelLabel roast={props.roast} showNotRoasted />} />}
-		</ul>
-	);
-}
-
-function SpecItem(props: { label: string; value: ReactNode }) {
-	return (
-		<li className={styles.specsItem}>
-			<span className="text-base text-teal-600">{props.label}</span>
-			{props.value}
-		</li>
 	);
 }
