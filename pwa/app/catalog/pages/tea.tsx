@@ -24,6 +24,7 @@ import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AddToPersonalCollectionButton } from "~/components/tea/AddToPersonalCollectionButton";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
+import { makeSessionCollectionOfTea } from "~/shared/query/teaSessionQuery";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -38,16 +39,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [favorite, setFavorite] = useState<MemberTea | null>(props.loaderData.favoriteTea);
 
-	const sessionsQuery = useQuery({
-		queryFn: async (): Promise<ApiPaginatedCollection<TeaSession>> => {
-			const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(
-				`/tea_sessions?tea=${tea.id}&itemsPerPage=5&contentful=1`,
-			);
-			const payload = await response.json();
-			return { ...payload, member: payload.member.map(denormalizeTeaSession) };
-		},
-		queryKey: ["page", tea["@id"], "sessions"],
-	});
+	const sessionsQuery = useQuery(makeSessionCollectionOfTea(tea));
 
 	const toggleFavorite = useMutation({
 		mutationFn: async () => {
