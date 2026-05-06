@@ -1,7 +1,5 @@
 import clsx from "clsx";
-import { type Origin } from "~t/types";
 import { type ReactNode } from "react";
-import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { useSEContext } from "~/search/hooks/useSearchQuery";
 import { handleUIEvent } from "~/utils/function";
 import styles from "~/components/origin/OriginSelect.module.css";
@@ -12,8 +10,6 @@ import { CultivarFilterButton } from "~/search/components/filter/CultivarFilterB
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters, rootOrigin } = useSEContext();
-
-	const cultivarQuery = useResourceQuery<Origin>(filters.cultivar, "/cultivars/");
 
 	return (
 		<>
