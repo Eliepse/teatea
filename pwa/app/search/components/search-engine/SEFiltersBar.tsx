@@ -23,13 +23,15 @@ export function SEFiltersBar(props: { className?: string }) {
 	return (
 		<>
 			<ul className={clsx("overflow-y-auto scrollbar-hide flex gap-x-2", props.className)}>
-				<li>
-					<FamilyFilterButton
-						family={filters.family}
-						onChange={(f) => patchFilters({ family: f })}
-						readonly={!!filters.type}
-					/>
-				</li>
+				{(!filters.type || !!filters.family) && (
+					<li>
+						<FamilyFilterButton
+							family={filters.family}
+							onChange={(f) => patchFilters({ family: f })}
+							readonly={!!filters.type}
+						/>
+					</li>
+				)}
 
 				<li>
 					<OriginFilterButton
