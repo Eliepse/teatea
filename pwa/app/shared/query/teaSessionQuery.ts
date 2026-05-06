@@ -6,7 +6,7 @@ import { extractId } from "~/utils/resource";
 
 export async function querySessionCollectionOfTea(teaId: Tea["id"]) {
 	const response = await getApi<ApiPaginatedCollection<TeaSessionRaw>>(
-		`/tea_sessions?tea=${teaId}&itemsPerPage=5&contentful=1`,
+		`/tea_sessions?tea=${teaId}&itemsPerPage=5`,
 	);
 	const payload = await response.json();
 	return { ...payload, member: payload.member.map(denormalizeTeaSession) };
