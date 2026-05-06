@@ -8,7 +8,7 @@ export type SearchFilters = {
 	rootOrigin?: string;
 	family?: TeaFamily;
 	type?: TeaType["slug"];
-	cultivar?: string | number;
+	cultivar?: number;
 	distinctByLevel?: 1 | 2 | 3;
 	year?: number;
 };
