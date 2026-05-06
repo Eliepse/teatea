@@ -20,6 +20,7 @@ export default function TeaSearchPage() {
 				),
 			);
 
+			// @ts-expect-error
 			return new URLSearchParams(patched);
 		});
 	}
