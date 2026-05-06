@@ -1,4 +1,4 @@
-import type { Route } from "../../../.react-router/types/app/pages/tea/+types/tea";
+import type { Route } from "../../../.react-router/types/app/catalog/pages/+types/tea";
 import styles from "./tea.module.css";
 import { deleteApi, getApi, postApi } from "~/utils/api";
 import {
