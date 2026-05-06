@@ -1,12 +1,19 @@
-import { useSEContext } from "~/catalog/hooks/useSearchQuery";
+import { type SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { TeaFamilyFilter } from "~/catalog/components/TeaFamilyFilter";
 import { TypesFilterBar } from "~/catalog/components/filter/TypesFilterBar";
 
-export function SmartFiltersBar(props: { className?: string }) {
-	const { filters, patchFilters, loading } = useSEContext();
-	const searchText = filters.q?.trim() ?? "";
+export function SmartFiltersBar(props: {
+	filters: SearchFilters;
+	onChange: (filters: SearchFilters) => void;
+	className?: string;
+}) {
+	const searchText = props.filters.q?.trim() ?? "";
 
-	if (!filters.family && !filters.type && 2 > searchText.length) {
+	function patchFilters(patch: Partial<SearchFilters>) {
+		props.onChange({ ...props.filters, ...patch });
+	}
+
+	if (!props.filters.family && !props.filters.type && 2 > searchText.length) {
 		return (
 			<div className={props.className}>
 				<h2 className="mb-2 uppercase text-xs text-green-900/80 font-medium">Tea families</h2>
@@ -15,14 +22,14 @@ export function SmartFiltersBar(props: { className?: string }) {
 		);
 	}
 
-	if (!filters.type) {
+	if (!props.filters.type) {
 		return (
 			<div className={props.className}>
 				<h2 className="mb-2 uppercase text-xs text-green-900/80 font-medium">Tea types</h2>
 				<TypesFilterBar
-					family={filters.family}
-					origin={filters.origin}
-					q={filters.q}
+					family={props.filters.family}
+					origin={props.filters.origin}
+					q={props.filters.q}
 					onSelect={(type) => patchFilters({ type: type.slug })}
 				/>
 			</div>

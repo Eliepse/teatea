@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { type ReactNode } from "react";
-import { useSEContext } from "~/catalog/hooks/useSearchQuery";
+import { type SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { handleUIEvent } from "~/utils/function";
 import styles from "~/components/origin/OriginSelect.module.css";
 import { YearFilterButton } from "~/catalog/components/filter/YearFilterButton";
@@ -8,39 +8,47 @@ import { OriginFilterButton } from "~/catalog/components/filter/OriginFilterButt
 import { FamilyFilterButton } from "~/catalog/components/filter/FamilyFilterButton";
 import { CultivarFilterButton } from "~/catalog/components/filter/CultivarFilterButton";
 
-export function FiltersBar(props: { className?: string }) {
-	const { filters, patchFilters, rootOrigin } = useSEContext();
+export function FiltersBar(props: {
+	filters: SearchFilters;
+	onChange: (filters: SearchFilters) => void;
+	className?: string;
+}) {
+	const showFamilyFilter = !props.filters.type || !!props.filters.family;
+
+	function patchFilters(patch: Partial<SearchFilters>) {
+		props.onChange({ ...props.filters, ...patch });
+	}
 
 	return (
 		<>
 			<ul className={clsx("overflow-y-auto scrollbar-hide flex gap-x-2", props.className)}>
-				{(!filters.type || !!filters.family) && (
+				{showFamilyFilter && (
 					<li>
 						<FamilyFilterButton
-							family={filters.family}
+							family={props.filters.family}
 							onChange={(f) => patchFilters({ family: f })}
-							readonly={!!filters.type}
+							readonly={!!props.filters.type}
 						/>
 					</li>
 				)}
 
 				<li>
 					<OriginFilterButton
-						origin={filters.origin}
-						root={filters.rootOrigin}
+						origin={props.filters.origin}
+						root={props.filters.rootOrigin}
 						onChange={(origin) => patchFilters({ origin })}
 					/>
 				</li>
 
 				<li>
 					<CultivarFilterButton
-						cultivar={filters.cultivar}
+						cultivar={props.filters.cultivar}
 						onChange={(id) => patchFilters({ cultivar: id })}
 					/>
 				</li>
 
 				<li>
-					<YearFilterButton year={filters.year} onChange={(year) => patchFilters({ year })} />
+					<YearFilterButton year={props.filters.year} onChange={(year) => patchFilters({ year })} />
 				</li>
 			</ul>
 		</>

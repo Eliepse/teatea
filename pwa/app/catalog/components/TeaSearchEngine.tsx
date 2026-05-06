@@ -22,24 +22,22 @@ export function TeaSearchEngine(props: {
 	onFiltersChange?: (filters?: SearchFilters) => void;
 }) {
 	const navigate = useNavigate();
-	const [filters, setFilters] = useState<SearchFilters | undefined>(props.defaultFilters);
+	const [filters, setFilters] = useState<SearchFilters>(props.defaultFilters ?? {});
 	const typeQuery = useQuery(makeTeaTypeQueryOpt(filters?.type, filters?.origin));
 	const query = useInfiniteQuery(makeSearchInfinitQueryOpt(filters));
 	const SEContext = useMemo(
-		() => ({
-			filters: filters ?? {},
-			patchFilters: (patch: SearchFilters) => {
-				const patched = { ...filters, ...patch };
-				setFilters(patched);
-				f(props.onFiltersChange)(patched);
-			},
-			loading: query.isLoading,
-		}),
+		() => ({ filters, loading: query.isLoading }),
 		[filters, props.onFiltersChange, typeQuery.data, query.isLoading],
 	);
 
+	function patchFilters(patch: Partial<SearchFilters>) {
+		const patched = { ...filters, ...patch };
+		setFilters(patched);
+		f(props.onFiltersChange)(patched);
+	}
+
 	function handleSearchUpdate(text?: string) {
-		SEContext.patchFilters({ q: text });
+		patchFilters({ q: text });
 	}
 
 	function handleItemClicked(item: Tea): void {
@@ -70,7 +68,7 @@ export function TeaSearchEngine(props: {
 								family={typeQuery?.data?.family}
 								origin={typeQuery?.data?.origin}
 								className="bg-white border border-green-700/20"
-								onClick={() => SEContext.patchFilters({ type: undefined })}
+								onClick={() => patchFilters({ type: undefined })}
 								closable
 							/>
 						)}
@@ -80,10 +78,10 @@ export function TeaSearchEngine(props: {
 						)}
 					</div>
 
-					<FiltersBar className="px-4 mt-2" />
+					<FiltersBar filters={filters} onChange={patchFilters} className="px-4 mt-2" />
 				</div>
 
-				<SmartFiltersBar className="px-4 my-4" />
+				<SmartFiltersBar filters={filters} onChange={patchFilters} className="px-4 my-4" />
 
 				<div className="py-4 flex-1 overflow-y-auto">
 					{query.isError && <div className="text-error px-4">Something went wrong...</div>}
