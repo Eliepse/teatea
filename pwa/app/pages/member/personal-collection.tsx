@@ -1,15 +1,13 @@
 import type { Route } from "../../../.react-router/types/app/pages/member/+types/personal-collection";
-import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection } from "~t/types";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { TokenUtils } from "~/auth/hooks/useToken";
-import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { CollectionTeaCard } from "~/pages/member/_components/CollectionTeaCard";
 import { Link } from "react-router";
 import { EmojiSurprise, Search } from "iconoir-react";
 import clsx from "clsx";
+import { makeMemberTeaCollectionQueryOpt } from "~/shared/query/memberTeaQuery";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
@@ -23,16 +21,7 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 }
 
 export default function PersonalCollectionPage(props: Route.ComponentProps) {
-	const itemsQuery = useQuery({
-		queryFn: async (ctx) => {
-			const response = await getApi<ApiPaginatedCollection<CollectionTeaRaw>>(
-				`/members/${ctx.queryKey[1]}/teas?itemsPerPage=50`,
-			);
-			const data = await response.json();
-			return { ...data, member: data.member.map(denormalizeCollectionTea) };
-		},
-		queryKey: ["collectionTeas", props.params.username],
-	});
+	const itemsQuery = useQuery(makeMemberTeaCollectionQueryOpt(props.params.username, {}, { itemsPerPage: 50 }));
 
 	const active = itemsQuery.data?.member?.filter((el) => !el.finishedAt) ?? [];
 	const inactive = itemsQuery.data?.member?.filter((el) => !!el.finishedAt) ?? [];
