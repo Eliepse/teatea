@@ -1,21 +1,14 @@
 import type { Route } from "../../../.react-router/types/app/catalog/pages/+types/tea";
 import { deleteApi, getApi, postApi } from "~/utils/api";
-import {
-	type ApiCollection,
-	type ApiPaginatedCollection,
-	type MemberTea,
-	type TeaSession,
-	type TeaStats,
-} from "~t/types";
+import { type ApiCollection, type MemberTea, type TeaStats } from "~t/types";
 import { Link, useNavigate } from "react-router";
 import { handleUIEvent } from "~/utils/function";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { formatDistanceToNow } from "date-fns";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
-import { CoffeeCup, EcologyBook, Heart, HeartSolid, PeopleTag, Plus } from "iconoir-react";
+import { CoffeeCup, Heart, HeartSolid, PeopleTag, Plus } from "iconoir-react";
 import { useState } from "react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 import { BrewButton } from "~/components/teaSession/BrewButton";
@@ -38,7 +31,6 @@ export default function TeaPage(props: Route.ComponentProps) {
 	const { tea, stats } = props.loaderData;
 	const navigate = useNavigate();
 	const [favorite, setFavorite] = useState<MemberTea | null>(props.loaderData.favoriteTea);
-
 	const sessionsQuery = useQuery(makeSessionCollectionOfTea(tea));
 
 	const toggleFavorite = useMutation({
@@ -93,7 +85,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<IfAuthenticated>
 							<li className="flex-1">
 								<AddToPersonalCollectionButton tea={tea["@id"]}>
-									<SecondaryButton>
+									<SecondaryButton className="w-full">
 										My teas
 										<Plus className="size-5 ml-auto" />
 									</SecondaryButton>
@@ -136,7 +128,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 				)}
 
 				<section className="px-4 mt-8">
-					<h2 className="text text-green-800/70 mb-4">Tea sessions with this tea</h2>
+					<h2 className="uppercase text-xs font-medium text-stone-500 mb-2">Tea sessions</h2>
 					{sessionsQuery.isPending && (
 						<div className="">
 							<div className="skeleton h-12 mb-2" />
@@ -145,7 +137,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 						</div>
 					)}
 
-					{0 !== (sessionsQuery.data?.member?.length ?? 0) && (
+					{!!sessionsQuery.data?.member?.length && (
 						<ul>
 							{sessionsQuery.data?.member?.map((session) => (
 								<li className="mb-2" key={session.id}>
@@ -175,6 +167,19 @@ export default function TeaPage(props: Route.ComponentProps) {
 								</li>
 							))}
 						</ul>
+					)}
+
+					{!sessionsQuery.data?.member?.length && (
+						<p>
+							This tea has not been
+							<BrewButton tea={props.loaderData.tea["@id"]} className="inline">
+								<SecondaryButton className="text-sm mx-1" small inline>
+									Brewed
+									<CoffeeCup className="size-4 ml-1" />
+								</SecondaryButton>
+								yet.
+							</BrewButton>
+						</p>
 					)}
 				</section>
 			</main>
