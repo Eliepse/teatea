@@ -8,7 +8,7 @@ import { OriginFilterButton } from "~/catalog/components/filter/OriginFilterButt
 import { FamilyFilterButton } from "~/catalog/components/filter/FamilyFilterButton";
 import { CultivarFilterButton } from "~/catalog/components/filter/CultivarFilterButton";
 
-export function SEFiltersBar(props: { className?: string }) {
+export function FiltersBar(props: { className?: string }) {
 	const { filters, patchFilters, rootOrigin } = useSEContext();
 
 	return (

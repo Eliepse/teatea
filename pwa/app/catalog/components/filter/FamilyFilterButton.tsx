@@ -2,7 +2,7 @@ import { FilterButton } from "~/catalog/components/FilterButton";
 import { teaFamilies, type TeaFamily } from "~t/types";
 import { Family } from "~/components/tea/Family";
 import { Modal } from "~/components/shared/modal/Modal";
-import { Item } from "~/catalog/components/search-engine/SEFiltersBar";
+import { Item } from "~/catalog/components/search-engine/FiltersBar";
 import { useState } from "react";
 
 export function FamilyFilterButton(props: {

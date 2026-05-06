@@ -3,7 +3,7 @@ import type { Tea, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { f } from "~/utils/function";
 import clsx from "clsx";
-import { SEFiltersBar } from "~/catalog/components/search-engine/SEFiltersBar";
+import { FiltersBar } from "~/catalog/components/search-engine/FiltersBar";
 import { useNavigate } from "react-router";
 import { SE_CONTEXT, type SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
@@ -80,7 +80,7 @@ export function TeaSearchEngine(props: {
 						)}
 					</div>
 
-					<SEFiltersBar className="px-4 mt-2" />
+					<FiltersBar className="px-4 mt-2" />
 				</div>
 
 				<SmartFiltersBar className="px-4 my-4" />
