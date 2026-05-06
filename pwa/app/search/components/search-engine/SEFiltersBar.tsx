@@ -1,6 +1,6 @@
 import { FilterButton } from "~/search/components/FilterButton";
 import clsx from "clsx";
-import { type Origin, teaFamilies, type TeaFamily } from "~t/types";
+import { type Origin } from "~t/types";
 import { type ReactNode, useState } from "react";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { extractId } from "~/utils/resource";
@@ -8,40 +8,27 @@ import { useSEContext } from "~/search/hooks/useSearchQuery";
 import { Modal } from "~/components/shared/modal/Modal";
 import { handleUIEvent } from "~/utils/function";
 import styles from "~/components/origin/OriginSelect.module.css";
-import { Family } from "~/components/tea/Family";
 import { SelectCultivar } from "~/components/tea/SelectCultivar";
 import { Check } from "iconoir-react";
 import { YearFilterButton } from "~/search/components/filter/YearFilterButton";
 import { OriginFilterButton } from "~/search/components/filter/OriginFilterButton";
-
-type Filter = "family" | "cultivar";
+import { FamilyFilterButton } from "~/search/components/filter/FamilyFilterButton";
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters, rootOrigin } = useSEContext();
-	const [popup, setPopup] = useState<Filter | undefined>(undefined);
+	const [popup, setPopup] = useState<"cultivar" | undefined>(undefined);
 
 	const cultivarQuery = useResourceQuery<Origin>(filters.cultivar, "/cultivars/");
-
-	function handleFamilyBtn() {
-		if (filters.type) {
-			return;
-		}
-
-		if (filters.family) {
-			patchFilters({ family: undefined });
-			return;
-		}
-
-		setPopup("family");
-	}
 
 	return (
 		<>
 			<ul className={clsx("overflow-y-auto scrollbar-hide flex gap-x-2", props.className)}>
 				<li>
-					<FilterButton onClick={handleFamilyBtn} active={!!filters.family} noIcon={!!filters.type}>
-						{filters.family ?? "Family"}
-					</FilterButton>
+					<FamilyFilterButton
+						family={filters.family}
+						onChange={(f) => patchFilters({ family: f })}
+						readonly={!!filters.type}
+					/>
 				</li>
 
 				<li>
@@ -72,27 +59,6 @@ export function SEFiltersBar(props: { className?: string }) {
 					<YearFilterButton year={filters.year} onChange={(year) => patchFilters({ year })} />
 				</li>
 			</ul>
-			<Modal open={"family" === popup && !filters.type} onClose={() => setPopup(undefined)} className="p-4">
-				<ul className="flex flex-col gap-2">
-					{Object.keys(teaFamilies).map((key) => (
-						<li key={key}>
-							<Item
-								label={
-									<>
-										<Family family={key as TeaFamily} className="capitalize mr-1" />
-										tea
-									</>
-								}
-								onSelect={() => {
-									patchFilters({ family: key as TeaFamily });
-									setPopup(undefined);
-								}}
-								selected={key === filters.family}
-							/>
-						</li>
-					))}
-				</ul>
-			</Modal>
 			<Modal open={"cultivar" === popup} onClose={() => setPopup(undefined)} className="p-0">
 				<SelectCultivar
 					onConfirm={(v) => {
