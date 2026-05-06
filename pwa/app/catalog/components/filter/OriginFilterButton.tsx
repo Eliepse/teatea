@@ -1,4 +1,4 @@
-import { FilterButton } from "~/search/components/FilterButton";
+import { FilterButton } from "~/catalog/components/FilterButton";
 import { extractId } from "~/utils/resource";
 import { OriginSelectModal } from "~/components/origin/OriginSelectModal";
 import { useState } from "react";

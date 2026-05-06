@@ -1,4 +1,4 @@
-import type { SearchFilters } from "~/search/hooks/useSearchQuery";
+import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Tea } from "~t/types";
 import { queryOptions } from "@tanstack/react-query";

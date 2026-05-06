@@ -11,7 +11,7 @@ export default [
 		route("/welcome", "pages/dashboard/dashboard.tsx"),
 
 		route("/tea/new", "pages/tea/tea-create.tsx"),
-		route("/tea/search", "search/pages/search.tsx"),
+		route("/tea/search", "catalog/pages/search.tsx"),
 		route("/tea/:id", "pages/tea/tea.tsx"),
 		route("/tea_types/:origin/:slug", "pages/tea/tea-type.tsx"),
 

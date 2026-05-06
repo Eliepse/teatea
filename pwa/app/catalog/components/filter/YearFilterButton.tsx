@@ -1,4 +1,4 @@
-import { FilterButton } from "~/search/components/FilterButton";
+import { FilterButton } from "~/catalog/components/FilterButton";
 import { useState } from "react";
 import { SelectYearModal } from "~/components/shared/modal/SelectYearModal";
 

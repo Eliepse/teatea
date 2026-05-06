@@ -3,16 +3,16 @@ import type { Tea, TeaType } from "~t/types";
 import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { f } from "~/utils/function";
 import clsx from "clsx";
-import { SEFiltersBar } from "~/search/components/search-engine/SEFiltersBar";
+import { SEFiltersBar } from "~/catalog/components/search-engine/SEFiltersBar";
 import { useNavigate } from "react-router";
-import { SE_CONTEXT, type SearchFilters } from "~/search/hooks/useSearchQuery";
+import { SE_CONTEXT, type SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
-import { SearchTextInput } from "~/search/components/SearchTextInput";
+import { SearchTextInput } from "~/catalog/components/SearchTextInput";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { makeTeaTypeQueryOpt } from "~/search/query/teatypeQuery";
-import { makeSearchInfinitQueryOpt } from "~/search/query/searchQuery";
-import { SmartFiltersBar } from "~/search/components/search-engine/SmartFiltersBar";
-import { SearchTypeCard } from "~/search/components/SearchTypeCard";
+import { makeTeaTypeQueryOpt } from "~/catalog/query/teatypeQuery";
+import { makeSearchInfinitQueryOpt } from "~/catalog/query/searchQuery";
+import { SmartFiltersBar } from "~/catalog/components/search-engine/SmartFiltersBar";
+import { SearchTypeCard } from "~/catalog/components/SearchTypeCard";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;

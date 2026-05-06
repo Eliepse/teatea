@@ -1,6 +1,6 @@
-import { useSEContext } from "~/search/hooks/useSearchQuery";
-import { TeaFamilyFilter } from "~/search/components/TeaFamilyFilter";
-import { TypesFilterBar } from "~/search/components/filter/TypesFilterBar";
+import { useSEContext } from "~/catalog/hooks/useSearchQuery";
+import { TeaFamilyFilter } from "~/catalog/components/TeaFamilyFilter";
+import { TypesFilterBar } from "~/catalog/components/filter/TypesFilterBar";
 
 export function SmartFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters, loading } = useSEContext();

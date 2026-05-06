@@ -1,6 +1,6 @@
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Tea } from "~t/types";
-import type { SearchFilters } from "~/search/hooks/useSearchQuery";
+import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { infiniteQueryOptions } from "@tanstack/react-query";
 import { queryTeaSearch } from "~/utils/query/teaQuery";
 

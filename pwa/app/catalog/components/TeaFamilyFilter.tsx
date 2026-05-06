@@ -1,6 +1,6 @@
 import { teaFamilies, type TeaFamily } from "~t/types";
 import styles from "./TeaFamilyFilter.module.css";
-import { FilterButton } from "~/search/components/FilterButton";
+import { FilterButton } from "~/catalog/components/FilterButton";
 import { Family } from "~/components/tea/Family";
 import clsx from "clsx";
 

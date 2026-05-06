@@ -1,4 +1,4 @@
-import { FilterButton } from "~/search/components/FilterButton";
+import { FilterButton } from "~/catalog/components/FilterButton";
 import type { Cultivar } from "~t/types";
 import { useState } from "react";
 import { Modal } from "~/components/shared/modal/Modal";

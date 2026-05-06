@@ -4,7 +4,7 @@ import { Family } from "~/components/tea/Family";
 import { CoffeeCup, Leaderboard, LeaderboardStar, Leaf, NavArrowRight } from "iconoir-react";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { Link, type LinkProps } from "react-router";
-import { queryTeaType } from "~/search/query/teatypeQuery";
+import { queryTeaType } from "~/catalog/query/teatypeQuery";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const origin = args.params.origin;

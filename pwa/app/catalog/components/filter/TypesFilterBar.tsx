@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { makeTypeSearchQueryOpt } from "~/utils/query/teaTypeQuery";
 import clsx from "clsx";
-import styles from "~/search/components/TeaFamilyFilter.module.css";
+import styles from "~/catalog/components/TeaFamilyFilter.module.css";
 import { type Origin, type TeaFamily, type TeaType } from "~t/types";
-import { FilterButton } from "~/search/components/FilterButton";
+import { FilterButton } from "~/catalog/components/FilterButton";
 import { Family } from "~/components/tea/Family";
-import { FilterbarFallback } from "~/search/components/filter/FilterbarFallback";
+import { FilterbarFallback } from "~/catalog/components/filter/FilterbarFallback";
 
 export function TypesFilterBar(props: {
 	q?: string;

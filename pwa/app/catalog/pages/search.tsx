@@ -1,7 +1,7 @@
-import { TeaSearchEngine } from "~/search/components/TeaSearchEngine";
+import { TeaSearchEngine } from "~/catalog/components/TeaSearchEngine";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { useSearchParams } from "react-router";
-import type { SearchFilters } from "~/search/hooks/useSearchQuery";
+import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { safeEmpty } from "~/utils/general";
 import type { TeaFamily } from "~t/types";
 

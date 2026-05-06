@@ -1,12 +1,12 @@
 import clsx from "clsx";
 import { type ReactNode } from "react";
-import { useSEContext } from "~/search/hooks/useSearchQuery";
+import { useSEContext } from "~/catalog/hooks/useSearchQuery";
 import { handleUIEvent } from "~/utils/function";
 import styles from "~/components/origin/OriginSelect.module.css";
-import { YearFilterButton } from "~/search/components/filter/YearFilterButton";
-import { OriginFilterButton } from "~/search/components/filter/OriginFilterButton";
-import { FamilyFilterButton } from "~/search/components/filter/FamilyFilterButton";
-import { CultivarFilterButton } from "~/search/components/filter/CultivarFilterButton";
+import { YearFilterButton } from "~/catalog/components/filter/YearFilterButton";
+import { OriginFilterButton } from "~/catalog/components/filter/OriginFilterButton";
+import { FamilyFilterButton } from "~/catalog/components/filter/FamilyFilterButton";
+import { CultivarFilterButton } from "~/catalog/components/filter/CultivarFilterButton";
 
 export function SEFiltersBar(props: { className?: string }) {
 	const { filters, patchFilters, rootOrigin } = useSEContext();
