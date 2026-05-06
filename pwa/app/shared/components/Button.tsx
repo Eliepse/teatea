@@ -1,14 +1,16 @@
 import clsx from "clsx";
 import type { PropsWithChildren } from "react";
 
-type BtnProps = { className?: string; onClick?: () => void };
+type BtnProps = { className?: string; onClick?: () => void; inline?: boolean; small?: boolean };
 
 export function Button(props: PropsWithChildren<BtnProps & { defaultClassName?: string }>) {
 	return (
 		<button
 			className={clsx(
-				"w-full flex items-center justify-center px-4 py-2 rounded-xl select-none",
+				props.inline ? "inline-flex" : "flex",
+				"items-center justify-center rounded-xl select-none",
 				"cursor-pointer disabled:bg-stone-200 disabled:text-stone-500",
+				props.small ? "text-sm px-3 py-1" : "text-base px-4 py-2",
 				props.defaultClassName ?? "bg-white text-green-700 hover:bg-green-200 active:bg-green-400",
 				props.className,
 			)}
