@@ -8,9 +8,9 @@ export function Button(props: PropsWithChildren<BtnProps & { defaultClassName?: 
 		<button
 			className={clsx(
 				props.inline ? "inline-flex" : "flex",
-				"items-center justify-center rounded-xl select-none",
+				"items-center justify-center select-none",
 				"cursor-pointer disabled:bg-stone-200 disabled:text-stone-500",
-				props.small ? "text-sm px-3 py-1" : "text-base px-4 py-2",
+				props.small ? "text-sm px-3 py-1 rounded-lg" : "text-base px-4 py-2 rounded-xl",
 				props.defaultClassName ?? "bg-white text-green-700 hover:bg-green-200 active:bg-green-400",
 				props.className,
 			)}

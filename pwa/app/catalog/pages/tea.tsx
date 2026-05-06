@@ -77,7 +77,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 					type={tea.type}
 					origin={tea.originPath}
 					hideArrow
-					className="-mt-12 mb-4 mx-4 relative z-10 bg-white shadow-sm"
+					className="-mt-12 mb-2 mx-4 relative z-10 bg-white shadow-sm"
 				/>
 
 				<nav className="mx-4 mb-8">
@@ -95,7 +95,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 						<IfAuthenticated>
 							<li className="flex-1">
 								<BrewButton tea={props.loaderData.tea["@id"]}>
-									<PrimaryButton className="w-full text-lg">
+									<PrimaryButton className="w-full">
 										Brew
 										<CoffeeCup className="size-5 ml-auto" />
 									</PrimaryButton>
