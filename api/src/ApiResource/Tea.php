@@ -22,8 +22,6 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-use function Symfony\Component\TypeInfo\TypeFactoryTrait;
-
 #[ApiResource(security: "is_granted('ROLE_USER')")]
 #[Get(normalizationContext: [
 	"groups" => [

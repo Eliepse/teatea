@@ -8,6 +8,9 @@ import { Link } from "react-router";
 import { EmojiSurprise, Search } from "iconoir-react";
 import clsx from "clsx";
 import { makeMemberTeaCollectionQueryOpt } from "~/shared/query/memberTeaQuery";
+import { TeaFamilyFilter } from "~/catalog/components/TeaFamilyFilter";
+import { useState } from "react";
+import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const token = TokenUtils.get();
@@ -21,17 +24,31 @@ export async function clientLoader(args: Route.ClientLoaderArgs) {
 }
 
 export default function PersonalCollectionPage(props: Route.ComponentProps) {
-	const itemsQuery = useQuery(makeMemberTeaCollectionQueryOpt(props.params.username, {}, { itemsPerPage: 50 }));
+	const [filters, setFilters] = useState<SearchFilters>({});
+	const itemsQuery = useQuery(makeMemberTeaCollectionQueryOpt(props.params.username, filters, { itemsPerPage: 50 }));
 
 	const active = itemsQuery.data?.member?.filter((el) => !el.finishedAt) ?? [];
 	const inactive = itemsQuery.data?.member?.filter((el) => !!el.finishedAt) ?? [];
 
+	function patchFilters(patch: Partial<SearchFilters>) {
+		setFilters((v) => ({ ...v, ...patch }));
+	}
+
 	return (
 		<WithMainMenu activeKey="my-teas" className="p-4 pb-20 bg-green-50 min-h-dvh">
-			<header className="mb-8 pt-2 relative">
+			<header className="mb-4 pt-2 relative">
 				<BackButton className="mr-auto shadow-sm absolute top-0 left-0" />
 				<h1 className="text-3xl font-bold font-header text-center text-green-900">My teas</h1>
 			</header>
+
+			<div className="mb-8 -mx-4">
+				<TeaFamilyFilter
+					selected={filters.family}
+					onSelect={(family) => patchFilters({ family })}
+					className="px-4"
+					allChoice
+				/>
+			</div>
 
 			{!itemsQuery.isLoading && 0 === itemsQuery.data?.totalItems && (
 				<div className="mt-16 px-4 py-8 text-green-700 bg-white/60 rounded-xl text-center">
