@@ -23,6 +23,7 @@ import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { AddToPersonalCollectionButton } from "~/components/tea/AddToPersonalCollectionButton";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
+import { WithMainMenu } from "~/layouts/WithMainMenu";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const teaId = args.params.id;
@@ -61,7 +62,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 	});
 
 	return (
-		<div className="pb-22 text-lg bg-green-50 min-h-dvh">
+		<WithMainMenu className="pb-22 text-lg bg-green-50 min-h-dvh">
 			<nav className="absolute inset-x-0 top-0 p-5 flex">
 				<BackButton className="mr-auto" />
 
@@ -185,6 +186,6 @@ export default function TeaPage(props: Route.ComponentProps) {
 					)}
 				</section>
 			</main>
-		</div>
+		</WithMainMenu>
 	);
 }
