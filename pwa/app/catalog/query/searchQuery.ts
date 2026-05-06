@@ -2,7 +2,7 @@ import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Tea } from "~t/types";
 import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { infiniteQueryOptions } from "@tanstack/react-query";
-import { queryTeaSearch } from "~/utils/query/teaQuery";
+import { queryTeaSearch } from "~/catalog/query/teaQuery";
 
 export function makeSearchInfinitQueryOpt(filters?: SearchFilters) {
 	return infiniteQueryOptions({
