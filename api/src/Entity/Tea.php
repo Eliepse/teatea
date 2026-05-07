@@ -70,10 +70,10 @@ class Tea
 	private Collection $collectionTeas;
 
 	/**
-	 * @var Collection<int, BusinessTea>
+	 * The business this tea is available at
 	 */
-	#[ORM\OneToMany(targetEntity: BusinessTea::class, mappedBy: "tea")]
-	private Collection $businessTeas;
+	#[ORM\ManyToOne(targetEntity: Business::class, inversedBy: "teas")]
+	public ?Business $business = null;
 
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(nullable: false)]
@@ -83,7 +83,6 @@ class Tea
 	{
 		$this->sessions = new ArrayCollection();
 		$this->collectionTeas = new ArrayCollection();
-		$this->businessTeas = new ArrayCollection();
 	}
 
 	public function setCultivar(?Cultivar $cultivar): static
@@ -110,7 +109,6 @@ class Tea
 	{
 		if (!$this->sessions->contains($session)) {
 			$this->sessions->add($session);
-
 			//			$session->setTea($this);
 		}
 

@@ -32,9 +32,9 @@ class Business
 	private Collection $acquiredTeas;
 
 	/**
-	 * @var Collection<int, BusinessTea>
+	 * @var Collection<int, Tea>
 	 */
-	#[ORM\OneToMany(targetEntity: BusinessTea::class, mappedBy: "business")]
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "business")]
 	private Collection $teas;
 
 	public function __construct()
