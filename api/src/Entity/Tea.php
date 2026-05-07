@@ -69,6 +69,12 @@ class Tea
 	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "tea")]
 	private Collection $collectionTeas;
 
+	/**
+	 * @var Collection<int, BusinessTea>
+	 */
+	#[ORM\OneToMany(targetEntity: BusinessTea::class, mappedBy: "tea")]
+	private Collection $businessTeas;
+
 	#[ORM\ManyToOne]
 	#[ORM\JoinColumn(nullable: false)]
 	public ?User $createdBy = null;
@@ -76,6 +82,8 @@ class Tea
 	public function __construct()
 	{
 		$this->sessions = new ArrayCollection();
+		$this->collectionTeas = new ArrayCollection();
+		$this->businessTeas = new ArrayCollection();
 	}
 
 	public function setCultivar(?Cultivar $cultivar): static
