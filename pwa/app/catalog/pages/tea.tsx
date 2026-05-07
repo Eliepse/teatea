@@ -76,6 +76,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 					cultivar={tea.cultivar}
 					type={tea.type}
 					origin={tea.originPath}
+					business={tea.business}
 					hideArrow
 					className="-mt-12 mb-2 mx-4 relative z-10 bg-white shadow-sm"
 				/>

@@ -70,6 +70,7 @@ export type Tea = Resource & {
 	cultivar?: Cultivar;
 	year?: number;
 	roast?: RoastLevel;
+	business?: Business;
 	addedAt?: Date;
 };
 
