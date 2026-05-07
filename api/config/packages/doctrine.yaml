@@ -22,6 +22,7 @@ doctrine:
             volume: App\Doctrine\DBAL\Types\VolumeType
             weight: App\Doctrine\DBAL\Types\WeightType
             RoastLevel: App\Doctrine\DBAL\Types\RoastLevelType
+            date_point: App\Doctrine\DBAL\Types\DatePointPostgresType
         connections:
             default:
                 url: '%env(resolve:DATABASE_URL)%'
