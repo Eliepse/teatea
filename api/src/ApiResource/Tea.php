@@ -22,21 +22,24 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-#[ApiResource(security: "is_granted('ROLE_USER')")]
-#[Get(normalizationContext: [
-	"groups" => [
-		"tea:read",
-		"embedded:teaType",
-		"with:origin",
-		"embedded:cultivar",
-	]
-], provider: TeaProvider::class)]
+#[ApiResource(
+	normalizationContext: [
+		"groups" => [
+			"tea:read",
+			"embedded:teaType",
+			"with:origin",
+			"embedded:cultivar",
+			"with:business",
+		]
+	],
+	security: "is_granted('ROLE_USER')",
+)]
+#[Get(provider: TeaProvider::class)]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,
 	paginationMaximumItemsPerPage: 50,
 	paginationClientItemsPerPage: true,
-	normalizationContext: ["groups" => ["tea:read", "embedded:teaType", "with:origin", "embedded:cultivar"]],
 	provider: TeaCollectionProvider::class,
 	parameters: [
 		"family" => new QueryParameter(
@@ -121,11 +124,14 @@ class Tea
 	public ?Cultivar $cultivar = null;
 
 	#[Assert\GreaterThanOrEqual(1800)]
-	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
 	public ?int $year = null;
 
-	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
 	public ?RoastLevel $roast = null;
+
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:business"])]
+	public ?Business $business = null;
 
 	#[Groups(["tea:read"])]
 	public \DateTimeImmutable $addedAt;

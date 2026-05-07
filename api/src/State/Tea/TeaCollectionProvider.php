@@ -143,11 +143,12 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		/** @var array<\App\Entity\Tea> $teaEntities */
 		$teaEntities = $this->em
 			->createQueryBuilder()
-			->select("tea", "type", "origin", "cultivar")
+			->select("tea", "type", "origin", "cultivar", "business")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.cultivar", "cultivar")
+			->leftJoin("tea.business", "business")
 			->where("tea.id IN (:ids)")
 			->setParameter("ids", Arr::pluck($searchResults, "id"), ArrayParameterType::INTEGER)
 			->getQuery()

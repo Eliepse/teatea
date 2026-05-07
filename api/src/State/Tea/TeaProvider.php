@@ -8,6 +8,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Tea;
 use App\DTO\OriginPath;
 use App\Entity\Origin;
+use App\State\Business\BusinessProvider;
 use App\State\Cultivar\CultivarProvider;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
@@ -108,6 +109,10 @@ readonly class TeaProvider implements ProviderInterface
 		$tea->originPath = $originPath;
 		if (null !== $entity->origin && false === $entity->origin instanceof Proxy) {
 			$tea->origin = OriginProvider::fromEntity($entity->origin);
+		}
+
+		if (!$entity->business instanceof Proxy) {
+			$tea->business = BusinessProvider::fromEntity($entity->business);
 		}
 
 		$tea->cultivar = CultivarProvider::fromEntity($entity->cultivar);
