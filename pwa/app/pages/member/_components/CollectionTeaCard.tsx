@@ -47,18 +47,19 @@ export function CollectionTeaCard(props: {
 			{hasMeta && <hr className={clsx("border-stone-200 mx-4 mt-1 mb-2", props.thumbnail && "mr-20")} />}
 
 			{hasMeta && (
-				<div className="text-sm px-4 text-stone-600 mb-1">
+				<div className="text-sm px-4 text-stone-600">
 					{!!props.acquiredFrom && (
-						<span className="mr-4">
-							<Shop className="inline size-4 mr-1 relative bottom-0.5" /> {props.acquiredFrom.name}
-						</span>
+						<div className="mr-4">
+							<Shop className="inline size-4 mr-1 relative bottom-0.5" />
+							{props.acquiredFrom.name}
+						</div>
 					)}
 
 					{!!props.acquiredAt && (
-						<span>
-							<Calendar className="inline size-4 mr-1 relative bottom-0.5" />{" "}
+						<div>
+							<Calendar className="inline size-4 mr-1 relative bottom-0.5" />
 							{props.acquiredAt.toLocaleDateString()}
-						</span>
+						</div>
 					)}
 				</div>
 			)}
