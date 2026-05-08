@@ -6,28 +6,25 @@ use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
-use App\Entity\Business;
-use App\Entity\Cultivar;
 use App\Entity\User;
-use App\Message\Query\TeaDuplicatesExistsQuery;
+use App\Message\Command\AddTeaCommand;
+use App\Message\CommandBus;
 use App\Message\QueryBus;
 use App\Repository\OriginRepository;
 use App\Repository\TeaTypeRepository;
+use App\State\Business\BusinessProvider;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 {
 	public function __construct(
-		private EntityManagerInterface $em,
-		private OriginRepository $originRepo,
 		private TeaTypeRepository $typeRepo,
 		private Security $security,
-		private QueryBus $queryBus,
+		private CommandBus $commandBus,
 	) {
 	}
 
@@ -52,45 +49,28 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 			throw new ItemNotFoundException("Tea type doesn't exist");
 		}
 
-		$teaOrigin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
-		if (null !== $data->origin && null === $teaOrigin) {
-			throw new ItemNotFoundException("Tea origin doesn't exist");
-		}
-
-		$entity = new \App\Entity\Tea();
-		$entity->family = $typeEntity->family;
-		$entity->type = $typeEntity;
-		$entity->origin = $teaOrigin;
-		$entity->year = $data->year;
-		$entity->roast = $data->roast;
-		$entity->createdBy = $user;
-		$entity->cultivar = $data->cultivar ? $this->em->getReference(Cultivar::class, $data->cultivar->id) : null;
-		$entity->business = $data->business ? $this->em->getReference(Business::class, $data->business->id) : null;
-
-		// Check if the tea has already been created.
-		// No need to check if a new type is created as it certainly new
-		$duplicateQuery = new TeaDuplicatesExistsQuery(
-			$entity->family,
-			$entity->type?->id,
-			$entity->cultivar?->id,
-			$entity->year,
-			$entity->roast,
-			$entity->origin?->path,
+		/** @var \App\Entity\Tea $entity */
+		$entity = $this->commandBus->process(
+			new AddTeaCommand(
+				$typeEntity->id,
+				$data->origin?->path,
+				$data->year,
+				$data->roast,
+				$data->cultivar?->id,
+				$user->id,
+				$data->business?->id,
+			),
 		);
-
-		if ($this->queryBus->ask($duplicateQuery)) {
-			throw new BadRequestException("A tea with the same parameters already exists", ["data" => $data]);
-		}
-
-		$this->em->persist($entity);
-		$this->em->flush();
 
 		$resource = new Tea();
 		$resource->id = $entity->id;
 		$resource->family = $entity->family;
 		$resource->type = TeaTypeProvider::fromEntity($entity->type);
-		$resource->origin = OriginProvider::fromEntity($teaOrigin);
+		$resource->origin = OriginProvider::fromEntity($entity->origin);
+		$resource->roast = $entity->roast;
+		$resource->year = $entity->year;
 		$resource->addedAt = $entity->createdAt;
+		$resource->business = BusinessProvider::fromEntity($entity->business);
 
 		return $resource;
 	}
