@@ -6,6 +6,8 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
 use App\Entity\User;
+use App\Message\Command\AddTypeCommand;
+use App\Message\CommandBus;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
 use App\Repository\TeaTypeRepository;
@@ -25,6 +27,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		private TeaTypeRepository $typeRepository,
 		private OriginRepository $originRepo,
 		private Security $security,
+		private CommandBus $commandBus,
 	) {}
 
 	/**
@@ -56,20 +59,9 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		$teaEntity->createdBy = $user;
 
 		// Create the new type if needed
-
 		if (null !== $data->type) {
-			// TODO: check if the type doesn't already exists
-			$typeEntity = new \App\Entity\TeaType();
-			$typeEntity->family = $data->family;
-			$typeEntity->name = trim($data->type->name);
-			$typeEntity->slug = new AsciiSlugger()
-				->slug($typeEntity->name)
-				->lower()
-				->toString();
-			$typeEntity->createdBy = $user;
-			$this->em->persist($typeEntity);
-
-			$teaEntity->type = $typeEntity;
+			$typeCmd = new AddTypeCommand($data->family, $data->type->name, $user->id);
+			$teaEntity->type = $this->commandBus->process($typeCmd);
 		} else {
 			// Get the tea_type equivalent to this tea's family
 			$families = $this->typeRepository->getFamilies();
