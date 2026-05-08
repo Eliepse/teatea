@@ -10,6 +10,7 @@ use App\Entity\Cultivar;
 use App\Entity\User;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
+use App\Repository\TeaTypeRepository;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,11 +24,13 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		private EntityManagerInterface $em,
 		private TeaRepository $repository,
 		private OriginRepository $originRepo,
+		private TeaTypeRepository $typeRepo,
 		private Security $security,
-	) {}
+	) {
+	}
 
 	/**
-	 * @param mixed|Tea $data
+	 * @param Tea $data
 	 * @param Operation $operation
 	 * @param array $uriVariables
 	 * @param array $context
@@ -35,21 +38,17 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 	 * @return mixed
 	 * @throws ORMException
 	 */
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Tea
 	{
 		$user = $this->security->getUser();
-		/** @var \App\Entity\TeaType $typeEntity */
-		$typeEntity = $this->em
-			->createQueryBuilder()
-			->select("type")
-			->from(\App\Entity\TeaType::class, "type")
-			->where("type.slug = :slug")
-			->setParameter("slug", $uriVariables["slug"])
-			->getQuery()
-			->getSingleResult();
-
-		assert($data instanceof Tea);
 		assert($user instanceof User);
+		assert($data instanceof Tea);
+
+		/** @var \App\Entity\TeaType $typeEntity */
+		$typeEntity = $this->typeRepo->findOneBy(["slug" => $uriVariables["slug"]]);
+		if (null === $typeEntity) {
+			throw new ItemNotFoundException("Tea type doesn't exist");
+		}
 
 		$teaOrigin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
 		if (null !== $data->origin && null === $teaOrigin) {
