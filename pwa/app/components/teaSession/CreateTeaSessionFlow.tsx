@@ -124,6 +124,7 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 						setForm({ ...form, place });
 						mutation.mutate({ ...form, place });
 					}}
+					allowCreate
 				/>
 			</StackFrame>
 		</NavigationStack>

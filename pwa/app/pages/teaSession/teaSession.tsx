@@ -352,6 +352,7 @@ function Options(props: { session: TeaSession }) {
 					onConfirm={changePlace}
 					defaultValue={props.session.place?.["@id"]}
 					confirmLabel="Confirm"
+					allowCreate
 				/>
 			</Modal>
 
