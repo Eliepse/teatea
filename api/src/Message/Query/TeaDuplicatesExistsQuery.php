@@ -14,6 +14,7 @@ final readonly class TeaDuplicatesExistsQuery
 		public ?int $year,
 		public ?RoastLevel $roast,
 		public ?string $originPath,
+		public ?int $businessId,
 	) {
 	}
 }
