@@ -6,14 +6,16 @@ export async function queryBusiness(iri: Business["@id"]) {
 	return await (await getApi<Business>(iri)).json();
 }
 
-export function makeBusinessQueryOpt(iri?: Business["@id"]) {
+export function makeBusinessQueryOpt(business?: Partial<Pick<Business, "@id" | "id">>) {
+	const iri = business?.["@id"];
+
 	return queryOptions({
 		queryFn: async () => {
-			if (!iri) {
+			if (!iri && !business?.id) {
 				return null;
 			}
 
-			return await queryBusiness(iri);
+			return await queryBusiness(iri ?? `/businesses/${business.id}`);
 		},
 		queryKey: [iri],
 		staleTime: 60 * 60_000,

@@ -23,7 +23,7 @@ export function TeaFormConfirmation(props: {
 	const navigationStack = useStackNavigator();
 	const isExistingType = props.values.type && "@id" in props.values.type;
 	const [openBusiness, setOpenBusiness] = useState(false);
-	const businessQuery = useQuery(makeBusinessQueryOpt(props.values.business));
+	const businessQuery = useQuery(makeBusinessQueryOpt({ "@id": props.values.business }));
 
 	return (
 		<PageLayout
