@@ -7,6 +7,7 @@ import { YearFilterButton } from "~/catalog/components/filter/YearFilterButton";
 import { OriginFilterButton } from "~/catalog/components/filter/OriginFilterButton";
 import { FamilyFilterButton } from "~/catalog/components/filter/FamilyFilterButton";
 import { CultivarFilterButton } from "~/catalog/components/filter/CultivarFilterButton";
+import { BusinessFilterButton } from "~/catalog/components/filter/BusinessFilterButton";
 
 export function FiltersBar(props: {
 	filters: SearchFilters;
@@ -44,6 +45,13 @@ export function FiltersBar(props: {
 					<CultivarFilterButton
 						cultivar={props.filters.cultivar}
 						onChange={(id) => patchFilters({ cultivar: id })}
+					/>
+				</li>
+
+				<li>
+					<BusinessFilterButton
+						business={props.filters.business}
+						onChange={(id) => patchFilters({ business: id })}
 					/>
 				</li>
 

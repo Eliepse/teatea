@@ -57,6 +57,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 			property: "cultivar",
 			description: "Filter by cultivar",
 		),
+		"business" => new QueryParameter(
+			schema: ["type" => Requirement::POSITIVE_INT, "example" => "12, 42, ..."],
+			property: "business",
+			description: "Filter by business",
+		),
 		// 1850 -> 2999
 		"year" => new QueryParameter(
 			schema: ["type" => "[1-2][8-9][0-9]{2}", "example" => "1993, 2008, ..."],

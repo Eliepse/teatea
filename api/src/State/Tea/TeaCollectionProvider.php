@@ -43,7 +43,8 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$familyFilter = OperationHelper::getParameter($operation, "family");
 		$typeFilter = OperationHelper::getParameter($operation, "type");
 		$yearFilter = OperationHelper::getParameter($operation, "year", castFn: "intval");
-		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar");
+		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar", castFn: "intval");
+		$businessFilter = OperationHelper::getParameter($operation, "business", castFn: "intval");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		// Ignore some filters when using tea type filter
@@ -98,6 +99,14 @@ readonly class TeaCollectionProvider implements ProviderInterface
 				->innerJoin("tea.cultivar", "cultivar")
 				->andWhere("cultivar.id = :cultivarId")
 				->setParameter("cultivarId", $cultivarFilter);
+		}
+
+		// Business
+		if ($businessFilter) {
+			$searchQb
+				->innerJoin("tea.business", "business")
+				->andWhere("business.id = :businessId")
+				->setParameter("businessId", $businessFilter);
 		}
 
 		// Yaer
