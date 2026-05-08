@@ -44,7 +44,7 @@ export function SearchTextInput(props: {
 
 	return (
 		<div className={clsx(styles.root)}>
-			<MagnifyingGlassIcon className={styles.prefixIcon} />
+			<MagnifyingGlassIcon className={styles.prefixIcon} width={20} height={20} />
 
 			<input
 				className={styles.input}
