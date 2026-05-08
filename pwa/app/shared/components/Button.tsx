@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import type { PropsWithChildren } from "react";
 
-type BtnProps = { className?: string; onClick?: () => void; inline?: boolean; small?: boolean };
+type BtnProps = { className?: string; onClick?: () => void; inline?: boolean; small?: boolean; disabled?: boolean };
 
 export function Button(props: PropsWithChildren<BtnProps & { defaultClassName?: string }>) {
 	return (
@@ -15,6 +15,7 @@ export function Button(props: PropsWithChildren<BtnProps & { defaultClassName?: 
 				props.className,
 			)}
 			onClick={props.onClick}
+			disabled={props.disabled}
 		>
 			{props.children}
 		</button>
