@@ -129,9 +129,6 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?DatePoint $drankAt;
 
-	#[Groups(["teaSession:create", "teaSession:read", "teaSession:edit", "with:business"])]
-	public ?Business $place = null;
-
 	public function __construct()
 	{
 		$this->drankAt = new DatePoint();
