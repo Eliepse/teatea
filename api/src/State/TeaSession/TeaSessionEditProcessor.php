@@ -5,7 +5,6 @@ namespace App\State\TeaSession;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\TeaSession;
-use App\DTO\SteepValue;
 use App\Entity\Tea;
 use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
@@ -37,7 +36,6 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
 		$entity->quality = $data->quality;
-		$entity->place = $data->place ? $this->em->getReference(\App\Entity\Business::class, $data->place->id) : null;
 		// TODO(elie): Find a way to have SteepValue array to be auto hydrated in Resource
 		$entity->setSteeps($data->steeps);
 		$this->em->persist($entity);

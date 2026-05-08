@@ -110,19 +110,7 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 						posthog.capture("session_flow_next", { step: "date" });
 						setForm({ ...form, drankAt: date });
 						stackNavigator.next("place:select");
-					}}
-				/>
-			</StackFrame>
-			<StackFrame frameKey="place:select">
-				<SelectBusinessFrame
-					header={header}
-					onBack={goBack}
-					defaultValue={form.place}
-					buttonText="Save this session"
-					onConfirm={(place) => {
-						posthog.capture("session_flow_next", { step: "place" });
-						setForm({ ...form, place });
-						mutation.mutate({ ...form, place });
+						mutation.mutate({ ...form, drankAt: date });
 					}}
 				/>
 			</StackFrame>

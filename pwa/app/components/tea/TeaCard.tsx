@@ -1,4 +1,5 @@
 import {
+	type Business,
 	type Cultivar,
 	type Origin,
 	type OriginPath,
@@ -11,7 +12,8 @@ import clsx from "clsx";
 import { FormatOrigin, FormatOriginPath } from "~/components/shared/FormatOriginPath";
 import type { PropsWithChildren, ReactNode } from "react";
 import { Family } from "~/components/tea/Family";
-import { ArrowRight } from "iconoir-react";
+import { ArrowRight, Shop } from "iconoir-react";
+import { Badge } from "~/components/shared/Badge";
 
 export function TeaCard(
 	props: PropsWithChildren<{
@@ -21,6 +23,7 @@ export function TeaCard(
 		cultivar?: Cultivar;
 		year?: number;
 		roast?: RoastLevel;
+		business?: Business;
 		className?: string;
 		showNoRoast?: boolean;
 		loading?: boolean;
@@ -29,14 +32,21 @@ export function TeaCard(
 	}>,
 ) {
 	const hasSpecs = Object.entries(props).some(
-		([k, v]) => ["path", "cultivar", "year", "roast", "origin"].includes(k) && !!v,
+		([k, v]) => ["path", "cultivar", "year", "roast", "origin", "business"].includes(k) && !!v,
 	);
 	const roast = props.showNoRoast || RoastLevelEnum.No !== props.roast ? props.roast : null;
 
 	return (
 		<article className={clsx("rounded-2xl", props.className)}>
 			<div className={clsx("py-2 px-4", !props.hideArrow && "cursor-pointer")} onClick={props.onClick}>
-				<Family family={props.family} className="capitalize text-teal-800 text-sm mb-1" />
+				<div className="flex gap-2 mb-1">
+					<Family family={props.family} className="capitalize text-teal-800 text-sm" />
+					{props.business && (
+						<Badge color="lightGreen" icon={<Shop className="size-3" />} className="ml-auto" small>
+							{props.business.name}
+						</Badge>
+					)}
+				</div>
 				<div className="flex justify-between items-center">
 					<h1 className="font-header font-bold text-2xl text-green-800">
 						{props.loading ? <span className="block w-40 h-6 mt-2 skeleton" /> : props.type?.name}

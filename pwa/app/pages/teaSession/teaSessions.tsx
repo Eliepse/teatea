@@ -139,7 +139,7 @@ function MemberSessionsGroup(props: {
 				{props.sessions.map((session) => (
 					<li key={session.id} className="nth-[1]:border-0 border-t border-green-100">
 						<Link to={`/sessions/${session.id}`}>
-							<SessionListItem tea={session.tea} place={session.place} />
+							<SessionListItem tea={session.tea} place={session.tea.business} />
 						</Link>
 					</li>
 				))}

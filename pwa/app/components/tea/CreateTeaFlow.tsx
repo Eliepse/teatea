@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import { SelectFamily } from "../family/SelectFamily";
-import type { Cultivar, Origin, RoastLevel, Tea, TeaFamily, TeaType } from "~t/types";
+import type { Cultivar, Iri, Origin, RoastLevel, Tea, TeaFamily, TeaType } from "~t/types";
 import { SelectOrigin } from "../origin/SelectOrigin";
 import { warnNotImplemented } from "~/utils/function";
 import { postApi } from "~/utils/api";
@@ -12,6 +12,7 @@ import { AskName } from "~/components/tea/create/AskName";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SelectCultivar } from "~/components/cultivar/SelectCultivar";
 import { useNavigate } from "react-router";
+import { BusinessSelect } from "~/components/shared/inputs/BusinessSelect";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
@@ -26,6 +27,7 @@ type FormValue = {
 	cultivar?: Cultivar;
 	year?: number;
 	roast?: RoastLevel;
+	business?: Iri;
 };
 
 export function useTeaFormContext() {
@@ -40,6 +42,7 @@ async function submitNewTea(data: FormValue & Required<Pick<FormValue, "family" 
 		origin: data.origin ? data.origin["@id"] : undefined,
 		type: !data.type || "slug" in data.type ? undefined : data.type,
 		cultivar: data.cultivar?.["@id"],
+		business: data.business,
 	});
 
 	return await response.json();

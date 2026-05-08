@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Doctrine\ORM\TimestampedEntity;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -29,4 +30,16 @@ class Business
 	 */
 	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "acquiredFrom")]
 	private Collection $acquiredTeas;
+
+	/**
+	 * @var Collection<int, Tea>
+	 */
+	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "business")]
+	private Collection $teas;
+
+	public function __construct()
+	{
+		$this->acquiredTeas = new ArrayCollection();
+		$this->teas = new ArrayCollection();
+	}
 }

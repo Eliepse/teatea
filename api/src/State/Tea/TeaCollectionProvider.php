@@ -43,7 +43,8 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$familyFilter = OperationHelper::getParameter($operation, "family");
 		$typeFilter = OperationHelper::getParameter($operation, "type");
 		$yearFilter = OperationHelper::getParameter($operation, "year", castFn: "intval");
-		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar");
+		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar", castFn: "intval");
+		$businessFilter = OperationHelper::getParameter($operation, "business", castFn: "intval");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
 
 		// Ignore some filters when using tea type filter
@@ -100,6 +101,14 @@ readonly class TeaCollectionProvider implements ProviderInterface
 				->setParameter("cultivarId", $cultivarFilter);
 		}
 
+		// Business
+		if ($businessFilter) {
+			$searchQb
+				->innerJoin("tea.business", "business")
+				->andWhere("business.id = :businessId")
+				->setParameter("businessId", $businessFilter);
+		}
+
 		// Yaer
 		if (is_int($yearFilter)) {
 			$searchQb->andWhere("tea.year = :year")->setParameter("year", $yearFilter);
@@ -143,11 +152,12 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		/** @var array<\App\Entity\Tea> $teaEntities */
 		$teaEntities = $this->em
 			->createQueryBuilder()
-			->select("tea", "type", "origin", "cultivar")
+			->select("tea", "type", "origin", "cultivar", "business")
 			->from(\App\Entity\Tea::class, "tea")
 			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.cultivar", "cultivar")
+			->leftJoin("tea.business", "business")
 			->where("tea.id IN (:ids)")
 			->setParameter("ids", Arr::pluck($searchResults, "id"), ArrayParameterType::INTEGER)
 			->getQuery()

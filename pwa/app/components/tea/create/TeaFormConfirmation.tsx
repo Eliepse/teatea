@@ -7,6 +7,11 @@ import { useStackNavigator } from "~/utils/navigation/useNavigationStack";
 import { handleUIEvent } from "~/utils/function";
 import { YearInput } from "~/components/shared/inputs/YearInput";
 import { RoastField } from "~/components/tea/create/RoastField";
+import { BusinessPickerStep } from "~/components/shared/form/modal-multistep/BusinessPickerStep";
+import { Modal } from "~/components/shared/modal/Modal";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { makeBusinessQueryOpt } from "~/utils/query/businessQuery";
 
 export function TeaFormConfirmation(props: {
 	values: ReturnType<typeof useTeaFormContext>["formValue"];
@@ -17,6 +22,8 @@ export function TeaFormConfirmation(props: {
 	const ctx = useTeaFormContext();
 	const navigationStack = useStackNavigator();
 	const isExistingType = props.values.type && "@id" in props.values.type;
+	const [openBusiness, setOpenBusiness] = useState(false);
+	const businessQuery = useQuery(makeBusinessQueryOpt({ "@id": props.values.business }));
 
 	return (
 		<PageLayout
@@ -34,7 +41,7 @@ export function TeaFormConfirmation(props: {
 			}
 		>
 			<button
-				className="my-4 btn btn-block text-left h-16"
+				className="my-2 btn btn-block text-left h-16"
 				onClick={handleUIEvent(() => navigationStack.next("origin:select"))}
 			>
 				<div>
@@ -48,7 +55,7 @@ export function TeaFormConfirmation(props: {
 			</button>
 
 			<button
-				className="mb-4 btn btn-block text-left h-16"
+				className="my-2 btn btn-block text-left h-16"
 				onClick={handleUIEvent(() => navigationStack.next("family:select"))}
 			>
 				<div>
@@ -59,7 +66,7 @@ export function TeaFormConfirmation(props: {
 			</button>
 
 			<button
-				className="my-4 btn btn-block text-left h-16"
+				className="my-2 btn btn-block text-left h-16"
 				onClick={() => navigationStack.next(isExistingType ? "type:select" : "name:ask")}
 			>
 				<div>
@@ -68,6 +75,29 @@ export function TeaFormConfirmation(props: {
 				</div>
 				<Chevron direction="right" className="size-4 ml-auto" />
 			</button>
+
+			<button className="my-2 btn btn-block text-left h-16" onClick={() => setOpenBusiness(true)}>
+				<div>
+					<div className="text-xs text-base-content/60 mb-1">Boutique</div>
+					<div>
+						{props.values.business
+							? (businessQuery.data?.name ?? <span className="inline-block w-24 h-6 skeleton" />)
+							: "Not set"}
+					</div>
+				</div>
+				<Chevron direction="right" className="size-4 ml-auto" />
+			</button>
+
+			<Modal open={openBusiness} onClose={() => setOpenBusiness(false)}>
+				<BusinessPickerStep
+					onConfirm={(iri) => {
+						props.onChange({ ...props.values, business: iri });
+						setOpenBusiness(false);
+					}}
+					defaultValue={props.values.business}
+					allowEmpty
+				/>
+			</Modal>
 
 			<fieldset className="fieldset mb-4">
 				<legend className="fieldset-legend">Harvest year</legend>

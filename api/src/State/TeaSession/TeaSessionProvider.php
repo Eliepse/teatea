@@ -5,7 +5,6 @@ namespace App\State\TeaSession;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Business;
 use App\ApiResource\Member;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaSession;
@@ -13,7 +12,6 @@ use App\Repository\OriginRepository;
 use App\State\Tea\TeaProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\Proxy;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class TeaSessionProvider implements ProviderInterface
@@ -21,7 +19,8 @@ readonly class TeaSessionProvider implements ProviderInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepository,
-	) {}
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
 	{
@@ -40,7 +39,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.cultivar", "cultivar")
-			->leftJoin("session.place", "business")
+			->leftJoin("tea.business", "business")
 			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {
@@ -139,15 +138,6 @@ readonly class TeaSessionProvider implements ProviderInterface
 		if ($entity->author) {
 			$resource->author = new Member();
 			$resource->author->username = $entity->author->username;
-		}
-
-		if ($entity->place) {
-			$resource->place = new Business();
-			$resource->place->id = $entity->place->id;
-
-			if (!$entity->place instanceof Proxy) {
-				$resource->place->name = $entity->place->name;
-			}
 		}
 
 		return $resource;

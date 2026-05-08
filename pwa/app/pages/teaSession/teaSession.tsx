@@ -1,13 +1,6 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, patchApi } from "~/utils/api";
-import {
-	BrewingQualityEnum,
-	type Iri,
-	type NullablePartial,
-	RoastLevelEnum,
-	type TeaSession,
-	type TeaType,
-} from "~t/types";
+import { BrewingQualityEnum, type Iri, type NullablePartial, RoastLevelEnum, type TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
 import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
@@ -23,27 +16,13 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import {
-	Check,
-	CoffeeCup,
-	Edit,
-	EmojiPuzzled,
-	EmojiSad,
-	EmojiSatisfied,
-	MoreVert,
-	Shop,
-	ShopFourTilesWindow,
-	Trash,
-	Xmark,
-} from "iconoir-react";
+import { Check, CoffeeCup, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, MoreVert, Trash, Xmark } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
 import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
-import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { TeaCard } from "~/components/tea/TeaCard";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
-import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 import { extractId } from "~/utils/resource";
 import { Badge } from "~/components/shared/Badge";
@@ -122,10 +101,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					</div>
 
 					<div className="flex items-center justify-center gap-2 mt-2">
-						{!!session.place && (
-							<Badge icon={<ShopFourTilesWindow className="size-4" />}>{session.place.name}</Badge>
-						)}
-
 						{!!session.author && (
 							<Link to={`/members/${extractId(session.author)}`}>
 								<Badge loading={member.isLoading}>@{member.data?.username}</Badge>
@@ -141,6 +116,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					cultivar={tea.cultivar}
 					year={tea.year}
 					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
+					business={tea.business}
 					onClick={() => navigate(`/tea/${tea.id}`)}
 					className="shadow bg-white my-2 overflow-hidden"
 				>
@@ -300,17 +276,12 @@ function useSessionMutations(sessionId: number) {
 }
 
 function Options(props: { session: TeaSession }) {
-	const [modalKey, setModalKey] = useState<"menu" | "place" | "params" | null>(null);
+	const [modalKey, setModalKey] = useState<"menu" | "params" | null>(null);
 	const popup = usePopup();
 	const mutation = useSessionMutations(props.session.id);
 
 	function deleteSession() {
 		popup.confirm({ body: "Are you sure you want to delete this session?" }).then(() => mutation.delete.mutate());
-	}
-
-	async function changePlace(iri: Iri | undefined) {
-		await mutation.edit.mutateAsync({ place: iri ? iri : null });
-		setModalKey(null);
 	}
 
 	async function updateBrewParams(tea: number | undefined, water: number | undefined) {
@@ -330,12 +301,7 @@ function Options(props: { session: TeaSession }) {
 			<MenuModal onClose={() => setModalKey(null)} open={"menu" === modalKey}>
 				<MenuItem label="Close" onClick={() => setModalKey(null)} icon={<Xmark className="size-5" />} />
 				<MenuItem
-					label="Change place"
-					onClick={() => setModalKey("place")}
-					icon={<Shop className="size-5" />}
-				/>
-				<MenuItem
-					label="Change brew parameters"
+					label="Change brewing parameters"
 					onClick={() => setModalKey("params")}
 					icon={<CoffeeCup className="size-5" />}
 				/>
@@ -346,14 +312,6 @@ function Options(props: { session: TeaSession }) {
 					danger
 				/>
 			</MenuModal>
-
-			<Modal open={"place" === modalKey} onClose={() => setModalKey(null)} className="p-0">
-				<SelectBusinessFrame
-					onConfirm={changePlace}
-					defaultValue={props.session.place?.["@id"]}
-					confirmLabel="Confirm"
-				/>
-			</Modal>
 
 			<Modal open={"params" === modalKey} onClose={() => setModalKey(null)} className="p-0">
 				<ParametersInput

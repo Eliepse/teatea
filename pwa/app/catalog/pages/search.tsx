@@ -28,6 +28,7 @@ export default function TeaSearchPage() {
 	const year = safeEmpty((searchParams.get("year") ?? "").trim());
 	const origin = safeEmpty((searchParams.get("origin") ?? "").trim());
 	const rootOrigin = safeEmpty((searchParams.get("rootOrigin") ?? "").trim());
+	const business = safeEmpty((searchParams.get("business") ?? "").trim());
 
 	return (
 		<WithMainMenu activeKey="search">
@@ -39,6 +40,7 @@ export default function TeaSearchPage() {
 					family: safeEmpty((searchParams.get("family") ?? "").trim() as TeaFamily | undefined),
 					type: safeEmpty((searchParams.get("type") ?? "").trim()),
 					year: year ? parseInt(year) : undefined,
+					business: business ? parseInt(business) : undefined,
 				}}
 				onFiltersChange={handleFiltersChanged}
 				allowCreation

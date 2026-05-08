@@ -107,6 +107,7 @@ export function TeaSearchEngine(props: {
 												cultivar={item.cultivar}
 												year={item.year}
 												roast={item.roast}
+												business={item.business}
 												className={clsx("bg-white shadow-xs")}
 												onClick={() => handleItemClicked(item)}
 											/>

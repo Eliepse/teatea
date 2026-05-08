@@ -182,6 +182,7 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 							onConfirm={(iri) => patchResource({ acquiredFrom: iri ?? null })}
 							defaultValue={meta.acquiredFrom?.["@id"]}
 							confirmLabel="Confirm"
+							allowCreate
 						/>
 					)}
 

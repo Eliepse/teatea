@@ -39,10 +39,6 @@ class TeaSession
 	#[ORM\Column(nullable: true)]
 	public ?BrewingQuality $quality = null;
 
-	#[ORM\ManyToOne]
-	#[ORM\JoinColumn]
-	public ?Business $place = null;
-
 	#[ORM\Column(nullable: true)]
 	public ?BrewingTechnic $technic = null;
 

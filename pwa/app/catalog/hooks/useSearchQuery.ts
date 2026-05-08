@@ -10,6 +10,7 @@ export type SearchFilters = {
 	cultivar?: number;
 	distinctByLevel?: 1 | 2 | 3;
 	year?: number;
+	business?: number;
 };
 
 export const SE_CONTEXT = createContext<{

@@ -54,14 +54,13 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 			throw new NotFoundHttpException();
 		}
 
-		$expr = $this->em->createQueryBuilder()->expr();
 		$sessionQb = $this->em
 			->createQueryBuilder()
 			->select("session", "tea", "type", "business")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
-			->leftJoin("session.place", "business")
+			->leftJoin("tea.business", "business")
 			->orderBy("session.drankAt", "DESC");
 
 		if (null !== $tea) {

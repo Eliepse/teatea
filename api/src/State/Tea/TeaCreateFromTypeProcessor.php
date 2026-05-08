@@ -6,28 +6,30 @@ use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
-use App\Entity\Cultivar;
 use App\Entity\User;
+use App\Message\Command\AddTeaCommand;
+use App\Message\CommandBus;
+use App\Message\QueryBus;
 use App\Repository\OriginRepository;
-use App\Repository\TeaRepository;
+use App\Repository\TeaTypeRepository;
+use App\State\Business\BusinessProvider;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 
 readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 {
 	public function __construct(
-		private EntityManagerInterface $em,
-		private TeaRepository $repository,
-		private OriginRepository $originRepo,
+		private TeaTypeRepository $typeRepo,
 		private Security $security,
-	) {}
+		private CommandBus $commandBus,
+	) {
+	}
 
 	/**
-	 * @param mixed|Tea $data
+	 * @param Tea $data
 	 * @param Operation $operation
 	 * @param array $uriVariables
 	 * @param array $context
@@ -35,49 +37,40 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 	 * @return mixed
 	 * @throws ORMException
 	 */
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
+	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Tea
 	{
 		$user = $this->security->getUser();
-		/** @var \App\Entity\TeaType $typeEntity */
-		$typeEntity = $this->em
-			->createQueryBuilder()
-			->select("type")
-			->from(\App\Entity\TeaType::class, "type")
-			->where("type.slug = :slug")
-			->setParameter("slug", $uriVariables["slug"])
-			->getQuery()
-			->getSingleResult();
-
-		assert($data instanceof Tea);
 		assert($user instanceof User);
+		assert($data instanceof Tea);
 
-		$teaOrigin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
-		if (null !== $data->origin && null === $teaOrigin) {
-			throw new ItemNotFoundException("Tea origin doesn't exist");
+		/** @var \App\Entity\TeaType $typeEntity */
+		$typeEntity = $this->typeRepo->findOneBy(["slug" => $uriVariables["slug"]]);
+		if (null === $typeEntity) {
+			throw new ItemNotFoundException("Tea type doesn't exist");
 		}
 
-		$entity = new \App\Entity\Tea();
-		$entity->family = $typeEntity->family;
-		$entity->type = $typeEntity;
-		$entity->origin = $teaOrigin;
-		$entity->year = $data->year;
-		$entity->roast = $data->roast;
-		$entity->createdBy = $user;
-		$entity->cultivar = $data->cultivar ? $this->em->getReference(Cultivar::class, $data->cultivar->id) : null;
-
-		if ($this->repository->hasDuplicate($entity)) {
-			throw new BadRequestException("This tea already exists");
-		}
-
-		$this->em->persist($entity);
-		$this->em->flush();
+		/** @var \App\Entity\Tea $entity */
+		$entity = $this->commandBus->process(
+			new AddTeaCommand(
+				$typeEntity->id,
+				$data->origin?->path,
+				$data->year,
+				$data->roast,
+				$data->cultivar?->id,
+				$user->id,
+				$data->business?->id,
+			),
+		);
 
 		$resource = new Tea();
 		$resource->id = $entity->id;
 		$resource->family = $entity->family;
 		$resource->type = TeaTypeProvider::fromEntity($entity->type);
-		$resource->origin = OriginProvider::fromEntity($teaOrigin);
+		$resource->origin = OriginProvider::fromEntity($entity->origin);
+		$resource->roast = $entity->roast;
+		$resource->year = $entity->year;
 		$resource->addedAt = $entity->createdAt;
+		$resource->business = BusinessProvider::fromEntity($entity->business);
 
 		return $resource;
 	}

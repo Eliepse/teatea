@@ -5,7 +5,6 @@ namespace App\State\TeaSession;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\TeaSession;
-use App\Entity\Business;
 use App\Entity\Tea;
 use App\Entity\User;
 use App\ValueObject\Volume;
@@ -21,10 +20,15 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-	) {}
+	) {
+	}
 
-	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TeaSession
-	{
+	public function process(
+		mixed $data,
+		Operation $operation,
+		array $uriVariables = [],
+		array $context = [],
+	): TeaSession {
 		$user = $this->security->getUser();
 
 		assert($data instanceof TeaSession);
@@ -49,7 +53,6 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 		$entity->note = trim($data->note ?? "") ?: null;
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
-		$entity->place = empty($data->place) ? null : $this->em->getReference(Business::class, $data->place->id);
 
 		$this->em->persist($entity);
 		$this->em->flush();

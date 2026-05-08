@@ -15,6 +15,7 @@ export function SelectBusinessFrame(props: {
 	header?: ReactNode;
 	className?: string;
 	confirmLabel?: string;
+	allowCreate?: boolean;
 }) {
 	const [value, setValue] = useState(props.defaultValue);
 	const [search, setSearch] = useState("");
@@ -84,14 +85,16 @@ export function SelectBusinessFrame(props: {
 						</li>
 					))}
 
-					<li className="mt-8">
-						<AddButton
-							onCreated={(business) => {
-								setSearch(business.name);
-								setValue(business["@id"]);
-							}}
-						/>
-					</li>
+					{props.allowCreate && (
+						<li className="mt-8">
+							<AddButton
+								onCreated={(business) => {
+									setSearch(business.name);
+									setValue(business["@id"]);
+								}}
+							/>
+						</li>
+					)}
 				</ul>
 			</div>
 

@@ -6,16 +6,20 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
 use App\Entity\User;
+use App\Message\Command\AddTeaCommand;
+use App\Message\Command\AddTypeCommand;
+use App\Message\CommandBus;
+use App\Message\Query\FindTypeFamilyQuery;
+use App\Message\QueryBus;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
 use App\Repository\TeaTypeRepository;
+use App\State\Business\BusinessProvider;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 readonly class TeaCreateProcess implements ProcessorInterface
 {
@@ -25,7 +29,10 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		private TeaTypeRepository $typeRepository,
 		private OriginRepository $originRepo,
 		private Security $security,
-	) {}
+		private CommandBus $commandBus,
+		private QueryBus $queryBus,
+	) {
+	}
 
 	/**
 	 * @param mixed|Tea $data
@@ -43,63 +50,43 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
-		$origin = null !== $data->origin ? $this->originRepo->byPath($data->origin->path) : null;
-		if (null !== $data->origin && null === $origin) {
-			throw new BadRequestException("The given origin doesn't exist");
-		}
-
-		$teaEntity = new \App\Entity\Tea();
-		$teaEntity->family = $data->family;
-		$teaEntity->origin = $origin;
-		$teaEntity->year = $data->year;
-		$teaEntity->roast = $data->roast;
-		$teaEntity->createdBy = $user;
-
 		// Create the new type if needed
-
 		if (null !== $data->type) {
-			// TODO: check if the type doesn't already exists
-			$typeEntity = new \App\Entity\TeaType();
-			$typeEntity->family = $data->family;
-			$typeEntity->name = trim($data->type->name);
-			$typeEntity->slug = new AsciiSlugger()
-				->slug($typeEntity->name)
-				->lower()
-				->toString();
-			$typeEntity->createdBy = $user;
-			$this->em->persist($typeEntity);
-
-			$teaEntity->type = $typeEntity;
+			$type = $this->commandBus->process(
+				new AddTypeCommand(
+					$data->family,
+					$data->type->name,
+					$user->id,
+				),
+			);
 		} else {
-			// Get the tea_type equivalent to this tea's family
-			$families = $this->typeRepository->getFamilies();
-			$familyType = $families[$data->family->value] ?? null;
-
-			if (null === $familyType) {
-				throw new \Error("Unable to find the type for the '{$data->family->value}' family");
-			}
-
-			$teaEntity->type = $familyType;
+			$type = $this->queryBus->ask(new FindTypeFamilyQuery($data->family));
 		}
 
-		// Check if the tea has already been created.
-		// No need to check if a new type is created as it certainly new
-		if (null === $data->type && $this->teaRepository->hasDuplicate($teaEntity)) {
-			throw new BadRequestException("A tea with the same parameters already exists", ["data" => $data]);
-		}
-
-		// Create the new tea
-		$this->em->persist($teaEntity);
-		$this->em->flush();
+		/** @var \App\Entity\Tea $entity */
+		$entity = $this->commandBus->process(
+			new AddTeaCommand(
+				$type->id,
+				$data->origin?->path,
+				$data->year,
+				$data->roast,
+				$data->cultivar?->id,
+				$user->id,
+				$data->business?->id,
+			),
+		);
 
 		// Hydrate new resource
 
 		$resource = new Tea();
-		$resource->id = $teaEntity->id;
-		$resource->family = $teaEntity->family;
-		$resource->type = TeaTypeProvider::fromEntity($teaEntity->type);
-		$resource->origin = OriginProvider::fromEntity($teaEntity->origin);
-		$resource->addedAt = $teaEntity->createdAt;
+		$resource->id = $entity->id;
+		$resource->family = $entity->family;
+		$resource->type = TeaTypeProvider::fromEntity($entity->type);
+		$resource->origin = OriginProvider::fromEntity($entity->origin);
+		$resource->addedAt = $entity->createdAt;
+		$resource->roast = $entity->roast;
+		$resource->year = $entity->year;
+		$resource->business = BusinessProvider::fromEntity($entity->business);
 
 		return $resource;
 	}
