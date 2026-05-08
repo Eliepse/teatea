@@ -8,6 +8,8 @@ use App\ApiResource\Tea;
 use App\Entity\User;
 use App\Message\Command\AddTypeCommand;
 use App\Message\CommandBus;
+use App\Message\Query\FindTypeFamilyQuery;
+use App\Message\QueryBus;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
 use App\Repository\TeaTypeRepository;
@@ -17,7 +19,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\String\Slugger\AsciiSlugger;
 
 readonly class TeaCreateProcess implements ProcessorInterface
 {
@@ -28,7 +29,9 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		private OriginRepository $originRepo,
 		private Security $security,
 		private CommandBus $commandBus,
-	) {}
+		private QueryBus $queryBus,
+	) {
+	}
 
 	/**
 	 * @param mixed|Tea $data
@@ -63,15 +66,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$typeCmd = new AddTypeCommand($data->family, $data->type->name, $user->id);
 			$teaEntity->type = $this->commandBus->process($typeCmd);
 		} else {
-			// Get the tea_type equivalent to this tea's family
-			$families = $this->typeRepository->getFamilies();
-			$familyType = $families[$data->family->value] ?? null;
-
-			if (null === $familyType) {
-				throw new \Error("Unable to find the type for the '{$data->family->value}' family");
-			}
-
-			$teaEntity->type = $familyType;
+			$teaEntity->type = $this->queryBus->ask(new FindTypeFamilyQuery($data->family));
 		}
 
 		// Check if the tea has already been created.
