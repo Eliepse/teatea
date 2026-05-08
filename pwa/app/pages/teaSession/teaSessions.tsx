@@ -5,13 +5,14 @@ import { formatDate, formatISO, isToday, isYesterday } from "date-fns";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { f, handleUIEvent } from "~/utils/function";
+import { f } from "~/utils/function";
 import { useState } from "react";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 import { Family } from "~/components/tea/Family";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import { CoffeeCup, Shop } from "iconoir-react";
 import { FloatingActions } from "~/layouts/FloatingActions";
+import { SecondaryButton } from "~/shared/components/Button";
 
 type Session = Embed<TeaSession, "author", Member>;
 type SessionDay = { [key: Member["username"]]: Session[] };
@@ -60,7 +61,7 @@ export default function ListTeaSessions() {
 	);
 
 	return (
-		<WithMainMenu className="px-4 pb-18 bg-green-50" activeKey="activity">
+		<WithMainMenu className="px-4 pb-40 bg-green-50" activeKey="activity">
 			<SessionsUserFilter username={filters.username} onChange={filterUser} className="my-8" />
 
 			{0 !== items.length && (
@@ -102,13 +103,13 @@ export default function ListTeaSessions() {
 					</div>
 
 					{sessionsQuery.hasNextPage && (
-						<button
-							className="btn btn-block btn-outline"
-							onClick={handleUIEvent(() => sessionsQuery.fetchNextPage())}
+						<SecondaryButton
+							className="w-full"
+							onClick={() => sessionsQuery.fetchNextPage()}
 							disabled={sessionsQuery.isFetchingNextPage}
 						>
-							Load previous
-						</button>
+							Load more
+						</SecondaryButton>
 					)}
 				</>
 			)}
