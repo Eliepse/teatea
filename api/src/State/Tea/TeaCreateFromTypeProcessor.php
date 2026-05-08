@@ -6,10 +6,12 @@ use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
+use App\Entity\Business;
 use App\Entity\Cultivar;
 use App\Entity\User;
+use App\Message\Query\TeaDuplicatesExistsQuery;
+use App\Message\QueryBus;
 use App\Repository\OriginRepository;
-use App\Repository\TeaRepository;
 use App\Repository\TeaTypeRepository;
 use App\State\Origin\OriginProvider;
 use App\State\TeaType\TeaTypeProvider;
@@ -22,10 +24,10 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private TeaRepository $repository,
 		private OriginRepository $originRepo,
 		private TeaTypeRepository $typeRepo,
 		private Security $security,
+		private QueryBus $queryBus,
 	) {
 	}
 
@@ -63,9 +65,21 @@ readonly class TeaCreateFromTypeProcessor implements ProcessorInterface
 		$entity->roast = $data->roast;
 		$entity->createdBy = $user;
 		$entity->cultivar = $data->cultivar ? $this->em->getReference(Cultivar::class, $data->cultivar->id) : null;
+		$entity->business = $data->business ? $this->em->getReference(Business::class, $data->business->id) : null;
 
-		if ($this->repository->hasDuplicate($entity)) {
-			throw new BadRequestException("This tea already exists");
+		// Check if the tea has already been created.
+		// No need to check if a new type is created as it certainly new
+		$duplicateQuery = new TeaDuplicatesExistsQuery(
+			$entity->family,
+			$entity->type?->id,
+			$entity->cultivar?->id,
+			$entity->year,
+			$entity->roast,
+			$entity->origin?->path,
+		);
+
+		if ($this->queryBus->ask($duplicateQuery)) {
+			throw new BadRequestException("A tea with the same parameters already exists", ["data" => $data]);
 		}
 
 		$this->em->persist($entity);

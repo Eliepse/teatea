@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Message\Command\AddTypeCommand;
 use App\Message\CommandBus;
 use App\Message\Query\FindTypeFamilyQuery;
+use App\Message\Query\TeaDuplicatesExistsQuery;
 use App\Message\QueryBus;
 use App\Repository\OriginRepository;
 use App\Repository\TeaRepository;
@@ -71,7 +72,16 @@ readonly class TeaCreateProcess implements ProcessorInterface
 
 		// Check if the tea has already been created.
 		// No need to check if a new type is created as it certainly new
-		if (null === $data->type && $this->teaRepository->hasDuplicate($teaEntity)) {
+		$duplicateQuery = new TeaDuplicatesExistsQuery(
+			$teaEntity->family,
+			$teaEntity->type?->id,
+			$teaEntity->cultivar?->id,
+			$teaEntity->year,
+			$teaEntity->roast,
+			$teaEntity->origin?->path,
+		);
+
+		if ($this->queryBus->ask($duplicateQuery)) {
 			throw new BadRequestException("A tea with the same parameters already exists", ["data" => $data]);
 		}
 
