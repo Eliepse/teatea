@@ -20,14 +20,14 @@ framework:
                 middleware:
                     - doctrine_ping_connection
                     - validation
-                    - dispatch_after_current_bus
+                    # - dispatch_after_current_bus -> note(elie): I think it's preferable to handle this manually
                     - doctrine_transaction
 
             # Queries (read)
             query.bus:
                 middleware:
                     - doctrine_ping_connection
-                    - dispatch_after_current_bus
+                    # - dispatch_after_current_bus -> note(elie): I think it's preferable to handle this manually
 
 # when@test:
 #    framework:
