@@ -3,7 +3,6 @@
 namespace App\State\Hydration;
 
 use App\ApiResource\CollectionTea;
-use App\State\Business\BusinessProvider;
 use App\State\Member\MemberProvider;
 use App\State\Tea\TeaProvider;
 
@@ -14,7 +13,8 @@ readonly class CollectionTeaHydrator implements ResourceHydrator
 {
 	public function __construct(
 		private MediaObjectHydrator $mediaHydrator,
-	) {}
+	) {
+	}
 
 	public function hydrate(?object $entity): ?object
 	{
@@ -30,7 +30,6 @@ readonly class CollectionTeaHydrator implements ResourceHydrator
 		$tea->owner = MemberProvider::hydrate($entity->owner);
 		$tea->description = $entity->description;
 		$tea->acquiredAt = $entity->acquiredAt;
-		$tea->acquiredFrom = BusinessProvider::fromEntity($entity->acquiredFrom);
 		$tea->finishedAt = $entity->finishedAt;
 		$tea->rating = $entity->rating;
 

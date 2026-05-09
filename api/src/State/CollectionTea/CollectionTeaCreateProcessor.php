@@ -17,7 +17,8 @@ readonly class CollectionTeaCreateProcessor implements ProcessorInterface
 		private EntityManagerInterface $em,
 		private Security $security,
 		private CollectionTeaHydrator $hydrator,
-	) {}
+	) {
+	}
 
 	public function process(
 		mixed $data,
@@ -38,9 +39,6 @@ readonly class CollectionTeaCreateProcessor implements ProcessorInterface
 		$entity->owner = $user;
 		$entity->tea = $this->em->getReference(\App\Entity\Tea::class, $data->tea->id);
 		$entity->acquiredAt = $data->acquiredAt;
-		$entity->acquiredFrom = $data->acquiredFrom
-			? $this->em->getReference(\App\Entity\Business::class, $data->acquiredFrom->id)
-			: null;
 		$this->em->persist($entity);
 		$this->em->flush();
 

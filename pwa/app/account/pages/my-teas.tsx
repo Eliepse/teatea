@@ -70,7 +70,6 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 						<Link to={`/members/${props.params.username}/teas/${item.id}`}>
 							<CollectionTeaCard
 								tea={item.tea}
-								acquiredFrom={item.acquiredFrom}
 								acquiredAt={item.acquiredAt}
 								description={item.description}
 								thumbnail={item.thumbnail}
@@ -89,7 +88,6 @@ export default function PersonalCollectionPage(props: Route.ComponentProps) {
 								<Link to={`/members/${props.params.username}/teas/${item.id}`}>
 									<CollectionTeaCard
 										tea={item.tea}
-										acquiredFrom={item.acquiredFrom}
 										acquiredAt={item.acquiredAt}
 										description={item.description}
 										thumbnail={item.thumbnail}

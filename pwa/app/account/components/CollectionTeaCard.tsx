@@ -1,18 +1,17 @@
-import type { Business, MediaObject, Tea } from "~t/types";
+import type { MediaObject, Tea } from "~t/types";
 import { Family } from "~/components/tea/Family";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import { Calendar, Shop } from "iconoir-react";
 import { DottedInlineList } from "~/components/shared/DottedInlineList";
-import clsx from "clsx";
+import { Badge } from "~/components/shared/Badge";
 
 export function CollectionTeaCard(props: {
 	tea: Tea;
 	description?: string;
 	acquiredAt?: Date;
-	acquiredFrom?: Business;
 	thumbnail?: MediaObject;
 }) {
-	const hasMeta = props.acquiredAt || props.acquiredFrom;
+	const hasMeta = !!props.acquiredAt || !!props.tea.business;
 
 	return (
 		<article className="bg-white rounded-xl shadow-xs overflow-hidden py-2">
@@ -44,21 +43,20 @@ export function CollectionTeaCard(props: {
 				)}
 			</div>
 
-			{hasMeta && <hr className={clsx("border-stone-200 mx-4 mt-1 mb-2", props.thumbnail && "mr-20")} />}
-
 			{hasMeta && (
 				<div className="text-sm px-4 text-stone-600">
-					{!!props.acquiredFrom && (
-						<div className="mr-4">
-							<Shop className="inline size-4 mr-1 relative bottom-0.5" />
-							{props.acquiredFrom.name}
+					{!!props.tea.business && (
+						<div className="mt-1">
+							<Badge color="lightGreen" icon={<Shop className="size-4" />} small>
+								{props.tea.business.name}
+							</Badge>
 						</div>
 					)}
-
 					{!!props.acquiredAt && (
-						<div>
-							<Calendar className="inline size-4 mr-1 relative bottom-0.5" />
-							{props.acquiredAt.toLocaleDateString()}
+						<div className="mt-1">
+							<Badge icon={<Calendar className="size-4" />} small>
+								{props.acquiredAt.toLocaleDateString()}
+							</Badge>
 						</div>
 					)}
 				</div>

@@ -31,10 +31,11 @@ readonly class CollectionTeaProvider implements ProviderInterface
 
 		$query = $this->em->createQuery(
 			<<<DQL
-			SELECT collection_tea, owner, tea, type, cultivar
+			SELECT collection_tea, owner, tea, type, cultivar, business
 			FROM App\Entity\CollectionTea collection_tea
 				INNER JOIN collection_tea.owner owner WITH owner.username = :username
 				LEFT JOIN collection_tea.tea tea
+				LEFT JOIN tea.business business
 				LEFT JOIN tea.type type
 				LEFT JOIN tea.cultivar cultivar
 			WHERE collection_tea.id = :id

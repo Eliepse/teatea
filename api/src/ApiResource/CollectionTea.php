@@ -104,9 +104,6 @@ class CollectionTea
 	#[Groups(["create:collectionTea", "edit:collectionTea"])]
 	public ?\DateTimeImmutable $acquiredAt = null;
 
-	#[Groups(["create:collectionTea", "edit:collectionTea"])]
-	public ?Business $acquiredFrom = null;
-
 	// When the last grams of tea has been drank
 	#[Groups(["edit:collectionTea"])]
 	public ?\DateTimeImmutable $finishedAt = null;

@@ -27,9 +27,6 @@ readonly class CollectionTeaEditProcessor implements ProcessorInterface
 		$entity = $this->em->find(\App\Entity\CollectionTea::class, $data->id);
 		$entity->description = $data->description;
 		$entity->acquiredAt = $data->acquiredAt;
-		$entity->acquiredFrom = $data->acquiredFrom
-			? $this->em->getReference(\App\Entity\Business::class, $data->acquiredFrom->id)
-			: null;
 		$entity->finishedAt = $data->finishedAt;
 
 		if (in_array($data->rating, [null, 1, 2, 3, 4, 5])) {

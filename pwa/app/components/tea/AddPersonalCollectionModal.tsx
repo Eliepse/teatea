@@ -12,12 +12,10 @@ import { useToken } from "~/auth/hooks/useToken";
 import type { CollectionTeaRaw } from "~/utils/api/normalization/collectionTea";
 import { SteppedModalFormLayout } from "~/components/shared/form/modal-multistep/SteppedModalFormLayout";
 import { DatePickerStep } from "~/components/shared/form/modal-multistep/DatePickerStep";
-import { BusinessPickerStep } from "~/components/shared/form/modal-multistep/BusinessPickerStep";
 
 type CollectionTeaForm = {
 	tea: Iri;
 	acquiredAt?: Date;
-	acquiredFrom?: Iri;
 };
 
 const FRAME_INFO_MAPPER = {
@@ -91,16 +89,7 @@ export function AddPersonalCollectionModal(props: { tea: Iri; onClose: () => voi
 						<DatePickerStep
 							onNext={(acquiredAt) => {
 								setForm((st) => ({ ...st, acquiredAt }));
-								stackNavigator.next("business:select");
-							}}
-							allowEmpty
-						/>
-					</StackFrame>
-					<StackFrame frameKey="business:select">
-						<BusinessPickerStep
-							onConfirm={(business) => {
-								setForm((st) => ({ ...st, acquiredFrom: business }));
-								mutation.mutate({ ...form, acquiredFrom: business });
+								mutation.mutate({ ...form, acquiredAt });
 							}}
 							allowEmpty
 						/>
