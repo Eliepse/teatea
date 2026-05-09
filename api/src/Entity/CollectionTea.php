@@ -33,10 +33,6 @@ class CollectionTea implements HasMedia
 	#[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
 	public ?\DateTimeImmutable $acquiredAt = null;
 
-	#[ORM\ManyToOne(inversedBy: "acquiredTeas")]
-	#[ORM\JoinColumn(nullable: true, onDelete: "SET NULL")]
-	public ?Business $acquiredFrom = null;
-
 	#[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
 	public ?\DateTimeImmutable $finishedAt = null;
 

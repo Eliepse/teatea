@@ -26,12 +26,6 @@ class Business
 	public User $author;
 
 	/**
-	 * @var Collection<int, CollectionTea>
-	 */
-	#[ORM\OneToMany(targetEntity: CollectionTea::class, mappedBy: "acquiredFrom")]
-	private Collection $acquiredTeas;
-
-	/**
 	 * @var Collection<int, Tea>
 	 */
 	#[ORM\OneToMany(targetEntity: Tea::class, mappedBy: "business")]
@@ -39,7 +33,6 @@ class Business
 
 	public function __construct()
 	{
-		$this->acquiredTeas = new ArrayCollection();
 		$this->teas = new ArrayCollection();
 	}
 }
