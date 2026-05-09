@@ -19,6 +19,6 @@ export function makeBusinessQueryOpt(business?: Partial<Pick<Business, "@id" | "
 		},
 		queryKey: [iri],
 		staleTime: 60 * 60_000,
-		enabled: !!iri,
+		enabled: !!iri || !!business?.id,
 	});
 }
