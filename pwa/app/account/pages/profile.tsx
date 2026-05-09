@@ -118,7 +118,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 						<MemberFamiliesChart
 							memberIri={member["@id"]}
 							since={statsSince}
-							className="col-span-3 mx-8 mb-6"
+							className="col-span-3 mb-4"
 						/>
 						<MemberHistoryChart memberIri={member["@id"]} since={statsSince} className="col-span-3" />
 					</IfFriend>
