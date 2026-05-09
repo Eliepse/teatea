@@ -1,7 +1,7 @@
 import type { Iri } from "~t/types";
 import { AlignLeft, Edit } from "iconoir-react";
 import clsx from "clsx";
-import { useCollectionTeaContext } from "~/pages/member/_components/MemberTeaContext";
+import { useCollectionTeaContext } from "~/account/components/MemberTeaContext";
 
 export function EditableDescription(props: { collTeaIri: Iri; value?: string; className?: string }) {
 	const context = useCollectionTeaContext();

@@ -1,4 +1,4 @@
-import type { Route } from "../../../.react-router/types/app/pages/member/+types/personal-collection-tea";
+import type { Route } from "../../../.react-router/types/app/account/pages/+types/my-teas-item";
 import { getApi, postApi } from "~/utils/api";
 import { type CollectionTeaRaw, denormalizeCollectionTea } from "~/utils/api/normalization/collectionTea";
 import { BackButton } from "~/components/shared/navigation/BackButton";
@@ -27,15 +27,11 @@ import { jsonableDate } from "~/utils/time";
 import { TextStep } from "~/components/shared/form/modal-multistep/TextStep";
 import { useCollectionTeaMutations } from "~/hooks/tea/useCollectionTeaMutations";
 import { extractId } from "~/utils/resource";
-import { EditableDescription } from "~/pages/member/_components/EditableDescription";
+import { EditableDescription } from "~/account/components/EditableDescription";
 import clsx from "clsx";
 import { Family } from "~/components/tea/Family";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
-import {
-	type MemberTeaContext,
-	MemberTeaCTX,
-	useCollectionTeaContext,
-} from "~/pages/member/_components/MemberTeaContext";
+import { type MemberTeaContext, MemberTeaCTX, useCollectionTeaContext } from "~/account/components/MemberTeaContext";
 import { Badge } from "~/components/shared/Badge";
 import { TeaRatingInput } from "~/components/shared/TeaRatingInput";
 

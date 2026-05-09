@@ -1,9 +1,9 @@
-import type { Route } from "../../../.react-router/types/app/pages/member/+types/personal-collection";
+import type { Route } from "../../../.react-router/types/app/account/pages/+types/my-teas";
 import { useQuery } from "@tanstack/react-query";
 import { BackButton } from "~/components/shared/navigation/BackButton";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { TokenUtils } from "~/auth/hooks/useToken";
-import { CollectionTeaCard } from "~/pages/member/_components/CollectionTeaCard";
+import { CollectionTeaCard } from "~/account/components/CollectionTeaCard";
 import { Link } from "react-router";
 import { EmojiSurprise, Search } from "iconoir-react";
 import clsx from "clsx";

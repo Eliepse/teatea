@@ -21,8 +21,8 @@ export default [
 		route("/lists/:id", "pages/member/teaList.tsx"),
 
 		route("/members/:username/friends", "account/pages/friends.tsx"),
-		route("/members/:username/teas", "pages/member/personal-collection.tsx"),
-		route("/members/:username/teas/:teaId", "pages/member/personal-collection-tea.tsx"),
+		route("/members/:username/teas", "account/pages/my-teas.tsx"),
+		route("/members/:username/teas/:teaId", "account/pages/my-teas-item.tsx"),
 
 		...prefix("/me", [route("/teas", "pages/tea/tea-list.tsx")]),
 	]),
