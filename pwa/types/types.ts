@@ -130,6 +130,15 @@ export const teaFamilies: Record<TeaFamily, string> = {
 	fermented: "Fermented tea",
 };
 
+export const teaFamiliesShort = {
+	white: "White",
+	yellow: "Yellow",
+	green: "Green",
+	wulong: "Wulong",
+	black: "Black",
+	fermented: "Fermented",
+} as const;
+
 export interface ApiCollection<T> {
 	"@context": string;
 	"@id": string;
