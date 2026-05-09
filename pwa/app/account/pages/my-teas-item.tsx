@@ -18,7 +18,6 @@ import type { CollectionTea, Cultivar, Origin, RoastLevel } from "~t/types";
 import { type ChangeEvent, type ReactNode, useMemo, useState } from "react";
 import { MenuItem, MenuModal } from "~/components/shared/navigation/MenuModal";
 import { Modal } from "~/components/shared/modal/Modal";
-import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { MenuButton } from "~/components/shared/navigation/MenuModalButton";
 import { Link, useNavigate, useRevalidator } from "react-router";
 import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
@@ -141,9 +140,9 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 					/>
 
 					<ul className="my-4 flex flex-wrap gap-2">
-						{!!meta.acquiredFrom && (
+						{!!tea.business && (
 							<li>
-								<Badge icon={<Shop className="size-4" />}>{meta.acquiredFrom.name}</Badge>
+								<Badge icon={<Shop className="size-4" />}>{tea.business.name}</Badge>
 							</li>
 						)}
 
@@ -173,15 +172,6 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 				<EditableDescription collTeaIri={meta["@id"]} value={meta.description} className="my-4" />
 
 				<Modal open={undefined !== action} onClose={() => setAction(undefined)} className="p-0">
-					{"edit:acquiredFrom" === action && (
-						<SelectBusinessFrame
-							onConfirm={(iri) => patchResource({ acquiredFrom: iri ?? null })}
-							defaultValue={meta.acquiredFrom?.["@id"]}
-							confirmLabel="Confirm"
-							allowCreate
-						/>
-					)}
-
 					{"edit:acquiredAt" === action && (
 						<DatePickerStep
 							onNext={(date) => patchResource({ acquiredAt: jsonableDate(date) })}
@@ -281,14 +271,6 @@ function OptionsMenu(props: { collectionTea: CollectionTea }) {
 		<>
 			<MenuButton onClick={() => setModalKey("_menu")} icon={<MoreVert className="size-6" />} />
 			<MenuModal onClose={() => setModalKey(null)} open={"_menu" === modalKey}>
-				<MenuItem
-					label="Change shop"
-					onClick={() => {
-						context?.act("edit:acquiredFrom");
-						setModalKey(null);
-					}}
-					icon={<Shop className="size-5" />}
-				/>
 				<MenuItem
 					label="Change acquisition date"
 					onClick={() => {
