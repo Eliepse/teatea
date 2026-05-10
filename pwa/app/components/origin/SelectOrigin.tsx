@@ -10,6 +10,7 @@ import { getApi, postApi } from "~/utils/api";
 import { getOriginLevel, getParentPath, useOrigin } from "~/utils/api/useOrigins";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { Modal } from "~/components/shared/modal/Modal";
+import { makePopularOriginQueryOpt } from "~/shared/query/originQuery";
 
 export function SelectOrigin(props: {
 	onBack: () => void;
@@ -183,21 +184,7 @@ export function SelectOrigin(props: {
 }
 
 function PopularOrigins(props: { selectionPath?: TreePath; onSelect: (origin: Origin) => void }) {
-	const { data: popularOrigins, ...popularsQuery } = useQuery({
-		queryFn: async (ctx) => {
-			const queryKey = ctx.queryKey[2] ?? null;
-			const params = typeof queryKey === "string" ? { limit: 3 } : queryKey;
-			const filters = {
-				...params,
-				sort: "popularity",
-				level: 1,
-			};
-			const data = await (await getApi<ApiCollection<Origin>>("/origins", filters)).json();
-			return data.member;
-		},
-		queryKey: ["origins", "populars", { limit: 3 }],
-		refetchOnMount: false,
-	});
+	const { data: popularOrigins, ...popularsQuery } = useQuery(makePopularOriginQueryOpt({ itemsPerPage: 3 }));
 
 	return (
 		<>
