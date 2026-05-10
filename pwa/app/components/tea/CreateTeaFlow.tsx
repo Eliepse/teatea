@@ -12,7 +12,6 @@ import { AskName } from "~/components/tea/create/AskName";
 import { useAlert } from "~/components/shared/modal/AlertManager";
 import { SelectCultivar } from "~/components/cultivar/SelectCultivar";
 import { useNavigate } from "react-router";
-import { BusinessSelect } from "~/components/shared/inputs/BusinessSelect";
 
 const CONTEXT = createContext({
 	formValue: {} as FormValue,
