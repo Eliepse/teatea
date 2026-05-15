@@ -7,10 +7,12 @@ import {
 	ArrowRightCircle,
 	Calendar,
 	CalendarPlus,
+	CoffeeCup,
 	GlassEmpty,
 	MediaImage,
 	MediaImagePlus,
 	MoreVert,
+	Plus,
 	Shop,
 	Trash,
 } from "iconoir-react";
@@ -33,6 +35,8 @@ import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import { type MemberTeaContext, MemberTeaCTX, useCollectionTeaContext } from "~/account/components/MemberTeaContext";
 import { Badge } from "~/components/shared/Badge";
 import { TeaRatingInput } from "~/components/shared/TeaRatingInput";
+import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
+import { BrewButton } from "~/components/teaSession/BrewButton";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const response = await getApi<CollectionTeaRaw>(`/members/${args.params.username}/teas/${args.params.teaId}`);
@@ -161,6 +165,17 @@ export default function PersonalCollectionTeaPage(props: Route.ComponentProps) {
 						</div>
 					)}
 				</header>
+
+				<ul className="text-green-900 flex items-center justify-center gap-2">
+					<li className="flex-1">
+						<BrewButton tea={meta}>
+							<PrimaryButton className="w-full">
+								Brew
+								<CoffeeCup className="size-5 ml-auto" />
+							</PrimaryButton>
+						</BrewButton>
+					</li>
+				</ul>
 
 				<TeaRatingInput
 					value={meta.rating}

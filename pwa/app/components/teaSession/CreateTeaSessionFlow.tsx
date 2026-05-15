@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Business, Iri, Tea } from "~t/types";
+import type { CollectionTea, Tea } from "~t/types";
 import { StackFrame, useNavigationStack } from "~/utils/navigation/useNavigationStack";
 import { ParametersInput } from "~/components/teaSession/create/ParametersInput";
 import { FrameDatePicker } from "~/components/shared/frame/FrameDatePicker";
@@ -12,16 +12,13 @@ import { useAlert } from "~/components/shared/modal/AlertManager";
 import { handleUIEvent } from "~/utils/function";
 import Arrow from "~/components/icons/arrow";
 import clsx from "clsx";
-import { SelectBusinessFrame } from "~/components/teaSession/create/SelectBusinessFrame";
 import { CoffeeCup, RefreshDouble } from "iconoir-react";
 import { usePostHog } from "@posthog/react";
 
 export type SessionForm = {
-	tea: Tea["@id"];
 	teaQuantity?: number;
 	waterMl?: number;
 	drankAt: Date;
-	place?: Business["@id"];
 };
 
 const FRAME_INFO_MAPPER = {
@@ -30,11 +27,14 @@ const FRAME_INFO_MAPPER = {
 	"place:select": { step: 3, title: "Is it in a special place?" },
 } as const;
 
-export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) {
+export function CreateTeaSessionFlow(props: {
+	tea: Pick<Tea | CollectionTea, "@id" | "id" | "@type">;
+	onCancel: () => void;
+}) {
 	const navigate = useNavigate();
 	const alert = useAlert();
 	const posthog = usePostHog();
-	const [form, setForm] = useState<SessionForm>({ drankAt: new Date(), tea: props.tea });
+	const [form, setForm] = useState<SessionForm>({ drankAt: new Date() });
 	const { NavigationStack, ...stackNavigator } = useNavigationStack({ defaultFrame: "parameters:input" });
 	const currentFrameKey = stackNavigator.stack.slice(-1)[0] as keyof typeof FRAME_INFO_MAPPER;
 
@@ -51,10 +51,17 @@ export function CreateTeaSessionFlow(props: { tea: Iri; onCancel: () => void }) 
 	}
 
 	const mutation = useMutation({
-		mutationFn: async (data: SessionForm & Required<Pick<SessionForm, "tea">>) => {
-			const drankAt = formatISO(data.drankAt);
-			const response = await postApi<TeaSessionRaw>("/tea_sessions", { ...data, drankAt });
-			return await response.json();
+		mutationFn: async (data: SessionForm) => {
+			const iri = props.tea["@id"];
+			console.debug(props.tea);
+			const payload = {
+				...data,
+				drankAt: formatISO(data.drankAt),
+				tea: "Tea" === props.tea["@type"] ? iri : undefined,
+				collectionTea: "CollectionTea" === props.tea["@type"] ? iri : undefined,
+			};
+
+			return await (await postApi<TeaSessionRaw>("/tea_sessions", payload)).json();
 		},
 		onError: (e) => {
 			alert({ title: "Error while saving your experience", body: e.message });
