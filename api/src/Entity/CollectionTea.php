@@ -43,9 +43,16 @@ class CollectionTea implements HasMedia
 	// Requires manual hydration
 	public ?Collection $media = null;
 
+	/**
+	 * @var Collection<int, TeaSession>
+	 */
+	#[ORM\OneToMany(targetEntity: TeaSession::class, mappedBy: "tea")]
+	private Collection $sessions;
+
 	public function __construct()
 	{
 		$this->media = new ArrayCollection();
+		$this->sessions = new ArrayCollection();
 	}
 
 	public function getType(): string
