@@ -183,6 +183,10 @@ export default function TeaPage(props: Route.ComponentProps) {
 						</p>
 					)}
 				</section>
+
+				<p className="mx-4 mt-4 text-sm text-stone-400">
+					Tea added {formatDistanceToNow(props.loaderData.tea.addedAt)} ago
+				</p>
 			</main>
 		</WithMainMenu>
 	);

@@ -71,7 +71,7 @@ export type Tea = Resource & {
 	year?: number;
 	roast?: RoastLevel;
 	business?: Business;
-	addedAt?: Date;
+	addedAt: Date;
 };
 
 export type TeaSession = Resource<"TeaSession"> & {
