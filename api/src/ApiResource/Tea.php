@@ -125,14 +125,14 @@ class Tea
 	public ?Origin $origin = null;
 
 	#[ApiProperty(readableLink: true)]
-	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "embedded:cultivar", "with:tea"])]
 	public ?Cultivar $cultivar = null;
 
 	#[Assert\GreaterThanOrEqual(1800)]
-	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:tea"])]
 	public ?int $year = null;
 
-	#[Groups(["tea:create", "tea:read", "tea:createFromType"])]
+	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:tea"])]
 	public ?RoastLevel $roast = null;
 
 	#[Groups(["tea:create", "tea:read", "tea:createFromType", "with:business"])]
