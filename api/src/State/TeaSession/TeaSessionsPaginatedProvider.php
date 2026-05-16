@@ -61,7 +61,8 @@ readonly class TeaSessionsPaginatedProvider implements ProviderInterface
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.business", "business")
-			->orderBy("session.drankAt", "DESC");
+			->orderBy("session.drankAt", "DESC")
+			->addOrderBy("session.id", "DESC");
 
 		if (null !== $tea) {
 			$sessionQb->andWhere("session.tea = :tea")->setParameter("tea", $tea);
