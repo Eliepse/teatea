@@ -1,4 +1,4 @@
-import type { Route } from "./+types/teaSession";
+import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, patchApi } from "~/utils/api";
 import { BrewingQualityEnum, type Iri, type NullablePartial, RoastLevelEnum, type TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
@@ -42,7 +42,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs) {
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const session = props.loaderData;
+	const session = props.loaderData as TeaSession;
 	const tea = session.tea;
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
@@ -120,34 +120,36 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					onClick={() => navigate(getTeaPageLink(session, isAuthor))}
 					className="shadow bg-white my-2 overflow-hidden"
 				>
-					<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">
-						{!!session.teaQuantity && (
-							<li>
-								<SpecBadge
-									label={<>{session.teaQuantity}&nbsp;g</>}
-									icon={<Leaf className="size-4 text-green-700" />}
-								/>
-							</li>
-						)}
+					{(!!session.teaQuantity || !!session.waterMl || undefined !== session.quality) && (
+						<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">
+							{!!session.teaQuantity && (
+								<li>
+									<SpecBadge
+										label={<>{session.teaQuantity}&nbsp;g</>}
+										icon={<Leaf className="size-4 text-green-700" />}
+									/>
+								</li>
+							)}
 
-						{!!session.waterMl && (
-							<li>
-								<SpecBadge
-									label={<>{session.waterMl}&nbsp;ml</>}
-									icon={<WaterDrop className="size-4 text-green-700" />}
-								/>
-							</li>
-						)}
+							{!!session.waterMl && (
+								<li>
+									<SpecBadge
+										label={<>{session.waterMl}&nbsp;ml</>}
+										icon={<WaterDrop className="size-4 text-green-700" />}
+									/>
+								</li>
+							)}
 
-						{undefined !== session.quality && (
-							<li>
-								<SpecBadge
-									label={`${QualityLabel[session.quality]} brew`}
-									icon={QualityIcon[session.quality]}
-								/>
-							</li>
-						)}
-					</ul>
+							{undefined !== session.quality && (
+								<li>
+									<SpecBadge
+										label={`${QualityLabel[session.quality]} brew`}
+										icon={QualityIcon[session.quality]}
+									/>
+								</li>
+							)}
+						</ul>
+					)}
 				</TeaCard>
 			</header>
 
@@ -234,8 +236,8 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 }
 
 function getTeaPageLink(session: Pick<TeaSession, "tea" | "collectionTea">, isAuthor: boolean): string {
-	if(!isAuthor || !session.collectionTea) {
-		return  `/tea/${session.tea.id}`;
+	if (!isAuthor || !session.collectionTea) {
+		return `/tea/${session.tea.id}`;
 	}
 
 	return session.collectionTea.slice(4); // Remove "/api" prefix
