@@ -1,9 +1,10 @@
 import { type PropsWithChildren } from "react";
 import clsx from "clsx";
+import { EditPencil } from "iconoir-react";
 
 const CLS = {
-	root: "w-full min-h-full p-4 flex flex-col items-center gap-1.5 text-sm rounded-lg",
-	empty: "border border-green-600 text-green-700",
+	root: "relative w-full min-h-full p-4 flex flex-col items-center gap-1.5 text-sm rounded-lg",
+	empty: "border border-dashed border-green-600 text-green-700",
 	editable: "cursor-pointer hover:bg-green-300 active:bg-green-400",
 	filled: "bg-white text-green-900 shadow-sm",
 };
@@ -23,6 +24,7 @@ export function SessionAction(
 
 	return (
 		<button className={clsx(styles, props.className)} onClick={props.onClick}>
+			{props.filled && <EditPencil className="absolute top-1.5 right-1.5 text-stone-400 size-4" />}
 			{props.children}
 		</button>
 	);
