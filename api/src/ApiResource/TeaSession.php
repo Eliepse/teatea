@@ -93,8 +93,7 @@ class TeaSession
 	#[ApiProperty(readable: true, readableLink: true)]
 	public ?Tea $tea = null;
 
-	#[Groups(["teaSession:create"])]
-	#[ApiProperty(readable: true, readableLink: true)]
+	#[Groups(["teaSession:create", "teaSession:read"])]
 	public ?CollectionTea $collectionTea = null;
 
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
