@@ -1,11 +1,11 @@
 import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
 import { deleteApi, patchApi } from "~/utils/api";
-import { BrewingQualityEnum, type Iri, type NullablePartial, RoastLevelEnum, type TeaSession } from "~t/types";
+import { type Iri, type NullablePartial, RoastLevelEnum, type TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { intlFormat } from "date-fns";
-import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
+import { Link, useNavigate, useRevalidator } from "react-router";
 import { Modal } from "~/components/shared/modal/Modal";
-import { type ReactNode, useState } from "react";
+import { Fragment, type ReactNode, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { nl2br } from "~/utils/content";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
@@ -13,8 +13,7 @@ import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
-import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import { Check, CoffeeCup, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, MoreVert, Trash, Xmark } from "iconoir-react";
+import { CoffeeCup, MoreVert, Trash, Xmark } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
 import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
@@ -25,16 +24,9 @@ import { ParametersInput } from "~/components/teaSession/create/ParametersInput"
 import { extractId } from "~/utils/resource";
 import { Badge } from "~/components/shared/Badge";
 import { queryTeaSession } from "~/utils/query/queryTeaSession";
-import { FloatingActions } from "~/layouts/FloatingActions";
-import { SessionAction } from "~/pages/teaSession/_components/Actions/SessionAction";
 import { BrewingTypeAction } from "~/pages/teaSession/_components/Actions/BrewingTypeAction";
 import { NoteAction } from "~/pages/teaSession/_components/Actions/NoteAction";
-
-const QualityIcon = {
-	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
-	[BrewingQualityEnum.Improvable]: <EmojiPuzzled className="size-5" />,
-	[BrewingQualityEnum.Bad]: <EmojiSad className="size-5" />,
-};
+import { RateTechnicAction } from "~/pages/teaSession/_components/Actions/RateTechnicAction";
 
 export async function clientLoader(props: Route.ClientLoaderArgs) {
 	return queryTeaSession(parseInt(props.params.id));
@@ -43,28 +35,11 @@ export async function clientLoader(props: Route.ClientLoaderArgs) {
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const { revalidate } = useRevalidator();
-	const [searchParams, setSearchParams] = useSearchParams();
 	const session = props.loaderData as TeaSession;
 	const tea = session.tea;
-	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
-	const [, setShowNodeEditor] = useState(false);
 	const sessionMutations = useSessionMutations(session.id);
 	const isAuthor = useIsAuthor(session.author);
-	const member = useMember({
-		iri: typeof session.author === "string" ? session.author : (session.author ?? {})["@id"],
-	});
-
-	function toggleEditMode() {
-		if (editMode && "1" === searchParams.get("edit")) {
-			setSearchParams((st) => Object.fromEntries(Object.entries(st).filter(([k]) => "edit" !== k)), {
-				replace: true,
-			});
-			setEditMode(false);
-			return;
-		}
-
-		setEditMode((st) => !st);
-	}
+	const member = useMember({ iri: session.author });
 
 	return (
 		<WithMainMenu className="px-4 pb-24 bg-green-50" activeKey="activity">
@@ -75,19 +50,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					<IfAuthor author={session.author}>
 						<nav>
 							<Options session={props.loaderData} />
-
-							<FloatingActions className="justify-center">
-								<button
-									className={clsx(
-										"btn btn-lg rounded-full btn-primary shadow-lg",
-										!editMode && "btn-outline bg-white",
-									)}
-									onClick={toggleEditMode}
-								>
-									{editMode ? <Check className="size-4" /> : <Edit className="size-4" />}
-									{editMode ? "Done" : "Edit"}
-								</button>
-							</FloatingActions>
 						</nav>
 					</IfAuthor>
 				</div>
@@ -117,7 +79,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					onClick={() => navigate(getTeaPageLink(session, isAuthor))}
 					className="shadow bg-white my-2 overflow-hidden"
 				>
-					{(!!session.teaQuantity || !!session.waterMl || undefined !== session.quality) && (
+					{(!!session.teaQuantity || !!session.waterMl) && (
 						<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">
 							{!!session.teaQuantity && (
 								<li>
@@ -136,35 +98,27 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 									/>
 								</li>
 							)}
-
-							{undefined !== session.quality && (
-								<li>
-									<SpecBadge
-										label={`${QualityLabel[session.quality]} brew`}
-										icon={QualityIcon[session.quality]}
-									/>
-								</li>
-							)}
 						</ul>
 					)}
 				</TeaCard>
 			</header>
 
 			<ul className="flex gap-2 items-stretch">
-				<li className="flex-1">
-					<BrewingTypeAction session={session} readonly={!isAuthor} updated={() => revalidate()} />
-				</li>
+				{(isAuthor || session.brewingType) && (
+					<li className="flex-1 max-w-1/2">
+						<BrewingTypeAction session={session} readonly={!isAuthor} updated={() => revalidate()} />
+					</li>
+				)}
+				{(isAuthor || undefined !== session.quality) && (
+					<li className="flex-1 max-w-1/2">
+						<RateTechnicAction session={session} readonly={!isAuthor} updated={() => revalidate()} />
+					</li>
+				)}
 				<IfAuthor author={session.author}>
-					<li className="flex-1">
+					<li className="flex-1 max-w-1/2">
 						<NoteAction session={session} updated={() => revalidate()} />
 					</li>
 				</IfAuthor>
-				<li className="flex-1">
-					<SessionAction onClick={console.debug}>
-						<EmojiPuzzled className="size-5" />
-						Rate technic
-					</SessionAction>
-				</li>
 			</ul>
 
 			{!!session.note && (
@@ -176,28 +130,18 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</div>
 			)}
 
-			{!!session.steeps?.length && <h2 className="text-green-800/70 mb-3">Steeps</h2>}
-			{(!!session.steeps?.length || editMode) && (
-				<EditableSteepsList
-					sessionId={session.id}
-					author={session.author}
-					steeps={session.steeps ?? []}
-					className="mb-12"
-					readonly={!editMode}
-					onChange={async (steeps) => await sessionMutations.edit.mutateAsync({ steeps })}
-				/>
-			)}
-
-			{editMode && (
-				<IfAuthor author={session.author}>
-					<h2 className="uppercase text-xs text-base-content/60 mb-2">Brewing quality</h2>
-					<BrewingQualityInput
-						onChange={async (quality) => {
-							await sessionMutations.edit.mutateAsync({ quality });
-						}}
-						value={session.quality}
+			{(!!session.steeps?.length || isAuthor) && (
+				<Fragment>
+					<h2 className="text-green-800/70 mt-6 mb-3">Steeps</h2>
+					<EditableSteepsList
+						sessionId={session.id}
+						author={session.author}
+						steeps={session.steeps ?? []}
+						className="mb-12"
+						readonly={!isAuthor}
+						onChange={async (steeps) => await sessionMutations.edit.mutateAsync({ steeps })}
 					/>
-				</IfAuthor>
+				</Fragment>
 			)}
 		</WithMainMenu>
 	);

@@ -82,7 +82,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	waterMl?: number;
 	quality?: BrewingQuality;
 	drankAt: Date;
-	author?: Iri | Member;
+	author?: Iri;
 	steeps?: Steep[];
 	place?: Business;
 	brewingType?: BrewingType;

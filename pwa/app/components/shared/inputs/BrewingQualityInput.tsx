@@ -1,11 +1,11 @@
 import { type BrewingQuality, BrewingQualityEnum } from "~t/types";
 import clsx from "clsx";
 import { useState } from "react";
-import { EmojiPuzzled, EmojiSad, EmojiSatisfied, RefreshDouble } from "iconoir-react";
+import { EmojiPuzzled, EmojiSad, EmojiSatisfied, EmojiThinkLeft, RefreshDouble } from "iconoir-react";
 
 export const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-4 mb-1" />,
-	[BrewingQualityEnum.Improvable]: <EmojiPuzzled className="size-4 mb-1" />,
+	[BrewingQualityEnum.Improvable]: <EmojiThinkLeft className="size-4 mb-1" />,
 	[BrewingQualityEnum.Bad]: <EmojiSad className="size-4 mb-1" />,
 } as const;
 

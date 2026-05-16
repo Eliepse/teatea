@@ -67,7 +67,7 @@ export function CreateTeaSessionFlow(props: {
 			alert({ title: "Error while saving your experience", body: e.message });
 		},
 		onSuccess: (data) => {
-			setTimeout(() => navigate(`/sessions/${data.id}?edit=1`), 500);
+			setTimeout(() => navigate(`/sessions/${data.id}`), 500);
 		},
 	});
 
