@@ -1,6 +1,13 @@
 import { Link, useSearchParams } from "react-router";
 import { getApi } from "~/utils/api";
-import type { ApiPaginatedCollection, Embed, Member, TeaSession } from "~t/types";
+import {
+	type ApiPaginatedCollection,
+	type BrewingType,
+	BrewingTypeEnum,
+	type Embed,
+	type Member,
+	type TeaSession,
+} from "~t/types";
 import { formatDate, formatISO, isToday, isYesterday } from "date-fns";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
@@ -10,7 +17,7 @@ import { useState } from "react";
 import { SessionsUserFilter } from "~/pages/teaSession/_components/sessionsUserFilter";
 import { Family } from "~/components/tea/Family";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
-import { CoffeeCup, Shop } from "iconoir-react";
+import { CoffeeCup, FireFlame, Shop, SnowFlake } from "iconoir-react";
 import { FloatingActions } from "~/layouts/FloatingActions";
 import { SecondaryButton } from "~/shared/components/Button";
 
@@ -140,7 +147,11 @@ function MemberSessionsGroup(props: {
 				{props.sessions.map((session) => (
 					<li key={session.id} className="nth-[1]:border-0 border-t border-green-100">
 						<Link to={`/sessions/${session.id}`}>
-							<SessionListItem tea={session.tea} place={session.tea.business} />
+							<SessionListItem
+								tea={session.tea}
+								place={session.tea.business}
+								brewingType={session.brewingType}
+							/>
 						</Link>
 					</li>
 				))}
@@ -149,7 +160,12 @@ function MemberSessionsGroup(props: {
 	);
 }
 
-export function SessionListItem(props: { tea: Session["tea"]; place?: Session["place"] }) {
+const typeIcon = {
+	[BrewingTypeEnum.Hot]: <FireFlame className="size-4" />,
+	[BrewingTypeEnum.Cold]: <SnowFlake className="size-4" />,
+} as const;
+
+export function SessionListItem(props: { tea: Session["tea"]; place?: Session["place"]; brewingType?: BrewingType }) {
 	return (
 		<article className="px-4 py-3 flex items-center">
 			<div className="flex-1">
@@ -157,10 +173,14 @@ export function SessionListItem(props: { tea: Session["tea"]; place?: Session["p
 					<Family family={props.tea.family} iconOnly className="mr-1" />
 					<span className="capitalize">{props.tea.type?.name ?? `${props.tea.family} tea`}</span>
 				</div>
-				<div className="text-sm text-teal-600">
+				<div className="text-sm text-teal-600 flex flex-wrap items-center">
 					{props.tea.cultivar && <span className="text-teal-600 text-sm">{props.tea.cultivar.name}</span>}
 					{props.tea.cultivar && props.tea.origin && <span className="mx-1">&middot;</span>}
 					{props.tea.origin && <FormatOrigin origin={props.tea.origin} maxLevel="region" />}
+					{(props.tea.cultivar || props.tea.origin) && props.brewingType && (
+						<span className="mx-1">&middot;</span>
+					)}
+					{props.brewingType && typeIcon[props.brewingType]}
 				</div>
 			</div>
 			<div className="text-sm">

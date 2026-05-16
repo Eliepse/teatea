@@ -16,7 +16,18 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import { Check, CoffeeCup, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, MoreVert, Trash, Xmark } from "iconoir-react";
+import {
+	AlignLeft,
+	Check,
+	CoffeeCup,
+	Edit,
+	EmojiPuzzled,
+	EmojiSad,
+	EmojiSatisfied,
+	MoreVert,
+	Trash,
+	Xmark,
+} from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
 import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
@@ -28,6 +39,8 @@ import { extractId } from "~/utils/resource";
 import { Badge } from "~/components/shared/Badge";
 import { queryTeaSession } from "~/utils/query/queryTeaSession";
 import { FloatingActions } from "~/layouts/FloatingActions";
+import { SessionAction } from "~/pages/teaSession/_components/Actions/SessionAction";
+import { BrewingTypeAction } from "~/pages/teaSession/_components/Actions/BrewingTypeAction";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -41,6 +54,7 @@ export async function clientLoader(props: Route.ClientLoaderArgs) {
 
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
+	const { revalidate } = useRevalidator();
 	const [searchParams, setSearchParams] = useSearchParams();
 	const session = props.loaderData as TeaSession;
 	const tea = session.tea;
@@ -71,7 +85,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 
 	return (
 		<WithMainMenu className="px-4 pb-24 bg-green-50" activeKey="activity">
-			<header className="py-4 relative">
+			<header className="pt-4 relative">
 				<div className="absolute inset-x-0 top-4 flex items-center mb-6">
 					<BackButton className="mr-auto shadow-xs" />
 
@@ -152,6 +166,24 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					)}
 				</TeaCard>
 			</header>
+
+			<ul className="flex gap-2 items-stretch">
+				<li className="flex-1">
+					<BrewingTypeAction session={session} readonly={!isAuthor} updated={() => revalidate()} />
+				</li>
+				<li className="flex-1">
+					<SessionAction onClick={console.debug} readonly>
+						<AlignLeft className="size-5" />
+						Add notes
+					</SessionAction>
+				</li>
+				<li className="flex-1">
+					<SessionAction onClick={console.debug}>
+						<EmojiPuzzled className="size-5" />
+						Rate technic
+					</SessionAction>
+				</li>
+			</ul>
 
 			<div className="mb-12">
 				{!!session.note && (
