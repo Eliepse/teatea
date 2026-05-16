@@ -36,6 +36,7 @@ readonly class TeaSessionEditProcessor implements ProcessorInterface
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
 		$entity->quality = $data->quality;
+		$entity->brewingType = $data->brewingType;
 		// TODO(elie): Find a way to have SteepValue array to be auto hydrated in Resource
 		$entity->setSteeps($data->steeps);
 		$this->em->persist($entity);

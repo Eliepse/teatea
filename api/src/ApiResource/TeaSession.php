@@ -96,7 +96,7 @@ class TeaSession
 	#[Groups(["teaSession:create", "teaSession:read"])]
 	public ?CollectionTea $collectionTea = null;
 
-	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
 	public ?BrewingType $brewingType = null;
 
 	#[Assert\Length(max: 1000)]
