@@ -51,7 +51,7 @@ export function BrewingTypeAction(props: {
 			</SessionAction>
 
 			{!props.readonly && (
-				<Modal open={edit}>
+				<Modal open={edit} onClose={() => setEdit(false)}>
 					<div className="px-4 py-6">
 						<BrewingTypeInput value={props.session.brewingType} onChange={persistChange} />
 						<PrimaryButton className="mt-4 w-full" onClick={() => setEdit(false)}>

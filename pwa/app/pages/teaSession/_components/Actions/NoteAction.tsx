@@ -43,7 +43,7 @@ export function NoteAction(props: {
 			</SessionAction>
 
 			{!props.readonly && (
-				<Modal open={edit} className="p-4">
+				<Modal open={edit} className="p-4" onClose={() => setEdit(false)}>
 					<div className="flex mb-4 gap-4">
 						<SecondaryButton className="flex-1" onClick={() => setEdit(false)}>
 							Cancel
