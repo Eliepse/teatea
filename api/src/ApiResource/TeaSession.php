@@ -13,7 +13,7 @@ use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\DTO\SteepValue;
 use App\Enum\BrewingQuality;
-use App\Enum\BrewingTechnic;
+use App\Enum\BrewingType;
 use App\State\TeaSession\TeaSessionCreateProcessor;
 use App\State\TeaSession\TeaSessionDeleteProcessor;
 use App\State\TeaSession\TeaSessionEditProcessor;
@@ -97,7 +97,7 @@ class TeaSession
 	public ?CollectionTea $collectionTea = null;
 
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
-	public ?BrewingTechnic $technic = null;
+	public ?BrewingType $brewingType = null;
 
 	#[Assert\Length(max: 1000)]
 	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]

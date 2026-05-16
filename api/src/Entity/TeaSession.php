@@ -5,7 +5,7 @@ namespace App\Entity;
 use App\Doctrine\ORM\TimestampedEntity;
 use App\DTO\SteepValue;
 use App\Enum\BrewingQuality;
-use App\Enum\BrewingTechnic;
+use App\Enum\BrewingType;
 use App\Repository\TeaSessionRepository;
 use App\ValueObject\Volume;
 use App\ValueObject\Weight;
@@ -40,7 +40,7 @@ class TeaSession
 	public ?BrewingQuality $quality = null;
 
 	#[ORM\Column(nullable: true)]
-	public ?BrewingTechnic $technic = null;
+	public ?BrewingType $brewingType = null;
 
 	#[ORM\ManyToOne(targetEntity: CollectionTea::class, inversedBy: "sessions")]
 	#[ORM\JoinColumn(nullable: true)]

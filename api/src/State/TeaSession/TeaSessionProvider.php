@@ -125,7 +125,7 @@ readonly class TeaSessionProvider implements ProviderInterface
 		$resource = new TeaSession();
 		$resource->id = $entity->id;
 		$resource->note = $entity->note;
-		$resource->technic = $entity->technic;
+		$resource->brewingType = $entity->brewingType;
 		$resource->teaQuantity = $entity->teaQuantity?->toGrams();
 		$resource->waterMl = $entity->waterVolume?->toMl();
 		$resource->drankAt = $entity->drankAt;
