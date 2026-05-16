@@ -5,10 +5,8 @@ import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normaliza
 import { intlFormat } from "date-fns";
 import { Link, useNavigate, useRevalidator, useSearchParams } from "react-router";
 import { Modal } from "~/components/shared/modal/Modal";
-import { type ChangeEvent, type ReactNode, useState } from "react";
-import { handleUIEvent } from "~/utils/function";
+import { type ReactNode, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { PencilSquare } from "~/components/icons/pencilSquare";
 import { nl2br } from "~/utils/content";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import Leaf from "~/components/icons/leaf";
@@ -16,18 +14,7 @@ import WaterDrop from "~/components/icons/WaterDrop";
 import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
-import {
-	AlignLeft,
-	Check,
-	CoffeeCup,
-	Edit,
-	EmojiPuzzled,
-	EmojiSad,
-	EmojiSatisfied,
-	MoreVert,
-	Trash,
-	Xmark,
-} from "iconoir-react";
+import { Check, CoffeeCup, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, MoreVert, Trash, Xmark } from "iconoir-react";
 import clsx from "clsx";
 import { useMember } from "~/utils/api/useMember";
 import { useAlert, usePopup } from "~/components/shared/modal/AlertManager";
@@ -41,6 +28,7 @@ import { queryTeaSession } from "~/utils/query/queryTeaSession";
 import { FloatingActions } from "~/layouts/FloatingActions";
 import { SessionAction } from "~/pages/teaSession/_components/Actions/SessionAction";
 import { BrewingTypeAction } from "~/pages/teaSession/_components/Actions/BrewingTypeAction";
+import { NoteAction } from "~/pages/teaSession/_components/Actions/NoteAction";
 
 const QualityIcon = {
 	[BrewingQualityEnum.Good]: <EmojiSatisfied className="size-5" />,
@@ -59,17 +47,12 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	const session = props.loaderData as TeaSession;
 	const tea = session.tea;
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
-	const [showNodeEditor, setShowNodeEditor] = useState(false);
-	const [noteValue, setNoteValue] = useState(session.note);
+	const [, setShowNodeEditor] = useState(false);
 	const sessionMutations = useSessionMutations(session.id);
 	const isAuthor = useIsAuthor(session.author);
 	const member = useMember({
 		iri: typeof session.author === "string" ? session.author : (session.author ?? {})["@id"],
 	});
-
-	function handleNoteChange(e: ChangeEvent<HTMLTextAreaElement>) {
-		setNoteValue(e.currentTarget.value);
-	}
 
 	function toggleEditMode() {
 		if (editMode && "1" === searchParams.get("edit")) {
@@ -171,12 +154,11 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				<li className="flex-1">
 					<BrewingTypeAction session={session} readonly={!isAuthor} updated={() => revalidate()} />
 				</li>
-				<li className="flex-1">
-					<SessionAction onClick={console.debug} readonly>
-						<AlignLeft className="size-5" />
-						Add notes
-					</SessionAction>
-				</li>
+				<IfAuthor author={session.author}>
+					<li className="flex-1">
+						<NoteAction session={session} updated={() => revalidate()} />
+					</li>
+				</IfAuthor>
 				<li className="flex-1">
 					<SessionAction onClick={console.debug}>
 						<EmojiPuzzled className="size-5" />
@@ -185,40 +167,14 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 				</li>
 			</ul>
 
-			<div className="mb-12">
-				{!!session.note && (
-					<div className="my-6">
-						<h2 className="flex text-green-800/70 mb-3">
-							<span>Tasting note</span>
-							{editMode && (
-								<IfAuthor author={session.author}>
-									<button
-										className="ml-auto py-2 -my-2 flex items-center text-info"
-										onClick={handleUIEvent(() => setShowNodeEditor(true))}
-									>
-										<PencilSquare className="size-3 inline mr-2" version="micro" /> Edit
-									</button>
-								</IfAuthor>
-							)}
-						</h2>
-
-						<p className="leading-normal text-lg text-green-900 bg-green-100 rounded-lg p-4 pt-3">
-							{nl2br(session.note)}
-						</p>
-					</div>
-				)}
-
-				<IfAuthor author={session.author}>
-					{!session.note && editMode && (
-						<button
-							className="btn btn-block btn-dash mt-2"
-							onClick={handleUIEvent(() => setShowNodeEditor(true))}
-						>
-							Add a tasting note
-						</button>
-					)}
-				</IfAuthor>
-			</div>
+			{!!session.note && (
+				<div className="my-6">
+					<h2 className="text-green-800/70 mb-3">Tasting note</h2>
+					<p className="leading-normal text-lg text-green-900 bg-green-100 rounded-lg p-4 pt-3">
+						{nl2br(session.note)}
+					</p>
+				</div>
+			)}
 
 			{!!session.steeps?.length && <h2 className="text-green-800/70 mb-3">Steeps</h2>}
 			{(!!session.steeps?.length || editMode) && (
@@ -243,26 +199,6 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					/>
 				</IfAuthor>
 			)}
-
-			<Modal onClose={() => setShowNodeEditor(false)} open={editMode && showNodeEditor}>
-				<div className="flex mb-2">
-					<button className="btn" onClick={handleUIEvent(() => setShowNodeEditor(false))}>
-						Cancel
-					</button>
-					<button
-						className="btn btn-primary ml-auto"
-						onClick={handleUIEvent(async () => {
-							await sessionMutations.edit.mutateAsync({ note: noteValue });
-							setShowNodeEditor(false);
-						})}
-						disabled={sessionMutations.edit.isPending}
-					>
-						Save
-					</button>
-				</div>
-
-				<textarea className="textarea w-full h-96" onChange={handleNoteChange} value={noteValue} />
-			</Modal>
 		</WithMainMenu>
 	);
 }
