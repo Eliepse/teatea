@@ -1,14 +1,12 @@
 import type { Tea } from "~t/types";
 import { createContext, useContext } from "react";
 import { warnNotImplemented } from "~/utils/function";
-import type { TechnicType } from "~/components/shared/BrewingTechnic";
 
 export type FormData = {
 	tea?: Tea;
 	teaQuantity?: number;
 	waterVolume?: number;
 	drankAt?: Date;
-	technic?: TechnicType | null;
 };
 
 export type SipContext = {

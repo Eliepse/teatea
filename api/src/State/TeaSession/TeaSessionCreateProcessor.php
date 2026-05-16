@@ -52,6 +52,7 @@ readonly class TeaSessionCreateProcessor implements ProcessorInterface
 		$entity->teaQuantity = empty($data->teaQuantity) ? null : Weight::fromGrams($data->teaQuantity);
 		$entity->waterVolume = empty($data->waterMl) ? null : Volume::fromMl($data->waterMl);
 		$entity->collectionTea = $collectionTea;
+		$entity->brewingType = $data->brewingType;
 
 		$this->em->persist($entity);
 		$this->em->flush();
