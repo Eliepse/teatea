@@ -12,7 +12,7 @@ final readonly class MediaObjectHydrator implements ResourceHydrator
 		private StorageInterface $storage,
 	) {}
 
-	public function hydrate(?object $entity): ?object
+	public function hydrate(?object $entity): ?\App\ApiResource\MediaObject
 	{
 		if (null === $entity) {
 			return null;
@@ -29,6 +29,21 @@ final readonly class MediaObjectHydrator implements ResourceHydrator
 		if ($entity instanceof MediaObjectPivot) {
 			$resource->collection = $entity->collection;
 		}
+
+		return $resource;
+	}
+
+	public function hydrateReference(?object $entity): ?\App\ApiResource\MediaObject
+	{
+		if (null === $entity) {
+			return null;
+		}
+
+		assert($entity instanceof MediaObject || $entity instanceof MediaObjectPivot);
+		$media = $entity instanceof MediaObject ? $entity : $entity->media;
+
+		$resource = new \App\ApiResource\MediaObject();
+		$resource->id = $media->id;
 
 		return $resource;
 	}

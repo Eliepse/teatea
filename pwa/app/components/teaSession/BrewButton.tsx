@@ -1,10 +1,16 @@
 import { type MouseEvent, type PropsWithChildren, useState } from "react";
 import { CoffeeCup } from "iconoir-react";
 import { CreateSessionModal } from "~/components/teaSession/create/CreateSessionModal";
-import type { Iri } from "~t/types";
+import type { CollectionTea, Tea } from "~t/types";
 import { FloatingActionButton } from "~/components/shared/navigation/FloatingActionButton";
 
-export function BrewButton(props: PropsWithChildren<{ tea: Iri; className?: string; text?: string }>) {
+export function BrewButton(
+	props: PropsWithChildren<{
+		tea: Pick<Tea | CollectionTea, "@id" | "id" | "@type">;
+		className?: string;
+		text?: string;
+	}>,
+) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	function openModal(e: MouseEvent) {

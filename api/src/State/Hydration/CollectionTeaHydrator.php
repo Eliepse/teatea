@@ -16,7 +16,7 @@ readonly class CollectionTeaHydrator implements ResourceHydrator
 	) {
 	}
 
-	public function hydrate(?object $entity): ?object
+	public function hydrate(?object $entity): ?CollectionTea
 	{
 		if (null === $entity) {
 			return null;
@@ -34,6 +34,21 @@ readonly class CollectionTeaHydrator implements ResourceHydrator
 		$tea->rating = $entity->rating;
 
 		$tea->thumbnail = $this->mediaHydrator->hydrate($entity->media?->first() ?: null);
+
+		return $tea;
+	}
+
+	public function hydrateReference(?object $entity): ?CollectionTea
+	{
+		if (null === $entity) {
+			return null;
+		}
+
+		assert($entity instanceof \App\Entity\CollectionTea);
+
+		$tea = new CollectionTea();
+		$tea->id = $entity->id;
+		$tea->owner = MemberProvider::hydrate($entity->owner);
 
 		return $tea;
 	}

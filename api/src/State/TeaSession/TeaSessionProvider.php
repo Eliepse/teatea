@@ -5,10 +5,13 @@ namespace App\State\TeaSession;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\CollectionTea;
 use App\ApiResource\Member;
 use App\ApiResource\Tea;
 use App\ApiResource\TeaSession;
 use App\Repository\OriginRepository;
+use App\State\CollectionTea\CollectionTeaProvider;
+use App\State\Hydration\CollectionTeaHydrator;
 use App\State\Tea\TeaProvider;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,13 +36,14 @@ readonly class TeaSessionProvider implements ProviderInterface
 
 		$sessionQb = $this->em
 			->createQueryBuilder()
-			->select("session", "tea", "type", "origin", "cultivar", "business")
+			->select("session", "tea", "type", "origin", "cultivar", "business", "collection_teas")
 			->from(\App\Entity\TeaSession::class, "session")
 			->leftJoin("session.tea", "tea")
 			->leftJoin("tea.type", "type")
 			->leftJoin("tea.origin", "origin")
 			->leftJoin("tea.cultivar", "cultivar")
 			->leftJoin("tea.business", "business")
+			->leftJoin("tea.collectionTeas", "collection_teas")
 			->orderBy("session.drankAt", "DESC");
 
 		if ($operation instanceof CollectionOperationInterface) {
@@ -133,6 +137,14 @@ readonly class TeaSessionProvider implements ProviderInterface
 		} elseif ($entity->tea) {
 			$resource->tea = new Tea();
 			$resource->tea->id = $entity->tea->id;
+		}
+
+		if($entity->collectionTea) {
+			$resource->collectionTea = new CollectionTea();
+			$resource->collectionTea->id = $entity->collectionTea->id;
+			$resource->collectionTea->owner = new Member();
+			$resource->collectionTea->owner->id = $entity->collectionTea->owner->id;
+			$resource->collectionTea->owner->username = $entity->collectionTea->owner->username;
 		}
 
 		if ($entity->author) {

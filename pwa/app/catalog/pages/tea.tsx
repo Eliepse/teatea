@@ -95,7 +95,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 						</IfAuthenticated>
 						<IfAuthenticated>
 							<li className="flex-1">
-								<BrewButton tea={props.loaderData.tea["@id"]}>
+								<BrewButton tea={props.loaderData.tea}>
 									<PrimaryButton className="w-full">
 										Brew
 										<CoffeeCup className="size-5 ml-auto" />
@@ -173,7 +173,7 @@ export default function TeaPage(props: Route.ComponentProps) {
 					{!sessionsQuery.data?.member?.length && (
 						<p>
 							This tea has not been
-							<BrewButton tea={props.loaderData.tea["@id"]} className="inline">
+							<BrewButton tea={props.loaderData.tea} className="inline">
 								<SecondaryButton className="text-sm mx-1" small inline>
 									Brewed
 									<CoffeeCup className="size-4 ml-1" />

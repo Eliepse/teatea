@@ -1,4 +1,4 @@
-import type { Route } from "../../../.react-router/types/app/pages/teaSession/+types/teaSession";
+import type { Route } from "./+types/teaSession";
 import { deleteApi, patchApi } from "~/utils/api";
 import { BrewingQualityEnum, type Iri, type NullablePartial, RoastLevelEnum, type TeaSession } from "~t/types";
 import { denormalizeTeaSession, type TeaSessionRaw } from "~/utils/api/normalization/teaSession";
@@ -13,7 +13,7 @@ import { nl2br } from "~/utils/content";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import Leaf from "~/components/icons/leaf";
 import WaterDrop from "~/components/icons/WaterDrop";
-import { IfAuthor } from "~/auth/components/voters/IfAuthor";
+import { IfAuthor, useIsAuthor } from "~/auth/components/voters/IfAuthor";
 import { EditableSteepsList } from "~/pages/teaSession/_components/EditableSteepsList";
 import { BrewingQualityInput, QualityLabel } from "~/components/shared/inputs/BrewingQualityInput";
 import { Check, CoffeeCup, Edit, EmojiPuzzled, EmojiSad, EmojiSatisfied, MoreVert, Trash, Xmark } from "iconoir-react";
@@ -42,13 +42,13 @@ export async function clientLoader(props: Route.ClientLoaderArgs) {
 export default function TeaSessionPage(props: Route.ComponentProps) {
 	const navigate = useNavigate();
 	const [searchParams, setSearchParams] = useSearchParams();
-	const revalidator = useRevalidator();
 	const session = props.loaderData;
 	const tea = session.tea;
 	const [editMode, setEditMode] = useState("1" === searchParams.get("edit"));
 	const [showNodeEditor, setShowNodeEditor] = useState(false);
 	const [noteValue, setNoteValue] = useState(session.note);
 	const sessionMutations = useSessionMutations(session.id);
+	const isAuthor = useIsAuthor(session.author);
 	const member = useMember({
 		iri: typeof session.author === "string" ? session.author : (session.author ?? {})["@id"],
 	});
@@ -117,7 +117,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 					year={tea.year}
 					roast={tea.roast && RoastLevelEnum.No !== tea.roast ? tea.roast : undefined}
 					business={tea.business}
-					onClick={() => navigate(`/tea/${tea.id}`)}
+					onClick={() => navigate(getTeaPageLink(session, isAuthor))}
 					className="shadow bg-white my-2 overflow-hidden"
 				>
 					<ul className="flex items-stretch justify-center gap-x-8 text-green-700 text-base py-4">
@@ -231,6 +231,14 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 			</Modal>
 		</WithMainMenu>
 	);
+}
+
+function getTeaPageLink(session: Pick<TeaSession, "tea" | "collectionTea">, isAuthor: boolean): string {
+	if(!isAuthor || !session.collectionTea) {
+		return  `/tea/${session.tea.id}`;
+	}
+
+	return session.collectionTea.slice(4); // Remove "/api" prefix
 }
 
 function SpecBadge(props: { label: ReactNode; icon: ReactNode; className?: string }) {

@@ -42,8 +42,12 @@ class TeaSession
 	#[ORM\Column(nullable: true)]
 	public ?BrewingTechnic $technic = null;
 
+	#[ORM\ManyToOne(targetEntity: CollectionTea::class, inversedBy: "sessions")]
+	#[ORM\JoinColumn(nullable: true)]
+	public ?CollectionTea $collectionTea = null;
+
 	public function __construct(
-		#[ORM\ManyToOne(inversedBy: "sessions")]
+		#[ORM\ManyToOne(targetEntity: Tea::class, inversedBy: "sessions")]
 		#[ORM\JoinColumn(nullable: false)]
 		public readonly Tea $tea,
 

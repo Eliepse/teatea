@@ -23,7 +23,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 	uriTemplate: "/members/{username}/teas/{id}",
 	uriVariables: [
 		"username" => new Link(
-			fromProperty: "username",
+			fromProperty: "owner",
 			fromClass: Member::class,
 			compositeIdentifier: true,
 			required: true,
