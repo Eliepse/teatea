@@ -3,10 +3,10 @@ import clsx from "clsx";
 import { EditPencil } from "iconoir-react";
 
 const CLS = {
-	root: "relative w-full min-h-full p-4 flex flex-col items-center gap-1.5 text-sm rounded-lg",
-	empty: "border border-dashed border-green-600 text-green-700",
+	root: "relative w-full min-h-full p-4 flex flex-col items-center gap-1.5 text-sm rounded-lg border",
+	empty: "border-dashed border-green-600 text-green-700",
 	editable: "cursor-pointer hover:bg-green-300 active:bg-green-400",
-	filled: "bg-white text-green-900 shadow-sm",
+	filled: "bg-white text-green-900 shadow-sm border-stone-100",
 };
 
 export function SessionAction(
