@@ -1,16 +1,19 @@
 import { Modal } from "~/components/shared/modal/Modal";
-import { ArrowRight, Bonfire, Calendar, Shop, SoilAlt } from "iconoir-react";
+import { ArrowRight, Bonfire, Calendar, SoilAlt, WarningTriangle } from "iconoir-react";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { TeaSpecButton } from "~/catalog/components/CreateTeaModal/TeaSpecButton";
 import { FamilyTypeAction } from "~/catalog/components/CreateTeaModal/FamilyTypeAction";
 import { useState } from "react";
-import type { Iri, Origin, TeaFamily } from "~t/types";
+import type { Iri, TeaFamily } from "~t/types";
 import { OriginAction } from "~/catalog/components/CreateTeaModal/OriginAction";
+import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessAction";
+import { Warning } from "postcss";
 
 type INewTea = {
 	family: TeaFamily;
 	type?: Iri;
-	origin?: Origin["path"];
+	origin?: Iri;
+	business?: Iri;
 };
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
@@ -22,7 +25,7 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 
 	return (
 		<Modal open={props.open ?? false} className="h-full flex flex-col gap-4">
-			<div className="flex-none flex gap-4 p-4 mb-4 border-b border-green-200">
+			<div className="flex-none flex gap-4 p-4 border-b border-green-200">
 				<SecondaryButton className="flex-1" onClick={props.onClose}>
 					Close
 				</SecondaryButton>
@@ -30,8 +33,8 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 					Create
 				</PrimaryButton>
 			</div>
-			<div className="flex-none flex text-center rounded-lg mx-4 px-3 py-2 bg-lime-100 text-lime-700 mb-2 text-sm">
-				<p>1 exact same tea already exists</p>
+			<div className="flex-none flex text-center rounded-lg mx-4 px-3 py-2 bg-lime-100 text-lime-700 text-sm">
+				<p><WarningTriangle className="inline size-4 mr-2" /> A tea with same parameters exists</p>
 				<button className="ml-auto text-lime-900">
 					Open <ArrowRight className="ml-1 size-3 inline" />
 				</button>
@@ -49,13 +52,7 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 						<OriginAction origin={tea.origin} onChange={(origin) => patch({ origin })} />
 					</li>
 					<li>
-						<TeaSpecButton
-							icon={<Shop className="size-4" />}
-							label="Chanoki"
-							onClick={console.debug}
-							filled
-						/>
-						{/*Boutique*/}
+						<BusinessAction business={tea.business} onChange={(business) => patch({ business })} />
 					</li>
 					<li>
 						<TeaSpecButton

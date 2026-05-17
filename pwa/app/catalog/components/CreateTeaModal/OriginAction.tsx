@@ -1,6 +1,5 @@
 import { Fragment, useState } from "react";
-import { Globe, Xmark } from "iconoir-react";
-import clsx from "clsx";
+import { Globe } from "iconoir-react";
 import { TeaSpecButton } from "~/catalog/components/CreateTeaModal/TeaSpecButton";
 import { type Iri } from "~t/types";
 import { useQuery } from "@tanstack/react-query";
