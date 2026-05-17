@@ -2,8 +2,9 @@ import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "motion/react";
 import styles from "./Modal.module.scss";
+import type { PropsWithChildren } from "react";
 
-type ModalType = React.PropsWithChildren & {
+type ModalType = PropsWithChildren & {
 	open: boolean;
 	noBackdrop?: boolean;
 	className?: string;
