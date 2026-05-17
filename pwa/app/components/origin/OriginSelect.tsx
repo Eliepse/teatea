@@ -4,7 +4,7 @@ import { getApi } from "~/utils/api";
 import { f, handleUIEvent } from "~/utils/function";
 import { type ReactNode } from "react";
 import clsx from "clsx";
-import { ArrowRight } from "iconoir-react";
+import { ArrowRight, Xmark } from "iconoir-react";
 import styles from "./OriginSelect.module.css";
 
 export function OriginSelect(props: {
@@ -73,6 +73,7 @@ export function OriginSelect(props: {
 							onSelect={() => selectOrigin(origin)}
 							selected={props.value === origin["@id"]}
 							onOpen={handleItemOpenMaker(origin)}
+							allowToggle={props.allowToggle}
 						/>
 					</li>
 				))}
@@ -86,11 +87,13 @@ export function Item(props: {
 	validated: boolean;
 	selected?: boolean;
 	onOpen?: () => void;
+	allowToggle?: boolean;
 }) {
 	return (
 		<div className={clsx(styles.btn, props.selected && styles.selected, "w-full")}>
 			<button className={clsx(styles.inner, "flex-1")} onClick={handleUIEvent(props.onSelect)}>
 				{props.label}
+				{props.allowToggle && props.selected && <Xmark className="size-6 ml-auto" />}
 			</button>
 			{props.onOpen && (
 				<button
