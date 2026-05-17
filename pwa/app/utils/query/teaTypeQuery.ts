@@ -2,24 +2,25 @@ import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, TeaType } from "~t/types";
 import { queryOptions } from "@tanstack/react-query";
+import type { Pagination } from "~t/query";
 
 type Filters = Pick<SearchFilters, "family" | "q" | "origin"> & { distinctOrigins?: boolean };
 
-export async function queryTypesSearch(filters: Filters, page: { itemsPerPage?: number }) {
+export async function queryTypesSearch({ distinctOrigins, ...filters }: Filters, pagination: Pagination) {
 	const originFilterNodes = filters.origin?.split(".")?.length ?? 1;
-	const queryFilters = {
+	const queryParams = {
 		...filters,
-		distinctByLevel: filters.distinctOrigins ? (originFilterNodes > 1 ? 3 : 1) : undefined,
+		...({ itemsPerPage: 8, ...pagination } satisfies Pagination),
+		distinctByLevel: distinctOrigins ? (originFilterNodes > 1 ? 3 : 1) : undefined,
 	};
 
-	const res = await getApi<ApiPaginatedCollection<TeaType>>("/tea_types", { ...queryFilters, ...page });
-	return await res.json();
+	return await (await getApi<ApiPaginatedCollection<TeaType>>("/tea_types", queryParams)).json();
 }
 
-export function makeTypeSearchQueryOpt(filters: Filters, limit = 8) {
+export function makeTypeSearchQueryOpt(filters: Filters, pagination: Pagination) {
 	return queryOptions({
-		queryFn: async () => await queryTypesSearch(filters, { itemsPerPage: limit }),
-		queryKey: ["search", "tea_types", { ...filters, itemsPerPage: limit }],
+		queryFn: async () => await queryTypesSearch(filters, pagination),
+		queryKey: ["search", "tea_types", filters, pagination],
 		staleTime: 60_000,
 	});
 }

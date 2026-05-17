@@ -14,7 +14,7 @@ export function TypesFilterBar(props: {
 	onSelect: (type: TeaType) => void;
 	className?: string;
 }) {
-	const query = useQuery(makeTypeSearchQueryOpt(props, 8));
+	const query = useQuery(makeTypeSearchQueryOpt(props, { itemsPerPage: 8 }));
 
 	if (query.isLoading) {
 		return <FilterbarFallback />;
