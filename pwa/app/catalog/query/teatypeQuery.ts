@@ -6,10 +6,12 @@ export async function queryTeaType(slug: string, origin: string, withStats: bool
 	return await (await getApi<TeaType>(`/api/tea_types/${slug}`, { origin, stats: withStats })).json();
 }
 
-export function makeTeaTypeQueryOpt(slug?: string, origin?: string) {
+export function makeTeaTypeQueryOpt(type?: Partial<Pick<TeaType, "@id" | "slug">>, origin?: string) {
+	const iri = type?.["@id"] ?? `/api/tea_types/${type?.slug}`;
+
 	return queryOptions({
-		queryFn: async () => await (await getApi<TeaType>(`/api/tea_types/${slug}`, { origin })).json(),
-		queryKey: ["tea_types", slug, { origin }],
-		enabled: !!slug,
+		queryFn: async () => await (await getApi<TeaType>(iri, { origin })).json(),
+		queryKey: ["tea_types", iri, { origin }],
+		enabled: !!type?.slug || !!type?.["@id"],
 	});
 }

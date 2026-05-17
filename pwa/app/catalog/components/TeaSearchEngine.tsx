@@ -23,7 +23,7 @@ export function TeaSearchEngine(props: {
 }) {
 	const navigate = useNavigate();
 	const [filters, setFilters] = useState<SearchFilters>(props.defaultFilters ?? {});
-	const typeQuery = useQuery(makeTeaTypeQueryOpt(filters?.type, filters?.origin));
+	const typeQuery = useQuery(makeTeaTypeQueryOpt({ slug: filters?.type }, filters?.origin));
 	const query = useInfiniteQuery(makeSearchInfinitQueryOpt(filters));
 	const SEContext = useMemo(
 		() => ({ filters, loading: query.isLoading }),
