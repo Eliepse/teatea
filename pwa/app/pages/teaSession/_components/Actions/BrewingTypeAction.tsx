@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { FireFlame, SnowFlake } from "iconoir-react";
 import { Modal } from "~/components/shared/modal/Modal";
-import { SessionAction } from "~/pages/teaSession/_components/Actions/SessionAction";
+import { SessionActionButton } from "~/pages/teaSession/_components/Actions/SessionActionButton";
 import { useMutation } from "@tanstack/react-query";
 import { makePathTeaSessionMutationOpt } from "~/utils/command/updateTeaSessionCommand";
 import  { type BrewingType, BrewingTypeEnum, type TeaSession } from "~t/types";
@@ -36,7 +36,7 @@ export function BrewingTypeAction(props: {
 
 	return (
 		<Fragment>
-			<SessionAction onClick={() => setEdit(true)} readonly={props.readonly} filled={filled}>
+			<SessionActionButton onClick={() => setEdit(true)} readonly={props.readonly} filled={filled}>
 				{filled ? (
 					<Fragment>
 						{TypeIcon[type]}
@@ -48,7 +48,7 @@ export function BrewingTypeAction(props: {
 						Brewing type
 					</Fragment>
 				)}
-			</SessionAction>
+			</SessionActionButton>
 
 			{!props.readonly && (
 				<Modal open={edit} onClose={() => setEdit(false)}>

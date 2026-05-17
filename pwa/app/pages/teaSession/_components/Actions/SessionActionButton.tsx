@@ -9,7 +9,7 @@ const CLS = {
 	filled: "bg-white text-green-900 shadow-sm border-stone-100",
 };
 
-export function SessionAction(
+export function SessionActionButton(
 	props: PropsWithChildren<{ filled?: boolean; onClick?: () => void; readonly?: boolean; className?: string }>,
 ) {
 	const styles = clsx(CLS.root, {
