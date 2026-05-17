@@ -1,14 +1,16 @@
 import { Modal } from "~/components/shared/modal/Modal";
-import { ArrowRight, Bonfire, Calendar, Globe, Shop, SoilAlt } from "iconoir-react";
+import { ArrowRight, Bonfire, Calendar, Shop, SoilAlt } from "iconoir-react";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { TeaSpecButton } from "~/catalog/components/CreateTeaModal/TeaSpecButton";
 import { FamilyTypeAction } from "~/catalog/components/CreateTeaModal/FamilyTypeAction";
 import { useState } from "react";
-import type { Iri, TeaFamily } from "~t/types";
+import type { Iri, Origin, TeaFamily } from "~t/types";
+import { OriginAction } from "~/catalog/components/CreateTeaModal/OriginAction";
 
 type INewTea = {
 	family: TeaFamily;
 	type?: Iri;
+	origin?: Origin["path"];
 };
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
@@ -44,7 +46,7 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 						/>
 					</li>
 					<li>
-						<TeaSpecButton icon={<Globe className="size-4" />} label="Origin" onClick={console.debug} />
+						<OriginAction origin={tea.origin} onChange={(origin) => patch({ origin })} />
 					</li>
 					<li>
 						<TeaSpecButton
