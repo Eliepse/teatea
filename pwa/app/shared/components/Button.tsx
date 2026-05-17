@@ -34,3 +34,12 @@ export function SecondaryButton(props: PropsWithChildren<BtnProps>) {
 		/>
 	);
 }
+
+export function DashedButton(props: PropsWithChildren<BtnProps>) {
+	return (
+		<Button
+			{...props}
+			defaultClassName="border border-dashed border-green-600 text-green-700 hover:bg-green-200 active:bg-green-400"
+		/>
+	);
+}
