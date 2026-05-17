@@ -61,9 +61,9 @@ export function FamilyTypeAction(props: {
 				filled
 			/>
 
-			<Modal open={isSelecting} onClose={() => setIsSelecting(false)} className="py-6 flex flex-col h-full">
+			<Modal open={isSelecting} onClose={() => setIsSelecting(false)} className="pb-6 flex flex-col h-full">
 				<div className="flex-none">
-					<div className="flex gap-4 mx-4 mb-6">
+					<div className="flex gap-4 p-4 mb-4 border-b border-green-200">
 						<SecondaryButton className="flex-1" onClick={cancel}>
 							Cancel
 						</SecondaryButton>

@@ -21,8 +21,8 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 	}
 
 	return (
-		<Modal open={props.open ?? false} className="h-full p-4 pt-6 flex flex-col gap-4">
-			<div className="flex-none flex gap-4">
+		<Modal open={props.open ?? false} className="h-full flex flex-col gap-4">
+			<div className="flex-none flex gap-4 p-4 mb-4 border-b border-green-200">
 				<SecondaryButton className="flex-1" onClick={props.onClose}>
 					Close
 				</SecondaryButton>
@@ -30,13 +30,13 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 					Create
 				</PrimaryButton>
 			</div>
-			<div className="flex-none flex text-center rounded-lg px-3 py-2 bg-lime-100 text-lime-700 mb-2 text-sm">
+			<div className="flex-none flex text-center rounded-lg mx-4 px-3 py-2 bg-lime-100 text-lime-700 mb-2 text-sm">
 				<p>1 exact same tea already exists</p>
 				<button className="ml-auto text-lime-900">
 					Open <ArrowRight className="ml-1 size-3 inline" />
 				</button>
 			</div>
-			<div className="flex-1">
+			<div className="flex-1 mx-4">
 				<ul className="grid grid-cols-2 gap-4">
 					<li className="col-span-2">
 						<FamilyTypeAction
