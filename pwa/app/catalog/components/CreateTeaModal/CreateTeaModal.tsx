@@ -1,14 +1,14 @@
 import { Modal } from "~/components/shared/modal/Modal";
-import { ArrowRight, Bonfire, WarningTriangle } from "iconoir-react";
+import { ArrowRight, WarningTriangle } from "iconoir-react";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
-import { TeaSpecButton } from "~/catalog/components/CreateTeaModal/TeaSpecButton";
 import { FamilyTypeAction } from "~/catalog/components/CreateTeaModal/FamilyTypeAction";
 import { useState } from "react";
-import type { Iri, TeaFamily } from "~t/types";
+import type { Iri, RoastLevel, TeaFamily } from "~t/types";
 import { OriginAction } from "~/catalog/components/CreateTeaModal/OriginAction";
 import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessAction";
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
 import { HarvestYearAction } from "~/catalog/components/CreateTeaModal/HarvestYearAction";
+import { RoastAction } from "~/catalog/components/CreateTeaModal/RoastAction";
 
 type INewTea = {
 	family: TeaFamily;
@@ -17,6 +17,7 @@ type INewTea = {
 	business?: Iri;
 	cultivar?: Iri;
 	year?: number;
+	roast?: RoastLevel;
 };
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
@@ -66,7 +67,7 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 						<HarvestYearAction year={tea.year} onChange={(year) => patch({ year })} />
 					</li>
 					<li>
-						<TeaSpecButton icon={<Bonfire className="size-4" />} label="Roast" onClick={console.debug} />
+						<RoastAction roast={tea.roast} onChange={(roast) => patch({ roast })} />
 					</li>
 				</ul>
 			</div>
