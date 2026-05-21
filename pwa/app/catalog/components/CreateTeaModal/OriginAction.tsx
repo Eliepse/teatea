@@ -5,11 +5,12 @@ import { type Iri } from "~t/types";
 import { useQuery } from "@tanstack/react-query";
 import { OriginSelectModal } from "~/components/origin/OriginSelectModal";
 import { makeOriginQueryOpt } from "~/shared/query/originQuery";
+import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 
 export function OriginAction(props: { origin?: Iri; onChange: (origin?: Iri) => void }) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const originQuery = useQuery(makeOriginQueryOpt({ "@id": props.origin }));
-	const label = originQuery?.data?.name ?? "Origin";
+	const label = originQuery?.data ? <FormatOrigin origin={originQuery.data} /> : "Origin";
 
 	function confirm(iri?: Iri) {
 		props.onChange(iri);
