@@ -11,6 +11,7 @@ export type SearchFilters = {
 	distinctByLevel?: 1 | 2 | 3;
 	year?: number;
 	business?: number;
+	exactMatch?: boolean;
 };
 
 export const SE_CONTEXT = createContext<{

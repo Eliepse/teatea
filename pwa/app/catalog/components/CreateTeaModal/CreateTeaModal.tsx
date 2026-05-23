@@ -9,8 +9,11 @@ import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessActi
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
 import { HarvestYearAction } from "~/catalog/components/CreateTeaModal/HarvestYearAction";
 import { RoastAction } from "~/catalog/components/CreateTeaModal/RoastAction";
+import { useQuery } from "@tanstack/react-query";
+import { makeCountSimilarTeasQueryOpt } from "~/catalog/query/teaQuery";
+import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarTeasWarning";
 
-type INewTea = {
+export type INewTea = {
 	family: TeaFamily;
 	type?: Iri;
 	origin?: Iri;
@@ -22,6 +25,7 @@ type INewTea = {
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 	const [tea, setTea] = useState<INewTea>({ family: "green" });
+	const similarQuery = useQuery(makeCountSimilarTeasQueryOpt(tea));
 
 	function patch(patch: Partial<INewTea>) {
 		setTea((st) => ({ ...st, ...patch }));
@@ -33,18 +37,13 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 				<SecondaryButton className="flex-1" onClick={props.onClose}>
 					Close
 				</SecondaryButton>
-				<PrimaryButton className="flex-2" disabled>
+				<PrimaryButton className="flex-2" disabled={!similarQuery.isSuccess || 0 !== similarQuery.data}>
 					Create
 				</PrimaryButton>
 			</div>
-			<div className="flex-none flex text-center rounded-lg mx-4 px-3 py-2 bg-lime-100 text-lime-700 text-sm">
-				<p>
-					<WarningTriangle className="inline size-4 mr-2" /> A tea with same parameters exists
-				</p>
-				<button className="ml-auto text-lime-900">
-					Open <ArrowRight className="ml-1 size-3 inline" />
-				</button>
-			</div>
+
+			<SimilarTeasWarning count={similarQuery.data} loading={similarQuery.isLoading} />
+
 			<div className="flex-1 mx-4">
 				<ul className="grid grid-cols-2 gap-4">
 					<li className="col-span-2">
