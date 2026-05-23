@@ -31,7 +31,7 @@ export function FamilyTypeAction(props: {
 	const queryPages = searchQuery.data?.pages ?? [];
 	const total = queryPages[0]?.totalItems ?? 0;
 	const familyLabel = teaFamilies[props.family];
-	const label = typeQuery?.data ? `${typeQuery.data.name} (${familyLabel})` : familyLabel;
+	const label = typeQuery?.data ? `${typeQuery.data.name} (${familyLabel})` : "Tea type";
 
 	function selectFamily(family?: TeaFamily) {
 		if (!family) {
@@ -59,7 +59,7 @@ export function FamilyTypeAction(props: {
 				icon={<Leaf className={clsx("size-4")} />}
 				label={typeQuery.isLoading ? <span className="inline-block skeleton h-4 w-16" /> : label}
 				onClick={() => setIsSelecting(true)}
-				filled
+				filled={!!selectedType}
 			/>
 
 			<Modal open={isSelecting} onClose={() => setIsSelecting(false)} className="pb-6 flex flex-col h-full">
@@ -68,7 +68,7 @@ export function FamilyTypeAction(props: {
 						<SecondaryButton className="flex-1" onClick={cancel}>
 							Cancel
 						</SecondaryButton>
-						<PrimaryButton className="flex-2" onClick={confirm} disabled={!selectedFamily}>
+						<PrimaryButton className="flex-2" onClick={confirm} disabled={!selectedType}>
 							Confirm
 						</PrimaryButton>
 					</div>
