@@ -1,4 +1,4 @@
-import { CheckCircle, Search, WarningTriangle } from "iconoir-react";
+import { CheckCircle, WarningTriangle } from "iconoir-react";
 import clsx from "clsx";
 import { Fragment } from "react";
 import { Spinner } from "~/shared/components/Spinner";
@@ -47,10 +47,8 @@ function WhileLoading() {
 
 function NothingFound() {
 	return (
-		<Fragment>
-			<p>
-				<CheckCircle className="inline size-4 mr-1" /> All good, no similar tea found!
-			</p>
-		</Fragment>
+		<p>
+			<CheckCircle className="inline size-4 mr-1" /> All good, no similar tea found!
+		</p>
 	);
 }

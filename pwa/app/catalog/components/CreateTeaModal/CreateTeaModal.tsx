@@ -1,5 +1,4 @@
 import { Modal } from "~/components/shared/modal/Modal";
-import { ArrowRight, WarningTriangle } from "iconoir-react";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { FamilyTypeAction } from "~/catalog/components/CreateTeaModal/FamilyTypeAction";
 import { useState } from "react";
@@ -25,7 +24,10 @@ export type INewTea = {
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 	const [tea, setTea] = useState<INewTea>({ family: "green" });
-	const similarQuery = useQuery(makeCountSimilarTeasQueryOpt(tea));
+	const teaHasData = !!tea.type || !!tea.origin || !!tea.business || !!tea.cultivar || !!tea.year || !!tea.roast;
+
+	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: teaHasData });
+	const hasSimilarTea = !similarQuery.isSuccess || 0 !== similarQuery.data;
 
 	function patch(patch: Partial<INewTea>) {
 		setTea((st) => ({ ...st, ...patch }));
@@ -37,12 +39,12 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 				<SecondaryButton className="flex-1" onClick={props.onClose}>
 					Close
 				</SecondaryButton>
-				<PrimaryButton className="flex-2" disabled={!similarQuery.isSuccess || 0 !== similarQuery.data}>
+				<PrimaryButton className="flex-2" disabled={!hasSimilarTea}>
 					Create
 				</PrimaryButton>
 			</div>
 
-			<SimilarTeasWarning count={similarQuery.data} loading={similarQuery.isLoading} />
+			{teaHasData && <SimilarTeasWarning count={similarQuery.data} loading={similarQuery.isLoading} />}
 
 			<div className="flex-1 mx-4">
 				<ul className="grid grid-cols-2 gap-4">
