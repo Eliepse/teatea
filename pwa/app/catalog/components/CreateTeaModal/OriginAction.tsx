@@ -32,6 +32,7 @@ export function OriginAction(props: { origin?: Iri; onChange: (origin?: Iri) => 
 				onSelect={confirm}
 				defaultValue={props.origin}
 				allowToggle
+				allowCreate
 			/>
 		</Fragment>
 	);
