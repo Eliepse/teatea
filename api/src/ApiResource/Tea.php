@@ -76,6 +76,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 			openApi: new OpenApiParameter(name: "enum", in: "query"),
 			description: "Sorting method",
 		),
+		"exactMatch" => new QueryParameter(
+			schema: ["type" => "boolean"],
+			description: "Use exact matching, no origin path children, or fuzzy text",
+		),
 	],
 )]
 #[Post(

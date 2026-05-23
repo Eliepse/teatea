@@ -46,6 +46,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar", castFn: "intval");
 		$businessFilter = OperationHelper::getParameter($operation, "business", castFn: "intval");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
+		$exactMatch = OperationHelper::getParameter($operation, "exactMatch", "boolval") ?? false;
 
 		// Ignore some filters when using tea type filter
 		// as a type already have some predefined constraints
@@ -69,7 +70,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			->groupBy("tea.id");
 
 		// Text search
-		if (null !== $searchText) {
+		if (null !== $searchText && false === $exactMatch) {
 			$searchQb
 				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
 				->setParameter("searchText", $searchText)
@@ -84,8 +85,13 @@ readonly class TeaCollectionProvider implements ProviderInterface
 
 		// Origin
 		if (null !== $originPath) {
-			$searchQb->andWhere("CONTAINS(:originPath, tea.originPath) = TRUE")
-				->setParameter("originPath", $originPath);
+			if ($exactMatch) {
+				$searchQb->andWhere("tea.originPath = :originPath");
+			} else {
+				$searchQb->andWhere("CONTAINS(:originPath, tea.originPath) = TRUE");
+			}
+
+			$searchQb->setParameter("originPath", $originPath);
 		}
 
 		// Type
