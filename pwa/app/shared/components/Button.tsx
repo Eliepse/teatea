@@ -1,23 +1,42 @@
 import clsx from "clsx";
 import type { PropsWithChildren } from "react";
+import { Spinner } from "~/shared/components/Spinner";
+import { f } from "~/utils/function";
 
-type BtnProps = { className?: string; onClick?: () => void; inline?: boolean; small?: boolean; disabled?: boolean };
+type BtnProps = {
+	className?: string;
+	onClick?: () => void;
+	inline?: boolean;
+	small?: boolean;
+	disabled?: boolean;
+	loading?: boolean;
+};
 
 export function Button(props: PropsWithChildren<BtnProps & { defaultClassName?: string }>) {
+	function handleClick() {
+		if(props.disabled || props.loading) {
+			return;
+		}
+
+		f(props.onClick)();
+	}
+
 	return (
 		<button
 			className={clsx(
 				props.inline ? "inline-flex" : "flex",
 				"items-center justify-center select-none",
 				"cursor-pointer disabled:bg-stone-200 disabled:text-stone-500",
+				props.loading && "cursor-wait",
 				props.small ? "text-sm px-3 py-1 rounded-lg" : "text-base px-4 py-2 rounded-xl",
 				props.defaultClassName ?? "bg-white text-green-700 hover:bg-green-200 active:bg-green-400",
 				props.className,
 			)}
-			onClick={props.onClick}
+			onClick={handleClick}
 			disabled={props.disabled}
 		>
-			{props.children}
+			{props.loading && <Spinner className={props.small ? "size-3.5" : "size-4"} />}
+			{!props.loading && props.children}
 		</button>
 	);
 }
