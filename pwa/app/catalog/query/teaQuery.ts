@@ -25,16 +25,17 @@ export function makeTeaSearchQueryOpt(filters: SearchFilters, limit = 8) {
 export function makeCountSimilarTeasQueryOpt(filters: INewTea) {
 	return queryOptions({
 		queryFn: async () => {
-			const res = await queryTeaSearch({
+			const res = await getApi<ApiPaginatedCollection<Tea>>("/teas", {
 				...filters,
 				type: extractId(filters.type),
 				origin: extractId(filters.origin),
 				cultivar: parseIntSafe(extractId(filters.cultivar)),
 				business: parseIntSafe(extractId(filters.business)),
 				exactMatch: true,
+				itemsPerPage: 1,
 			});
 
-			return res.totalItems;
+			return (await res.json()).totalItems;
 		},
 		queryKey: ["find_similar", filters],
 	});
