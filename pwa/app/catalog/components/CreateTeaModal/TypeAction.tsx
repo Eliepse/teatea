@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { TeaSpecButton } from "~/catalog/components/CreateTeaModal/TeaSpecButton";
 import { Modal } from "~/components/shared/modal/Modal";
 import { TeaFamilyFilter } from "~/catalog/components/TeaFamilyFilter";
-import { type Iri, teaFamilies, type TeaFamily } from "~t/types";
+import { type Iri, type TeaFamily } from "~t/types";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { makeTypeSearchInfiniteOpt } from "~/utils/query/teaTypeQuery";
 import { SearchTextInput } from "~/catalog/components/SearchTextInput";
@@ -12,13 +12,9 @@ import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { makeTeaTypeQueryOpt } from "~/catalog/query/teatypeQuery";
 import { SelectItem } from "~/catalog/components/CreateTeaModal/SelectItem";
 
-export function FamilyTypeAction(props: {
-	family: TeaFamily;
-	type?: Iri;
-	onChange: (family: TeaFamily, type?: Iri) => void;
-}) {
+export function TypeAction(props: { type?: Iri; onChange: (type?: Iri) => void }) {
 	const [isSelecting, setIsSelecting] = useState(false);
-	const [selectedFamily, setSelectedFamily] = useState<TeaFamily>(props.family);
+	const [selectedFamily, setSelectedFamily] = useState<TeaFamily>("green");
 	const [selectedType, setSelectedType] = useState<Iri | undefined>(props.type);
 	const [search, setSearch] = useState<string | undefined>();
 
@@ -30,8 +26,7 @@ export function FamilyTypeAction(props: {
 
 	const queryPages = searchQuery.data?.pages ?? [];
 	const total = queryPages[0]?.totalItems ?? 0;
-	const familyLabel = teaFamilies[props.family];
-	const label = typeQuery?.data ? `${typeQuery.data.name} (${familyLabel})` : "Tea type";
+	const label = typeQuery?.data?.name ?? "Tea type";
 
 	function selectFamily(family?: TeaFamily) {
 		if (!family) {
@@ -42,14 +37,13 @@ export function FamilyTypeAction(props: {
 	}
 
 	function cancel() {
-		setSelectedFamily(props.family);
 		setSelectedType(props.type);
 		setSearch(undefined);
 		setIsSelecting(false);
 	}
 
 	function confirm() {
-		props.onChange(selectedFamily, selectedType);
+		props.onChange(selectedType);
 		setIsSelecting(false);
 	}
 

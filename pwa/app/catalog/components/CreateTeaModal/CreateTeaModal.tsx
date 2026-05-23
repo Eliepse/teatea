@@ -1,8 +1,8 @@
 import { Modal } from "~/components/shared/modal/Modal";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
-import { FamilyTypeAction } from "~/catalog/components/CreateTeaModal/FamilyTypeAction";
+import { TypeAction } from "~/catalog/components/CreateTeaModal/TypeAction";
 import { useState } from "react";
-import type { Iri, RoastLevel, TeaFamily } from "~t/types";
+import type { Iri, RoastLevel } from "~t/types";
 import { OriginAction } from "~/catalog/components/CreateTeaModal/OriginAction";
 import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessAction";
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
@@ -13,7 +13,6 @@ import { makeCountSimilarTeasQueryOpt } from "~/catalog/query/teaQuery";
 import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarTeasWarning";
 
 export type INewTea = {
-	family: TeaFamily;
 	type?: Iri;
 	origin?: Iri;
 	business?: Iri;
@@ -23,7 +22,7 @@ export type INewTea = {
 };
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
-	const [tea, setTea] = useState<INewTea>({ family: "green" });
+	const [tea, setTea] = useState<INewTea>({});
 	const teaHasData = !!tea.type || !!tea.origin || !!tea.business || !!tea.cultivar || !!tea.year || !!tea.roast;
 
 	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: teaHasData });
@@ -49,11 +48,7 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 			<div className="flex-1 mx-4">
 				<ul className="grid grid-cols-2 gap-4">
 					<li className="col-span-2">
-						<FamilyTypeAction
-							family={tea.family}
-							type={tea.type}
-							onChange={(family, type) => patch({ family, type })}
-						/>
+						<TypeAction type={tea.type} onChange={(type) => patch({ type })} />
 					</li>
 					<li>
 						<OriginAction origin={tea.origin} onChange={(origin) => patch({ origin })} />
