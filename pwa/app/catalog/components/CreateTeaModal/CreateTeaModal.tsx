@@ -11,10 +11,11 @@ import { RoastAction } from "~/catalog/components/CreateTeaModal/RoastAction";
 import { useQuery } from "@tanstack/react-query";
 import { makeCountSimilarTeasQueryOpt } from "~/catalog/query/teaQuery";
 import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarTeasWarning";
+import type { NewOrigin } from "~/components/origin/OriginSelect";
 
 export type INewTea = {
 	type?: Iri;
-	origin?: Iri;
+	origin?: Iri | NewOrigin;
 	business?: Iri;
 	cultivar?: Iri;
 	year?: number;

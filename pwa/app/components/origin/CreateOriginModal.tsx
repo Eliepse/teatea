@@ -4,12 +4,11 @@ import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { f } from "~/utils/function";
 import { useState } from "react";
 import { TextInput } from "~/shared/components/Form/TextInput";
-import type { IForm } from "~/utils/command/createOriginMutation";
 
 export function CreateOriginModal(props: {
 	open: boolean;
 	onClose?: () => void;
-	onConfirm: (origin: IForm) => Promise<void>;
+	onConfirm: (origin: { name: string }) => Promise<void>;
 }) {
 	const [isPending, setPending] = useState(false);
 	const [data, setData] = useState<Partial<Pick<Origin, "name">>>({});

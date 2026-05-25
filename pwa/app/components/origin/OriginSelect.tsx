@@ -1,5 +1,5 @@
 import type { ApiCollection, Iri, Origin } from "~t/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getApi } from "~/utils/api";
 import { f, handleUIEvent } from "~/utils/function";
 import { type ReactNode, useState } from "react";
@@ -10,17 +10,22 @@ import { DashedButton } from "~/shared/components/Button";
 import { If } from "~/shared/components/Logical/If";
 import { CreateOriginModal } from "~/components/origin/CreateOriginModal";
 import { type IForm, makeCreateOriginMutation } from "~/utils/command/createOriginMutation";
+import { makeOriginQueryOpt } from "~/shared/query/originQuery";
+
+// Un-persisted version of a new origin
+export type NewOrigin = IForm & Partial<Pick<Origin, "namePath">>;
 
 export type CreationMode = {
+	// Persist immediatly the origin through api
 	persist?: boolean;
-	onCreated?: (origin?: IForm | Origin) => void;
+	onCreated?: (origin?: NewOrigin | Origin) => void;
 };
 
 export function OriginSelect(
 	props: {
-		value?: Iri;
+		value?: Iri | NewOrigin;
 		// Select the parent node for the list of selectable origins
-		onChange: (value?: Iri) => void;
+		onChange: (value?: Iri | NewOrigin) => void;
 		filterPath?: string;
 		onFilterPathChange?: (value?: Iri) => void;
 		allowToggle?: boolean;
@@ -29,6 +34,7 @@ export function OriginSelect(
 		className?: string;
 	} & CreationMode,
 ) {
+	const queryClient = useQueryClient();
 	const [creating, setCreating] = useState<string | boolean>(false);
 
 	// store parent or "true" for top level
@@ -77,12 +83,26 @@ export function OriginSelect(
 		return () => f(props.onFilterPathChange)(origin.path);
 	}
 
-	async function handleSubmitNewOrigin(data: IForm) {
+	async function handleSubmitNewOrigin(data: { name: string }) {
 		if (!creating) {
 			return;
 		}
 
-		const payload = { ...data, parent: true !== creating ? creating : undefined };
+		// Load the parent to setup the "name path"
+		let parent: Origin | undefined;
+		try {
+			if (typeof creating === "string") {
+				parent = await queryClient.fetchQuery(makeOriginQueryOpt({ "@id": creating }));
+			}
+		} catch (_e) {
+			console.warn(`Failed to fetch the parent: ${creating}`);
+		}
+
+		const payload = {
+			...data,
+			parent: true !== creating ? creating : undefined,
+			namePath: parent?.namePath ? [...parent.namePath, data.name] : undefined,
+		} satisfies NewOrigin;
 
 		if (props.persist) {
 			await mutation.mutateAsync(payload);

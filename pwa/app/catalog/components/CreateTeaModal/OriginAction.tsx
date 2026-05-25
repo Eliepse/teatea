@@ -6,14 +6,18 @@ import { useQuery } from "@tanstack/react-query";
 import { OriginSelectModal } from "~/components/origin/OriginSelectModal";
 import { makeOriginQueryOpt } from "~/shared/query/originQuery";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
+import type { NewOrigin } from "~/components/origin/OriginSelect";
 
-export function OriginAction(props: { origin?: Iri; onChange: (origin?: Iri) => void }) {
+export function OriginAction(props: { origin?: Iri | NewOrigin; onChange: (origin?: Iri | NewOrigin) => void }) {
 	const [isSelecting, setIsSelecting] = useState(false);
-	const originQuery = useQuery(makeOriginQueryOpt({ "@id": props.origin }));
-	const label = originQuery?.data ? <FormatOrigin origin={originQuery.data} /> : "Origin";
+	const originQuery = useQuery(
+		makeOriginQueryOpt({ "@id": typeof props.origin === "string" ? props.origin : undefined }),
+	);
+	const newOriginLabel = typeof props.origin === "object" ? <FormatOrigin origin={props.origin} /> : undefined;
+	const label = originQuery?.data ? <FormatOrigin origin={originQuery.data} /> : (newOriginLabel ?? "Origin");
 
-	function confirm(iri?: Iri) {
-		props.onChange(iri);
+	function confirm(value?: Iri | NewOrigin) {
+		props.onChange(value);
 		setIsSelecting(false);
 	}
 

@@ -1,22 +1,25 @@
 import type { Iri, Origin } from "~t/types";
-import { OriginSelect } from "~/components/origin/OriginSelect";
+import { Item, type NewOrigin, OriginSelect } from "~/components/origin/OriginSelect";
 import { Modal } from "~/components/shared/modal/Modal";
-import { type PropsWithChildren, useState } from "react";
+import { Fragment, type PropsWithChildren, useState } from "react";
 import { ArrowLeft, Check } from "iconoir-react";
 import { useResourceQuery } from "~/utils/api/useResourceQuery";
 import { handleUIEvent } from "~/utils/function";
 import clsx from "clsx";
+import type { IForm } from "~/utils/command/createOriginMutation";
+import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 
 export function OriginSelectModal(props: {
 	open: boolean;
 	onClose: () => void;
-	onSelect: (value?: Iri) => void;
-	defaultValue?: Iri;
+	onSelect: (value?: Iri | IForm) => void;
+	defaultValue?: Iri | IForm;
 	allowToggle?: boolean;
+	allowCreate?: boolean;
 	maxDepth?: number;
-	rootOrigin?: string,
+	rootOrigin?: string;
 }) {
-	const [value, setValue] = useState<Iri | undefined>(props.defaultValue);
+	const [value, setValue] = useState<Iri | NewOrigin | undefined>(props.defaultValue);
 	const [filterPath, setFilterPath] = useState<string | undefined>(props.rootOrigin);
 	const { data: filterOrigin, isLoading } = useResourceQuery<Origin>(
 		filterPath ? `/api/origins/${filterPath}` : props.rootOrigin ? `/api/origins/${props.rootOrigin}` : null,
@@ -46,32 +49,50 @@ export function OriginSelectModal(props: {
 	}
 
 	return (
-		<Modal open={props.open} onClose={props.onClose} className="h-full p-0">
-			<div className="sticky top-0 flex justify-between items-center mb-4 pb-4 border-b border-green-200 bg-white px-4 pt-4">
-				<Button onClick={handleReturn}>
-					<ArrowLeft className="size-4" />
-				</Button>
+		<Fragment>
+			<Modal open={props.open} onClose={props.onClose} className="h-full p-0">
+				<div className="sticky top-0 flex justify-between items-center mb-4 pb-4 border-b border-green-200 bg-white px-4 pt-4">
+					<Button onClick={handleReturn}>
+						<ArrowLeft className="size-4" />
+					</Button>
 
-				<Button onClick={() => props.onSelect(value)} disabled={!props.allowToggle && !value}>
-					Done <Check className="size-4 ml-2" />
-				</Button>
-			</div>
+					<Button onClick={() => props.onSelect(value)} disabled={!props.allowToggle && !value}>
+						Done <Check className="size-4 ml-2" />
+					</Button>
+				</div>
 
-			<div className="text-2xl font-header px-6 mb-6 text-center">
-				{isLoading && <div className="skeleton w-24 h-8 mx-auto" />}
-				{!isLoading && (filterOrigin?.namePath?.join(", ") ?? "Countries")}
-			</div>
+				{value && typeof value !== "string" && (
+					<div className="mx-6 mb-6 pb-6 border-b border-green-200">
+						<h3 className="text-2xl font-header px-6 mb-6 text-center">New origin</h3>
+						<Item
+							label={<FormatOrigin origin={value} />}
+							onSelect={() => setValue(undefined)}
+							validated
+							allowToggle
+							selected
+						/>
+					</div>
+				)}
 
-			<OriginSelect
-				onChange={(iri) => setValue(iri)}
-				value={value}
-				filterPath={filterPath}
-				onFilterPathChange={handleFilterPathChange}
-				maxDepth={props.maxDepth}
-				className="px-6 mb-6"
-				allowToggle
-			/>
-		</Modal>
+				<div className="text-2xl font-header px-6 mb-6 text-center">
+					{isLoading && <div className="skeleton w-24 h-8 mx-auto" />}
+					{!isLoading && (filterOrigin?.namePath?.join(", ") ?? "Countries")}
+				</div>
+
+				<OriginSelect
+					onChange={(iri) => setValue(iri)}
+					value={value}
+					filterPath={filterPath}
+					onFilterPathChange={handleFilterPathChange}
+					maxDepth={props.maxDepth}
+					className="px-6 mb-6"
+					allowCreate={props.allowCreate}
+					persist={false}
+					onCreated={(origin) => setValue(origin)}
+					allowToggle
+				/>
+			</Modal>
+		</Fragment>
 	);
 }
 
