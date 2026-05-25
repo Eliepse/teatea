@@ -25,8 +25,8 @@ function SimilarExists(props: { count: number }) {
 	return (
 		<Fragment>
 			<p>
-				<WarningTriangle className="inline size-4 mr-1" />
-				{props.count} tea{1 < props.count && "s"} with same parameters exists
+				<WarningTriangle className="inline size-4 mr-2" />
+				A similar tea already exists
 			</p>
 			{/*<button className="ml-auto text-lime-900">*/}
 			{/*	Open <ArrowRight className="ml-1 size-3 inline" />*/}

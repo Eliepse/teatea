@@ -2,9 +2,9 @@ import type { SearchFilters } from "~/catalog/hooks/useSearchQuery";
 import { getApi } from "~/utils/api";
 import type { ApiPaginatedCollection, Tea } from "~t/types";
 import { queryOptions } from "@tanstack/react-query";
-import type { INewTea } from "~/catalog/components/CreateTeaModal/CreateTeaModal";
 import { extractId } from "~/utils/resource";
 import { parseIntSafe } from "~/utils/math";
+import type { NewTeaData } from "~/catalog/mutation/createTeaMutation";
 
 export async function queryTeaSearch(filters?: SearchFilters, page?: { itemsPerPage?: number }) {
 	const originFilterNodes = filters?.origin?.split(".")?.length ?? 1;
@@ -22,9 +22,13 @@ export function makeTeaSearchQueryOpt(filters: SearchFilters, limit = 8) {
 	});
 }
 
-export function makeCountSimilarTeasQueryOpt(filters: INewTea) {
+export function makeCountSimilarTeasQueryOpt(filters: NewTeaData) {
 	return queryOptions({
 		queryFn: async () => {
+			if (typeof filters.origin === "object") {
+				return 0;
+			}
+
 			const res = await getApi<ApiPaginatedCollection<Tea>>("/teas", {
 				...filters,
 				type: extractId(filters.type),

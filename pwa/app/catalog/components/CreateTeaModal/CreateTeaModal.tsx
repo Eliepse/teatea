@@ -2,7 +2,6 @@ import { Modal } from "~/components/shared/modal/Modal";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { TypeAction } from "~/catalog/components/CreateTeaModal/TypeAction";
 import { useState } from "react";
-import type { Iri, RoastLevel } from "~t/types";
 import { OriginAction } from "~/catalog/components/CreateTeaModal/OriginAction";
 import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessAction";
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
@@ -11,25 +10,17 @@ import { RoastAction } from "~/catalog/components/CreateTeaModal/RoastAction";
 import { useQuery } from "@tanstack/react-query";
 import { makeCountSimilarTeasQueryOpt } from "~/catalog/query/teaQuery";
 import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarTeasWarning";
-import type { NewOrigin } from "~/components/origin/OriginSelect";
-
-export type INewTea = {
-	type?: Iri;
-	origin?: Iri | NewOrigin;
-	business?: Iri;
-	cultivar?: Iri;
-	year?: number;
-	roast?: RoastLevel;
-};
+import { makeCreateTeaMutationOpt, type NewTeaData } from "~/catalog/mutation/createTeaMutation";
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
-	const [tea, setTea] = useState<INewTea>({});
-	const teaHasData = !!tea.type || !!tea.origin || !!tea.business || !!tea.cultivar || !!tea.year || !!tea.roast;
+	const [tea, setTea] = useState<NewTeaData>({});
+	const hasRequiredData = !!tea.type;
 
-	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: teaHasData });
+	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: hasRequiredData });
 	const hasSimilarTea = !similarQuery.isSuccess || 0 !== similarQuery.data;
+	const canSubmit = hasRequiredData && !hasSimilarTea;
 
-	function patch(patch: Partial<INewTea>) {
+	function patch(patch: Partial<NewTeaData>) {
 		setTea((st) => ({ ...st, ...patch }));
 	}
 
@@ -39,12 +30,12 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 				<SecondaryButton className="flex-1" onClick={props.onClose}>
 					Close
 				</SecondaryButton>
-				<PrimaryButton className="flex-2" disabled={!hasSimilarTea}>
+				<PrimaryButton className="flex-2" disabled={!canSubmit}>
 					Create
 				</PrimaryButton>
 			</div>
 
-			{teaHasData && <SimilarTeasWarning count={similarQuery.data} loading={similarQuery.isLoading} />}
+			{hasRequiredData && <SimilarTeasWarning count={similarQuery.data} loading={similarQuery.isLoading} />}
 
 			<div className="flex-1 mx-4">
 				<ul className="grid grid-cols-2 gap-4">
