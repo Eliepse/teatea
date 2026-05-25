@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Message\Command\AddOriginCommand;
 use App\Message\CommandBus;
 use App\Repository\OriginRepository;
+use App\State\Hydration\OriginHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -25,6 +26,7 @@ readonly class OriginProcessor implements ProcessorInterface
 	public function __construct(
 		private Security $security,
 		private CommandBus $commandBus,
+		private OriginHydrator $hydrator,
 	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Origin
@@ -36,7 +38,7 @@ readonly class OriginProcessor implements ProcessorInterface
 
 		$entity = $this->commandBus->process(new AddOriginCommand($data->name, $data->parentPath, $user->id));
 
-		$resource = OriginProvider::fromEntity($entity);
+		$resource = $this->hydrator->hydrate($entity);
 		$resource->isLeaf = true;
 		return $resource;
 	}
