@@ -22,7 +22,7 @@ export function makeTeaSearchQueryOpt(filters: SearchFilters, limit = 8) {
 	});
 }
 
-export function makeCountSimilarTeasQueryOpt(filters: NewTeaData) {
+export function makeCountSimilarTeasQueryOpt(filters: Partial<NewTeaData>) {
 	return queryOptions({
 		queryFn: async () => {
 			if (typeof filters.origin === "object") {

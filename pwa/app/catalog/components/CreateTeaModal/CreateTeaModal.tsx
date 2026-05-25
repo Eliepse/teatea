@@ -7,21 +7,34 @@ import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessActi
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
 import { HarvestYearAction } from "~/catalog/components/CreateTeaModal/HarvestYearAction";
 import { RoastAction } from "~/catalog/components/CreateTeaModal/RoastAction";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { makeCountSimilarTeasQueryOpt } from "~/catalog/query/teaQuery";
 import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarTeasWarning";
 import { makeCreateTeaMutationOpt, type NewTeaData } from "~/catalog/mutation/createTeaMutation";
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
-	const [tea, setTea] = useState<NewTeaData>({});
+	const [tea, setTea] = useState<Partial<NewTeaData>>({});
 	const hasRequiredData = !!tea.type;
 
 	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: hasRequiredData });
 	const hasSimilarTea = !similarQuery.isSuccess || 0 !== similarQuery.data;
 	const canSubmit = hasRequiredData && !hasSimilarTea;
 
+	const persistTea = useMutation(makeCreateTeaMutationOpt());
+
 	function patch(patch: Partial<NewTeaData>) {
 		setTea((st) => ({ ...st, ...patch }));
+	}
+
+	function submit() {
+		const type = tea.type;
+
+		if (!canSubmit || !type) {
+			return;
+		}
+
+
+		persistTea.mutate({ ...tea, type });
 	}
 
 	return (
@@ -30,7 +43,7 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 				<SecondaryButton className="flex-1" onClick={props.onClose}>
 					Close
 				</SecondaryButton>
-				<PrimaryButton className="flex-2" disabled={!canSubmit}>
+				<PrimaryButton className="flex-2" disabled={!canSubmit} loading={persistTea.isPending} onClick={submit}>
 					Create
 				</PrimaryButton>
 			</div>

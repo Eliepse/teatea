@@ -45,7 +45,7 @@ class Origin
 {
 	#[ApiProperty(identifier: true)]
 	#[Groups(["origin:read", "with:origin"])]
-	public string $path;
+	public ?string $path = null;
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 24)]

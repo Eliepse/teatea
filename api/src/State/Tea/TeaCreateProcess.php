@@ -5,7 +5,9 @@ namespace App\State\Tea;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
+use App\Entity\Origin;
 use App\Entity\User;
+use App\Message\Command\AddOriginCommand;
 use App\Message\Command\AddTeaCommand;
 use App\Message\Command\AddTypeCommand;
 use App\Message\CommandBus;
@@ -20,13 +22,14 @@ use App\State\TeaType\TeaTypeProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\ORMException;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 readonly class TeaCreateProcess implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
 		private TeaRepository $teaRepository,
-		private TeaTypeRepository $typeRepository,
+		private TeaTypeRepository $typeRepo,
 		private OriginRepository $originRepo,
 		private Security $security,
 		private CommandBus $commandBus,
@@ -50,24 +53,31 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
+		$type = $this->typeRepo->findOneBy(["slug" => $data->type->slug]);
+
+		if(!$type) {
+			throw new NotFoundHttpException("Couldn't find the type: {$data->type->slug}");
+		}
+
 		// Create the new type if needed
-		if (null !== $data->type) {
-			$type = $this->commandBus->process(
-				new AddTypeCommand(
-					$data->family,
-					$data->type->name,
-					$user->id,
-				),
+		if (null !== $data->origin && null === $data->origin->path) {
+			$origin = $this->commandBus->process(
+				new AddOriginCommand($data->origin->name, $data->origin->parentPath, $user->id),
 			);
 		} else {
-			$type = $this->queryBus->ask(new FindTypeFamilyQuery($data->family));
+			$origin = $this->em->getReference(Origin::class, $data->origin->path);
 		}
+
+		// Create the new type if needed
+//		if (null !== $data->type) {
+//			$type = $this->commandBus->process(new AddTypeCommand($data->family, $data->type->name, $user->id));
+//		}
 
 		/** @var \App\Entity\Tea $entity */
 		$entity = $this->commandBus->process(
 			new AddTeaCommand(
 				$type->id,
-				$data->origin?->path,
+				$origin?->path,
 				$data->year,
 				$data->roast,
 				$data->cultivar?->id,
