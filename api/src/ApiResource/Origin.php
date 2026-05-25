@@ -63,5 +63,5 @@ class Origin
 	public bool $proposal = true;
 
 	#[Groups(["origin:write"])]
-	public string $parentPath;
+	public ?string $parentPath = null;
 }
