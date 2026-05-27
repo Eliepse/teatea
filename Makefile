@@ -10,3 +10,9 @@ stop:
 reboot:
 	docker compose stop
 	docker compose up -d
+
+sh-api:
+	docker compose exec -ti api bash
+
+sh-pwa:
+	docker compose exec -ti pwa sh
