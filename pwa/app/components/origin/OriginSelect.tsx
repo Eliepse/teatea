@@ -152,7 +152,9 @@ export function OriginSelect(
 						className="w-full h-15"
 						onClick={() => setCreating(props.filterPath ? `/api/origins/${props.filterPath}` : true)}
 					>
-						Add a {0 === filterNodes.length ? "country" : "region"}
+						{0 === filterNodes.length && "Add a country"}
+						{1 === filterNodes.length && "Add a region"}
+						{2 === filterNodes.length && "Add a locality"}
 					</DashedButton>
 				</div>
 
