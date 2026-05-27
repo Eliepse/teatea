@@ -5,16 +5,13 @@ namespace App\State\Tea;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
+use App\Entity\Business;
 use App\Entity\Origin;
 use App\Entity\User;
+use App\Message\Command\AddBusinessCommand;
 use App\Message\Command\AddOriginCommand;
 use App\Message\Command\AddTeaCommand;
-use App\Message\Command\AddTypeCommand;
 use App\Message\CommandBus;
-use App\Message\Query\FindTypeFamilyQuery;
-use App\Message\QueryBus;
-use App\Repository\OriginRepository;
-use App\Repository\TeaRepository;
 use App\Repository\TeaTypeRepository;
 use App\State\Business\BusinessProvider;
 use App\State\Origin\OriginProvider;
@@ -28,12 +25,9 @@ readonly class TeaCreateProcess implements ProcessorInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
-		private TeaRepository $teaRepository,
 		private TeaTypeRepository $typeRepo,
-		private OriginRepository $originRepo,
 		private Security $security,
 		private CommandBus $commandBus,
-		private QueryBus $queryBus,
 	) {
 	}
 
@@ -55,7 +49,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 
 		$type = $this->typeRepo->findOneBy(["slug" => $data->type->slug]);
 
-		if(!$type) {
+		if (!$type) {
 			throw new NotFoundHttpException("Couldn't find the type: {$data->type->slug}");
 		}
 
@@ -66,6 +60,15 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			);
 		} else {
 			$origin = $this->em->getReference(Origin::class, $data->origin->path);
+		}
+
+		// Create the new type if needed
+		if (null !== $data->business && null === $data->business->id) {
+			$business = $this->commandBus->process(
+				new AddBusinessCommand($data->business->name, $user->id),
+			);
+		} else {
+			$business = $this->em->getReference(Business::class, $data->business->id);
 		}
 
 		// Create the new type if needed
@@ -82,7 +85,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 				$data->roast,
 				$data->cultivar?->id,
 				$user->id,
-				$data->business?->id,
+				$business?->id,
 			),
 		);
 
