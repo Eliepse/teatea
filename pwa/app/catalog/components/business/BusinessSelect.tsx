@@ -24,8 +24,7 @@ export type CreationMode = {
 export function BusinessSelect(
 	props: {
 		value?: Iri | NewBusiness;
-		// Select the parent node for the list of selectable origins
-		onChange: (value?: Iri | NewBusiness) => void;
+		onChange: (value?: Iri) => void;
 		allowToggle?: boolean;
 		allowCreate?: boolean;
 		className?: string;
@@ -44,7 +43,7 @@ export function BusinessSelect(
 	const total = queryPages[0]?.totalItems ?? 0;
 
 	function selectBusiness(business: Business) {
-		if (props.allowToggle && props.value !== business["@id"]) {
+		if (props.allowToggle && props.value === business["@id"]) {
 			props.onChange(undefined);
 			return;
 		}
