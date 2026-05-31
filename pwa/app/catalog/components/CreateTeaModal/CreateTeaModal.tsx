@@ -12,17 +12,26 @@ import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarT
 import { makeCreateTeaMutationOpt, type NewTeaData } from "~/catalog/mutation/createTeaMutation";
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
 import { ErrorBanner } from "~/catalog/components/CreateTeaModal/ErrorBanner";
+import { useNavigate } from "react-router";
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 	const [tea, setTea] = useState<Partial<NewTeaData>>({});
 	const [error, setError] = useState<string|undefined>();
+	const navigate = useNavigate();
 	const hasRequiredData = !!tea.type;
 
 	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: hasRequiredData });
 	const hasSimilarTea = !similarQuery.isSuccess || 0 !== similarQuery.data;
 	const canSubmit = hasRequiredData && !hasSimilarTea;
 
-	const persistTea = useMutation({ ...makeCreateTeaMutationOpt(), onError: (e) => setError(e.message) });
+	const persistTea = useMutation({
+		...makeCreateTeaMutationOpt(),
+		onSuccess: (tea) => navigate(`/tea/${tea.id}`),
+		onError: (e) => {
+			console.error(e);
+			setError(e.message);
+		},
+	});
 
 	function patch(patch: Partial<NewTeaData>) {
 		setTea((st) => ({ ...st, ...patch }));
