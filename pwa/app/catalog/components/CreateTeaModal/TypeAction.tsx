@@ -8,7 +8,11 @@ import { makeTeaTypeQueryOpt } from "~/catalog/query/teatypeQuery";
 import { TypeSelectModal } from "~/catalog/components/teaType/TypeSelectModal";
 import type { NewType } from "~/catalog/components/teaType/TypeSelect";
 
-export function TypeAction(props: { type?: Iri | NewType; onChange: (type?: Iri | NewType) => void }) {
+export function TypeAction(props: {
+	type?: Iri | NewType;
+	onChange: (type?: Iri | NewType) => void;
+	readonly?: boolean;
+}) {
 	const [isSelecting, setIsSelecting] = useState(false);
 
 	const typeQuery = useQuery(makeTeaTypeQueryOpt({ "@id": typeof props.type !== "string" ? undefined : props.type }));
@@ -26,6 +30,7 @@ export function TypeAction(props: { type?: Iri | NewType; onChange: (type?: Iri 
 				label={typeQuery.isLoading ? <span className="inline-block skeleton h-4 w-16" /> : label}
 				onClick={() => setIsSelecting(true)}
 				filled={!!props.type}
+				readonly={props.readonly}
 			/>
 
 			<TypeSelectModal

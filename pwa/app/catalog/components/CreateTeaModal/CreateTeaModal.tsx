@@ -11,19 +11,22 @@ import { makeCountSimilarTeasQueryOpt } from "~/catalog/query/teaQuery";
 import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarTeasWarning";
 import { makeCreateTeaMutationOpt, type NewTeaData } from "~/catalog/mutation/createTeaMutation";
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
+import { ErrorBanner } from "~/catalog/components/CreateTeaModal/ErrorBanner";
 
 export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 	const [tea, setTea] = useState<Partial<NewTeaData>>({});
+	const [error, setError] = useState<string|undefined>();
 	const hasRequiredData = !!tea.type;
 
 	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: hasRequiredData });
 	const hasSimilarTea = !similarQuery.isSuccess || 0 !== similarQuery.data;
 	const canSubmit = hasRequiredData && !hasSimilarTea;
 
-	const persistTea = useMutation(makeCreateTeaMutationOpt());
+	const persistTea = useMutation({ ...makeCreateTeaMutationOpt(), onError: (e) => setError(e.message) });
 
 	function patch(patch: Partial<NewTeaData>) {
 		setTea((st) => ({ ...st, ...patch }));
+		setError(undefined);
 	}
 
 	function submit() {
@@ -33,14 +36,13 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 			return;
 		}
 
-
 		persistTea.mutate({ ...tea, type });
 	}
 
 	return (
 		<Modal open={props.open ?? false} className="h-full flex flex-col gap-4">
 			<div className="flex-none flex gap-4 p-4 border-b border-green-200">
-				<SecondaryButton className="flex-1" onClick={props.onClose}>
+				<SecondaryButton className="flex-1" onClick={props.onClose} disabled={persistTea.isPending}>
 					Close
 				</SecondaryButton>
 				<PrimaryButton className="flex-2" disabled={!canSubmit} loading={persistTea.isPending} onClick={submit}>
@@ -49,26 +51,51 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 			</div>
 
 			{hasRequiredData && <SimilarTeasWarning count={similarQuery.data} loading={similarQuery.isLoading} />}
+			{error && <ErrorBanner className="mx-4">Failed to create this new tea</ErrorBanner>}
 
 			<div className="flex-1 mx-4">
 				<ul className="grid grid-cols-2 gap-4">
 					<li className="col-span-2">
-						<TypeAction type={tea.type} onChange={(type) => patch({ type })} />
+						<TypeAction
+							type={tea.type}
+							onChange={(type) => patch({ type })}
+							readonly={persistTea.isPending}
+						/>
 					</li>
 					<li>
-						<OriginAction origin={tea.origin} onChange={(origin) => patch({ origin })} />
+						<OriginAction
+							origin={tea.origin}
+							onChange={(origin) => patch({ origin })}
+							readonly={persistTea.isPending}
+						/>
 					</li>
 					<li>
-						<BusinessAction business={tea.business} onChange={(business) => patch({ business })} />
+						<BusinessAction
+							business={tea.business}
+							onChange={(business) => patch({ business })}
+							readonly={persistTea.isPending}
+						/>
 					</li>
 					<li>
-						<CultivarAction cultivar={tea.cultivar} onChange={(cultivar) => patch({ cultivar })} />
+						<CultivarAction
+							cultivar={tea.cultivar}
+							onChange={(cultivar) => patch({ cultivar })}
+							readonly={persistTea.isPending}
+						/>
 					</li>
 					<li>
-						<HarvestYearAction year={tea.year} onChange={(year) => patch({ year })} />
+						<HarvestYearAction
+							year={tea.year}
+							onChange={(year) => patch({ year })}
+							readonly={persistTea.isPending}
+						/>
 					</li>
 					<li>
-						<RoastAction roast={tea.roast} onChange={(roast) => patch({ roast })} />
+						<RoastAction
+							roast={tea.roast}
+							onChange={(roast) => patch({ roast })}
+							readonly={persistTea.isPending}
+						/>
 					</li>
 				</ul>
 			</div>

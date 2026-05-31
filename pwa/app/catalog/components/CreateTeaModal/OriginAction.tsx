@@ -8,7 +8,11 @@ import { makeOriginQueryOpt } from "~/shared/query/originQuery";
 import { FormatOrigin } from "~/components/shared/FormatOriginPath";
 import type { NewOrigin } from "~/components/origin/OriginSelect";
 
-export function OriginAction(props: { origin?: Iri | NewOrigin; onChange: (origin?: Iri | NewOrigin) => void }) {
+export function OriginAction(props: {
+	origin?: Iri | NewOrigin;
+	onChange: (origin?: Iri | NewOrigin) => void;
+	readonly?: boolean;
+}) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const originQuery = useQuery(
 		makeOriginQueryOpt({ "@id": typeof props.origin === "string" ? props.origin : undefined }),
@@ -28,6 +32,7 @@ export function OriginAction(props: { origin?: Iri | NewOrigin; onChange: (origi
 				label={originQuery.isLoading ? <span className="inline-block skeleton h-4 w-16" /> : label}
 				onClick={() => setIsSelecting(true)}
 				filled={!!props.origin}
+				readonly={props.readonly}
 			/>
 
 			<OriginSelectModal

@@ -10,6 +10,7 @@ import { BusinessSelectModal } from "~/catalog/components/business/BusinessSelec
 export function BusinessAction(props: {
 	business?: Iri | NewBusiness;
 	onChange: (business?: Iri | NewBusiness) => void;
+	readonly?: boolean;
 }) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const queryBusiness = useQuery(
@@ -29,6 +30,7 @@ export function BusinessAction(props: {
 				label={queryBusiness.isLoading ? <span className="inline-block skeleton h-4 w-16" /> : label}
 				onClick={() => setIsSelecting(true)}
 				filled={!!props.business}
+				readonly={props.readonly}
 			/>
 
 			<BusinessSelectModal

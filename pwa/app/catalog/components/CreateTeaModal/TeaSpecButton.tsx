@@ -9,8 +9,6 @@ export function TeaSpecButton(props: {
 	filled?: boolean;
 	readonly?: boolean;
 }) {
-	const Icon = props.icon;
-
 	function handleClick() {
 		if (props.readonly) {
 			return;
@@ -24,7 +22,7 @@ export function TeaSpecButton(props: {
 			className={clsx(
 				"relative w-full h-24 p-4 flex flex-col items-center justify-center gap-1.5 text-sm rounded-lg border",
 				!props.filled && "border-dashed border-green-600 text-green-700",
-				"cursor-pointer hover:bg-green-300 active:bg-green-400",
+				!props.readonly && "cursor-pointer hover:bg-green-300 active:bg-green-400",
 				props.filled && "bg-green-100 text-green-900 border-green-100",
 			)}
 			onClick={handleClick}

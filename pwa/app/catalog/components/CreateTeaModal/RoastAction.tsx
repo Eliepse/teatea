@@ -14,7 +14,7 @@ const RoastLevelLabel = {
 	strong: "Strong",
 } as const;
 
-export function RoastAction(props: { roast?: RoastLevel; onChange: (roast?: RoastLevel) => void }) {
+export function RoastAction(props: { roast?: RoastLevel; onChange: (roast?: RoastLevel) => void; readonly?: boolean }) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [value, setValue] = useState<RoastLevel | undefined>(props.roast);
 
@@ -35,6 +35,7 @@ export function RoastAction(props: { roast?: RoastLevel; onChange: (roast?: Roas
 				label={props.roast ? RoastLevelLabel[props.roast] : "Roast"}
 				onClick={() => setIsSelecting(true)}
 				filled={!!props.roast}
+				readonly={props.readonly}
 			/>
 
 			<Modal open={isSelecting} onClose={() => setIsSelecting(false)} className="">
@@ -48,7 +49,7 @@ export function RoastAction(props: { roast?: RoastLevel; onChange: (roast?: Roas
 				</div>
 
 				<div className="px-6 py-10">
-					<RadioButtonGroup value={value ?? "no"} onChange={setValue} layout="vertical">
+					<RadioButtonGroup value={value ?? "no"} onChange={setValue}>
 						<RadioButton value={RoastLevelEnum.No}>No</RadioButton>
 						<RadioButton value={RoastLevelEnum.Yes}>Yes</RadioButton>
 						<RadioButton value={RoastLevelEnum.Light}>Light</RadioButton>

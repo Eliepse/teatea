@@ -10,6 +10,7 @@ import { CultivarSelectModal } from "~/catalog/components/cultivar/CultivarSelec
 export function CultivarAction(props: {
 	cultivar?: Iri | NewCultivar;
 	onChange: (cultivar?: Iri | NewCultivar) => void;
+	readonly?: boolean;
 }) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const queryCultivar = useQuery(
@@ -29,6 +30,7 @@ export function CultivarAction(props: {
 				label={queryCultivar.isLoading ? <span className="inline-block skeleton h-4 w-16" /> : label}
 				onClick={() => setIsSelecting(true)}
 				filled={!!props.cultivar}
+				readonly={props.readonly}
 			/>
 
 			<CultivarSelectModal

@@ -5,7 +5,7 @@ import { Modal } from "~/components/shared/modal/Modal";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { WheelPicker, WheelPickerWrapper } from "@ncdai/react-wheel-picker";
 
-export function HarvestYearAction(props: { year?: number; onChange: (year?: number) => void }) {
+export function HarvestYearAction(props: { year?: number; onChange: (year?: number) => void; readonly?: boolean }) {
 	const [isSelecting, setIsSelecting] = useState(false);
 	const [value, setValue] = useState<number | undefined>(props.year);
 	const options = useMemo(() => {
@@ -38,6 +38,7 @@ export function HarvestYearAction(props: { year?: number; onChange: (year?: numb
 				label={props.year ?? "Harvest year"}
 				onClick={() => setIsSelecting(true)}
 				filled={!!props.year}
+				readonly={props.readonly}
 			/>
 
 			<Modal open={isSelecting} onClose={() => setIsSelecting(false)} className="pb-6">
