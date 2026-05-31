@@ -33,6 +33,10 @@ export function makeCountSimilarTeasQueryOpt(filters: Partial<NewTeaData>) {
 				return 0;
 			}
 
+			if (typeof filters.cultivar === "object") {
+				return 0;
+			}
+
 			const res = await getApi<ApiPaginatedCollection<Tea>>("/teas", {
 				...filters,
 				type: extractId(filters.type),
