@@ -1,17 +1,17 @@
-import type { Business } from "~t/types";
+import type { Cultivar } from "~t/types";
 import { Modal } from "~/components/shared/modal/Modal";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { f } from "~/utils/function";
 import { useState } from "react";
 import { TextInput } from "~/shared/components/Form/TextInput";
 
-export function CreateBusinessModal(props: {
+export function CreateCultivarModal(props: {
 	open: boolean;
 	onClose?: () => void;
-	onConfirm: (business: { name: string }) => Promise<void>;
+	onConfirm: (cultivar: { name: string }) => Promise<void>;
 }) {
 	const [isPending, setPending] = useState(false);
-	const [data, setData] = useState<Partial<Pick<Business, "name">>>({});
+	const [data, setData] = useState<Partial<Pick<Cultivar, "name">>>({});
 	const isNameValid = 2 < (data?.name?.length ?? 0);
 
 	function submit() {

@@ -5,12 +5,13 @@ import { postApi } from "~/utils/api";
 import { denormalizeTea, type TeaRaw } from "~/utils/api/normalization/tea";
 import { extractId } from "~/utils/resource";
 import type { NewBusiness } from "~/catalog/components/business/BusinessSelect";
+import type { NewCultivar } from "~/catalog/components/cultivar/CultivarSelect";
 
 export interface NewTeaData {
 	type: Iri;
 	origin?: Iri | NewOrigin;
 	business?: Iri | NewBusiness;
-	cultivar?: Iri;
+	cultivar?: Iri | NewCultivar;
 	year?: number;
 	roast?: RoastLevel;
 }
@@ -19,7 +20,7 @@ type NewTeaPayload = {
 	type: Iri;
 	origin?: Iri | { name: string; parentPath?: string };
 	business?: Iri | { name: string };
-	cultivar?: Iri;
+	cultivar?: Iri | { name: string };
 	year?: number;
 	roast?: RoastLevel;
 };
@@ -31,7 +32,7 @@ export function makeCreateTeaMutationOpt() {
 				type: data.type,
 				origin: extractOrigin(data.origin),
 				business: extractBusiness(data.business),
-				cultivar: data.cultivar,
+				cultivar: extractCultivar(data.cultivar),
 				year: data.year,
 				roast: data.roast,
 			} satisfies NewTeaPayload);
@@ -49,6 +50,14 @@ function extractOrigin(data: NewTeaData["origin"]): NewTeaPayload["origin"] {
 }
 
 function extractBusiness(data: NewTeaData["business"]): NewTeaPayload["business"] {
+	if (typeof data === "string") {
+		return data;
+	}
+
+	return data ? { name: data.name } : undefined;
+}
+
+function extractCultivar(data: NewTeaData["cultivar"]): NewTeaPayload["cultivar"] {
 	if (typeof data === "string") {
 		return data;
 	}

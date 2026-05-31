@@ -6,9 +6,11 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Tea;
 use App\Entity\Business;
+use App\Entity\Cultivar;
 use App\Entity\Origin;
 use App\Entity\User;
 use App\Message\Command\AddBusinessCommand;
+use App\Message\Command\AddCultivarCommand;
 use App\Message\Command\AddOriginCommand;
 use App\Message\Command\AddTeaCommand;
 use App\Message\CommandBus;
@@ -47,6 +49,11 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
+
+		$origin = null;
+		$business = null;
+		$cultivar = null;
+
 		$type = $this->typeRepo->findOneBy(["slug" => $data->type->slug]);
 
 		if (!$type) {
@@ -58,7 +65,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$origin = $this->commandBus->process(
 				new AddOriginCommand($data->origin->name, $data->origin->parentPath, $user->id),
 			);
-		} else {
+		} elseif (null !== $data->origin?->path) {
 			$origin = $this->em->getReference(Origin::class, $data->origin->path);
 		}
 
@@ -67,8 +74,17 @@ readonly class TeaCreateProcess implements ProcessorInterface
 			$business = $this->commandBus->process(
 				new AddBusinessCommand($data->business->name, $user->id),
 			);
-		} else {
+		} elseif (null !== $data->business?->id) {
 			$business = $this->em->getReference(Business::class, $data->business->id);
+		}
+
+		// Create the new cultivar if needed
+		if (null !== $data->cultivar && null === $data->cultivar->id) {
+			$cultivar = $this->commandBus->process(
+				new AddCultivarCommand($data->cultivar->name, $user->id),
+			);
+		} elseif (null !== $data->cultivar?->id) {
+			$cultivar = $this->em->getReference(Cultivar::class, $data->cultivar->id);
 		}
 
 		// Create the new type if needed
@@ -83,7 +99,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 				$origin?->path,
 				$data->year,
 				$data->roast,
-				$data->cultivar?->id,
+				$cultivar?->id,
 				$user->id,
 				$business?->id,
 			),

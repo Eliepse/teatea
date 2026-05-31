@@ -84,7 +84,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[Post(
 	normalizationContext: ["groups" => ["tea:read"]],
-	denormalizationContext: ["groups" => ["tea:create", "origin:write", "business:write"]],
+	denormalizationContext: ["groups" => ["tea:create", "origin:write", "business:write", "cultivar:write"]],
 	processor: TeaCreateProcess::class,
 )]
 #[Post(
