@@ -1,7 +1,13 @@
 import clsx from "clsx";
 import { Xmark } from "iconoir-react";
+import type { ReactNode } from "react";
 
-export function SelectItem(props: { label: string; onClick: () => void; selected?: boolean }) {
+export function SelectItem(props: {
+	label: ReactNode;
+	onClick: () => void;
+	selected?: boolean;
+	allowToggle?: boolean;
+}) {
 	return (
 		<button
 			className={clsx(
@@ -12,7 +18,7 @@ export function SelectItem(props: { label: string; onClick: () => void; selected
 			onClick={props.onClick}
 		>
 			{props.label}
-			{props.selected && <Xmark className="size-6 ml-auto" />}
+			{props.selected && props.allowToggle && <Xmark className="size-6 ml-auto" />}
 		</button>
 	);
 }

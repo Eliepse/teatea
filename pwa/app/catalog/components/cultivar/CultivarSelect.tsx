@@ -75,7 +75,7 @@ export function CultivarSelect(
 			{props.value && typeof props.value !== "string" && (
 				<div className="my-6 pb-6 border-b border-green-200">
 					<h3 className="text-xl font-header mb-2">New cultivar</h3>
-					<SelectItem label={props.value.name} onClick={() => props.onChange(undefined)} selected />
+					<SelectItem label={props.value.name} onClick={() => props.onChange(undefined)} selected allowToggle />
 				</div>
 			)}
 
@@ -108,6 +108,7 @@ export function CultivarSelect(
 								label={cultivar.name}
 								selected={cultivar["@id"] === props.value}
 								onClick={() => selectCultivar(cultivar)}
+								allowToggle={props.allowToggle}
 							/>
 						</li>
 					)),

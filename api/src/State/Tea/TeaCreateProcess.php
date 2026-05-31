@@ -13,6 +13,7 @@ use App\Message\Command\AddBusinessCommand;
 use App\Message\Command\AddCultivarCommand;
 use App\Message\Command\AddOriginCommand;
 use App\Message\Command\AddTeaCommand;
+use App\Message\Command\AddTypeCommand;
 use App\Message\CommandBus;
 use App\Repository\TeaTypeRepository;
 use App\State\Business\BusinessProvider;
@@ -49,12 +50,17 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		assert($data instanceof Tea);
 		assert($user instanceof User);
 
-
+		$type = null;
 		$origin = null;
 		$business = null;
 		$cultivar = null;
 
-		$type = $this->typeRepo->findOneBy(["slug" => $data->type->slug]);
+		// Create the new type if needed
+		if (null !== $data->type && null === $data->type->slug) {
+			$type = $this->commandBus->process(new AddTypeCommand($data->type->family, $data->type->name, $user->id));
+		} elseif (null !== $data->origin?->path) {
+			$type = $this->typeRepo->findOneBy(["slug" => $data->type->slug]);
+		}
 
 		if (!$type) {
 			throw new NotFoundHttpException("Couldn't find the type: {$data->type->slug}");
@@ -86,11 +92,6 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		} elseif (null !== $data->cultivar?->id) {
 			$cultivar = $this->em->getReference(Cultivar::class, $data->cultivar->id);
 		}
-
-		// Create the new type if needed
-//		if (null !== $data->type) {
-//			$type = $this->commandBus->process(new AddTypeCommand($data->family, $data->type->name, $user->id));
-//		}
 
 		/** @var \App\Entity\Tea $entity */
 		$entity = $this->commandBus->process(

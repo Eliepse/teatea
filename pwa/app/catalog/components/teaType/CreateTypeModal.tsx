@@ -1,0 +1,69 @@
+import { type Cultivar, teaFamilies, type TeaFamily } from "~t/types";
+import { Modal } from "~/components/shared/modal/Modal";
+import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
+import { f } from "~/utils/function";
+import { useState } from "react";
+import { TextInput } from "~/shared/components/Form/TextInput";
+import { Family } from "~/components/tea/Family";
+
+export function CreateTypeModal(props: {
+	open: boolean;
+	family: TeaFamily;
+	onClose?: () => void;
+	onConfirm: (type: { name: string; family: TeaFamily }) => Promise<void>;
+}) {
+	const [isPending, setPending] = useState(false);
+	const [data, setData] = useState<Partial<Pick<Cultivar, "name">>>({});
+	const isNameValid = 2 < (data?.name?.length ?? 0);
+
+	function submit() {
+		const name = data.name;
+
+		if (!name || 2 >= name.length) {
+			return;
+		}
+
+		setPending(true);
+		props.onConfirm({ name, family: props.family }).finally(() => setPending(false));
+	}
+
+	function cancel() {
+		f(props.onClose)();
+	}
+
+	return (
+		<Modal open={props.open} onClose={props.onClose} className="p-0 pb-4">
+			<div className="flex gap-4 p-4 mb-4 border-b border-green-200">
+				<SecondaryButton className="flex-1" onClick={cancel}>
+					Cancel
+				</SecondaryButton>
+
+				<PrimaryButton
+					className="flex-2"
+					onClick={submit}
+					disabled={!isNameValid || isPending}
+					loading={isPending}
+				>
+					Create
+				</PrimaryButton>
+			</div>
+
+			<div className="m-4">
+				<label>
+					<span className="block mb-2 text-green-800">Family</span>
+					<div className="bg-green-50 px-4 py-2.5 rounded-xl border-green-100 text-lg text-green-900">
+						<Family family={props.family} className="mr-2" iconOnly />
+						{teaFamilies[props.family]}
+					</div>
+				</label>
+			</div>
+
+			<div className="m-4">
+				<label>
+					<span className="block mb-2 text-green-800">Name</span>
+					<TextInput value={data.name} onChange={(v) => setData({ name: v })} disabled={isPending} />
+				</label>
+			</div>
+		</Modal>
+	);
+}

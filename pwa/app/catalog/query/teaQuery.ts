@@ -25,6 +25,10 @@ export function makeTeaSearchQueryOpt(filters: SearchFilters, limit = 8) {
 export function makeCountSimilarTeasQueryOpt(filters: Partial<NewTeaData>) {
 	return queryOptions({
 		queryFn: async () => {
+			if (typeof filters.type === "object") {
+				return 0;
+			}
+
 			if (typeof filters.origin === "object") {
 				return 0;
 			}
