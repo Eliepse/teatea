@@ -58,7 +58,7 @@ readonly class TeaCreateProcess implements ProcessorInterface
 		// Create the new type if needed
 		if (null !== $data->type && null === $data->type->slug) {
 			$type = $this->commandBus->process(new AddTypeCommand($data->type->family, $data->type->name, $user->id));
-		} elseif (null !== $data->origin?->path) {
+		} elseif (null !== $data->type?->slug) {
 			$type = $this->typeRepo->findOneBy(["slug" => $data->type->slug]);
 		}
 
