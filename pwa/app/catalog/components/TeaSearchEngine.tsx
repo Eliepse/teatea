@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
 import type { Tea, TeaType } from "~t/types";
-import { CreateTeaButton } from "~/components/tea/CreateTeaButton";
 import { f } from "~/utils/function";
 import clsx from "clsx";
 import { FiltersBar } from "~/catalog/components/search-engine/FiltersBar";
@@ -13,6 +12,8 @@ import { makeTeaTypeQueryOpt } from "~/catalog/query/teatypeQuery";
 import { makeSearchInfinitQueryOpt } from "~/catalog/query/searchQuery";
 import { SmartFiltersBar } from "~/catalog/components/search-engine/SmartFiltersBar";
 import { SearchTypeCard } from "~/catalog/components/SearchTypeCard";
+import { DashedButton } from "~/shared/components/Button";
+import { CreateTeaModal } from "~/catalog/components/CreateTeaModal/CreateTeaModal";
 
 export function TeaSearchEngine(props: {
 	onSelect?: (tea: Tea | TeaType) => void;
@@ -22,6 +23,7 @@ export function TeaSearchEngine(props: {
 	onFiltersChange?: (filters?: SearchFilters) => void;
 }) {
 	const navigate = useNavigate();
+	const [createTea, setCreateTea] = useState(false);
 	const [filters, setFilters] = useState<SearchFilters>(props.defaultFilters ?? {});
 	const typeQuery = useQuery(makeTeaTypeQueryOpt({ slug: filters?.type }, filters?.origin));
 	const query = useInfiniteQuery(makeSearchInfinitQueryOpt(filters));
@@ -147,10 +149,14 @@ export function TeaSearchEngine(props: {
 
 					{query.isSuccess && true === props.allowCreation && (
 						<div className="px-4 mt-4">
-							<CreateTeaButton className="btn-dash btn-block h-14 mt-8" onCreated={onTeaCreated} />
+							<DashedButton onClick={() => setCreateTea(true)} className="w-full mt-4">
+								Create tea
+							</DashedButton>
 						</div>
 					)}
 				</div>
+
+				<CreateTeaModal open={createTea} onClose={() => setCreateTea(false)} />
 			</div>
 		</SE_CONTEXT.Provider>
 	);
