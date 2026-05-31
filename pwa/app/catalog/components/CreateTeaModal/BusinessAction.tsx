@@ -15,7 +15,7 @@ export function BusinessAction(props: {
 	const queryBusiness = useQuery(
 		makeBusinessQueryOpt({ "@id": typeof props.business !== "string" ? undefined : props.business }),
 	);
-	const label = queryBusiness.data?.name ?? (typeof props.business !== "string" ? props.business?.name : "Business");
+	const label = queryBusiness.data?.name ?? (typeof props.business === "object" ? props.business?.name : "Business");
 
 	function confirm(value?: Iri | NewBusiness) {
 		props.onChange(value);
