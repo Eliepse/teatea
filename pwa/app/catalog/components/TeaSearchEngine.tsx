@@ -53,8 +53,9 @@ export function TeaSearchEngine(props: {
 
 	const onTeaCreated = useCallback(
 		async (tea: Tea) => {
+			setCreateTea(false);
 			void query.refetch();
-			f(props.onSelect)(tea);
+			handleItemClicked(tea);
 		},
 		[props.onSelect, query],
 	);
@@ -156,7 +157,18 @@ export function TeaSearchEngine(props: {
 					)}
 				</div>
 
-				<CreateTeaModal open={createTea} onClose={() => setCreateTea(false)} />
+				<CreateTeaModal
+					open={createTea}
+					onClose={() => setCreateTea(false)}
+					onCreated={onTeaCreated}
+					defaultParams={{
+						business: filters.business ? `/api/businesses/${filters.business}` : undefined,
+						cultivar: filters.cultivar ? `/api/cultivars/${filters.cultivar}` : undefined,
+						origin: filters.origin ? `/api/origins/${filters.origin}` : undefined,
+						type: filters.type ? `/api/tea_types/${filters.type}` : undefined,
+						year: filters.year,
+					}}
+				/>
 			</div>
 		</SE_CONTEXT.Provider>
 	);

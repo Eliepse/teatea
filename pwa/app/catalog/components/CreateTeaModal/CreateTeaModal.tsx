@@ -1,7 +1,7 @@
 import { Modal } from "~/components/shared/modal/Modal";
 import { PrimaryButton, SecondaryButton } from "~/shared/components/Button";
 import { TypeAction } from "~/catalog/components/CreateTeaModal/TypeAction";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { OriginAction } from "~/catalog/components/CreateTeaModal/OriginAction";
 import { BusinessAction } from "~/catalog/components/CreateTeaModal/BusinessAction";
 import { HarvestYearAction } from "~/catalog/components/CreateTeaModal/HarvestYearAction";
@@ -13,20 +13,39 @@ import { makeCreateTeaMutationOpt, type NewTeaData } from "~/catalog/mutation/cr
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
 import { ErrorBanner } from "~/catalog/components/CreateTeaModal/ErrorBanner";
 import { useNavigate } from "react-router";
+import type { Tea } from "~t/types";
 
-export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
-	const [tea, setTea] = useState<Partial<NewTeaData>>({});
-	const [error, setError] = useState<string|undefined>();
-	const navigate = useNavigate();
-	const hasRequiredData = !!tea.type;
+const DEFAULT_TEA = {};
 
-	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(tea), enabled: hasRequiredData });
+export function CreateTeaModal(props: {
+	open?: boolean;
+	defaultParams?: Partial<NewTeaData>;
+	onCreated: (tea: Tea) => void;
+	onClose: () => void;
+}) {
+	const isDirty = useRef(false);
+	const [data, setData] = useState<Partial<NewTeaData>>(props.defaultParams ?? DEFAULT_TEA);
+	const [error, setError] = useState<string | undefined>();
+	const hasRequiredData = !!data.type;
+
+	const similarQuery = useQuery({ ...makeCountSimilarTeasQueryOpt(data), enabled: hasRequiredData });
 	const hasSimilarTea = !similarQuery.isSuccess || 0 !== similarQuery.data;
 	const canSubmit = hasRequiredData && !hasSimilarTea;
 
+	useEffect(() => {
+		if (!props.open || isDirty.current) {
+			return;
+		}
+
+		setData(props.defaultParams ?? DEFAULT_TEA);
+	}, [props.open]);
+
 	const persistTea = useMutation({
 		...makeCreateTeaMutationOpt(),
-		onSuccess: (tea) => navigate(`/tea/${tea.id}`),
+		onSuccess: (tea) => {
+			isDirty.current = false;
+			props.onCreated(tea);
+		},
 		onError: (e) => {
 			console.error(e);
 			setError(e.message);
@@ -34,18 +53,19 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 	});
 
 	function patch(patch: Partial<NewTeaData>) {
-		setTea((st) => ({ ...st, ...patch }));
+		isDirty.current = true;
+		setData((st) => ({ ...st, ...patch }));
 		setError(undefined);
 	}
 
 	function submit() {
-		const type = tea.type;
+		const type = data.type;
 
 		if (!canSubmit || !type) {
 			return;
 		}
 
-		persistTea.mutate({ ...tea, type });
+		persistTea.mutate({ ...data, type });
 	}
 
 	return (
@@ -66,42 +86,42 @@ export function CreateTeaModal(props: { open?: boolean; onClose: () => void }) {
 				<ul className="grid grid-cols-2 gap-4">
 					<li className="col-span-2">
 						<TypeAction
-							type={tea.type}
+							type={data.type}
 							onChange={(type) => patch({ type })}
 							readonly={persistTea.isPending}
 						/>
 					</li>
 					<li>
 						<OriginAction
-							origin={tea.origin}
+							origin={data.origin}
 							onChange={(origin) => patch({ origin })}
 							readonly={persistTea.isPending}
 						/>
 					</li>
 					<li>
 						<BusinessAction
-							business={tea.business}
+							business={data.business}
 							onChange={(business) => patch({ business })}
 							readonly={persistTea.isPending}
 						/>
 					</li>
 					<li>
 						<CultivarAction
-							cultivar={tea.cultivar}
+							cultivar={data.cultivar}
 							onChange={(cultivar) => patch({ cultivar })}
 							readonly={persistTea.isPending}
 						/>
 					</li>
 					<li>
 						<HarvestYearAction
-							year={tea.year}
+							year={data.year}
 							onChange={(year) => patch({ year })}
 							readonly={persistTea.isPending}
 						/>
 					</li>
 					<li>
 						<RoastAction
-							roast={tea.roast}
+							roast={data.roast}
 							onChange={(roast) => patch({ roast })}
 							readonly={persistTea.isPending}
 						/>
