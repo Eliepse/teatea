@@ -12,8 +12,8 @@ import { SimilarTeasWarning } from "~/catalog/components/CreateTeaModal/SimilarT
 import { makeCreateTeaMutationOpt, type NewTeaData } from "~/catalog/mutation/createTeaMutation";
 import { CultivarAction } from "~/catalog/components/CreateTeaModal/CultivarAction";
 import { ErrorBanner } from "~/catalog/components/CreateTeaModal/ErrorBanner";
-import { useNavigate } from "react-router";
 import type { Tea } from "~t/types";
+import { useLocalStorage } from "~/utils/browser/useLocalStorage";
 
 const DEFAULT_TEA = {};
 
@@ -24,6 +24,7 @@ export function CreateTeaModal(props: {
 	onClose: () => void;
 }) {
 	const isDirty = useRef(false);
+	const [draft, setDraft] = useLocalStorage<Partial<NewTeaData> | undefined>("tea:create_unpersisted", undefined);
 	const [data, setData] = useState<Partial<NewTeaData>>(props.defaultParams ?? DEFAULT_TEA);
 	const [error, setError] = useState<string | undefined>();
 	const hasRequiredData = !!data.type;
@@ -37,6 +38,11 @@ export function CreateTeaModal(props: {
 			return;
 		}
 
+		if (draft) {
+			setData(draft);
+			return;
+		}
+
 		setData(props.defaultParams ?? DEFAULT_TEA);
 	}, [props.open]);
 
@@ -44,6 +50,7 @@ export function CreateTeaModal(props: {
 		...makeCreateTeaMutationOpt(),
 		onSuccess: (tea) => {
 			isDirty.current = false;
+			setDraft(undefined);
 			props.onCreated(tea);
 		},
 		onError: (e) => {
@@ -54,6 +61,7 @@ export function CreateTeaModal(props: {
 
 	function patch(patch: Partial<NewTeaData>) {
 		isDirty.current = true;
+		setDraft({ ...data, ...patch });
 		setData((st) => ({ ...st, ...patch }));
 		setError(undefined);
 	}
