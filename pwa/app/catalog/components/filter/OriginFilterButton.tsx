@@ -13,7 +13,7 @@ export function OriginFilterButton(props: {
 }) {
 	const value = props.origin ?? props.root;
 	const [open, setOpen] = useState(false);
-	const originQuery = useQuery(makeOriginQueryOpt(props.origin ?? props.root));
+	const originQuery = useQuery(makeOriginQueryOpt({ path: props.origin ?? props.root }));
 
 	return (
 		<>

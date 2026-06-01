@@ -10,7 +10,6 @@ export default [
 	layout("auth/components/AuthenticatedGuard.tsx", [
 		route("/welcome", "pages/dashboard/dashboard.tsx"),
 
-		route("/tea/new", "pages/tea/tea-create.tsx"),
 		route("/tea/search", "catalog/pages/search.tsx"),
 		route("/tea/:id", "catalog/pages/tea.tsx"),
 		route("/tea_types/:origin/:slug", "pages/tea/tea-type.tsx"),
@@ -29,10 +28,6 @@ export default [
 
 	layout("auth/components/AdminGuard.tsx", [
 		route("/refs", "pages/refs.tsx"),
-		...prefix("/admin", [
-			route("/", "pages/admin/home.tsx"),
-			route("/type/new", "pages/type/type-create.tsx"),
-			route("/members", "pages/admin/members.tsx"),
-		]),
+		...prefix("/admin", [route("/", "pages/admin/home.tsx"), route("/members", "pages/admin/members.tsx")]),
 	]),
 ] satisfies RouteConfig;

@@ -1,4 +1,4 @@
-import type { TeaFamily } from "~t/types";
+import { teaFamilies, teaFamiliesShort, type TeaFamily } from "~t/types";
 import Leaf from "~/components/icons/leaf";
 import clsx from "clsx";
 
@@ -11,9 +11,11 @@ const ICON_COLOR = {
 	fermented: "text-stone-500",
 } as const;
 
-export function Family(props: { family: TeaFamily; iconLast?: boolean; iconOnly?: boolean; className?: string }) {
+export function Family(props: { family: TeaFamily; iconLast?: boolean; iconOnly?: boolean; className?: string; long?: boolean }) {
 	const leaf = <Leaf className={clsx("size-[.75em]", ICON_COLOR[props.family])} />;
-	const text = !props.iconOnly && <span className={props.iconLast ? "mr-1" : "ml-1"}>{props.family}</span>;
+	const text = !props.iconOnly && <span className={props.iconLast ? "mr-1" : "ml-1"}>
+		{props.long ? teaFamilies[props.family] : teaFamiliesShort[props.family]}
+	</span>;
 
 	return (
 		<span className={clsx("inline-flex items-center", props.className)}>

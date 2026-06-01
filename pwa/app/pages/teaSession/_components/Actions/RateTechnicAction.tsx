@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { EmojiPuzzled, EmojiSad, EmojiSatisfied, EmojiThinkLeft } from "iconoir-react";
 import { Modal } from "~/components/shared/modal/Modal";
-import { SessionAction } from "~/pages/teaSession/_components/Actions/SessionAction";
+import { SessionActionButton } from "~/pages/teaSession/_components/Actions/SessionActionButton";
 import { useMutation } from "@tanstack/react-query";
 import { makePathTeaSessionMutationOpt } from "~/utils/command/updateTeaSessionCommand";
 import { type BrewingQuality, BrewingQualityEnum, type TeaSession } from "~t/types";
@@ -37,10 +37,10 @@ export function RateTechnicAction(props: {
 
 	return (
 		<Fragment>
-			<SessionAction onClick={() => setEdit(true)} readonly={props.readonly} filled={filled}>
+			<SessionActionButton onClick={() => setEdit(true)} readonly={props.readonly} filled={filled}>
 				{filled ? QualityIcon[value] : <EmojiPuzzled className="size-5" />}
 				{filled ? QualityLabel[value] : "Rate brew"}
-			</SessionAction>
+			</SessionActionButton>
 
 			{!props.readonly && (
 				<Modal open={edit} className="p-4" onClose={() => setEdit(false)}>

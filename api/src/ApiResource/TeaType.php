@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
 	normalizationContext: ["groups" => ["type:read", "origin:read", "with:origin"]],
+	denormalizationContext: ["groups" => ["teaType:create"]],
 	security: "is_granted('ROLE_USER')",
 )]
 #[Get(
@@ -72,12 +73,12 @@ class TeaType
 	#[ApiProperty(writable: false, identifier: true)]
 	public ?string $slug = null;
 
-	#[Groups(["with:origin", "with:teatype"])]
+	#[Groups(["with:origin", "with:teatype", "teaType:create"])]
 	public TeaFamily $family;
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 16)]
-	#[Groups(["embedded:teaType", "with:teatype", "with:origin", "tea:create"])]
+	#[Groups(["embedded:teaType", "with:teatype", "with:origin", "teaType:create"])]
 	public string $name;
 
 	#[Groups(["with:origin"])]

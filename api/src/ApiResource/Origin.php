@@ -45,7 +45,7 @@ class Origin
 {
 	#[ApiProperty(identifier: true)]
 	#[Groups(["origin:read", "with:origin"])]
-	public string $path;
+	public ?string $path = null;
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 24)]
@@ -63,5 +63,5 @@ class Origin
 	public bool $proposal = true;
 
 	#[Groups(["origin:write"])]
-	public string $parentPath;
+	public ?string $parentPath = null;
 }

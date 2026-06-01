@@ -46,6 +46,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		$cultivarFilter = OperationHelper::getParameter($operation, "cultivar", castFn: "intval");
 		$businessFilter = OperationHelper::getParameter($operation, "business", castFn: "intval");
 		$sortParam = OperationHelper::getParameter($operation, "sort") ?? "popularity";
+		$exactMatch = OperationHelper::getParameter($operation, "exactMatch", "boolval") ?? false;
 
 		// Ignore some filters when using tea type filter
 		// as a type already have some predefined constraints
@@ -69,7 +70,7 @@ readonly class TeaCollectionProvider implements ProviderInterface
 			->groupBy("tea.id");
 
 		// Text search
-		if (null !== $searchText) {
+		if (null !== $searchText && false === $exactMatch) {
 			$searchQb
 				->andWhere("0.1 < SIMILARITY(UNACCENT(type.name), UNACCENT(:searchText))")
 				->setParameter("searchText", $searchText)
@@ -78,40 +79,57 @@ readonly class TeaCollectionProvider implements ProviderInterface
 		}
 
 		// Family
+		// No need to force on exactMatch mode to prevent looking for NULL values
+		// (when looking for type, the family search parameter is forced to NULL)
 		if (null !== $familyFilter) {
 			$searchQb->andWhere("tea.family = :family")->setParameter("family", $familyFilter);
 		}
 
 		// Origin
-		if (null !== $originPath) {
-			$searchQb->andWhere("CONTAINS(:originPath, tea.originPath) = TRUE")
-				->setParameter("originPath", $originPath);
+		if (null !== $originPath && false === $exactMatch) {
+			$searchQb->andWhere("CONTAINS(:originPath, tea.originPath) = TRUE")->setParameter("originPath", $originPath);
+		} elseif ($exactMatch && null !== $originPath) {
+			$searchQb->andWhere("tea.originPath = :originPath")->setParameter("originPath", $originPath);
+		} elseif ($exactMatch && null === $originPath) {
+			$searchQb->andWhere("tea.originPath IS NULL");
 		}
 
 		// Type
 		if (null !== $typeFilter) {
 			$searchQb->andWhere("type.slug = :typeSlug")->setParameter("typeSlug", $typeFilter);
+		} elseif ($exactMatch) {
+			$searchQb->andWhere("type.slug IS NULL");
 		}
 
 		// Cultivar
 		if (null !== $cultivarFilter) {
 			$searchQb
-				->innerJoin("tea.cultivar", "cultivar")
+				->leftJoin("tea.cultivar", "cultivar")
 				->andWhere("cultivar.id = :cultivarId")
 				->setParameter("cultivarId", $cultivarFilter);
+		} elseif ($exactMatch) {
+			$searchQb
+				->leftJoin("tea.cultivar", "cultivar")
+				->andWhere("cultivar.id IS NULL");
 		}
 
 		// Business
 		if ($businessFilter) {
 			$searchQb
-				->innerJoin("tea.business", "business")
+				->leftJoin("tea.business", "business")
 				->andWhere("business.id = :businessId")
 				->setParameter("businessId", $businessFilter);
+		} elseif($exactMatch) {
+			$searchQb
+				->leftJoin("tea.business", "business")
+				->andWhere("business.id IS NULL");
 		}
 
 		// Yaer
 		if (is_int($yearFilter)) {
 			$searchQb->andWhere("tea.year = :year")->setParameter("year", $yearFilter);
+		} elseif($exactMatch) {
+			$searchQb->andWhere("tea.year IS NULL");
 		}
 
 		// Sorting

@@ -76,11 +76,23 @@ use Symfony\Component\Validator\Constraints as Assert;
 			openApi: new OpenApiParameter(name: "enum", in: "query"),
 			description: "Sorting method",
 		),
+		"exactMatch" => new QueryParameter(
+			schema: ["type" => "boolean"],
+			description: "Use exact matching, no origin path children, or fuzzy text",
+		),
 	],
 )]
 #[Post(
 	normalizationContext: ["groups" => ["tea:read"]],
-	denormalizationContext: ["groups" => ["tea:create"]],
+	denormalizationContext: [
+		"groups" => [
+			"tea:create",
+			"origin:write",
+			"business:write",
+			"cultivar:write",
+			"teaType:create"
+		]
+	],
 	processor: TeaCreateProcess::class,
 )]
 #[Post(
@@ -111,7 +123,7 @@ class Tea
 	#[Groups(["tea:read", "embedded:tea", "with:tea"])]
 	public ?int $id;
 
-	#[Groups(["tea:create", "tea:read", "embedded:tea", "with:tea"])]
+	#[Groups(["tea:read", "embedded:tea", "with:tea"])]
 	public TeaFamily $family;
 
 	#[Groups(["tea:create", "tea:read", "embedded:tea", "with:tea"])]

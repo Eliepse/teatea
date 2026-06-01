@@ -3,17 +3,14 @@ import { getApi } from "~/utils/api";
 import type { ApiCollection, Origin } from "~t/types";
 import type { Pagination } from "~t/query";
 
-export function makeOriginQueryOpt(path?: string) {
-	return queryOptions({
-		queryFn: async () => {
-			if (!path) {
-				return null;
-			}
+export function makeOriginQueryOpt(origin?: Partial<Pick<Origin, "@id" | "path">>) {
+	const iri = origin?.["@id"] ?? `/origins/${origin?.path}`;
 
-			return await (await getApi<Origin>(`/origins/${path}`)).json();
-		},
-		queryKey: ["origins", path],
+	return queryOptions({
+		queryFn: async () => await (await getApi<Origin>(iri)).json(),
+		queryKey: ["origins", iri],
 		staleTime: 7 * 24 * 60_000,
+		enabled: !!origin?.path || !!origin?.["@id"],
 	});
 }
 

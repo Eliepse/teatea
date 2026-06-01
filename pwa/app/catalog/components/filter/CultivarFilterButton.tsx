@@ -13,7 +13,7 @@ export function CultivarFilterButton(props: {
 	onChange: (cultivar: Cultivar["id"] | undefined) => void;
 }) {
 	const [open, setOpen] = useState(false);
-	const cultivarQuery = useQuery(makeCultivarQueryOpt(props.cultivar));
+	const cultivarQuery = useQuery(makeCultivarQueryOpt({ id: props.cultivar }));
 
 	return (
 		<>

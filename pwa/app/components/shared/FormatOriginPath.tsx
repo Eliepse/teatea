@@ -14,8 +14,8 @@ export function FormatOriginPath(props: { originPath: OriginPath; maxLevel?: Ori
 	return props.originPath.country.name;
 }
 
-export function FormatOrigin(props: { origin: Pick<Origin, "namePath">; maxLevel?: OriginLevel }) {
-	const [country, region, locality] = props.origin.namePath;
+export function FormatOrigin(props: { origin: Partial<Pick<Origin, "namePath" | "name">>; maxLevel?: OriginLevel }) {
+	const [country, region, locality] = props.origin.namePath ?? [props.origin.name].filter(v => v);
 
 	if (undefined !== locality && !["region", "country"].includes(props.maxLevel ?? "locality")) {
 		return `${locality}, ${region} (${country})`;

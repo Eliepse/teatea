@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Origin;
+use App\State\Hydration\OriginHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -16,6 +17,7 @@ readonly class OriginProvider implements ProviderInterface
 {
 	public function __construct(
 		private EntityManagerInterface $em,
+		private OriginHydrator $hydrator,
 	) {}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?Origin
@@ -50,7 +52,7 @@ readonly class OriginProvider implements ProviderInterface
 			return null;
 		}
 
-		$resource = static::fromEntity($result[0]);
+		$resource = $this->hydrator->hydrate($result[0]);
 		$resource->isLeaf = 0 === $result["children"];
 		$resource->namePath = array_values(array_unique(json_decode($result["namePath"])));
 		return $resource;
