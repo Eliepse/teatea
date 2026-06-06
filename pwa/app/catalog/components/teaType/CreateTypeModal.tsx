@@ -17,7 +17,7 @@ export function CreateTypeModal(props: {
 	const isNameValid = 2 < (data?.name?.length ?? 0);
 
 	function submit() {
-		const name = data.name;
+		const name = data.name?.trim();
 
 		if (!name || 2 >= name.length) {
 			return;

@@ -19,8 +19,9 @@ export function TextInput(props: {
 	}
 
 	function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
-		const cleanValue = e.target.value.trim();
-		f(props.onChange)(cleanValue.length ? cleanValue : undefined);
+		const rawValue = e.target.value;
+		const cleanValue = rawValue.trim();
+		f(props.onChange)(cleanValue.length ? rawValue : undefined);
 	}
 
 	return (
