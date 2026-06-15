@@ -4,7 +4,7 @@ export function meta({}: Route.MetaArgs) {
   return [{ title: "Teatea - Refs" }];
 }
 
-export async function loader() {
+export async function clientLoader() {
   return {
     stores: [
       ["https://chanoki.fr", "Chanoki"],
