@@ -11,6 +11,9 @@
 		"lint": "eslint"
 	},
 	"dependencies": {
+		"@capacitor/android": "^8.4.1",
+		"@capacitor/core": "^8.4.1",
+		"@daypicker/react": "^10.0.1",
 		"@heroicons/react": "^2.2.0",
 		"@ncdai/react-wheel-picker": "^1.2.2",
 		"@posthog/react": "^1.10.0",
@@ -38,13 +41,13 @@
 		"qrcode": "^1.5.4",
 		"react": "^19.2.7",
 		"react-chartjs-2": "^5.3.1",
-		"@daypicker/react": "^10.0.1",
 		"react-dom": "^19.2.7",
 		"react-robot": "^1.2.1",
 		"react-router": "^7.17.0",
 		"tailwindcss": "^4.3.0"
 	},
 	"devDependencies": {
+		"@capacitor/cli": "^8.4.1",
 		"@eslint/js": "^10.0.1",
 		"@react-router/dev": "^7.17.0",
 		"@tailwindcss/vite": "^4.3.0",
