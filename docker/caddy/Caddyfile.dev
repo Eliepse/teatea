@@ -57,7 +57,10 @@
 
 	# Comment the following line if you don't want PWA to catch requests for HTML documents.
 	# In this case, they will be handled by the PHP app.
-	reverse_proxy @pwa http://{$PWA_UPSTREAM}
+	handle @pwa {
+		header >Access-Control-Allow-Origin *
+		reverse_proxy @pwa http://{$PWA_UPSTREAM}
+	}
 
 	php_server
 }
