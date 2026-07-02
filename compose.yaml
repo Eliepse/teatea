@@ -2,13 +2,12 @@ services:
   api:
     user: "1000:1000"
     build:
-      context: ./api
+      context: .
       target: dev
     depends_on:
       - database
     env_file:
       - .env
-      - api/.env.local
     restart: unless-stopped
     environment:
       APP_DEBUG: true
@@ -33,7 +32,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./api/:/app
-      - ./api/frankenphp/Caddyfile:/etc/caddy/Caddyfile
+      - ./docker/caddy/Caddyfile.dev:/etc/caddy/Caddyfile
     ports:
       - "80:80"
     develop:
