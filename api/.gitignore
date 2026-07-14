@@ -1,6 +1,9 @@
 /docker/db/data
 /public/media
 
+# Removed as Mercure bundle keep updating it for no reason
+/config/reference.php
+
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
