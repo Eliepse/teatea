@@ -16,6 +16,7 @@ export default [
 
 		route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
 		route("/sessions", "pages/teaSession/teaSessions.tsx"),
+		route("/feed", "social/pages/feed.tsx"),
 
 		route("/lists/:id", "pages/member/teaList.tsx"),
 

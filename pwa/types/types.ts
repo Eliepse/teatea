@@ -236,3 +236,10 @@ export type CollectionTea = Resource<"CollectionTea"> & {
 	thumbnail?: MediaObject;
 	rating?: number;
 };
+
+export type Post = Resource<"Post"> & {
+	content: string;
+	author: Iri;
+	createdAt: Date;
+	updatedAt: Date;
+}
