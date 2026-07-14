@@ -7,3 +7,7 @@ compose.override.yml
 .pnpm-store
 /.env
 .env.local
+runtime-env.d.ts
+
+# Bruno api client
+docs/api/teatea/environments

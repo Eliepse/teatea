@@ -1,0 +1,43 @@
+opencollection: 1.0.0
+
+info:
+  name: teatea
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  auth:
+    type: bearer
+    token: "{{token}}"
+  variables:
+    - name: LOGIN_KEY
+      value: "{"
+  scripts:
+    - type: before-request
+      code: |-
+        if("Login" === req.getName()) {
+          return;
+        }
+
+        const tokenExpiration = bru.getVar("token_expiration");
+
+        if(tokenExpiration && Date.now() > tokenExpiration * 1000) {
+          return;
+        }
+
+        bru.runRequest("Login");
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git
