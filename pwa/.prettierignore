@@ -1,3 +1,5 @@
 # Ignore artifacts:
 build
 coverage
+.react-router
+node_modules
