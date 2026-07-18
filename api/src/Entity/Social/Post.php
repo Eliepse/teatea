@@ -11,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
+#[ORM\Index(name: "post_timeline", fields: ["createdAt", "id"])]
 class Post
 {
 	use TimestampedEntity;

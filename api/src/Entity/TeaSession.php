@@ -14,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Clock\DatePoint;
 
 #[ORM\Entity(repositoryClass: TeaSessionRepository::class)]
+#[ORM\Index(name: "tea_session_timeline", fields: ["drankAt", "id"])]
 class TeaSession
 {
 	use TimestampedEntity;

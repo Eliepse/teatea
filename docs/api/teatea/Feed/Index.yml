@@ -1,0 +1,20 @@
+info:
+  name: Index
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: http://localhost/api/feed
+  params:
+    - name: cursor[lt]
+      value: MTc4MDM1ODQwMC4wLjEzODU=
+      type: query
+      disabled: true
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

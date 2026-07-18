@@ -15,6 +15,9 @@ config:
       bypassProxy: ""
 
 request:
+  headers:
+    - name: Cookie
+      value: XDEBUG_SESSION=PHPSTORM
   auth:
     type: bearer
     token: "{{token}}"
@@ -36,8 +39,4 @@ request:
 
         bru.runRequest("Login");
 bundled: false
-extensions:
-  bruno:
-    ignore:
-      - node_modules
-      - .git
+extensions: {}

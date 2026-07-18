@@ -11,9 +11,11 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use App\ApiResource\Social\Feedable;
 use App\DTO\SteepValue;
 use App\Enum\BrewingQuality;
 use App\Enum\BrewingType;
+use App\Enum\Social\FeedableType;
 use App\State\TeaSession\TeaSessionCreateProcessor;
 use App\State\TeaSession\TeaSessionDeleteProcessor;
 use App\State\TeaSession\TeaSessionEditProcessor;
@@ -21,6 +23,7 @@ use App\State\TeaSession\TeaSessionProvider;
 use App\State\TeaSession\TeaSessionsPaginatedProvider;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(normalizationContext: [
@@ -83,7 +86,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 		),
 	],
 )]
-class TeaSession
+class TeaSession implements Feedable
 {
 	#[Groups(["teaSession:read", "teaSession:minimal"])]
 	#[ApiProperty(identifier: true)]
@@ -146,5 +149,23 @@ class TeaSession
 			fn($v) => $v instanceof SteepValue ? $v : new SteepValue($v["duration"], $v["temperature"] ?? null),
 			$steeps,
 		);
+	}
+
+	#[Ignore]
+	public function getId(): int
+	{
+		return $this->id;
+	}
+
+	#[Ignore]
+	public function getType(): FeedableType
+	{
+		return FeedableType::TeaSession;
+	}
+
+	#[Ignore]
+	public function getPublishedAt(): \DateTimeImmutable
+	{
+		return $this->drankAt;
 	}
 }
