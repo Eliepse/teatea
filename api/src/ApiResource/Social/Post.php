@@ -4,19 +4,23 @@ namespace App\ApiResource\Social;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
 use App\ApiResource\Member;
 use App\Enum\Social\FeedableType;
 use App\State\Post\PostCreateProcessor;
 use App\State\Post\PostPaginatedProvider;
+use App\State\Post\PostProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
 	normalizationContext: ["groups" => ["post:read", "with:post"]],
 	denormalizationContext: ["groups" => ["post:write"]],
+	security: "is_granted('ROLE_USER')",
 )]
+#[Get(processor: PostProvider::class)]
 #[ApiPost(processor: PostCreateProcessor::class)]
 #[GetCollection(
 	paginationEnabled: true,
@@ -28,22 +32,22 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 class Post implements Feedable
 {
 	#[ApiProperty(identifier: true)]
-	#[Groups(["post:read", "feed"])]
+	#[Groups(["post:read", "with:post"])]
 	public ?int $id = null;
 
-	#[Groups(["post:read", "feed"])]
+	#[Groups(["post:read"])]
 	public Member $author;
 
-	#[Groups(["post:read", "feed", "post:write"])]
+	#[Groups(["post:read", "post:write"])]
 	public string $content;
 
-	#[Groups(["post:read", "feed"])]
+	#[Groups(["post:read"])]
 	public \DateTimeImmutable $createdAt;
 
-	#[Groups(["post:read", "feed"])]
+	#[Groups(["post:read"])]
 	public \DateTimeImmutable $updatedAt;
 
-	#[Ignore]
+	#[Groups(["post:read", "with:post"])]
 	public function getId(): int
 	{
 		return $this->id;

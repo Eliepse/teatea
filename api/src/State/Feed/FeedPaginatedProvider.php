@@ -69,9 +69,10 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 		$sessionsById = $this->em
 			->createQuery(
 				<<<DQL
-				SELECT session, tea, tea_type, business
+				SELECT session, tea, tea_type, business, author
 				FROM App\Entity\TeaSession session
 				LEFT JOIN session.tea tea
+				LEFT JOIN session.author author
 				LEFT JOIN tea.type tea_type
 				LEFT JOIN tea.business business
 				WHERE session.id IN (:ids)

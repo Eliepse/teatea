@@ -15,16 +15,16 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 	normalizationContext: [
 		"groups" => [
 			"feed",
-			"with:post",
-			"with:tea_session",
+			"post:read",
+			"teaSession:read",
 			"with:tea",
 			"with:business",
 			"with:teatype",
-			"teaSession:read",
 			"with:origin",
 			"embedded:cultivar",
 		]
 	],
+	security: "is_granted('ROLE_USER')",
 )]
 #[GetCollection(
 	paginationViaCursor: [
@@ -37,16 +37,17 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 	paginationClientItemsPerPage: true,
 	provider: FeedPaginatedProvider::class,
 )]
-#[Groups(["feed"])]
-class Feed implements HideIdentifierInterface
+readonly class Feed implements HideIdentifierInterface
 {
 	public function __construct(
 		#[Ignore]
-		public readonly FeedCursor $cursor,
-		public readonly Feedable $item,
+		public FeedCursor $cursor,
+		#[Groups(["feed"])]
+		public Feedable $item,
 	) {
 	}
 
+	#[Groups(["feed"])]
 	public function getPublishedAt(): \DateTimeImmutable
 	{
 		return $this->item->getPublishedAt();
