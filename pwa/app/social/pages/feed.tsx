@@ -1,19 +1,21 @@
 import { Post, PostSkeleton } from "~/social/components/Post";
 import { WithMainMenu } from "~/layouts/WithMainMenu";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { makePostInfiniteOpt } from "~/social/query/postQuery";
 import { extractId } from "~/utils/resource";
 import { Fragment } from "react";
+import { makeFeedInfiniteOpt } from "~/social/query/feedQuery";
+import { DashedButton } from "~/shared/components/Button";
+import { TeaSession } from "~/social/components/TeaSession";
 
 export async function clientLoader() {}
 
 export default function FeedPage() {
-	const postsQuery = useInfiniteQuery(makePostInfiniteOpt({}));
+	const feedQuery = useInfiniteQuery(makeFeedInfiniteOpt(undefined, { itemsPerPage: 16 }));
 
 	return (
 		<WithMainMenu activeKey="activity" className="p-4">
 			<ul>
-				{postsQuery.isLoading && (
+				{feedQuery.isLoading && (
 					<Fragment>
 						<li className="mb-4">
 							<PostSkeleton />
@@ -29,18 +31,36 @@ export default function FeedPage() {
 						</li>
 					</Fragment>
 				)}
-				{postsQuery.data?.pages?.map((page) =>
-					page.member.map((post) => (
-						<li key={post.id} className="mb-4">
-							<Post
-								createdAt={post.createdAt}
-								author={{ username: extractId(post.author) }}
-								content={post.content}
-							/>
+				{feedQuery.data?.pages?.map((page) =>
+					page.member.map((feedItem) => (
+						<li key={feedItem.item["@id"]} className="mb-4">
+							{"Post" === feedItem.item["@type"] && (
+								<Post
+									createdAt={feedItem.item.createdAt}
+									author={{ username: extractId(feedItem.item.author) }}
+									content={feedItem.item.content}
+								/>
+							)}
+							{"TeaSession" === feedItem.item["@type"] && (
+								<TeaSession
+									id={feedItem.item.id}
+									author={feedItem.item.author}
+									tea={feedItem.item.tea}
+									className="mx-2"
+								/>
+							)}
 						</li>
 					)),
 				)}
 			</ul>
+
+			<div>
+				{feedQuery.hasNextPage && (
+					<DashedButton className="" onClick={() => feedQuery.fetchNextPage()}>
+						Next page
+					</DashedButton>
+				)}
+			</div>
 		</WithMainMenu>
 	);
 }

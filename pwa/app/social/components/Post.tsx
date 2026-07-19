@@ -9,7 +9,7 @@ export function Post(props: { author: Pick<Member, "username">; content: string;
 				<span className="text-stone-600">{formatDate(props.createdAt, "HH:mm")}</span>
 			</div>
 			<div>
-				<p className="px-4 pb-4">{props.content}</p>
+				<p className="px-4 pb-4 leading-tight">{props.content}</p>
 			</div>
 		</article>
 	);

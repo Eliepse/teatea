@@ -82,7 +82,7 @@ export type TeaSession = Resource<"TeaSession"> & {
 	waterMl?: number;
 	quality?: BrewingQuality;
 	drankAt: Date;
-	author?: Iri;
+	author: Iri;
 	steeps?: Steep[];
 	place?: Business;
 	brewingType?: BrewingType;
@@ -242,4 +242,9 @@ export type Post = Resource<"Post"> & {
 	author: Iri;
 	createdAt: Date;
 	updatedAt: Date;
+}
+
+export type FeedItem = Omit<Resource<"Feed">, "@id" | "id"> & {
+	item: Post|TeaSession;
+	publishedAt: Date;
 }
