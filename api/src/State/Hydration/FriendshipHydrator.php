@@ -4,11 +4,13 @@ namespace App\State\Hydration;
 
 use App\ApiResource\Friendship;
 use App\State\Member\MemberProvider;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
 /**
  * @implements ResourceHydrator<Friendship>
  */
-readonly class FriendshipHydrator implements ResourceHydrator
+#[AsTaggedItem(\App\Entity\Pivot\Friendship::class)]
+final readonly class FriendshipHydrator implements ResourceHydrator
 {
 	public function hydrate(?object $entity): ?Friendship
 	{
@@ -22,7 +24,6 @@ readonly class FriendshipHydrator implements ResourceHydrator
 		$resource->id = $entity->id;
 		$resource->requestor = MemberProvider::hydrate($entity->requestedBy);
 		$resource->requestedAt = $entity->requestedAt;
-
 		return $resource;
 	}
 
@@ -36,7 +37,6 @@ readonly class FriendshipHydrator implements ResourceHydrator
 
 		$resource = new Friendship();
 		$resource->id = $entity->id;
-
 		return $resource;
 	}
 }

@@ -9,8 +9,8 @@ use Vich\UploaderBundle\Storage\StorageInterface;
 /**
  * @implements ResourceHydrator<MediaObject>
  */
-#[AsTaggedItem(\App\Entity\MediaObject::class)]
-final readonly class MediaObjectHydrator implements ResourceHydrator
+#[AsTaggedItem(\App\Entity\Pivot\MediaObjectPivot::class)]
+final readonly class MediaObjectPivotHydrator implements ResourceHydrator
 {
 	public function __construct(
 		private StorageInterface $storage,
@@ -23,12 +23,13 @@ final readonly class MediaObjectHydrator implements ResourceHydrator
 			return null;
 		}
 
-		assert($entity instanceof \App\Entity\MediaObject);
+		assert($entity instanceof \App\Entity\Pivot\MediaObjectPivot);
 
 		$resource = new MediaObject();
-		$resource->id = $entity->id;
-		$resource->contentUrl = $this->storage->resolveUri($entity, "file");
-		$resource->placeholder = $entity->placeholder;
+		$resource->id = $entity->media->id;
+		$resource->contentUrl = $this->storage->resolveUri($entity->media, "file");
+		$resource->placeholder = $entity->media->placeholder;
+		$resource->collection = $entity->collection;
 		return $resource;
 	}
 
@@ -38,10 +39,10 @@ final readonly class MediaObjectHydrator implements ResourceHydrator
 			return null;
 		}
 
-		assert($entity instanceof \App\Entity\MediaObject);
+		assert($entity instanceof \App\Entity\Pivot\MediaObjectPivot);
 
 		$resource = new MediaObject();
-		$resource->id = $entity->id;
+		$resource->id = $entity->media->id;
 		return $resource;
 	}
 }

@@ -2,9 +2,13 @@
 
 namespace App\State\Hydration;
 
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+
 /**
  * @template TOutput of object
  */
+#[AutoconfigureTag]
 interface ResourceHydrator
 {
 	/**

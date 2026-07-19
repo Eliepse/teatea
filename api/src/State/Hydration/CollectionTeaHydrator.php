@@ -3,16 +3,16 @@
 namespace App\State\Hydration;
 
 use App\ApiResource\CollectionTea;
-use App\State\Member\MemberProvider;
-use App\State\Tea\TeaProvider;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
 /**
  * @implements ResourceHydrator<CollectionTea>
  */
-readonly class CollectionTeaHydrator implements ResourceHydrator
+#[AsTaggedItem(\App\Entity\CollectionTea::class)]
+final readonly class CollectionTeaHydrator implements ResourceHydrator
 {
 	public function __construct(
-		private MediaObjectHydrator $mediaHydrator,
+		private ResourceHydrator $hydrator,
 	) {
 	}
 
@@ -24,18 +24,18 @@ readonly class CollectionTeaHydrator implements ResourceHydrator
 
 		assert($entity instanceof \App\Entity\CollectionTea);
 
-		$tea = new CollectionTea();
-		$tea->id = $entity->id;
-		$tea->tea = TeaProvider::hydrateResource($entity->tea);
-		$tea->owner = MemberProvider::hydrate($entity->owner);
-		$tea->description = $entity->description;
-		$tea->acquiredAt = $entity->acquiredAt;
-		$tea->finishedAt = $entity->finishedAt;
-		$tea->rating = $entity->rating;
-
-		$tea->thumbnail = $this->mediaHydrator->hydrate($entity->media?->first() ?: null);
-
-		return $tea;
+		$resource = new CollectionTea();
+		$resource->id = $entity->id;
+		/** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+		$resource->tea = $this->hydrator->hydrate($entity->tea);
+		/** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+		$resource->owner = $this->hydrator->hydrate($entity->owner);
+		$resource->description = $entity->description;
+		$resource->acquiredAt = $entity->acquiredAt;
+		$resource->finishedAt = $entity->finishedAt;
+		$resource->rating = $entity->rating;
+		$resource->thumbnail = $this->hydrator->hydrate($entity->media?->first() ?: null);
+		return $resource;
 	}
 
 	public function hydrateReference(?object $entity): ?CollectionTea
@@ -48,7 +48,8 @@ readonly class CollectionTeaHydrator implements ResourceHydrator
 
 		$tea = new CollectionTea();
 		$tea->id = $entity->id;
-		$tea->owner = MemberProvider::hydrate($entity->owner);
+		/** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+		$tea->owner = $this->hydrator->hydrate($entity->owner);
 
 		return $tea;
 	}

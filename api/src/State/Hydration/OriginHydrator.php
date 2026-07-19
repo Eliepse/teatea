@@ -3,19 +3,25 @@
 namespace App\State\Hydration;
 
 use App\ApiResource\Origin;
-use App\State\Hydration\ResourceHydrator;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
-class OriginHydrator implements ResourceHydrator
+/**
+ * @implements ResourceHydrator<Origin>
+ */
+#[AsTaggedItem(\App\Entity\Origin::class)]
+final readonly class OriginHydrator implements ResourceHydrator
 {
 
 	/**
 	 * @inheritDoc
 	 */
-	public function hydrate(?object $entity): ?\App\ApiResource\Origin
+	public function hydrate(?object $entity): ?Origin
 	{
 		if (null === $entity) {
 			return null;
 		}
+
+		assert($entity instanceof \App\Entity\Origin);
 
 		$resource = new Origin();
 		$resource->name = $entity->name;
@@ -28,11 +34,13 @@ class OriginHydrator implements ResourceHydrator
 	/**
 	 * @inheritDoc
 	 */
-	public function hydrateReference(?object $entity): ?\App\ApiResource\Origin
+	public function hydrateReference(?object $entity): ?Origin
 	{
 		if (null === $entity) {
 			return null;
 		}
+
+		assert($entity instanceof \App\Entity\Origin);
 
 		$resource = new Origin();
 		$resource->path = $entity->path->getPath();

@@ -12,10 +12,8 @@ use App\ApiResource\Social\Post;
 use App\ApiResource\TeaSession;
 use App\Enum\Social\FeedableType;
 use App\Helper\Arr;
-use App\State\Hydration\PostHydrator;
+use App\State\Hydration\ResourceHydrator;
 use App\State\Pagination\CursorPaginator;
-use App\State\TeaSession\TeaSessionProvider;
-use DateTimeInterface;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,9 +24,9 @@ use Doctrine\ORM\EntityManagerInterface;
 final readonly class FeedPaginatedProvider implements ProviderInterface
 {
 	public function __construct(
-		private PostHydrator $postHydrator,
 		private EntityManagerInterface $em,
 		private Pagination $pagination,
+		private ResourceHydrator $hydrator,
 	) {
 	}
 
@@ -69,7 +67,16 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 		$postsById = Arr::keyBy($postsById, "id");
 
 		$sessionsById = $this->em
-			->createQuery("SELECT session FROM App\Entity\TeaSession session WHERE session.id IN (:ids)")
+			->createQuery(
+				<<<DQL
+				SELECT session, tea, tea_type, business
+				FROM App\Entity\TeaSession session
+				LEFT JOIN session.tea tea
+				LEFT JOIN tea.type tea_type
+				LEFT JOIN tea.business business
+				WHERE session.id IN (:ids)
+				DQL,
+			)
 			->setParameter("ids", $sessionIds, ArrayParameterType::INTEGER)
 			->getResult();
 		$sessionsById = Arr::keyBy($sessionsById, "id");
@@ -78,8 +85,8 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 
 		foreach ($results as $result) {
 			$item = match ($result["type"]) {
-				FeedableType::Post => $this->postHydrator->hydrate($postsById[$result["id"]]),
-				FeedableType::TeaSession => TeaSessionProvider::hydrate($sessionsById[$result["id"]]),
+				FeedableType::Post => $this->hydrator->hydrate($postsById[$result["id"]]),
+				FeedableType::TeaSession => $this->hydrator->hydrate($sessionsById[$result["id"]]),
 			};
 
 			$resources[] = new Feed(FeedCursor::fromFeedable($item), $item);
