@@ -13,7 +13,10 @@ use App\State\Post\PostPaginatedProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
-#[ApiResource(denormalizationContext: ["groups" => ["post:write"]])]
+#[ApiResource(
+	normalizationContext: ["groups" => ["post:read", "with:post"]],
+	denormalizationContext: ["groups" => ["post:write"]],
+)]
 #[ApiPost(processor: PostCreateProcessor::class)]
 #[GetCollection(
 	paginationEnabled: true,
@@ -25,15 +28,19 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 class Post implements Feedable
 {
 	#[ApiProperty(identifier: true)]
+	#[Groups(["post:read", "feed"])]
 	public ?int $id = null;
 
+	#[Groups(["post:read", "feed"])]
 	public Member $author;
 
-	#[Groups(["post:write"])]
+	#[Groups(["post:read", "feed", "post:write"])]
 	public string $content;
 
+	#[Groups(["post:read", "feed"])]
 	public \DateTimeImmutable $createdAt;
 
+	#[Groups(["post:read", "feed"])]
 	public \DateTimeImmutable $updatedAt;
 
 	#[Ignore]

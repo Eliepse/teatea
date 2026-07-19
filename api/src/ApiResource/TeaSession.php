@@ -92,14 +92,14 @@ class TeaSession implements Feedable
 	#[ApiProperty(identifier: true)]
 	public ?int $id = null;
 
-	#[Groups(["teaSession:create", "teaSession:read"])]
+	#[Groups(["teaSession:create", "teaSession:read", "feed"])]
 	#[ApiProperty(readable: true, readableLink: true)]
 	public ?Tea $tea = null;
 
 	#[Groups(["teaSession:create", "teaSession:read"])]
 	public ?CollectionTea $collectionTea = null;
 
-	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal"])]
+	#[Groups(["teaSession:create", "teaSession:edit", "teaSession:read", "teaSession:minimal", "with:teaSession"])]
 	public ?BrewingType $brewingType = null;
 
 	#[Assert\Length(max: 1000)]

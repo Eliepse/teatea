@@ -4,6 +4,7 @@ namespace App\ApiResource\Social;
 
 use App\Enum\Social\FeedableType;
 
+
 interface Feedable
 {
 	public function getId(): int;
