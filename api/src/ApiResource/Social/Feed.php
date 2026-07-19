@@ -32,9 +32,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 	],
 	paginationEnabled: true,
 	paginationType: "cursor",
-	paginationItemsPerPage: 8,
-	paginationMaximumItemsPerPage: 50,
+	paginationMaximumItemsPerPage: 64,
 	paginationPartial: true,
+	paginationClientItemsPerPage: true,
 	provider: FeedPaginatedProvider::class,
 )]
 #[Groups(["feed"])]

@@ -11,6 +11,10 @@ http:
       value: MTc4MDM1ODQwMC4wLjEzODU=
       type: query
       disabled: true
+    - name: itemsPerPage
+      value: "20"
+      type: query
+      disabled: true
   auth: inherit
 
 settings:
