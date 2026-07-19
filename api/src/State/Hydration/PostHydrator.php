@@ -12,6 +12,12 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 #[AsTaggedItem(\App\Entity\Social\Post::class)]
 final readonly class PostHydrator implements ResourceHydrator
 {
+	public function __construct(
+		private ResourceHydrator $hydrator,
+	)
+	{
+	}
+
 	/**
 	 * @inheritDoc
 	 */
@@ -26,7 +32,8 @@ final readonly class PostHydrator implements ResourceHydrator
 		$resource = new Post();
 		$resource->id = $entity->id;
 		$resource->content = $entity->content;
-		$resource->author = MemberProvider::hydrate($entity->author);
+		/** @noinspection PhpFieldAssignmentTypeMismatchInspection */
+		$resource->author = $this->hydrator->hydrate($entity->author);
 		$resource->createdAt = $entity->createdAt;
 		$resource->updatedAt = $entity->updatedAt;
 		return $resource;
