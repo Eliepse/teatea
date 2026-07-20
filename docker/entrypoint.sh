@@ -2,7 +2,7 @@
 set -e
 
 if [ -z "$(ls -A 'vendor/' 2>/dev/null)" ] || [ $APP_ENV = "dev" ]; then
-	composer install --prefer-dist --no-progress --no-interaction
+	composer install --prefer-dist --no-progress --no-interaction --no-scripts
 fi
 
 if grep -q ^DATABASE_URL= .env; then
