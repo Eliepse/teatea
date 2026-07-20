@@ -34,7 +34,7 @@ class Tea
 	public ?Cultivar $cultivar = null;
 
 	#[ORM\Column(type: "ltree", nullable: true)]
-	public LTreePath $originPath;
+	public ?LTreePath $originPath = null;
 
 	#[ORM\ManyToOne(targetEntity: Origin::class, inversedBy: "teas")]
 	#[ORM\JoinColumn("origin_path", referencedColumnName: "path", nullable: true)]
