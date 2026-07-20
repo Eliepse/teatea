@@ -18,6 +18,9 @@ request:
   headers:
     - name: Cookie
       value: XDEBUG_SESSION=PHPSTORM
+    - name: Cookie
+      value: XDEBUG_SESSION=PHPSTORM; XDEBUG_PROFILE=PHPSTORM
+      disabled: true
   auth:
     type: bearer
     token: "{{token}}"
