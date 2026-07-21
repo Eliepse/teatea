@@ -8,6 +8,5 @@ else
 	bun install --frozen-lockfile
 fi
 
-bun run gen-env
 exec /usr/local/bin/docker-entrypoint.sh "$@"
 

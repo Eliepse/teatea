@@ -4,9 +4,13 @@
 
 parameters:
     app.base_url: "%env(string:BASE_URL)%"
+    app.support_email: "%env(string:SUPPORT_EMAIL)%"
     auth.refresh_token.ttl: 2592000 # 30 days as seconds
     # Key that must be passed to the url to gain access as admin, only in dev
     auth.dev_login_key: ""
+    
+    posthog.host: "%env(string:POSTHOG_HOST)%"
+    posthog.key: "%env(string:POSTHOG_KEY)%"
 
 when@dev:
     parameters:

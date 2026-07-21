@@ -11,16 +11,12 @@ services:
     restart: unless-stopped
     environment:
       APP_DEBUG: true
+      APP_SECRET: ${APP_SECRET}
       PWA_UPSTREAM: ${PWA_UPSTREAM:-pwa:3000}
       SERVER_NAME: ${SERVER_NAME:-localhost:80}, php:80
-      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
-      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       TRUSTED_PROXIES: ${TRUSTED_PROXIES:-127.0.0.0/8,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,pwa}
       TRUSTED_HOSTS: ${TRUSTED_HOSTS:-^${SERVER_NAME:-example\.com|localhost}|php$$}
       DATABASE_URL: postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin}@database:5432/${POSTGRES_DB:-app}?serverVersion=17&charset=utf8
-      MERCURE_URL: ${CADDY_MERCURE_URL:-http://php/.well-known/mercure}
-      MERCURE_PUBLIC_URL: ${CADDY_MERCURE_PUBLIC_URL:-https://${SERVER_NAME:-localhost}/.well-known/mercure}
-      MERCURE_JWT_SECRET: ${CADDY_MERCURE_JWT_SECRET:-!ChangeThisMercureHubJWTSecretKey!}
       JWT_SECRET_KEY: ${JWT_SECRET_KEY:-/app/config/jwt/key}
       JWT_PUBLIC_KEY: ${JWT_PUBLIC_KEY:-/app/config/jwt/key.pub}
       JWT_PASSPHRASE: ${JWT_PASSPHRASE:-!ChangeMe!}
@@ -28,6 +24,8 @@ services:
       MAILER_DSN: "smtp://aaa:bbb@maildev:1025"
       POSTHOG_KEY: ${POSTHOG_KEY}
       POSTHOG_HOST: ${POSTHOG_HOST}
+      DEV_LOGIN_KEY: ${DEV_LOGIN_KEY}
+      SUPPORT_EMAIL: ${SUPPORT_EMAIL}
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -58,6 +56,8 @@ services:
       VITE_POSTHOG_KEY: ${POSTHOG_KEY}
       VITE_POSTHOG_HOST: ${POSTHOG_HOST}
       VITE_BASE_URL: ${BASE_URL}
+      VITE_SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+      VITE_DEV_LOGIN_KEY: ${DEV_LOGIN_KEY}
     depends_on:
       - api
     volumes:

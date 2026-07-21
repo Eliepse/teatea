@@ -1,7 +1,6 @@
 import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import type { Route } from "./+types/root";
 import "./app.css";
-import "/public/runtime-env.js?no-inline";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AlertContext } from "~/components/shared/modal/AlertManager";
 import { type ReactNode, StrictMode, useState } from "react";
@@ -58,6 +57,7 @@ export function Layout({ children }: { children: ReactNode }) {
 					<link rel="icon" href="/favicon.ico" sizes="any" />
 					<link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
 					<meta name="theme-color" content="#ffffff" />
+					<script src="/client/pwa-support.js"></script>
 					<Links />
 				</head>
 				<body>
