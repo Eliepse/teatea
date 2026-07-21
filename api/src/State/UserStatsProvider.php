@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ActivityGraph;
 use App\ApiResource\Member;
-use App\DTO\Stats\TeaFamilyAmount;
 use App\Entity\Tea as TeaEntity;
 use App\Entity\User;
 use App\Helper\Arr;
@@ -109,13 +108,16 @@ readonly class UserStatsProvider implements ProviderInterface
 			->setMaxResults(3)
 			->getResult();
 
-		$originsPath = Arr::pluck($topTeas, fn(TeaEntity $t) => $t->originPath->getPath(), true);
+		$originsPath = array_filter(Arr::pluck($topTeas, fn(TeaEntity $t) => $t->originPath?->getPath(), true));
 		$originsByPath = Arr::keyBy($this->originRepo->findManyWithAncestorNames($originsPath), "path");
 
 		$teas = [];
 
 		foreach ($topTeas as $teaEntity) {
-			$teaEntity->origin = $originsByPath[$teaEntity->originPath->getPath()] ?? null;
+			if ($teaEntity->originPath) {
+				$teaEntity->origin = $originsByPath[$teaEntity->originPath->getPath()] ?? null;
+			}
+
 			$teas[] = TeaProvider::hydrateResource($teaEntity);
 		}
 

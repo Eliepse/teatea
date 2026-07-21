@@ -28,7 +28,8 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 		private EntityManagerInterface $em,
 		private OriginRepository $originRepo,
 		private Security $security,
-	) {}
+	) {
+	}
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): array
 	{
@@ -59,7 +60,10 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 		/** @var \App\Entity\TeaListPivot[] $entities */
 		$entities = $listedTeaQuery->getQuery()->getResult();
 
-		$originPaths = Arr::pluck($entities, fn(\App\Entity\TeaListPivot $p) => $p->tea->originPath->getPath(), true);
+		$originPaths = array_filter(
+			Arr::pluck($entities, fn(\App\Entity\TeaListPivot $p) => $p->tea->originPath?->getPath(), true),
+		);
+
 		$originsByPath = Arr::keyBy(
 			$this->originRepo->findManyWithAncestorNames($originPaths),
 			fn(\App\Entity\Origin $o) => $o->path->getPath(),
@@ -77,9 +81,11 @@ readonly class NativeListMemberTeaCollectionProvider implements ProviderInterfac
 			$resource = MemberTeaProvider::fromEntity($entity);
 			$resource->tea = TeaProvider::hydrateResource($entity->tea);
 
-			$path = $originsByPath[$entity->tea->originPath->getPath()] ?? null;
-			if (null !== $path) {
-				$resource->tea->origin = OriginProvider::fromEntity($path);
+			if ($entity->tea->originPath) {
+				$path = $originsByPath[$entity->tea->originPath->getPath()] ?? null;
+				if (null !== $path) {
+					$resource->tea->origin = OriginProvider::fromEntity($path);
+				}
 			}
 
 			$resource->list = $list;

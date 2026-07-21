@@ -53,9 +53,12 @@ readonly class CollectionTeaProvider implements ProviderInterface
 		}
 
 		$collectionTea->media = $this->mediaRepo->findByHasMedia($collectionTea);
-		$collectionTea->tea->origin = $this->originRepo->findWithAncestorNames(
-			$collectionTea->tea->originPath->getPath(),
-		);
+
+		if($collectionTea->tea->originPath) {
+			$collectionTea->tea->origin = $this->originRepo->findWithAncestorNames(
+				$collectionTea->tea->originPath->getPath(),
+			);
+		}
 
 		return $this->hydrator->hydrate($collectionTea);
 	}
