@@ -2,13 +2,14 @@
 services:
   api:
     build:
-      context: ./api
+      context: .
       target: prod
+    user: "www-data:www-data"
     environment:
-      APP_SECRET: ${APP_SECRET}
-      MERCURE_PUBLISHER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
-      MERCURE_SUBSCRIBER_JWT_KEY: ${CADDY_MERCURE_JWT_SECRET}
+      APP_DEBUG: false
+      PWA_UPSTREAM: ""
+    volumes: !reset
+      - caddy_data:/data
+      - caddy_config:/config
 
-  database:
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  pwa: !reset {}

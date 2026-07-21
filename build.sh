@@ -1,7 +1,3 @@
 #!/usr/bin/env bash
 
-cd ./api || exit
-./build.sh
-
-cd ../pwa || exit
-./build.sh
+docker build . --push --target prod -t registry.agency-ye.com/teatea/api:latest
