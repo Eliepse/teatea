@@ -49,7 +49,7 @@
 	# Todo(elie): Prefix all api into "/api" subroute to simplify router matching
 	@api expression `path(
 		'/api*', '/auth*', '/docs*', '/bundles*', '/contexts*', '/_profiler*', '/_wdt*',
-		'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml', '/media/*', '/client/pwa-support.js'
+		'*.json*', '*.html', '*.csv', '*.yml', '*.yaml', '*.xml', '/client/pwa-support.js'
 	) && !path('/manifest.json')`
 
 	handle @api {
@@ -58,6 +58,12 @@
 			file_server off
 		}
 	}
+
+	@assets {
+		path /media/*
+	}
+
+	root @assets /app/public
 
 	handle {
 		try_files {path} /index.html
