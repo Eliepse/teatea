@@ -13,7 +13,7 @@ export default function FeedPage() {
 	const feedQuery = useInfiniteQuery(makeFeedInfiniteOpt(undefined, { itemsPerPage: 16 }));
 
 	return (
-		<WithMainMenu activeKey="activity" className="p-4">
+		<WithMainMenu activeKey="feed" className="p-4">
 			<ul>
 				{feedQuery.isLoading && (
 					<Fragment>

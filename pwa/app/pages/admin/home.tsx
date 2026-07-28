@@ -5,7 +5,7 @@ export default function AdminHomePage() {
 	const navigate = useNavigate();
 
 	return (
-		<PageLayout title="Admin" onBack={() => navigate("/welcome")}>
+		<PageLayout title="Admin" onBack={() => navigate("/feed")}>
 			<Link to="/admin/members" className="btn btn-block">
 				Members
 			</Link>

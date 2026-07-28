@@ -107,7 +107,7 @@ function SuccessView() {
 		<div className="text-center pt-2">
 			<SecurityPass className="mx-auto size-12 text-emerald-500" />
 			<h2 className="text-lg my-6 text-emerald-500">Successfully verified!</h2>
-			<Link to="/welcome" className="btn btn-lg btn-block btn-primary">
+			<Link to="/feed" className="btn btn-lg btn-block btn-primary">
 				Open my tea journal
 			</Link>
 		</div>
@@ -195,7 +195,7 @@ function LoginForm(props: {
 		}
 
 		void loginDevMode(runtimeEnv.VITE_DEV_LOGIN_KEY);
-		navigate("/welcome");
+		navigate("/feed");
 	}
 
 	return (

@@ -21,7 +21,7 @@ export async function clientLoader() {
 	}
 
 	if (token.roles?.includes("ROLE_USER")) {
-		throw redirect("/welcome");
+		throw redirect("/feed");
 	}
 }
 
@@ -124,7 +124,7 @@ export default function OnboardingPage() {
 							className="ml-auto btn btn-lg bg-green-100 text-green-600 rounded-xl"
 							onClick={() => {
 								posthog.capture("onboarding_confirmed_step", { step: "session", target: "home" });
-								start("/welcome");
+								start("/feed");
 							}}
 						>
 							Skip <ArrowRightIcon className="size-4" />

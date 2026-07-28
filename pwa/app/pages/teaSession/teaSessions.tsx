@@ -68,7 +68,7 @@ export default function ListTeaSessions() {
 	);
 
 	return (
-		<WithMainMenu className="px-4 pb-40 bg-green-50" activeKey="activity">
+		<WithMainMenu className="px-4 pb-40 bg-green-50" activeKey="feed">
 			<SessionsUserFilter username={filters.username} onChange={filterUser} className="my-8" />
 
 			{0 !== items.length && (

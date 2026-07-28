@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import { CalendarDaysIcon, HomeIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { EcologyBook } from "iconoir-react";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { CoffeeCup, EcologyBook, PeopleTag } from "iconoir-react";
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import { useToken } from "~/auth/hooks/useToken";
@@ -11,8 +11,8 @@ export function MainMenu(props: { activeKey?: string }) {
 	return (
 		<ul className="w-full h-full flex px-4">
 			<li className="flex-1">
-				<Link to="/welcome">
-					<NavItem icon={<HomeIcon className="size-5" />} label="Home" active={"home" === props.activeKey} />
+				<Link to="/feed">
+					<NavItem icon={<CoffeeCup className="size-5" />} label="Home" active={"feed" === props.activeKey} />
 				</Link>
 			</li>
 			<li className="flex-1">
@@ -34,11 +34,11 @@ export function MainMenu(props: { activeKey?: string }) {
 				</Link>
 			</li>
 			<li className="flex-1">
-				<Link to="/sessions">
+				<Link to={`/members/${token?.username}`}>
 					<NavItem
-						icon={<CalendarDaysIcon className="size-5" />}
-						label="Activity"
-						active={"activity" === props.activeKey}
+						icon={<PeopleTag className="size-5" />}
+						label={token?.username ?? "-"}
+						active={"profile" === props.activeKey}
 					/>
 				</Link>
 			</li>
@@ -51,7 +51,7 @@ function NavItem(props: { icon: ReactNode; label: string; active: boolean }) {
 		<div
 			className={clsx(
 				"h-full flex flex-col items-center justify-center",
-				props.active ? "text-primary" : "text-gray-600",
+				props.active ? "text-primary" : "text-gray-600"
 			)}
 		>
 			{props.icon}

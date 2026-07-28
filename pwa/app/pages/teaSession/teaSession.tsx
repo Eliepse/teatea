@@ -42,7 +42,7 @@ export default function TeaSessionPage(props: Route.ComponentProps) {
 	const member = useMember({ iri: session.author });
 
 	return (
-		<WithMainMenu className="px-4 pb-24 bg-green-50" activeKey="activity">
+		<WithMainMenu className="px-4 pb-24 bg-green-50" activeKey="feed">
 			<header className="pt-4 relative">
 				<div className="absolute inset-x-0 top-4 flex items-center mb-6">
 					<BackButton className="mr-auto shadow-xs" />

@@ -2,7 +2,7 @@
 	"name": "Teatea Club",
 	"short_name": "Teatea",
 	"description": "Social and collaborative tea journal",
-	"start_url": "/welcome",
+	"start_url": "/feed",
 	"display": "standalone",
 	"display_override": [
 		"standalone"

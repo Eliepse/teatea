@@ -8,6 +8,7 @@ export default [
 	route("/members/:username", "account/pages/profile.tsx"),
 
 	layout("auth/components/AuthenticatedGuard.tsx", [
+		route("/feed", "pages/dashboard/dashboard.tsx"),
 		route("/welcome", "pages/dashboard/dashboard.tsx"),
 
 		route("/tea/search", "catalog/pages/search.tsx"),

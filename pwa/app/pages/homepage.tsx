@@ -14,7 +14,7 @@ export default function Homepage() {
 
 	function openJournal() {
 		if (token) {
-			navigate("/welcome");
+			navigate("/feed");
 			return;
 		}
 

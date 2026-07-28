@@ -55,7 +55,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<WithMainMenu className="bg-green-50 px-4 text-green-900">
+		<WithMainMenu activeKey={isMemberSelf ? "profile" : undefined} className="bg-green-50 px-4 text-green-900">
 			<div className="flex items-center pt-4 mb-2">
 				<BackButton className="shadow-xs" />
 
@@ -115,11 +115,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 							</button>
 						</div>
 
-						<MemberFamiliesChart
-							memberIri={member["@id"]}
-							since={statsSince}
-							className="col-span-3 mb-4"
-						/>
+						<MemberFamiliesChart memberIri={member["@id"]} since={statsSince} className="col-span-3 mb-4" />
 						<MemberHistoryChart memberIri={member["@id"]} since={statsSince} className="col-span-3" />
 					</IfFriend>
 				</div>
