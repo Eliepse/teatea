@@ -36,6 +36,7 @@ export function Button(props: PropsWithChildren<BtnProps & { defaultClassName?: 
 			onClick={handleClick}
 			disabled={props.disabled}
 		>
+			&nbsp;
 			{props.loading && <Spinner className={props.small ? "size-3.5" : "size-4"} />}
 			{!props.loading && props.children}
 		</button>
