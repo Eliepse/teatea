@@ -6,7 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Social\Post;
 use App\Entity\User;
-use App\State\Hydration\PostHydrator;
+use App\State\Hydration\ResourceHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 
@@ -15,7 +15,7 @@ readonly class PostCreateProcessor implements ProcessorInterface
 	public function __construct(
 		private EntityManagerInterface $em,
 		private Security $security,
-		private PostHydrator $postHydrator,
+		private ResourceHydrator $hydrator,
 	) {}
 
 	public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Post
@@ -31,6 +31,7 @@ readonly class PostCreateProcessor implements ProcessorInterface
 		$this->em->persist($entity);
 		$this->em->flush();
 
-		return $this->postHydrator->hydrate($entity);
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return $this->hydrator->hydrate($entity);
 	}
 }

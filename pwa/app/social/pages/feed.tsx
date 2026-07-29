@@ -6,6 +6,7 @@ import { Fragment } from "react";
 import { makeFeedInfiniteOpt } from "~/social/query/feedQuery";
 import { DashedButton } from "~/shared/components/Button";
 import { TeaSession } from "~/social/components/TeaSession";
+import { FeedPostInput } from "~/social/components/FeedPostInput";
 
 export async function clientLoader() {}
 
@@ -14,6 +15,8 @@ export default function FeedPage() {
 
 	return (
 		<WithMainMenu activeKey="feed" className="p-4">
+			<FeedPostInput className="mb-8" />
+
 			<ul>
 				{feedQuery.isLoading && (
 					<Fragment>

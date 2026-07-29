@@ -27,7 +27,7 @@ export function makeFeedInfiniteOpt(filters?: {}, pagination?: Pick<Pagination, 
 			return await queryFeed(filters, pagination);
 		},
 		queryKey: ["feed", "infinite", filters, pagination],
-		staleTime: 60_000,
+		staleTime: Infinity,
 		getPreviousPageParam: (lastPage) => lastPage.view.previous,
 		getNextPageParam: (lastPage) => lastPage.view.next,
 		initialPageParam: "",
