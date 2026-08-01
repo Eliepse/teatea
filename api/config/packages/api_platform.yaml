@@ -4,6 +4,9 @@ api_platform:
     show_webby: true
     patch_formats:
         json: [ "application/merge-patch+json" ]
+    formats:
+        jsonld: [ "application/ld+json" ]
+        multipart: [ "multipart/form-data" ]
     
     enable_swagger_ui: "%kernel.debug%"
     enable_swagger: "%kernel.debug%"
@@ -13,5 +16,5 @@ api_platform:
     defaults:
         stateless: true
         cache_headers:
-            vary: ["Content-Type", "Authorization", "Origin"]
+            vary: [ "Content-Type", "Authorization", "Origin" ]
         route_prefix: /api
