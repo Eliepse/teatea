@@ -9,6 +9,8 @@ use App\Entity\User;
 use App\State\Hydration\ResourceHydrator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 
 readonly class PostCreateProcessor implements ProcessorInterface
 {
@@ -28,6 +30,9 @@ readonly class PostCreateProcessor implements ProcessorInterface
 		$entity = new \App\Entity\Social\Post();
 		$entity->content = trim($data->content);
 		$entity->author = $user;
+
+		dd($data, $context);
+
 		$this->em->persist($entity);
 		$this->em->flush();
 

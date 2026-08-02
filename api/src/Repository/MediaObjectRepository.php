@@ -30,6 +30,8 @@ class MediaObjectRepository extends ServiceEntityRepository
 			->andWhere("pivots.mediableType = :mediableType AND pivots.mediableId = :mediableId")
 			->setParameter("mediableType", $mediable->getType())
 			->setParameter("mediableId", $mediable->id)
+			->orderBy("media.createdAt")
+			->addOrderBy("media.id")
 			->getQuery()
 			->getResult();
 
