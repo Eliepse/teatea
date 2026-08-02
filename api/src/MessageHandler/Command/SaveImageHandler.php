@@ -7,6 +7,8 @@ use App\Message\Command\SaveImageCommand;
 use App\MessageHandler\Contract\CommandHandlerInterface;
 use App\Repository\MediaObjectRepository;
 use App\State\MediaObject\ImageProcessor;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class SaveImageHandler implements CommandHandlerInterface
@@ -19,9 +21,9 @@ final readonly class SaveImageHandler implements CommandHandlerInterface
 	}
 
 	/**
-	 * @return array<MediaObject>
+	 * @return Collection<MediaObject>
 	 */
-	public function __invoke(SaveImageCommand $cmd): array
+	public function __invoke(SaveImageCommand $cmd): Collection
 	{
 		$entities = [];
 
@@ -39,14 +41,14 @@ final readonly class SaveImageHandler implements CommandHandlerInterface
 		}
 
 		if(null === $cmd->ownerMaxImages) {
-			return $entities;
+			return new ArrayCollection($entities);
 		}
 
 		$mediaObjects = $this->mediaRepo->findByHasMedia($cmd->owner);
 		$count = count($mediaObjects) + 1; // Add one to account for the one that will be created
 
 		if($cmd->ownerMaxImages >= $count) {
-			return $entities;
+			return new ArrayCollection($entities);
 		}
 
 		// Remove all existing instance
@@ -56,6 +58,6 @@ final readonly class SaveImageHandler implements CommandHandlerInterface
 		}
 		$this->em->flush();
 
-		return $entities;
+		return new ArrayCollection($entities);
 	}
 }

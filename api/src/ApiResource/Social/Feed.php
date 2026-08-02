@@ -21,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 			"with:business",
 			"with:teatype",
 			"with:origin",
+			"with:media",
 			"embedded:cultivar",
 		]
 	],

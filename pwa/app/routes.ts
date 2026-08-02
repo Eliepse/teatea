@@ -8,7 +8,7 @@ export default [
 	route("/members/:username", "account/pages/profile.tsx"),
 
 	layout("auth/components/AuthenticatedGuard.tsx", [
-		route("/feed", "pages/dashboard/dashboard.tsx"),
+		route("/feed", "social/pages/feed.tsx"),
 		route("/welcome", "pages/dashboard/dashboard.tsx"),
 
 		route("/tea/search", "catalog/pages/search.tsx"),
@@ -17,7 +17,6 @@ export default [
 
 		route("/sessions/:id", "pages/teaSession/teaSession.tsx"),
 		route("/sessions", "pages/teaSession/teaSessions.tsx"),
-		route("/feed", "social/pages/feed.tsx"),
 
 		route("/lists/:id", "pages/member/teaList.tsx"),
 

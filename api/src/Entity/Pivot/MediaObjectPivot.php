@@ -38,7 +38,7 @@ final class MediaObjectPivot
 	public function setMediable(HasMedia $mediable): void
 	{
 		$this->mediable = $mediable;
-		$this->mediableType = $mediable->getType();
+		$this->mediableType = $mediable->getMediaType();
 		$this->mediableId = $mediable->id;
 	}
 }

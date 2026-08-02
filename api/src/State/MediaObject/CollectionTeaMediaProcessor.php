@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\MediaObject;
 use App\Message\Command\SaveImageCommand;
 use App\Message\CommandBus;
+use App\State\Hydration\ResourceHydrator;
 use App\ValueObject\FileArray;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -21,6 +22,7 @@ readonly class CollectionTeaMediaProcessor implements ProcessorInterface
 		#[Autowire("%app.base_url%")]
 		private string $baseUrl,
 		private CommandBus $commandBus,
+		private ResourceHydrator $hydrator,
 	) {
 	}
 
@@ -61,8 +63,7 @@ readonly class CollectionTeaMediaProcessor implements ProcessorInterface
 		);
 		$media = $medias[0] ?? throw new \RuntimeException("Failed to save the media");
 
-		$data->id = $media->id;
-		$data->contentUrl = $this->baseUrl . $this->storage->resolveUri($media, "file");
-		return $data;
+		/** @noinspection PhpIncompatibleReturnTypeInspection */
+		return $this->hydrator->hydrate($media);
 	}
 }

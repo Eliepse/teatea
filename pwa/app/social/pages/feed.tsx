@@ -42,6 +42,7 @@ export default function FeedPage() {
 									createdAt={feedItem.item.createdAt}
 									author={{ username: extractId(feedItem.item.author) }}
 									content={feedItem.item.content}
+									images={feedItem.item.photos ?? []}
 								/>
 							)}
 							{"TeaSession" === feedItem.item["@type"] && (

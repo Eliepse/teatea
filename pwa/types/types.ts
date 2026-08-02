@@ -242,6 +242,7 @@ export type Post = Resource<"Post"> & {
 	author: Iri;
 	createdAt: Date;
 	updatedAt: Date;
+	photos?: MediaObject[];
 }
 
 export type FeedItem = Omit<Resource<"Feed">, "@id" | "id"> & {

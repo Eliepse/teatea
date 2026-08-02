@@ -28,7 +28,7 @@ class MediaObjectRepository extends ServiceEntityRepository
 			->addSelect("pivots")
 			->innerJoin("media.pivots", "pivots")
 			->andWhere("pivots.mediableType = :mediableType AND pivots.mediableId = :mediableId")
-			->setParameter("mediableType", $mediable->getType())
+			->setParameter("mediableType", $mediable->getMediaType())
 			->setParameter("mediableId", $mediable->id)
 			->orderBy("media.createdAt")
 			->addOrderBy("media.id")

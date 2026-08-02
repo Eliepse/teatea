@@ -36,6 +36,9 @@ final readonly class PostHydrator implements ResourceHydrator
 		$resource->author = $this->hydrator->hydrate($entity->author);
 		$resource->createdAt = $entity->createdAt;
 		$resource->updatedAt = $entity->updatedAt;
+
+		$resource->photos = array_map(fn($m) => $this->hydrator->hydrate($m), $entity->media?->toArray() ?? []);
+
 		return $resource;
 	}
 

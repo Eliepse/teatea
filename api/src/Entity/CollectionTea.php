@@ -55,7 +55,7 @@ class CollectionTea implements HasMedia
 		$this->sessions = new ArrayCollection();
 	}
 
-	public function getType(): string
+	public function getMediaType(): string
 	{
 		return CollectionTea::class;
 	}

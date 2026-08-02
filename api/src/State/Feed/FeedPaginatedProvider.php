@@ -10,10 +10,13 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Social\Feed;
 use App\ApiResource\Social\Post;
 use App\ApiResource\TeaSession;
+use App\Entity\CollectionTea;
+use App\Entity\Pivot\MediaObjectPivot;
 use App\Enum\Social\FeedableType;
 use App\Helper\Arr;
 use App\State\Hydration\ResourceHydrator;
 use App\State\Pagination\CursorPaginator;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -65,6 +68,30 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 			->setParameter("ids", $postIds, ArrayParameterType::INTEGER)
 			->getResult();
 		$postsById = Arr::keyBy($postsById, "id");
+
+		/** @var MediaObjectPivot[] $mediaPivots */
+		$mediaPivots = $this->em
+			->createQuery(<<<DQL
+				SELECT pivot, media
+				FROM App\Entity\Pivot\MediaObjectPivot pivot
+				LEFT JOIN pivot.media media
+				WHERE pivot.mediableType = :type
+				  AND pivot.mediableId IN (:ids)
+				DQL)
+			->setParameter("type", \App\Entity\Social\Post::class)
+			->setParameter("ids", array_keys($postsById), ArrayParameterType::INTEGER)
+			->getResult();
+
+		foreach ($mediaPivots as $pivot) {
+			$parent = $postsById[$pivot->mediableId] ?? null;
+
+			if (null === $parent) {
+				continue;
+			}
+
+			$parent->media ??= new ArrayCollection();
+			$parent->media->add($pivot->media);
+		}
 
 		$sessionsById = $this->em
 			->createQuery(

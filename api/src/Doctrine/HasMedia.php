@@ -12,7 +12,7 @@ interface HasMedia
 	/**
 	 * Return the type of the entity for the polymorphic association (usually the FQCN)
 	 */
-	public function getType(): string;
+	public function getMediaType(): string;
 
 	public int $id {
 		get;
