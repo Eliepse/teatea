@@ -25,7 +25,6 @@ RUN set -eux; \
 	install-php-extensions @composer apcu intl opcache zip pdo_pgsql exif
 
 COPY --link docker/php/app.ini $PHP_INI_DIR/conf.d/
-COPY --link --chmod=755 docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
 ENTRYPOINT ["docker-entrypoint"]
 HEALTHCHECK --start-period=60s CMD curl -f http://localhost:2019/metrics || exit 1
@@ -49,6 +48,8 @@ RUN install-php-extensions xdebug
 
 COPY --link docker/php/app.dev.ini $PHP_INI_DIR/conf.d/
 COPY --link docker/caddy/Caddyfile.dev /etc/caddy/Caddyfile
+COPY --link --chmod=755 docker/entrypoint.sh /usr/local/bin/docker-entrypoint
+
 RUN mkdir /.cache && chmod -R 777 /.cache
 
 CMD [ "frankenphp", "run", "--config", "/etc/caddy/Caddyfile", "--watch" ]
@@ -61,6 +62,7 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --link docker/php/app.prod.ini $PHP_INI_DIR/conf.d/
 COPY --link docker/caddy/Caddyfile.prod /etc/caddy/Caddyfile
+COPY --link --chmod=755 docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link api/composer.* api/symfony.* api/.env ./
@@ -77,7 +79,6 @@ RUN set -eux; \
 COPY --link --chown=www-data api/ ./
 
 RUN set -eux; \
-    ls -hal &&\
 	mkdir -p var/cache var/log && \
 	composer dump-autoload --no-dev --classmap-authoritative --apcu && \
 	chmod +x bin/console
