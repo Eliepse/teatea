@@ -1,6 +1,6 @@
 services:
   api:
-    user: "1000:1000"
+#    user: "1000:1000"
     build:
       context: .
       target: dev
@@ -30,6 +30,7 @@ services:
       - caddy_data:/data
       - caddy_config:/config
       - ./api/:/app
+      - api_var:/app/var
       - ./docker/caddy/Caddyfile.dev:/etc/caddy/Caddyfile
     ports:
       - "80:80"
@@ -89,3 +90,4 @@ volumes:
   caddy_data:
   caddy_config:
   database_data:
+  api_var:
