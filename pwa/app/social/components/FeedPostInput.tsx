@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { type ChangeEvent, type FocusEvent, type MouseEvent, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, type FocusEvent, Fragment, type MouseEvent, useMemo, useRef, useState } from "react";
 import { MediaImagePlus, Plus, Xmark } from "iconoir-react";
 import { GhostButton, PrimaryButton } from "~/shared/components/Button";
 import { useMutation } from "@tanstack/react-query";
@@ -84,24 +84,28 @@ export function FeedPostInput(props: { className?: string }) {
 			{fileInput}
 
 			{!!form.files.length && (
-				<ul className="flex gap-1 px-3 pt-3">
-					{form.files.map(([src, file]) => (
-						<li
-							key={src}
-							className="relative cursor-pointer"
-							onClick={() => setForm((v) => ({ ...v, files: v.files.filter((f) => f[1] !== file) }))}
-						>
-							<span className="bg-white rounded-full absolute -top-1 -right-1 p-0.5 shadow z-1">
-								<Xmark className="w-3 h-3 block" />
-							</span>
-							<img src={src} className="w-10 h-10 rounded object-cover" />
-						</li>
-					))}
-				</ul>
+				<Fragment>
+					<ul className="flex gap-1 px-3 pt-3">
+						{form.files.map(([src, file]) => (
+							<li
+								key={src}
+								className="relative cursor-pointer"
+								onClick={() => setForm((v) => ({ ...v, files: v.files.filter((f) => f[1] !== file) }))}
+							>
+								<span className="bg-white rounded-full absolute -top-1 -right-1 p-0.5 shadow z-1">
+									<Xmark className="w-3 h-3 block" />
+								</span>
+								<img src={src} className="w-10 h-10 rounded object-cover" alt={file.name} />
+							</li>
+						))}
+					</ul>
+
+					<hr className="mx-4 border-slate-200 mt-3 mb-2" />
+				</Fragment>
 			)}
 
 			<textarea
-				className={clsx("w-full px-3 py-4 outline-none resize-none", !active && "pl-9.5")}
+				className={clsx("w-full px-3 py-4 outline-none resize-none field-sizing-content max-h-64", !active && "pl-9.5")}
 				rows={1}
 				placeholder="Share your thoughts..."
 				onChange={(e) => setForm((v) => ({ ...v, text: e.target.value }))}
