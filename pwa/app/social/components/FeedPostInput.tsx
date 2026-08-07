@@ -46,7 +46,7 @@ export function FeedPostInput(props: { className?: string }) {
 	}
 
 	function handleBlur(e: FocusEvent) {
-		if (containerRef.current?.contains(e.target)) {
+		if (containerRef.current?.contains(e.relatedTarget)) {
 			return;
 		}
 
