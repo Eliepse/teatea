@@ -1,5 +1,6 @@
 import type { MediaObject, Member } from "~t/types";
 import { formatDate } from "date-fns";
+import { PostImagesCarousel } from "~/social/components/PostImagesCarousel";
 
 export function Post(props: {
 	author: Pick<Member, "username">;
@@ -9,20 +10,7 @@ export function Post(props: {
 }) {
 	return (
 		<article className="bg-white rounded-lg shadow-xs overflow-hidden">
-			{!!props.images.length && (
-				<div className="flex flex-nowrap align-top justify-start overflow-y-auto snap-mandatory snap-x mb-4">
-					{props.images.map((img) => (
-						<div key={img.id} className="snap-start shrink-0 w-90">
-							<img
-								src={img.contentUrl}
-								style={{ backgroundImage: `url(data:image/webp;base64,${img.placeholder})` }}
-								className="w-full h-full min-h-48 max-h-96 object-cover bg-center bg-cover z-0"
-								alt=""
-							/>
-						</div>
-					))}
-				</div>
-			)}
+			{!!props.images.length && <PostImagesCarousel images={props.images} />}
 
 			<div className="py-Y">
 				<p className="px-4 leading-tight">{props.content}</p>
