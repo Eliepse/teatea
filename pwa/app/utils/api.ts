@@ -49,9 +49,21 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 		]);
 		fetchConfigs.body = undefined;
 	} else if (undefined !== config?.method && undefined !== payload) {
-		if (Object.values(payload).some((v) => v instanceof File)) {
+		if (Object.values(payload).some((v) => (v instanceof File) || (Array.isArray(v) && v.some(el => el instanceof File)))) {
 			const form = new FormData();
-			Object.entries(payload).forEach(([k, v]) => form.set(k, v));
+			Object.entries(payload).forEach(([k, v]) => {
+				if(v instanceof File) {
+					form.set(k, JSON.stringify(v));
+					return;
+				}
+
+				if(Array.isArray(v) && v.some((item) => item instanceof File)) {
+					v.forEach((file) => form.append(`${k}[]`, file))
+					return;
+				}
+
+				form.set(k, JSON.stringify(v));
+			});
 			fetchConfigs.body = form;
 			fetchConfigs.headers.delete("Content-Type");
 		} else {
