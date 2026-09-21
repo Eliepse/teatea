@@ -25,8 +25,7 @@ readonly class MemberOnboardingProcessor implements ProcessorInterface
 	{
 		$user = $this->security->getUser();
 
-		assert($data instanceof Member);
-		assert($user->id === $data->id);
+		assert(null === $user->username);
 
 		$user->username = $data->username;
 		$user->setRoles(["ROLE_USER"]);
