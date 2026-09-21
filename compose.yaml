@@ -26,6 +26,10 @@ services:
       POSTHOG_HOST: ${POSTHOG_HOST}
       DEV_LOGIN_KEY: ${DEV_LOGIN_KEY}
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_CONFIG: ""
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -81,9 +85,9 @@ services:
       retries: 5
       start_period: 60s
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./api/docker/db/data:/var/lib/postgresql/data:rw
+      - database_data:/var/lib/postgresql:rw
+    ports:
+      - "2345:5432"
 
 volumes:
   caddy_data:

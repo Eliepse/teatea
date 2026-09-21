@@ -45,14 +45,14 @@ use Symfony\Component\Validator\Constraints as Assert;
 	provider: MemberProvider::class,
 )]
 #[Post(
-	denormalizationContext: ["groups" => "member:create"],
+	denormalizationContext: ["groups" => ["member:create"]],
 	security: "is_granted('ROLE_ADMIN')",
 	processor: MemberCreateProcessor::class,
 )]
 #[Patch(
 	uriTemplate: "/members/{id}/onboarding",
 	uriVariables: ["id" => new Link(fromProperty: "id")],
-	denormalizationContext: ["groups" => "member:onboarding"],
+	denormalizationContext: ["groups" => ["member:onboarding"]],
 	security: "is_granted('ROLE_ONBOARDING')",
 	provider: MemberProvider::class,
 	processor: MemberOnboardingProcessor::class,

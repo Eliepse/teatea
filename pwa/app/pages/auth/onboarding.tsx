@@ -42,13 +42,13 @@ export default function OnboardingPage() {
 
 			posthog.capture("onboarding_submitted_username", { username });
 			await patchApi(`/members/${user.data.id}/onboarding`, { username });
+			await refreshToken();
+			await user.refetch();
 			stack.next("cta:session");
 		},
 	});
 
 	async function start(redirectTo: string) {
-		await refreshToken();
-		await user.refetch();
 		navigate(redirectTo);
 	}
 

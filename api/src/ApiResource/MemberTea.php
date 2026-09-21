@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[Post(
 	uriTemplate: "/lists/favorites/teas",
 	uriVariables: [],
-	denormalizationContext: ["groups" => "listedTea:write-native"],
+	denormalizationContext: ["groups" => ["listedTea:write-native"]],
 	processor: NativeListMemberTeaProcessor::class,
 	extraProperties: ["list" => TeaListPivotType::Favorites],
 )]
