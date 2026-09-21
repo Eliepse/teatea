@@ -26,6 +26,10 @@ services:
       POSTHOG_HOST: ${POSTHOG_HOST}
       DEV_LOGIN_KEY: ${DEV_LOGIN_KEY}
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      XDEBUG_CONFIG: ""
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
