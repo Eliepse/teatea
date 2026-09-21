@@ -65,16 +65,18 @@ COPY --link docker/caddy/Caddyfile.prod /etc/caddy/Caddyfile
 # prevent the reinstallation of vendors at every changes in the source code
 COPY --link api/composer.* api/symfony.* api/.env ./
 
-RUN chown www-data:www-data -R . /data /config
-COPY --link --from=pwa-build ./app/build/client ./pwa
-
-USER www-data
-
 RUN set -eux; \
-	composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress
+    composer install --no-cache --prefer-dist --no-dev --no-autoloader --no-scripts --no-progress &&\
+    chown www-data:www-data -R /app /data /config
 
 # copy sources
-COPY --link --chown=www-data api/ ./
+COPY --link api/ ./
+COPY --link --from=pwa-build ./app/build/client ./pwa
+
+RUN set -eux; \
+    chown www-data:www-data -R /app /data /config
+
+USER www-data
 
 RUN set -eux; \
     ls -hal &&\
