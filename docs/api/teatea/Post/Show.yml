@@ -8,7 +8,7 @@ http:
   url: http://localhost/api/posts/:id
   params:
     - name: id
-      value: "10"
+      value: "2"
       type: path
   auth: inherit
 
@@ -17,3 +17,4 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+  forwardAuthorizationHeader: true

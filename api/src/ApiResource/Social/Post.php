@@ -4,6 +4,7 @@ namespace App\ApiResource\Social;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post as ApiPost;
@@ -11,6 +12,7 @@ use App\ApiResource\MediaObject;
 use App\ApiResource\Member;
 use App\Enum\Social\FeedableType;
 use App\State\Post\PostCreateProcessor;
+use App\State\Post\PostDeleteProcessor;
 use App\State\Post\PostPaginatedProvider;
 use App\State\Post\PostProvider;
 use App\ValueObject\FileArray;
@@ -22,8 +24,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 	normalizationContext: ["groups" => ["post:read", "with:post", "with:media"]],
 	denormalizationContext: ["groups" => ["post:write"]],
 	security: "is_granted('ROLE_USER')",
+    provider: PostProvider::class,
 )]
-#[Get(processor: PostProvider::class)]
+#[Get]
 #[GetCollection(
 	paginationEnabled: true,
 	paginationItemsPerPage: 15,

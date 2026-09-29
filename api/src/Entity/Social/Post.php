@@ -32,7 +32,7 @@ class Post implements HasMedia
 	#[ORM\ManyToMany(targetEntity: Tea::class)]
 	public Collection $teas;
 
-	// Requires manual hydration
+	// Requires manual hydration/deletion
 	public ?Collection $media = null;
 
 	public function __construct()
