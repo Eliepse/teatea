@@ -9,6 +9,8 @@ services:
     env_file:
       - .env
     restart: unless-stopped
+    extra_hosts:
+      - host.docker.internal:host-gateway
     environment:
       APP_DEBUG: true
       APP_SECRET: ${APP_SECRET}
@@ -26,6 +28,8 @@ services:
       POSTHOG_HOST: ${POSTHOG_HOST}
       DEV_LOGIN_KEY: ${DEV_LOGIN_KEY}
       SUPPORT_EMAIL: ${SUPPORT_EMAIL}
+      XDEBUG_MODE: ${XDEBUG_MODE}
+      XDEBUG_CONFIG: "start_with_request=trigger"
     volumes:
       - caddy_data:/data
       - caddy_config:/config
@@ -81,6 +85,8 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+    ports:
+      - "5432:5432"
     volumes:
       - database_data:/var/lib/postgresql/data:rw
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
