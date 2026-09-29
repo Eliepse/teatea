@@ -38,6 +38,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 	inputFormats: ['multipart' => ['multipart/form-data']],
 	processor: PostCreateProcessor::class,
 )]
+#[Delete(
+    security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and user.username === object.author.username)",
+    processor: PostDeleteProcessor::class,
+)]
 class Post implements Feedable
 {
 	#[ApiProperty(identifier: true)]
