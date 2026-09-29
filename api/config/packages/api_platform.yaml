@@ -8,10 +8,10 @@ api_platform:
         jsonld: [ "application/ld+json" ]
         multipart: [ "multipart/form-data" ]
     
-    enable_swagger_ui: "%kernel.debug%"
+    enable_swagger_ui: false
     enable_swagger: "%kernel.debug%"
     enable_docs: "%kernel.debug%"
-    enable_re_doc: "%kernel.debug%"
+    enable_re_doc: false
     
     defaults:
         stateless: true
