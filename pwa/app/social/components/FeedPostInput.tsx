@@ -11,6 +11,7 @@ interface IForm {
 }
 
 const EMPTY_FORM: IForm = { text: "", files: [] };
+const MAX_MEDIA = 3;
 
 export function FeedPostInput(props: { className?: string }) {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -62,10 +63,10 @@ export function FeedPostInput(props: { className?: string }) {
 	function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
 		setForm((v) => {
 			const files = Array.from(e.target.files ?? [])
-				.slice(0, 8 - v.files.length)
+				.slice(0, MAX_MEDIA - v.files.length)
 				.map((file) => [URL.createObjectURL(file), file] satisfies IForm["files"][number]);
 
-			return { ...v, files: [...v.files, ...files].slice(0, 8) };
+			return { ...v, files: [...v.files, ...files].slice(0, MAX_MEDIA) };
 		});
 	}
 
@@ -125,7 +126,7 @@ export function FeedPostInput(props: { className?: string }) {
 					<GhostButton
 						icon={<MediaImagePlus />}
 						onClick={handleClickFileBtn}
-						disabled={8 <= form.files.length}
+						disabled={MAX_MEDIA <= form.files.length}
 						small
 					/>
 

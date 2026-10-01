@@ -68,7 +68,7 @@ class Post implements Feedable
 		new Assert\File(maxSize: "8M"),
 		new Assert\Image(),
 	])]
-	#[Assert\Count(max: 8)]
+	#[Assert\Count(max: 3)]
 	#[Groups(["post:write"])]
 	public FileArray $files;
 
