@@ -4,6 +4,7 @@ namespace App\ApiResource\Social;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\ApiResource\Member;
 use App\Serializer\HideIdentifierInterface;
 use App\State\Feed\FeedCursor;
 use App\State\Feed\FeedPaginatedProvider;
@@ -52,5 +53,11 @@ readonly class Feed implements HideIdentifierInterface
 	public function getPublishedAt(): \DateTimeImmutable
 	{
 		return $this->item->getPublishedAt();
+	}
+
+	#[Groups(["feed"])]
+	public function getAuthor(): ?Member
+	{
+		return $this->item->getAuthor();
 	}
 }

@@ -248,4 +248,5 @@ export type Post = Resource<"Post"> & {
 export type FeedItem = Omit<Resource<"Feed">, "@id" | "id"> & {
 	item: Post|TeaSession;
 	publishedAt: Date;
+	author?: Iri;
 }

@@ -168,4 +168,9 @@ class TeaSession implements Feedable
 	{
 		return $this->drankAt;
 	}
+
+    public function getAuthor(): ?Member
+    {
+        return $this->author;
+    }
 }

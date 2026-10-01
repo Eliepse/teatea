@@ -94,4 +94,9 @@ class Post implements Feedable
 	{
 		return $this->createdAt;
 	}
+
+    public function getAuthor(): ?Member
+    {
+        return $this->author;
+    }
 }
