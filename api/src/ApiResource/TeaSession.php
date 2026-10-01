@@ -135,6 +135,9 @@ class TeaSession implements Feedable
 	#[Groups(["teaSession:create", "teaSession:read", "teaSession:minimal"])]
 	public ?DatePoint $drankAt;
 
+    #[Ignore]
+    public \DateTimeImmutable $createdAt;
+
 	public function __construct()
 	{
 		$this->drankAt = new DatePoint();
@@ -166,7 +169,8 @@ class TeaSession implements Feedable
 	#[Ignore]
 	public function getPublishedAt(): \DateTimeImmutable
 	{
-		return $this->drankAt;
+        $date = getdate($this->drankAt->getTimestamp());
+		return $this->createdAt->setDate($date["year"], $date["mon"], $date["mday"]);
 	}
 
     public function getAuthor(): ?Member

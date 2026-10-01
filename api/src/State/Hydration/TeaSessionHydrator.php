@@ -36,6 +36,7 @@ final readonly class TeaSessionHydrator implements ResourceHydrator
 		$resource->drankAt = $entity->drankAt;
 		$resource->quality = $entity->quality;
 		$resource->steeps = $entity->getSteeps();
+		$resource->createdAt = $entity->createdAt;
 
 		$resource->tea = $this->hydrator->hydrate($entity->tea);
 		$resource->collectionTea = $this->hydrator->hydrate($entity->collectionTea);
