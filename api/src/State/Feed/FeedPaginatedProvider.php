@@ -8,12 +8,13 @@ use ApiPlatform\State\Pagination\Pagination;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Social\Feed;
+use App\ApiResource\Social\Feedable;
 use App\ApiResource\Social\Post;
 use App\ApiResource\TeaSession;
-use App\Entity\CollectionTea;
 use App\Entity\Pivot\MediaObjectPivot;
 use App\Enum\Social\FeedableType;
 use App\Helper\Arr;
+use App\Repository\OriginRepository;
 use App\State\Hydration\ResourceHydrator;
 use App\State\Pagination\CursorPaginator;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -30,8 +31,10 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 		private EntityManagerInterface $em,
 		private Pagination $pagination,
 		private ResourceHydrator $hydrator,
+		private OriginRepository $originRepo,
 	) {
 	}
+
 
 	public function provide(Operation $operation, array $uriVariables = [], array $context = []): object
 	{
@@ -77,7 +80,8 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 				LEFT JOIN pivot.media media
 				WHERE pivot.mediableType = :type
 				  AND pivot.mediableId IN (:ids)
-				DQL)
+				DQL
+			)
 			->setParameter("type", \App\Entity\Social\Post::class)
 			->setParameter("ids", array_keys($postsById), ArrayParameterType::INTEGER)
 			->getResult();
@@ -96,12 +100,13 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 		$sessionsById = $this->em
 			->createQuery(
 				<<<DQL
-				SELECT session, tea, tea_type, business, author
+				SELECT session, tea, tea_type, business, author, cultivar
 				FROM App\Entity\TeaSession session
 				LEFT JOIN session.tea tea
 				LEFT JOIN session.author author
 				LEFT JOIN tea.type tea_type
 				LEFT JOIN tea.business business
+				LEFT JOIN tea.cultivar cultivar
 				WHERE session.id IN (:ids)
 				DQL,
 			)
@@ -109,15 +114,26 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 			->getResult();
 		$sessionsById = Arr::keyBy($sessionsById, "id");
 
+		$originsPaths = Arr::pluck($sessionsById, fn($item) => $item->tea->originPath?->getPath(), true);
+		$originsByPath = $this->originRepo->findManyWithAncestorNames(array_filter($originsPaths));
+		$originsByPath = Arr::keyBy($originsByPath, "path");
+
 		$resources = [];
 
 		foreach ($results as $result) {
 			$item = match ($result["type"]) {
-				FeedableType::Post => $this->hydrator->hydrate($postsById[$result["id"]]),
-				FeedableType::TeaSession => $this->hydrator->hydrate($sessionsById[$result["id"]]),
+				FeedableType::Post => $postsById[$result["id"]],
+				FeedableType::TeaSession => $sessionsById[$result["id"]],
 			};
 
-			$resources[] = new Feed(FeedCursor::fromFeedable($item), $item);
+			if ($item instanceof \App\Entity\TeaSession) {
+				$path = $item->tea->originPath?->getPath();
+				$item->tea->origin = $path ? ($originsByPath[$path] ?? null) : null;
+			}
+
+			/** @var Feedable $resource */
+			$resource = $this->hydrator->hydrate($item);
+			$resources[] = new Feed(FeedCursor::fromFeedable($resource), $resource);
 		}
 
 		return new CursorPaginator($resources, $pageSize);
