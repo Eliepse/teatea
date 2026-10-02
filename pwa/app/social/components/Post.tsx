@@ -9,18 +9,15 @@ export function Post(props: {
 	images: MediaObject[];
 }) {
 	return (
-		<article className="bg-white rounded-lg shadow-xs overflow-hidden">
+		<div className="rounded-xl overflow-hidden">
 			{!!props.images.length && <PostImagesCarousel images={props.images} />}
 
-			<div className="py-Y">
-				<p className="px-4 leading-tight">{props.content}</p>
+			<div className="py-3">
+				<p className="px-4">
+					{props.content}
+				</p>
 			</div>
-
-			<footer className="p-4 pb-2 text-xs flex justify-between text-stone-600">
-				<span className="font-medium">@{props.author.username}</span>
-				<span className="text-stone-400">{formatDate(props.createdAt, "HH:mm")}</span>
-			</footer>
-		</article>
+		</div>
 	);
 }
 

@@ -1,5 +1,6 @@
 import type { MediaObject } from "~t/types";
-import { useRef, useState, type UIEvent, useEffect } from "react";
+import { type UIEvent, useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 
 function getActiveIndex(container: HTMLElement): number {
 	const scrollLeft = container.scrollLeft;
@@ -7,7 +8,7 @@ function getActiveIndex(container: HTMLElement): number {
 	return Math.round(scrollLeft / itemWidth);
 }
 
-export function PostImagesCarousel(props: { images: Array<MediaObject> }) {
+export function PostImagesCarousel(props: { images: Array<MediaObject>; className?: string }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [activeIndex, setActiveIndex] = useState(0);
 
@@ -16,7 +17,7 @@ export function PostImagesCarousel(props: { images: Array<MediaObject> }) {
 	}
 
 	useEffect(() => {
-		if(!containerRef.current) {
+		if (!containerRef.current) {
 			return;
 		}
 
@@ -24,7 +25,7 @@ export function PostImagesCarousel(props: { images: Array<MediaObject> }) {
 	}, []);
 
 	return (
-		<div className="mb-4 relative">
+		<div className={clsx("relative", props.className)}>
 			<div
 				ref={containerRef}
 				className="flex flex-nowrap align-top justify-start overflow-y-auto snap-mandatory snap-x"
