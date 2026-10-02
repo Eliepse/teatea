@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { type ChangeEvent, type FocusEvent, Fragment, type MouseEvent, useMemo, useRef, useState } from "react";
 import { MediaImagePlus, Plus, Xmark } from "iconoir-react";
 import { GhostButton, PrimaryButton } from "~/shared/components/Button";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { makeCreatePostMutation } from "~/social/mutation/createPostMutation";
 
 interface IForm {
@@ -16,6 +16,7 @@ const MAX_MEDIA = 3;
 export function FeedPostInput(props: { className?: string }) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
+	const queryClient = useQueryClient();
 
 	const [focused, setFocused] = useState(false);
 	const [form, setForm] = useState<IForm>({ ...EMPTY_FORM });
@@ -32,6 +33,7 @@ export function FeedPostInput(props: { className?: string }) {
 		...makeCreatePostMutation(),
 		onSuccess: (post) => {
 			setForm({ ...EMPTY_FORM });
+			queryClient.invalidateQueries({ queryKey: ["feed", "infinite"] });
 		},
 	});
 
