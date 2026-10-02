@@ -10,8 +10,12 @@ export interface IForm extends Pick<Post, "content"> {
 export function makeCreatePostMutation() {
 	return mutationOptions({
 		mutationFn: async (data: IForm) => {
-			const res = await postApi<PostRaw>("/api/posts", { content: data.content, files: data.images });
+			const res = await postApi<PostRaw>(
+				"/api/posts",
+				{ content: data.content, files: data.images ?? [] },
+				{ forceMultipart: true },
+			);
 			return denormalizePost(await res.json());
-		}
+		},
 	});
 }

@@ -14,7 +14,9 @@ type FetchApiConfig = Omit<RequestInit, "body" | "method"> &
 				method?: "GET";
 				payload?: Record<string, string | number | boolean | undefined>;
 		  }
-	);
+	) & {
+		forceMultipart?: true;
+	};
 
 type TResponse<T = unknown> = Omit<Response, "json"> & { json: () => Promise<T> };
 
@@ -49,7 +51,11 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 		]);
 		fetchConfigs.body = undefined;
 	} else if (undefined !== config?.method && undefined !== payload) {
-		if (Object.values(payload).some((v) => (v instanceof File) || (Array.isArray(v) && v.some(el => el instanceof File)))) {
+		const hasFile = Object.values(payload).some(
+			(v) => v instanceof File || (Array.isArray(v) && v.some((el) => el instanceof File)),
+		);
+
+		if (hasFile || true === config.forceMultipart) {
 			const form = new FormData();
 			Object.entries(payload).forEach(([k, v]) => {
 				if(v instanceof File) {
