@@ -17,15 +17,15 @@ function formatPublicationDate(date: Date): string {
 		return format(date, "'yesterday at' HH:mm");
 	}
 
-	if (isAfter(date, subDays(new Date(), 3))) {
+	if (isAfter(date, subDays(new Date(), 6))) {
 		return formatDistanceToNow(date, { includeSeconds: true, addSuffix: true }) + " at " + format(date, "HH:mm");
 	}
 
 	if (isThisYear(new Date())) {
-		return format(date, "MMM do 'at' HH:mm");
+		return format(date, "eee. MMM. do 'at' HH:mm");
 	}
 
-	return format(date, "MMM do, yyyy 'at' HH:mm");
+	return format(date, "yyyy-MM-dd 'at' HH:mm");
 }
 
 export function FeedItemContainer(
@@ -40,14 +40,21 @@ export function FeedItemContainer(
 ) {
 	return (
 		<article className={clsx("text-stone-800", props.className)}>
-			<header className="mb-2 mx-1 text-sm text-stone-600">
+			<header className="mb-1.5 mx-1 text-sm text-stone-600">
 				<strong className="font-medium">{extractId(props.author)}</strong>{" "}
-				<span className="text-xs text-stone-500">
+				<span className="text-stone-500">
 					{props.action} &middot; {formatPublicationDate(props.publishedAt)}
 				</span>
 			</header>
 
-			<div className={clsx("border bg-white rounded-xl", props.highlight ? "border-green-200" : "border-stone-200")}>{props.children}</div>
+			<div
+				className={clsx(
+					"border bg-white rounded-xl",
+					props.highlight ? "border-green-300" : "border-stone-300",
+				)}
+			>
+				{props.children}
+			</div>
 		</article>
 	);
 }
