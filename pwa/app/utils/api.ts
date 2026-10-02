@@ -57,19 +57,22 @@ export async function fetchApi<T>(path: string, config?: FetchApiConfig): Promis
 
 		if (hasFile || true === config.forceMultipart) {
 			const form = new FormData();
+
+			// Parse payload into FormData
 			Object.entries(payload).forEach(([k, v]) => {
-				if(v instanceof File) {
-					form.set(k, JSON.stringify(v));
+				if (Array.isArray(v) && v.some((item) => item instanceof File)) {
+					v.forEach((file) => form.append(`${k}[]`, file));
 					return;
 				}
 
-				if(Array.isArray(v) && v.some((item) => item instanceof File)) {
-					v.forEach((file) => form.append(`${k}[]`, file))
+				if (!(v instanceof File)) {
+					form.set(k, JSON.stringify(v));
 					return;
 				}
 
 				form.set(k, JSON.stringify(v));
 			});
+
 			fetchConfigs.body = form;
 			fetchConfigs.headers.delete("Content-Type");
 		} else {
