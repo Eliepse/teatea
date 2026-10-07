@@ -21,6 +21,7 @@ use App\State\TeaSession\TeaSessionDeleteProcessor;
 use App\State\TeaSession\TeaSessionEditProcessor;
 use App\State\TeaSession\TeaSessionProvider;
 use App\State\TeaSession\TeaSessionsPaginatedProvider;
+use App\Validator\Username;
 use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -73,7 +74,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 	provider: TeaSessionsPaginatedProvider::class,
 	parameters: [
 		"tea" => new QueryParameter(schema: ["type" => "integer", "minimum" => 1]),
-		"member" => new QueryParameter(schema: ["pattern" => "/^[\p{L}_]{2,16}$/"]),
+		"member" => new QueryParameter(constraints: [new Username()]),
 		"contentful" => new QueryParameter(
 			schema: ["type" => "boolean"],
 			description: "When true, consider only sessions that have at least a note, water or tea volume set",

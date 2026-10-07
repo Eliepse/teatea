@@ -14,6 +14,7 @@ use App\State\Member\MemberOnboardingProcessor;
 use App\State\Member\MemberProvider;
 use App\State\UserProvider;
 use App\State\UserStatsProvider;
+use App\Validator\Username;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -70,7 +71,7 @@ class Member
 	public ?int $id;
 
 	#[ApiProperty(identifier: true)]
-	#[Assert\Regex("/^[\p{L}_]{2,16}$/")]
+	#[Username]
 	#[Assert\NotBlank(groups: ["member:onboarding"])]
 	#[Groups(["role:admin", "member:onboarding", "member:self", "embedded:member", "with:member", "auth:guest"])]
 	public ?string $username;
