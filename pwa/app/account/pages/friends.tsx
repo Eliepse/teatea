@@ -9,6 +9,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 import type { Friendship } from "~t/types";
 import { FriendshipDecisionModal } from "~/account/components/FriendshipDecisionModal";
+import { BackButton } from "~/components/shared/navigation/BackButton";
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 	const currentUsername = TokenUtils.get()?.username;
@@ -30,21 +31,23 @@ export default function friendsPage(props: Route.ComponentProps) {
 	const revalidator = useRevalidator();
 
 	return (
-		<WithMainMenu className="bg-green-50 p-4">
-			<div className="flex items-center mb-6">
-				<h1 className="flex items-center flex-1 text-3xl font-header font-bold text-green-700">
+		<WithMainMenu className="bg-green-50">
+			<div className="grid grid-cols-3 pt-4 mb-8 px-4">
+				<BackButton className="shadow-xs" />
+
+				<span className="text-xl font-medium font-header text-center self-center">
 					Friends
 					<span className="font-normal font-mono text-stone-600 bg-white rounded-full text-base inline-block px-2 py-1 leading-none ml-2">
 						{friends.totalItems}
 					</span>
-				</h1>
+				</span>
 			</div>
 
-			<ul className="mb-8">
+			<ul className="mb-8 px-4">
 				{friends.member.map((friend) => (
 					<li key={friend["@id"]}>
 						<Link
-							className="flex items-center mb-2 px-3 py-3 bg-white rounded-md shadow-xs"
+							className="flex items-center mb-2 px-3 py-3 bg-white rounded-lg shadow-xs"
 							to={`/members/${friend.username}`}
 						>
 							{friend.username}
