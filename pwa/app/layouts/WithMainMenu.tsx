@@ -1,11 +1,11 @@
-import type { PropsWithChildren } from "react";
+import type { PropsWithChildren, PropsWithRef, Ref } from "react";
 import clsx from "clsx";
 import { useNavigation } from "react-router";
 import { Leaf } from "iconoir-react";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 import { MainMenu } from "~/layouts/MainMenu";
 
-export function WithMainMenu(props: PropsWithChildren<{ className?: string; activeKey?: string }>) {
+export function WithMainMenu(props: PropsWithChildren<{ className?: string; activeKey?: string; ref?: Ref<HTMLDivElement> }>) {
 	const navigation = useNavigation();
 	const isNavigating = Boolean(navigation.location);
 

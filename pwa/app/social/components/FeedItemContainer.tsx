@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { extractId } from "~/utils/resource";
 import type { Iri } from "~t/types";
 import { format, formatDistanceToNow, isAfter, isThisYear, isToday, isYesterday, subDays, subHours } from "date-fns";
+import { Link } from "react-router";
 
 function formatPublicationDate(date: Date): string {
 	if (isAfter(date, subHours(new Date(), 6))) {
@@ -38,10 +39,13 @@ export function FeedItemContainer(
 		className?: string;
 	}>,
 ) {
+	const username = extractId(props.author);
 	return (
 		<article className={clsx("text-stone-800", props.className)}>
 			<header className="mb-1.5 mx-1 text-sm text-stone-600">
-				<strong className="font-medium">{extractId(props.author)}</strong>{" "}
+				<Link to={`/members/${username}`}>
+					<strong className="font-medium">{username}</strong>{" "}
+				</Link>
 				<span className="text-stone-500">
 					{props.action} &middot; {formatPublicationDate(props.publishedAt)}
 				</span>
