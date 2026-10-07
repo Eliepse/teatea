@@ -19,6 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { makeMemberStatsQueryOpt } from "~/account/query/memberStatsQuery";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 import { FriendTag, getFriendshipStatus } from "~/account/components/FriendTag";
+import { FeedStream } from "~/social/components/FeedStream";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;
@@ -55,8 +56,8 @@ export default function ProfilePage(props: Route.ComponentProps) {
 	}
 
 	return (
-		<WithMainMenu activeKey={isMemberSelf ? "profile" : undefined} className="bg-green-50 px-4 text-green-900">
-			<div className="flex items-center pt-4 mb-2">
+		<WithMainMenu activeKey={isMemberSelf ? "profile" : undefined} className="bg-green-50 text-green-900">
+			<div className="flex items-center pt-4 mb-2 px-4">
 				<BackButton className="shadow-xs" />
 
 				<IfAuthor author={member}>
@@ -70,7 +71,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 				</IfAuthor>
 			</div>
 
-			<div className="flex flex-col items-center gap-4 mb-4">
+			<div className="flex flex-col items-center gap-4 mb-4 px-4">
 				<h1 className="text-3xl font-header font-bold text-green-700 text-center">
 					<PeopleTag className="size-6 block mx-auto mb-1" />
 					{member.username}
@@ -88,7 +89,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 			</div>
 
 			<IfAuthenticated>
-				<div className="grid grid-cols-3 gap-4 p-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
+				<div className="grid grid-cols-3 gap-4 mx-4 p-4 mt-1 bg-white rounded-xl text-lg shadow-sm">
 					<Stats username={member.username} isSelf={isMemberSelf} />
 
 					<IfFriend member={member}>
@@ -124,12 +125,14 @@ export default function ProfilePage(props: Route.ComponentProps) {
 			<IfAuthor author={member}>
 				<Link
 					to={`/members/${member.username}/friends`}
-					className="flex items-center bg-white text-green-900 rounded-xl px-6 h-16 text-lg shadow-sm my-4"
+					className="flex items-center bg-white text-green-900 rounded-xl px-6 h-16 text-lg shadow-sm my-4 mx-4"
 				>
 					Friends
 					<User className="ml-auto size-6" />
 				</Link>
 			</IfAuthor>
+
+			<FeedStream filters={{ username: member.username }} />
 		</WithMainMenu>
 	);
 }
