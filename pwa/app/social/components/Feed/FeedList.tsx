@@ -3,7 +3,7 @@ import { useUser } from "~/auth/hooks/useUser";
 import type { FeedItem } from "~t/types";
 import clsx from "clsx";
 import { extractId } from "~/utils/resource";
-import { FeedItemContainer } from "~/social/components/FeedItemContainer";
+import { FeedItemContainer } from "~/social/components/Feed/FeedItemContainer";
 import { Post } from "~/social/components/Post";
 import { CoffeeCup } from "iconoir-react";
 import { TeaSession } from "~/social/components/TeaSession";
@@ -13,6 +13,13 @@ export function FeedList(props: { items: Array<FeedItem>; highlightSelf?: boolea
 
 	return (
 		<ul>
+			{0 === props.items.length && (
+				<li className="py-8 px-4 text-green-700">
+					<CoffeeCup className="size-7 block mb-4 mx-auto text-center text-green-700" />
+
+					<p className="text-lg  text-center">There isn't any news to display!</p>
+				</li>
+			)}
 			{props.items.map((feedItem) => (
 				<li
 					key={feedItem.item["@id"]}

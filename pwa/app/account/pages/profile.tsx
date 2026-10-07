@@ -19,7 +19,7 @@ import { useQuery } from "@tanstack/react-query";
 import { makeMemberStatsQueryOpt } from "~/account/query/memberStatsQuery";
 import { IfAuthenticated } from "~/auth/components/voters/IfAuthenticated";
 import { FriendTag, getFriendshipStatus } from "~/account/components/FriendTag";
-import { FeedStream } from "~/social/components/FeedStream";
+import { FeedStream } from "~/social/components/Feed/FeedStream";
 
 export async function clientLoader(args: Route.ClientLoaderArgs) {
 	const username = args.params.username;

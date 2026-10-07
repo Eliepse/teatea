@@ -1,6 +1,6 @@
 import { WithMainMenu } from "~/layouts/WithMainMenu";
-import { FeedPostInput } from "~/social/components/FeedPostInput";
-import { FeedStream } from "~/social/components/FeedStream";
+import { FeedPostInput } from "~/social/components/Feed/FeedPostInput";
+import { FeedStream } from "~/social/components/Feed/FeedStream";
 
 export async function clientLoader() {}
 

@@ -1,9 +1,10 @@
 import { Fragment, useEffect, useRef } from "react";
 import { PrimaryButton } from "~/shared/components/Button";
-import { FeedListSkeleton } from "~/social/components/FeedListSkeleton";
-import { FeedList } from "~/social/components/FeedList";
+import { FeedListSkeleton } from "~/social/components/Feed/FeedListSkeleton";
+import { FeedList } from "~/social/components/Feed/FeedList";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { type Filters as FeedFilters, makeFeedInfiniteOpt } from "~/social/query/feedQuery";
+import { WarningCircle } from "iconoir-react";
 
 const DEFAULT_AUTOLOAD_CREDITS = 3;
 
@@ -78,6 +79,14 @@ export function FeedStream(props: { filters?: FeedFilters; highlightSelf?: boole
 
 	return (
 		<Fragment>
+			{feedQuery.isError && (
+				<div className="py-8 px-4 text-red-700">
+					<WarningCircle className="size-7 block mb-4 mx-auto text-center text-green-700" />
+
+					<p className="text-lg  text-center">Oops, we had trouble loading the feed</p>
+				</div>
+			)}
+
 			{feedQuery.isLoading ? (
 				<FeedListSkeleton amount={5} />
 			) : (
