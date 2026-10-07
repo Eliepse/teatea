@@ -8,7 +8,7 @@ export default function FeedPage() {
 	return (
 		<WithMainMenu activeKey="feed" className="py-4">
 			<FeedPostInput className="mx-4 mb-8" />
-			<FeedStream />
+			<FeedStream highlightSelf />
 		</WithMainMenu>
 	);
 }

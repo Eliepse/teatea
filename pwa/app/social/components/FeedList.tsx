@@ -8,7 +8,7 @@ import { Post } from "~/social/components/Post";
 import { CoffeeCup } from "iconoir-react";
 import { TeaSession } from "~/social/components/TeaSession";
 
-export function FeedList(props: { items: Array<FeedItem> }) {
+export function FeedList(props: { items: Array<FeedItem>; highlightSelf?: boolean }) {
 	const { data: user } = useUser();
 
 	return (
@@ -16,7 +16,10 @@ export function FeedList(props: { items: Array<FeedItem> }) {
 			{props.items.map((feedItem) => (
 				<li
 					key={feedItem.item["@id"]}
-					className={clsx("py-3 px-4", user?.username === extractId(feedItem.author) && "bg-green-100")}
+					className={clsx(
+						"py-3 px-4",
+						props.highlightSelf && user?.username === extractId(feedItem.author) && "bg-green-100",
+					)}
 				>
 					{"Post" === feedItem.item["@type"] && (
 						<FeedItemContainer

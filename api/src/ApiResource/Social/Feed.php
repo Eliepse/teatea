@@ -4,10 +4,12 @@ namespace App\ApiResource\Social;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use App\ApiResource\Member;
 use App\Serializer\HideIdentifierInterface;
 use App\State\Feed\FeedCursor;
 use App\State\Feed\FeedPaginatedProvider;
+use App\Validator\Username;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
@@ -24,7 +26,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 			"with:origin",
 			"with:media",
 			"embedded:cultivar",
-		]
+		],
 	],
 	security: "is_granted('ROLE_USER')",
 )]
@@ -38,6 +40,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 	paginationPartial: true,
 	paginationClientItemsPerPage: true,
 	provider: FeedPaginatedProvider::class,
+	parameters: [
+		new QueryParameter("username", constraints: [new Username()]),
+	],
 )]
 readonly class Feed implements HideIdentifierInterface
 {

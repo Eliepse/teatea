@@ -15,12 +15,14 @@ use App\Entity\Pivot\MediaObjectPivot;
 use App\Enum\Social\FeedableType;
 use App\Helper\Arr;
 use App\Repository\OriginRepository;
+use App\Repository\UserRepository;
 use App\State\Hydration\ResourceHydrator;
 use App\State\Pagination\CursorPaginator;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @implements ProviderInterface<PaginatorInterface<Post|TeaSession>>
@@ -32,6 +34,7 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 		private Pagination $pagination,
 		private ResourceHydrator $hydrator,
 		private OriginRepository $originRepo,
+		private UserRepository $userRepo,
 	) {
 	}
 
@@ -42,16 +45,30 @@ final readonly class FeedPaginatedProvider implements ProviderInterface
 		$pageSize = $this->pagination->getLimit($operation, $context);
 		$cursor = FeedCursor::decode($context["filters"]["cursor"]["lt"] ?? null);
 
+		$username = $context["filters"]["username"] ?? null;
+		$member = null !== $username ? $this->userRepo->findOneBy(["username" => $username]) : null;
+
+		if (null !== $username && null === $member) {
+			throw new NotFoundHttpException();
+		}
+
 		$searchQB = $this->em->getConnection()->createQueryBuilder()
 			->select("id", "type", "published_at")
 			->from("feed")
 			->setMaxResults($pageSize);
 
+		// Apply cursor for pagination
 		if (null !== $cursor) {
 			$searchQB->where("(published_at, type, id) < (:publishedAt, :type, :id)")
 				->setParameter("publishedAt", $cursor->publishedAt, Types::DATETIME_IMMUTABLE)
 				->setParameter("type", $cursor->itemType->value)
 				->setParameter("id", $cursor->itemId);
+		}
+
+		// Filter by member
+		if (null !== $member) {
+			$searchQB->andWhere("author_id = :authorId")
+				->setParameter("authorId", $member->id);
 		}
 
 		/** @var array<array{type: FeedableType, id: int, published_at: string}> $results */

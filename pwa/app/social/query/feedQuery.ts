@@ -4,7 +4,11 @@ import type { ApiPaginatedCollection } from "~t/types";
 import type { Pagination } from "~t/query";
 import { denormalizeFeedItem, type FeedItemRaw } from "~/utils/api/normalization/feedItem";
 
-export async function queryFeed(filters?: {}, pagination?: Pick<Pagination, "itemsPerPage">) {
+export type Filters = {
+	username?: string;
+}
+
+export async function queryFeed(filters?: Filters, pagination?: Pick<Pagination, "itemsPerPage">) {
 	const queryParams = {
 		...filters,
 		...({ itemsPerPage: 16, ...pagination } satisfies Pagination),
@@ -15,7 +19,7 @@ export async function queryFeed(filters?: {}, pagination?: Pick<Pagination, "ite
 	return { ...payload, member: payload.member.map(denormalizeFeedItem) };
 }
 
-export function makeFeedInfiniteOpt(filters?: {}, pagination?: Pick<Pagination, "itemsPerPage">) {
+export function makeFeedInfiniteOpt(filters?: Filters, pagination?: Pick<Pagination, "itemsPerPage">) {
 	return infiniteQueryOptions({
 		queryFn: async ({ pageParam }) => {
 			if (pageParam) {

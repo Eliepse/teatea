@@ -1,14 +1,13 @@
 import { Fragment, useEffect, useRef } from "react";
 import { PrimaryButton } from "~/shared/components/Button";
-import type { Iri } from "~t/types";
 import { FeedListSkeleton } from "~/social/components/FeedListSkeleton";
 import { FeedList } from "~/social/components/FeedList";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { makeFeedInfiniteOpt } from "~/social/query/feedQuery";
+import { type Filters as FeedFilters, makeFeedInfiniteOpt } from "~/social/query/feedQuery";
 
 const DEFAULT_AUTOLOAD_CREDITS = 3;
 
-export function FeedStream(props: { filters?: { member?: Iri }; autoloadMaxCredits?: number }) {
+export function FeedStream(props: { filters?: FeedFilters; highlightSelf?: boolean; autoloadMaxCredits?: number }) {
 	const filters = props.filters ?? {};
 	const { hasNextPage, fetchNextPage, ...feedQuery } = useInfiniteQuery(
 		makeFeedInfiniteOpt(filters, { itemsPerPage: 24 }),
@@ -79,7 +78,11 @@ export function FeedStream(props: { filters?: { member?: Iri }; autoloadMaxCredi
 
 	return (
 		<Fragment>
-			{feedQuery.isLoading ? <FeedListSkeleton amount={5} /> : <FeedList items={items} />}
+			{feedQuery.isLoading ? (
+				<FeedListSkeleton amount={5} />
+			) : (
+				<FeedList items={items} highlightSelf={props.highlightSelf} />
+			)}
 
 			<div className="pt-8 pb-4 px-8">
 				{hasNextPage && (
