@@ -60,7 +60,7 @@ export function Layout({ children }: { children: ReactNode }) {
 					<script src="/client/pwa-support.js"></script>
 					<Links />
 				</head>
-				<body>
+				<body className="bg-green-50/80">
 					<AlertContext>
 						<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 					</AlertContext>

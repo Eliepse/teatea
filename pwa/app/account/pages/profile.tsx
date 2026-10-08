@@ -75,7 +75,7 @@ export default function ProfilePage(props: Route.ComponentProps) {
 
 			<IfAuthenticated>
 				<div
-					className="grid grid-cols-3 gap-4 mx-4 p-4 mt-1 bg-white rounded-xl text-lg shadow-sm"
+					className="grid grid-cols-3 gap-4 mx-4 p-4 mt-1 mb-4 bg-white rounded-xl text-lg shadow-sm"
 					onClick={() => navigate(`/members/${member.username}/stats`)}
 				>
 					<TopUserStats username={member.username} />

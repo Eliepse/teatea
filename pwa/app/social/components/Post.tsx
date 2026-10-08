@@ -3,36 +3,36 @@ import { PostImagesCarousel } from "~/social/components/PostImagesCarousel";
 import clsx from "clsx";
 import { useState } from "react";
 
+const TRUNCATE_THRESHOLD = 120;
+
 export function Post(props: {
 	author: Pick<Member, "username">;
 	content: string;
 	createdAt: Date;
 	images: MediaObject[];
 }) {
-	const shouldTruncate = 140 < props.content.length;
+	const shouldTruncate = TRUNCATE_THRESHOLD < props.content.length;
 	const [truncated, setTruncated] = useState(shouldTruncate);
 
 	return (
 		<div className="rounded-xl overflow-hidden">
 			{!!props.images.length && <PostImagesCarousel images={props.images} />}
 
-			<div className={clsx("py-3")}>
-				<p className="px-4">
-					{truncated ? props.content.slice(0, 140) + "..." : props.content}
+			<p className="m-4">
+				{truncated ? props.content.slice(0, TRUNCATE_THRESHOLD) + "..." : props.content}
 
-					{shouldTruncate && (
-						<button
-							onClick={() => setTruncated((v) => !v)}
-							className={clsx(
-								"text-sm text-green-800/60 cursor-pointer",
-								truncated ? "inline-block ml-2" : "block mt-2",
-							)}
-						>
-							{truncated ? "Show more" : "Show less"}
-						</button>
-					)}
-				</p>
-			</div>
+				{shouldTruncate && (
+					<button
+						onClick={() => setTruncated((v) => !v)}
+						className={clsx(
+							"text-sm text-green-800/70 cursor-pointer",
+							truncated ? "inline-block ml-2" : "block mt-2",
+						)}
+					>
+						{truncated ? "Show more" : "Show less"}
+					</button>
+				)}
+			</p>
 		</div>
 	);
 }
